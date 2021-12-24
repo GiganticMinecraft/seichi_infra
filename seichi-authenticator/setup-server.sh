@@ -42,6 +42,17 @@ echo-bar
 
 # endregion
 
+# region install docker compose (see https://github.com/docker/compose/tree/381df200105f902db9d9e7f109c19bbed58302cd#linux)
+
+cd ~
+wget https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64 docker-compose
+chmod +x docker-compose
+sudo mv docker-compose /usr/lib/docker/cli-plugins
+
+# endregion
+
+# endregion
+
 echo-bar
 echo "all setup complete. rebooting..."
 echo-bar
