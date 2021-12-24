@@ -36,7 +36,7 @@ echo \
 sudo apt-get update && sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 
 echo-bar
-echo "done installing docker-ce. docker --version output:"
+echo "Done installing docker-ce. Docker version:"
 docker --version
 echo-bar
 
@@ -45,16 +45,23 @@ echo-bar
 # region install docker compose (see https://github.com/docker/compose/tree/381df200105f902db9d9e7f109c19bbed58302cd#linux)
 
 cd ~
-wget https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64 docker-compose
+wget -O docker-compose https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64
 chmod +x docker-compose
-sudo mv docker-compose /usr/lib/docker/cli-plugins
+
+sudo mkdir -p /usr/lib/docker/cli-plugins
+sudo mv -f docker-compose /usr/lib/docker/cli-plugins
+
+echo-bar
+echo "Done installing docker compose. Docker Compose version:"
+docker compose version
+echo-bar
 
 # endregion
 
 # endregion
 
 echo-bar
-echo "all setup complete. rebooting..."
+echo "All setup complete. Rebooting..."
 echo-bar
 
 sudo reboot
