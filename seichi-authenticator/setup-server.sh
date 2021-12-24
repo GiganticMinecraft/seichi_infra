@@ -7,8 +7,9 @@ function echo-bar () {
 
 # This is an idempotent script that
 # - installs all the required toolchains
+# - clones the latest revision of seichi_open_servers to /root/seichi_open_servers/
 # - configures the server to
-#   - reboot at 16:00 AM
+#   - reboot at 4:00 AM (TODO: implement this)
 #   - restart all the services on reboot
 # - reboots the server to reinitialize everything
 
@@ -56,6 +57,20 @@ echo-bar
 echo "Done installing docker compose. Docker Compose version:"
 docker compose version
 echo-bar
+
+# endregion
+
+# region clone seichi_open_servers
+
+sudo rm -r /root/seichi_open_servers
+sudo git clone --depth 1 git@github.com:GiganticMinecraft/seichi_servers.git /root/seichi_open_servers
+
+# endregion
+
+# region configure the systemd service
+
+ln -s /root/seichi_open_servers/seichi-authenticator/seichi-authenticator.service /etc/systemd/system/seichi-authenticator.service
+systemctl enable seichi-authenticator
 
 # endregion
 

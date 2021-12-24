@@ -1,0 +1,10 @@
+[Unit]
+Description=Start seichi-kernel for debug server
+After=network-online.target nss-lookup.target docker.service
+Wants=network-online.target nss-lookup.target docker.service
+
+[Service]
+ExecStart=/root/seichi_open_servers/seichi-authenticator/start-services.sh
+
+[Install]
+WantedBy=multi-user.target
