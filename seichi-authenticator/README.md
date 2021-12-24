@@ -18,6 +18,5 @@
 2. `seichi-authenticator` にスクリプトを実行させる
 
     ```bash
-    ssh seichi-authenticator \
-    'bash <(wget -qO- https://raw.githubusercontent.com/GiganticMinecraft/seichi_open_servers/main/seichi-authenticator/setup-server.sh)'
+    ssh seichi-authenticator -t 'bash <(wget -qO- https://raw.githubusercontent.com/GiganticMinecraft/seichi_open_servers/main/seichi-authenticator/setup-server.sh)'
     ```
