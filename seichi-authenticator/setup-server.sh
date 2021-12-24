@@ -59,8 +59,6 @@ echo-bar
 
 # endregion
 
-# endregion
-
 echo-bar
 echo "All setup complete. Rebooting..."
 echo-bar
