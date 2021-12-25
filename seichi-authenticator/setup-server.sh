@@ -8,9 +8,7 @@ function echo-bar () {
 # This is an idempotent script that
 # - installs all the required toolchains
 # - clones the latest revision of seichi_open_servers to /root/seichi_open_servers/
-# - configures the server to
-#   - reboot at 4:00 AM (TODO: implement this)
-#   - restart all the services on reboot
+# - configures the server to restart all the services on reboot
 # - reboots the server to reinitialize everything
 
 sudo apt-get -y update && sudo apt-get -y upgrade
