@@ -61,7 +61,7 @@ echo-bar
 # region clone seichi_open_servers
 
 sudo rm -r /root/seichi_open_servers || true
-sudo git clone --depth 1 git@github.com:GiganticMinecraft/seichi_open_servers.git /root/seichi_open_servers
+sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_open_servers.git /root/seichi_open_servers
 
 # endregion
 
