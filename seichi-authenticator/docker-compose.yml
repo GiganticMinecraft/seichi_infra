@@ -1,0 +1,17 @@
+networks:
+  cloudflared-internet:
+  cloudflared-keycloak:
+
+volumes:
+  cloudflared-home:
+
+services:
+
+  # TODO: publish cloudflared image on GiganticMinecraft and use it
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:16.1.0
+    networks:
+      - cloudflared-keycloak
+    env_file:
+      - ${KEYCLOAK_ENV_FILE_PATH}
