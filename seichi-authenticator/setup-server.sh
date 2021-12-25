@@ -67,8 +67,8 @@ sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_open_server
 
 # region configure the systemd service
 
-ln -s /root/seichi_open_servers/seichi-authenticator/seichi-authenticator.service /etc/systemd/system/seichi-authenticator.service
-systemctl enable seichi-authenticator
+sudo ln -s /root/seichi_open_servers/seichi-authenticator/seichi-authenticator.service /etc/systemd/system/seichi-authenticator.service
+sudo systemctl enable seichi-authenticator
 
 # endregion
 
