@@ -1,9 +1,11 @@
 networks:
   cloudflared-internet:
   cloudflared-keycloak:
+  keycloak-postgres:
 
 volumes:
   cloudflared-home:
+  postgres-data:
 
 services:
 
@@ -15,3 +17,24 @@ services:
       - cloudflared-keycloak
     env_file:
       - ${KEYCLOAK_ENV_FILE_PATH}
+    environment:
+      - DB_VENDOR=postgres
+      - DB_ADDR=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      # KEYCLOAK_ADMIN_PASSWORD to be provided by .keycloak.env
+      # DB_PASSWORD to be provided by .keycloak.env
+
+  postgres:
+    image: postgres/9.6.24-bullseye
+    networks:
+      - keycloak-postgres
+    env_file:
+      - ${POSTGRES_ENV_FILE_PATH}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      # POSTGRES_PASSWORD to be provided by .postgres.env
