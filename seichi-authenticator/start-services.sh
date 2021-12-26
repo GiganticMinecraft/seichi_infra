@@ -11,8 +11,8 @@ echo 'reboot' | at 4:00
 # region start services
 
 env_files=(
-  "/root/seichi_open_servers_configs/.keycloak.env"
-  "/root/seichi_open_servers_configs/.postgres.env"
+  "/root/seichi_infra_configs/.keycloak.env"
+  "/root/seichi_infra_configs/.postgres.env"
 )
 
 for env_file in "${env_files[@]}"; do
@@ -24,10 +24,10 @@ for env_file in "${env_files[@]}"; do
   fi
 done
 
-cd /root/seichi_open_servers/seichi-authenticator/services
+cd /root/seichi_infra/seichi-authenticator/services
 
-export KEYCLOAK_ENV_FILE_PATH=/root/seichi_open_servers_configs/.keycloak.env
-export POSTGRES_ENV_FILE_PATH=/root/seichi_open_servers_configs/.postgres.env
+export KEYCLOAK_ENV_FILE_PATH=/root/seichi_infra_configs/.keycloak.env
+export POSTGRES_ENV_FILE_PATH=/root/seichi_infra_configs/.postgres.env
 
 docker compose up
 

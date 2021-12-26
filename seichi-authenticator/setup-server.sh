@@ -7,7 +7,7 @@ function echo-bar () {
 
 # This is an idempotent script that
 # - installs all the required toolchains
-# - clones the latest revision of seichi_open_servers to /root/seichi_open_servers/
+# - clones the latest revision of seichi_infra to /root/seichi_infra/
 # - configures the server to restart all the services on reboot
 # - reboots the server to reinitialize everything
 
@@ -58,17 +58,17 @@ echo-bar
 
 # endregion
 
-# region clone seichi_open_servers
+# region clone seichi_infra
 
-sudo rm -r /root/seichi_open_servers || true
-sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_open_servers.git /root/seichi_open_servers
+sudo rm -r /root/seichi_infra || true
+sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_infra.git /root/seichi_infra
 
 # endregion
 
 # region configure the systemd service
 
 sudo rm /etc/systemd/system/seichi-authenticator.service
-sudo ln -s /root/seichi_open_servers/seichi-authenticator/seichi-authenticator.service /etc/systemd/system/seichi-authenticator.service
+sudo ln -s /root/seichi_infra/seichi-authenticator/seichi-authenticator.service /etc/systemd/system/seichi-authenticator.service
 sudo systemctl enable seichi-authenticator
 
 # endregion

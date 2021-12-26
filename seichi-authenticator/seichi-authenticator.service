@@ -4,7 +4,7 @@ After=network-online.target nss-lookup.target docker.service
 Wants=network-online.target nss-lookup.target docker.service
 
 [Service]
-ExecStart=/root/seichi_open_servers/seichi-authenticator/start-services.sh
+ExecStart=/root/seichi_infra/seichi-authenticator/start-services.sh
 
 [Install]
 WantedBy=multi-user.target
