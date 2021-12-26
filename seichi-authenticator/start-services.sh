@@ -26,9 +26,9 @@ done
 
 cd /root/seichi_open_servers/seichi-authenticator/services
 
-docker compose \
-  -e KEYCLOAK_ENV_FILE_PATH=/root/seichi_open_servers_configs/.keycloak.env
-  -e POSTGRES_ENV_FILE_PATH=/root/seichi_open_servers_configs/.postgres.env
-  up
+KEYCLOAK_ENV_FILE_PATH=/root/seichi_open_servers_configs/.keycloak.env
+POSTGRES_ENV_FILE_PATH=/root/seichi_open_servers_configs/.postgres.env
+
+docker compose up
 
 # endregion
