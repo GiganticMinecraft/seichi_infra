@@ -23,6 +23,7 @@ services:
     image: quay.io/keycloak/keycloak:16.1.0
     networks:
       - cloudflared-keycloak
+      - keycloak-postgres
     env_file:
       - ${KEYCLOAK_ENV_FILE_PATH}
     environment:
