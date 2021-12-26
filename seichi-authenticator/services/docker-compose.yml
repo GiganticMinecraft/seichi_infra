@@ -32,7 +32,8 @@ services:
       - DB_PORT=5432
       - DB_DATABASE=keycloak
       - DB_USER=keycloak
-      # KEYCLOAK_ADMIN_PASSWORD to be provided by .keycloak.env
+      - KEYCLOAK_USER=admin
+      # KEYCLOAK_PASSWORD to be provided by .keycloak.env
       # DB_PASSWORD to be provided by .keycloak.env
 
   postgres:
