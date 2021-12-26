@@ -36,7 +36,7 @@ services:
       - KEYCLOAK_USER=admin
       # KEYCLOAK_PASSWORD to be provided by .keycloak.env
       - PROXY_ADDRESS_FORWARDING=true
-      - KEYCLOAK_FRONTEND_URL=https://auth.seichi.click/
+      - KEYCLOAK_FRONTEND_URL=https://auth.seichi.click/auth
 
   postgres:
     image: postgres:9.6.24-bullseye
