@@ -35,7 +35,7 @@ services:
       # DB_PASSWORD to be provided by .keycloak.env
 
   postgres:
-    image: postgres/9.6.24-bullseye
+    image: postgres:9.6.24-bullseye
     networks:
       - keycloak-postgres
     env_file:
