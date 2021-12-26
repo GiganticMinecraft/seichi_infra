@@ -32,9 +32,11 @@ services:
       - DB_PORT=5432
       - DB_DATABASE=keycloak
       - DB_USER=keycloak
+      # DB_PASSWORD to be provided by .keycloak.env
       - KEYCLOAK_USER=admin
       # KEYCLOAK_PASSWORD to be provided by .keycloak.env
-      # DB_PASSWORD to be provided by .keycloak.env
+      - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_FRONTEND_URL=https://auth.seichi.click/
 
   postgres:
     image: postgres:9.6.24-bullseye
