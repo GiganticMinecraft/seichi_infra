@@ -1,15 +1,23 @@
 networks:
   cloudflared-internet:
   cloudflared-keycloak:
+    internal: true
   keycloak-postgres:
+    internal: true
 
 volumes:
   cloudflared-home:
   postgres-data:
 
 services:
-
-  # TODO: publish cloudflared image on GiganticMinecraft and use it
+  cloudflared:
+    image: ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:f2aba03
+    volumes:
+      - cloudflared-home:/root
+      - ./cloudflared/tunnel-config.yml:/image/tunnel-config.yml
+    networks:
+      - cloudflared-internet
+      - cloudflared-keycloak
 
   keycloak:
     image: quay.io/keycloak/keycloak:16.1.0

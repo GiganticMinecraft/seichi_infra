@@ -1,0 +1,4 @@
+ingress:
+  - hostname: auth.seichi.click
+    service: "http://keycloak:80"
+  - service: http_status:404

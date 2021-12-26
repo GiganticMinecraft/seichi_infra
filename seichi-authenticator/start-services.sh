@@ -24,10 +24,11 @@ for env_file in "${env_files[@]}"; do
   fi
 done
 
+cd /root/seichi_open_servers/seichi-authenticator/services
+
 docker compose \
   -e KEYCLOAK_ENV_FILE_PATH=/root/seichi_open_servers_configs/.keycloak.env
   -e POSTGRES_ENV_FILE_PATH=/root/seichi_open_servers_configs/.postgres.env
-  -f /root/seichi_open_servers/seichi-authenticator/docker-compose.yml \
   up
 
 # endregion
