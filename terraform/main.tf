@@ -69,6 +69,7 @@ variable "terraform_github_app_pem" {
 }
 
 provider "github" {
+  owner = local.github_org_name
   app_auth {
     id              = var.terraform_github_app_id
     installation_id = var.terraform_github_app_installation_id
