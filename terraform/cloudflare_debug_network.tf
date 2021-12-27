@@ -26,7 +26,6 @@ resource "cloudflare_access_service_token" "debug_linode_to_onp" {
   # サービストークンの有効期限は、最後に生成/renewされてから365日となっている。
   # そこで、トークンの有効期限が切れる30日前以降は terraform apply されたときにrenewするように設定しておく。
   # FIXME: これrefreshじゃなさそう　生成後335日以降は普通にtokenがregenerateされて困る
-  # TODO: HashiCorp Vaultにトークンを送って、LinodeからVaultに取りに行ってもらうようにする
   min_days_for_renewal = 365
 
   lifecycle {
