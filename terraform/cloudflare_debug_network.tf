@@ -26,7 +26,7 @@ resource "cloudflare_access_service_token" "debug_linode_to_onp" {
   # サービストークンの有効期限は、最後に生成/renewされてから365日となっている。
   # そこで、トークンの有効期限が切れる30日前以降は terraform apply されたときにrenewするように設定しておく。
   # FIXME: これrefreshじゃなさそう　生成後335日以降は普通にtokenがregenerateされて困る
-  min_days_for_renewal = 30
+  min_days_for_renewal = 365
 
   lifecycle {
     # This flag is important to set if min_days_for_renewal is defined otherwise 
