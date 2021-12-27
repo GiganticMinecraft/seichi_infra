@@ -1,6 +1,6 @@
 resource "github_team" "nginx_test_connection_team" {
   name        = "nginx-test-connection-team"
-  description = "テスト用のTeam。このTeamのメンバーのみ nginx-test.seichi.click にアクセスできるはず。"
+  description = "テスト用のTeam。このTeamのメンバーのみ public-nginx.test.seichi.click にアクセスできるはず。"
   privacy     = "secret"
 }
 
