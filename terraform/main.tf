@@ -14,7 +14,7 @@ terraform {
     organization = "GiganticMinecraft"
 
     workspaces {
-      name = "seichi_cloudflare_terraform"
+      name = "seichi_infra"
     }
   }
 }
