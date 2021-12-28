@@ -9,7 +9,7 @@ resource "github_team" "admin_team" {
   privacy     = "closed"
 }
 
-resource "github_team" "nginx_test_connection_team" {
+resource "github_team" "infra_collaborator" {
   name        = "Infra Collaborator"
   description = "[Terraform]"
   privacy     = "closed"
@@ -21,7 +21,7 @@ resource "github_team" "nginx_test_connection_team" {
   privacy     = "closed"
 }
 
-resource "github_team" "nginx_test_connection_team" {
+resource "github_team" "springer" {
   name        = "Springer"
   description = "[Terraform] 整地鯖(春)のデベロッパー"
   privacy     = "closed"
