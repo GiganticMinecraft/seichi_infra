@@ -8,7 +8,7 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
 
  - 当OrganizationのGitHub Teamsの[定義](./terraform/github_teams.tf)
  - Cloudflare周りの設定
-   - Cloudflare Accessによるアクセス制御をGitHub Teamsに属しているか、で行えるようになっている
+   - Cloudflare Accessによるアクセス制御を、特定のGitHub Teamsに属しているか、という条件で行えるようになっている
 
 ## サーバー一覧
 
