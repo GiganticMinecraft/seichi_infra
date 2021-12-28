@@ -5,24 +5,24 @@
 
 resource "github_team" "admin_team" {
   name        = "Admin team"
-  description = "[Terraform] 運営チーム"
+  description = "運営チーム"
   privacy     = "closed"
 }
 
 resource "github_team" "infra_collaborator" {
   name        = "Infra Collaborator"
-  description = "[Terraform]"
+  description = "インフラ関連の外部コラボレーター"
   privacy     = "closed"
 }
 
 resource "github_team" "nginx_test_connection_team" {
   name        = "nginx-test-connection-team"
-  description = "[Terraform] テスト用のTeam。このTeamのメンバーのみ public-nginx.test.seichi.click にアクセスできるはず。"
+  description = "テスト用のTeam。このTeamのメンバーのみ public-nginx.test.seichi.click にアクセスできるはず。"
   privacy     = "closed"
 }
 
 resource "github_team" "springer" {
   name        = "Springer"
-  description = "[Terraform] 整地鯖(春)のデベロッパー"
+  description = "整地鯖(春)のデベロッパー"
   privacy     = "closed"
 }
