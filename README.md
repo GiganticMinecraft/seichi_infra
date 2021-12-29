@@ -1,4 +1,4 @@
-# Seichi Servers
+# `seichi_infra`
 
 seichi.click networkのオンプレ環境のうち、公開可能な箇所を管理するレポジトリです。
 
@@ -6,9 +6,7 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
 
 ## [Terraform](./terraform) 管理下にあるもの
 
- - 当OrganizationのGitHub Teamsの[定義](./terraform/github_teams.tf)
  - Cloudflare周りの設定
-   - Cloudflare Accessによるアクセス制御を、特定のGitHub Teamsに属しているか、という条件で行えるようになっている
 
 ## サーバー一覧
 
