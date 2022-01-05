@@ -94,3 +94,26 @@ provider "github" {
 }
 
 # endregion
+
+# region proxy-layer's k8s access configuration
+
+variable "lke_k8s_kubeconfig" {
+  "description" = "LKE cluster's kubeconfig.yaml content"
+  type          = "string"
+  sensitive     = true
+}
+
+# LKEの kubeconfig.yaml は、host、userのtokenとcluster CA certificateをそれぞれ
+#  - clusters[?].cluster.server にplaintextで
+#  - users[?].user.token にplaintextで
+#  - clusters[?].cluster.certificate-authority-data にbase64で
+# 保持している。
+# LKE以外のmanaged k8s環境へ乗り換える際には、クラスタから得られるkubeconfigが含む情報が異なる可能性があるので注意。
+
+provider "kubernetes" {
+  host                   = yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.server
+  token                  = yamldecode(var.lke_k8s_kubeconfig).users[0].user.token
+  cluster_ca_certificate = base64decode(yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
+}
+
+# endregion
