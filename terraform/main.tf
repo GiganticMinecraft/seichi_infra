@@ -19,6 +19,12 @@ terraform {
   }
 }
 
+locals {
+  cloudflare_zone_id = "77c10fdfa7c65de4d14903ed8879ebcb"
+  root_domain = "seichi.click"
+  github_org_name = "GiganticMinecraft"
+}
+
 variable "cloudflare_email" {
   description = "email used for Cloudflare API authentication"
   type        = string
@@ -75,10 +81,4 @@ provider "github" {
     installation_id = var.terraform_github_app_installation_id
     pem_file        = var.terraform_github_app_pem
   }
-}
-
-locals {
-  cloudflare_zone_id = "77c10fdfa7c65de4d14903ed8879ebcb"
-  root_domain = "seichi.click"
-  github_org_name = "GiganticMinecraft"
 }
