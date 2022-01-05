@@ -98,7 +98,7 @@ provider "github" {
 # region proxy-layer's k8s access configuration
 
 variable "lke_k8s_kubeconfig" {
-  "description" = "LKE cluster's kubeconfig.yaml content"
+  description   = "LKE cluster's kubeconfig.yaml content"
   type          = "string"
   sensitive     = true
 }
