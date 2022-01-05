@@ -99,7 +99,7 @@ provider "github" {
 
 variable "lke_k8s_kubeconfig" {
   description   = "LKE cluster's kubeconfig.yaml content"
-  type          = "string"
+  type          = string
   sensitive     = true
 }
 
