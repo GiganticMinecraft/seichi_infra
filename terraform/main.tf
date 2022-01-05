@@ -25,6 +25,8 @@ locals {
   github_org_name = "GiganticMinecraft"
 }
 
+# region cloudflare provider
+
 variable "cloudflare_email" {
   description = "email used for Cloudflare API authentication"
   type        = string
@@ -42,6 +44,10 @@ provider "cloudflare" {
   api_key = var.cloudflare_api_key
 }
 
+# endregion
+
+# region cloudflare-github integration settings
+
 variable "github_cloudflare_oauth_client_id" {
   description = "Client ID of Cloudflare as seens as an OAuth App on GitHub"
   type        = string
@@ -53,6 +59,10 @@ variable "github_cloudflare_oauth_client_secret" {
   type        = string
   sensitive   = true
 }
+
+# endregion
+
+# region terraform-github integration settings
 
 variable "terraform_github_app_id" {
   description = "Client ID of the GitHub App used for Terraform automation"
@@ -82,3 +92,5 @@ provider "github" {
     pem_file        = var.terraform_github_app_pem
   }
 }
+
+# endregion
