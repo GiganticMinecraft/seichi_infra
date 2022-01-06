@@ -7,8 +7,8 @@ on:
     types: [closed]
     paths:
       - '.github/workflows/deploy_clusterwide_manifests.yaml'
-      - 'clusterwide-k8s-manifests/**'
-      - 'argocd-apps/**'
+      - 'proxy-kubernetes/clusterwide-k8s-manifests/**'
+      - 'proxy-kubernetes/argocd-apps/**'
 
 env:
   KUBECONFIG: kubeconfig.yaml
@@ -26,11 +26,11 @@ jobs:
           command: |
             echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
             echo "deploy clusterwide manifests"
-            dir_path="./clusterwide-k8s-manifests/*"
+            dir_path="./proxy-kubernetes/clusterwide-k8s-manifests/*"
             dirs=`find $dir_path -maxdepth 0 -type d`
             for dir in $dirs;
             do
                 kubectl apply -k $dir
             done
             echo "deploy argocd apps"
-            kubectl apply -f argocd-apps
+            kubectl apply -f proxy-kubernetes/argocd-apps
