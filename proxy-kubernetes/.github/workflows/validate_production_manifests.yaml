@@ -1,0 +1,29 @@
+name: "本番環境の更新チェック"
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+    paths:
+      - '.github/workflows/validate_production_manifests.yaml'
+      - 'production-k8s-manifests/**'
+      - 'base-k8s-manifests/**'
+
+env:
+  KUBECONFIG: kubeconfig.yaml
+
+jobs:
+  validate-production:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate production manifests
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.23.1
+          command: |
+            echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
+            echo "validate production manifests"
+
+            kubectl diff -k production-k8s-manifests || true

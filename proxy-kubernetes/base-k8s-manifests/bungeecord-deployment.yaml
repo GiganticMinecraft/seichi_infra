@@ -1,0 +1,94 @@
+# オブジェクトを削除する際はこのファイルの定義を削除＋k8s上の該当オブジェクトをkubectlで手動削除してください
+
+# bungeecordのdeployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bungeecord
+spec:
+  replicas: 2
+  template:
+    spec:
+      imagePullSecrets:
+      - name: seichi-network-gcr-private-image
+      initContainers:
+      - name: init-sysctl
+        image: busybox
+        command:
+        - sysctl
+        - -w
+        - net.core.somaxconn=65535
+        securityContext:
+          privileged: true
+          runAsUser: 0
+          runAsNonRoot: False
+      containers:
+      - name: bungeecord
+        env:
+        - name: TYPE
+          value: "WATERFALL"
+        command:
+          - sh
+          - -c
+          - 'eval "echo \"$(cat /plugins/RedisBungee/config.yml)\"" > /plugins/RedisBungee/config.yml; /usr/bin/run-bungeecord.sh'
+        ports:
+        - containerPort: 25577
+          name: minecraft
+        readinessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 2
+          failureThreshold: 2
+          tcpSocket:
+            port: 25577
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--default-deny-egress-all
+spec:
+  policyTypes:
+  - Egress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: bungeecord--allow-egress-dns
+spec:
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: bungeecord--allow-egress-www
+spec:
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - port: 80
+      protocol: TCP
+    - port: 443
+      protocol: TCP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: bungeecord--allow-egress-cloudflared
+spec:
+  policyTypes:
+  - Egress

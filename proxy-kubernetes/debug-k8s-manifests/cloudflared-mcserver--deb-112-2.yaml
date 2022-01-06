@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-mcserver--deb-112-2
+  namespace: haproxy-debug-gw
+  labels:
+    app: cloudflared-mcserver--deb-112-2
+    appgroup: cloudflared
+    env: debug
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared-mcserver--deb-112-2
+      appgroup: cloudflared
+      env: debug
+  template:
+    metadata:
+      labels:
+        app: cloudflared-mcserver--deb-112-2
+        appgroup: cloudflared
+        env: debug
+    spec:
+      containers:
+      - name: cloudflared-mcserver--deb-112-2
+        image: cloudflare/cloudflared:2021.12.1
+        args:
+          - access
+          - tcp
+          - --loglevel
+          - debug
+          - --hostname
+          - mcserver--deb-112-2.tcp-debug-network.seichi.click
+          - --url
+          - 0.0.0.0:25565
+        env:
+        - name: TUNNEL_SERVICE_TOKEN_ID
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_ID
+        - name: TUNNEL_SERVICE_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_SECRET
+        ports:
+        - containerPort: 25565
+          name: minecraft
+        readinessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 2
+          failureThreshold: 2
+          tcpSocket:
+            port: 25565
+        resources:
+          requests:
+            memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared-mcserver--deb-112-2
+  namespace: haproxy-debug-gw
+spec:
+  type: ClusterIP
+  ports:
+  - name: minecraft
+    port: 25565
+    protocol: TCP
+    targetPort: 25565
+  selector:
+    app: cloudflared-mcserver--deb-112-2
+    appgroup: cloudflared
+    env: debug

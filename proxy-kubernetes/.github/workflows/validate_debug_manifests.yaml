@@ -1,0 +1,29 @@
+name: "デバッグ環境の更新チェック"
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+    paths:
+      - '.github/workflows/validate_debug_manifests.yaml'
+      - 'debug-k8s-manifests/**'
+      - 'base-k8s-manifests/**'
+
+env:
+  KUBECONFIG: kubeconfig.yaml
+
+jobs:
+  validate-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate debug manifests
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.23.1
+          command: |
+            echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
+            echo "validate debug manifests"
+
+            kubectl diff -k debug-k8s-manifests || true

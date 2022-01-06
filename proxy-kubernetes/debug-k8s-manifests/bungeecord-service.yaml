@@ -1,0 +1,25 @@
+# bungeecord-deploymentの外部公開用にLinode NodeBalancerを作成するserviceオブジェクト
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-debug-gw-loadbalancer-bungeecord01
+  namespace: haproxy-debug-gw
+  annotations:
+    service.beta.kubernetes.io/linode-loadbalancer-check-attempts: "2"
+    service.beta.kubernetes.io/linode-loadbalancer-check-interval: "5"
+    service.beta.kubernetes.io/linode-loadbalancer-check-passive: "false"
+    service.beta.kubernetes.io/linode-loadbalancer-check-timeout: "3"
+    service.beta.kubernetes.io/linode-loadbalancer-check-type: none
+    service.beta.kubernetes.io/linode-loadbalancer-default-protocol: tcp
+    service.beta.kubernetes.io/linode-loadbalancer-proxy-protocol: v2
+    service.beta.kubernetes.io/linode-loadbalancer-throttle: "1"
+spec:
+  type: LoadBalancer
+  sessionAffinity: None
+  ports:
+  - name: bungee
+    port: 25565
+    protocol: TCP
+    targetPort: 25577
+  selector:
+    app: bungeecord

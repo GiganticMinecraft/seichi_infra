@@ -1,0 +1,35 @@
+name: "クラスタ内の管理系アドオンの更新チェック"
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+    paths:
+      - '.github/workflows/validate_clusterwide_manifests.yaml'
+      - 'clusterwide-k8s-manifests/**'
+      - 'argocd-apps/**'
+
+env:
+  KUBECONFIG: kubeconfig.yaml
+
+jobs:
+  validate-clusterwide:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate clusterwide manifests
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.23.1
+          command: |
+            echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
+            echo "validate clusterwide manifests"
+            dir_path="./clusterwide-k8s-manifests/*"
+            dirs=`find $dir_path -maxdepth 0 -type d`
+            for dir in $dirs;
+            do
+                kubectl diff -k $dir || true
+            done
+            echo "validate argocd apps"
+            kubectl diff -f argocd-apps || true

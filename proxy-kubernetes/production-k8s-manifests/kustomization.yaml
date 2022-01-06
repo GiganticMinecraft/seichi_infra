@@ -1,0 +1,22 @@
+resources:
+- 00-namespace-production.yaml
+- ../base-k8s-manifests
+- bungeecord-service.yaml
+- cloudflared-mcserver--cre.yaml
+- cloudflared-mcserver--eve.yaml
+- cloudflared-mcserver--eve02.yaml
+- cloudflared-mcserver--h1.yaml
+- cloudflared-mcserver--kagawa.yaml
+- cloudflared-mcserver--lobby.yaml
+- cloudflared-mcserver--petra.yaml
+- cloudflared-mcserver--reset.yaml
+- cloudflared-mcserver--s1.yaml
+- cloudflared-mcserver--s2.yaml
+- cloudflared-mcserver--s3.yaml
+- cloudflared-mcserver--s5.yaml
+- cloudflared-mcserver--s7.yaml
+namespace: haproxy-gw
+patches:
+- bungeecord-deployment.yaml
+- cloudflared-redis--bungeesemaphore.yaml
+- cloudflared-redis--redisbungee.yaml

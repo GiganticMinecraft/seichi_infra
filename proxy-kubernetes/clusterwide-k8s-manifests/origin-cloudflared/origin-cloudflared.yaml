@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: origin-cloudflared-authorization-certificate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+  storageClassName: linode-block-storage-retain
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: origin-cloudflared-configmap
+data:
+  tunnel-config.yml: |
+    ingress:
+      - hostname: sealed-secrets.bungee-proxy-public.seichi.click
+        service: http://sealed-secrets-controller:8080
+
+      - hostname: grafana.bungee-proxy-public.seichi.click
+        service: http://grafana.monitoring:3000
+
+      - hostname: argocd.bungee-proxy-public.seichi.click
+        service: https://argocd-server.argocd:443
+        originRequest:
+          originServerName: argocd-server.argocd
+          noTLSVerify: true
+
+      # ArgoCD CLIはgRPCでArgoCDと通信するが、
+      #  cloudflared-with-auto-dns-route:2f9a183
+      # の段階では HTTP/2 での通信をCloudflare及びcloudflaredがサポートしていないため、
+      #  argocd.bungee-proxy-public.seichi.click
+      # 経由での通信ではArgoCD CLIが動いてくれない。
+      # このworkaroundとして、raw TCPで繋がれるトンネルを用意している。ArgoCD CLIを利用したい時は
+      #  cloudflared access tcp --hostname argocd-tcp.bungee-proxy-public.seichi.click --url localhost:8081
+      # を実行し、 localhost:8081 にArgoCDの接続先を向けるだけでよい。
+      - hostname: argocd-tcp.bungee-proxy-public.seichi.click
+        service: tcp://argocd-server.argocd:443
+
+      - service: http_status:404
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: origin-cloudflared
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: origin-cloudflared
+    appgroup: origin-cloudflared
+    env: clusterwide
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: origin-cloudflared
+      appgroup: origin-cloudflared
+      env: clusterwide
+  template:
+    metadata:
+      labels:
+        app: origin-cloudflared
+        appgroup: origin-cloudflared
+        env: clusterwide
+    spec:
+      containers:
+        - name: origin-cloudflared
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2f9a183"
+          volumeMounts:
+          - mountPath: "/root/.cloudflared"
+            name: origin-cloudflared-authorization-certificate
+          - mountPath: "/etc/cloudflared"
+            name: origin-cloudflared-config
+          resources:
+            requests:
+              memory: 128Mi
+      volumes:
+        - name: origin-cloudflared-authorization-certificate
+          persistentVolumeClaim:
+            claimName: origin-cloudflared-authorization-certificate
+        - name: origin-cloudflared-config
+          configMap:
+            name: origin-cloudflared-configmap

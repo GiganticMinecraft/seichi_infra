@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://raw.githubusercontent.com/kubernetes-sigs/descheduler/v0.22.1/kubernetes/base/rbac.yaml
+  - https://raw.githubusercontent.com/kubernetes-sigs/descheduler/v0.22.1/kubernetes/base/configmap.yaml
+  - https://raw.githubusercontent.com/kubernetes-sigs/descheduler/v0.22.1/kubernetes/cronjob/cronjob.yaml
+
+patches:
+  - path: patch.yaml
+    target:
+      group: batch
+      version: v1
+      kind: CronJob
+      name: descheduler-cronjob
