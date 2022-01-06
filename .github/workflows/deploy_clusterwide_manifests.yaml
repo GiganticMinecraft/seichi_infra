@@ -3,7 +3,7 @@ name: "クラスタ内の管理系アドオンの更新"
 on:
   pull_request:
     branches:
-      - master
+      - main
     types: [closed]
     paths:
       - '.github/workflows/deploy_clusterwide_manifests.yaml'

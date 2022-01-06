@@ -3,7 +3,7 @@ name: "デバッグ環境の更新チェック"
 on:
   pull_request:
     branches:
-      - master
+      - main
     types: [opened, synchronize]
     paths:
       - '.github/workflows/validate_debug_manifests.yaml'

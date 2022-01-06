@@ -3,7 +3,7 @@ name: "クラスタ内の管理系アドオンの更新チェック"
 on:
   pull_request:
     branches:
-      - master
+      - main
     types: [opened, synchronize]
     paths:
       - '.github/workflows/validate_clusterwide_manifests.yaml'
