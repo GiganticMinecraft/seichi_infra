@@ -13,8 +13,11 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 |  BungeeCord | Minecraftプロトコル用プロキシ                                                  | 
 | cloudflared | Cloudflare Argo Tunnelを利用したオンプレ(うんちゃまクラウド)環境との接続に使用 | 
 
-# 外部公開禁止
-本リポジトリはPrivateリポジトリを想定して作成されており、seichi.click networkインフラにまつわるいくつかの機密情報を含みます。本リポジトリの一部、全部を許可なく外部公開することを禁じます。
+# 注意事項(主にレビュアーや運営チームな方向け)
+本リポジトリはPublicリポジトリを想定し、seichi.click networkに関する公開可能なインフラ構成についての情報を取り扱っています。コントリビュート/レビューにあたっては以下の点に留意してください。
+- 外部公開不可な情報(tokenやsecretなど)を復号可能な状態(平文やBASE64エンコしただけなど)でコードに含めないでください。
+- 外部コントリビュータからpullreqを受けた場合は、workflowが承認待ち状態(※1)となります。pullreqに含まれるコードがworkflow等を通じて意図的に秘匿情報にアクセスしようとしていないか、必ずコードレビューをした上でworkflowのrunを承認するようお願いします。<br>
+※1 Githubのリポジトリ設定で実現しています。具体的にはこちら：`Settings -> Actions -> General -> Fork pull request workflows from outside collaborators -> Require approval for all outside collaborators`
 
 # 構築上の注意点
 
