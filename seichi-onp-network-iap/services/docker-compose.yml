@@ -1,0 +1,14 @@
+networks:
+  cloudflared-internet:
+
+volumes:
+  cloudflared-home:
+
+services:
+  cloudflared:
+    image: ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:b471d0c
+    volumes:
+      - cloudflared-home:/root
+      - ./cloudflared/tunnel-config.yml:/image/tunnel-config.yml
+    networks:
+      - cloudflared-internet

@@ -1,0 +1,32 @@
+ingress:
+  - hostname: mcserver--cre.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25568"
+  - hostname: mcserver--eve.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25574"
+  - hostname: mcserver--h1.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25567"
+  - hostname: mcserver--kagawa.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25593"
+  - hostname: mcserver--lobby.tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.100:25565"
+  - hostname: mcserver--petra.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25585"
+  - hostname: mcserver--reset.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25591"
+  - hostname: mcserver--s1.tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.1:25565"
+  - hostname: mcserver--s2.tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.2:25565"
+  - hostname: mcserver--s3.tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.3:25565"
+  - hostname: mcserver--s5.tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.5:25565"
+  - hostname: mcserver--s7.tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.7:25565"
+  - hostname: mcserver--spade.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.187:25501"
+  - hostname: redis--bungeesemaphore.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.188:11788"
+  - hostname: redis--redisbungee.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.188:11787"
+  - service: http_status:404
