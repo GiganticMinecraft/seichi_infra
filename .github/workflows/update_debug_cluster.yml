@@ -1,0 +1,31 @@
+name: "デバッグサーバー用のクラスタ定義更新を処理する"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/update_debug_cluster.yml'
+      - 'proxy-kubernetes/debug-k8s-manifests/**'
+      - 'proxy-kubernetes/base-k8s-manifests/**'
+
+env:
+  KUBECONFIG: kubeconfig.yaml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Kubernetes tools
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.23.1
+          command: |
+            echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
+            echo "deploy to debug"
+            kubectl apply -k proxy-kubernetes/debug-k8s-manifests/
+
+            echo "restart debug"
+            kubectl -n haproxy-debug-gw rollout restart deployments/bungeecord

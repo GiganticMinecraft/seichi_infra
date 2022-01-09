@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-redis--bungeesemaphore
+spec:
+  template:
+    spec:
+      containers:
+      - name: cloudflared-redis--bungeesemaphore
+        image: cloudflare/cloudflared:2021.12.1
+        env:
+        - name: TUNNEL_SERVICE_TOKEN_ID
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_ID
+        - name: TUNNEL_SERVICE_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_SECRET
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 2
+          failureThreshold: 2
+          tcpSocket:
+            port: 6379
+        resources:
+          requests:
+            memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared-redis--bungeesemaphore
+spec:
+  type: ClusterIP
+  ports:
+  - name: redis
+    port: 6379
+    protocol: TCP
+    targetPort: 6379

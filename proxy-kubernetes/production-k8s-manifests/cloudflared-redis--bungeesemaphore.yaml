@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-redis--bungeesemaphore
+  labels:
+    app: cloudflared-redis--bungeesemaphore
+    appgroup: cloudflared
+    env: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared-redis--bungeesemaphore
+      appgroup: cloudflared
+      env: prod
+  template:
+    metadata:
+      labels:
+        app: cloudflared-redis--bungeesemaphore
+        appgroup: cloudflared
+        env: prod
+    spec:
+      containers:
+      - name: cloudflared-redis--bungeesemaphore
+        image: cloudflare/cloudflared:2021.12.1
+        args:
+          - access
+          - tcp
+          - --loglevel
+          - debug
+          - --hostname
+          - redis--bungeesemaphore.tcp-prod-network.seichi.click
+          - --url
+          - 0.0.0.0:6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared-redis--bungeesemaphore
+spec:
+  selector:
+    app: cloudflared-redis--bungeesemaphore
+    appgroup: cloudflared
+    env: prod

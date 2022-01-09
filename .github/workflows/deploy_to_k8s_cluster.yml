@@ -1,0 +1,26 @@
+name: "本番ネットワーク用のk8sクラスタを更新する"
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "30 19 10,20,30 * *"
+
+env:
+  KUBECONFIG: kubeconfig.yaml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Kubernetes tools
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.23.1
+          command: |
+            echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
+            echo "deploy to production"
+            kubectl apply -k proxy-kubernetes/production-k8s-manifests/
+
+            echo "restart production"
+            kubectl -n haproxy-gw rollout restart deployments/bungeecord

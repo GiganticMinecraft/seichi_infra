@@ -1,0 +1,36 @@
+name: "クラスタ内の管理系アドオンの更新"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+    paths:
+      - '.github/workflows/deploy_clusterwide_manifests.yaml'
+      - 'proxy-kubernetes/clusterwide-k8s-manifests/**'
+      - 'proxy-kubernetes/argocd-apps/**'
+
+env:
+  KUBECONFIG: kubeconfig.yaml
+
+jobs:
+  deploy-clusterwide:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Apply clusterwide manifests
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.23.1
+          command: |
+            echo "${{ secrets.DEPLOY_TARGET_K8S_KEY }}" | base64 -d > $KUBECONFIG
+            echo "deploy clusterwide manifests"
+            dir_path="./proxy-kubernetes/clusterwide-k8s-manifests/*"
+            dirs=`find $dir_path -maxdepth 0 -type d`
+            for dir in $dirs;
+            do
+                kubectl apply -k $dir
+            done
+            echo "deploy argocd apps"
+            kubectl apply -f proxy-kubernetes/argocd-apps
