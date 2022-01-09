@@ -24,21 +24,21 @@ spec:
           name: redis
         livenessProbe:
           httpGet:
-            # Cloudflared has a /ready endpoint which returns 200 if and only if
-            # it has an active connection to the edge.
             path: /ready
-            port: 2000
-          failureThreshold: 1
-          initialDelaySeconds: 10
-          periodSeconds: 10
+            port: 3333
+            scheme: HTTP
         readinessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 5
-          timeoutSeconds: 1
-          successThreshold: 2
-          failureThreshold: 2
-          tcpSocket:
-            port: 6379
+          httpGet:
+            path: /ready
+            port: 3333
+            scheme: HTTP
+        startupProbe:
+          httpGet:
+            path: /ready
+            port: 3333
+            scheme: HTTP
+          failureThreshold: 60
+          periodSeconds: 10
         resources:
           requests:
             memory: 64Mi

@@ -33,14 +33,23 @@ spec:
           - mcserver--deb-112-2.tcp-debug-network.seichi.click
           - --url
           - 0.0.0.0:25565
+          - --metrics=0.0.0.0:3333
         livenessProbe:
           httpGet:
-            # Cloudflared has a /ready endpoint which returns 200 if and only if
-            # it has an active connection to the edge.
             path: /ready
-            port: 2000
-          failureThreshold: 1
-          initialDelaySeconds: 10
+            port: 3333
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3333
+            scheme: HTTP
+        startupProbe:
+          httpGet:
+            path: /ready
+            port: 3333
+            scheme: HTTP
+          failureThreshold: 60
           periodSeconds: 10
         env:
         - name: TUNNEL_SERVICE_TOKEN_ID
@@ -56,14 +65,6 @@ spec:
         ports:
         - containerPort: 25565
           name: minecraft
-        readinessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 5
-          timeoutSeconds: 1
-          successThreshold: 2
-          failureThreshold: 2
-          tcpSocket:
-            port: 25565
         resources:
           requests:
             memory: 64Mi
