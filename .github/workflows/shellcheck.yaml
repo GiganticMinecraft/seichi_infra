@@ -1,0 +1,20 @@
+name: shellcheck
+
+on:
+  pull_request:
+    paths:
+      - "**.sh"
+
+jobs:
+  shellcheck:
+    name: shellcheck with reviewdog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: shellcheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          pattern: "*.sh"
