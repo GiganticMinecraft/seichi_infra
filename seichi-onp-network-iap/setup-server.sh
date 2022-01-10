@@ -65,14 +65,6 @@ sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_infra.git /
 
 # endregion
 
-# region configure the systemd service
-
-sudo rm /etc/systemd/system/seichi-onp-network-iap.service
-sudo ln -s /root/seichi_infra/seichi-onp-network-iap/seichi-onp-network-iap.service /etc/systemd/system/seichi-onp-network-iap.service
-sudo systemctl enable seichi-onp-network-iap
-
-# endregion
-
 # region setup compose-cd for continuous deployment
 
 sudo git clone --depth 1 https://github.com/sksat/compose-cd.git /root/compose-cd
