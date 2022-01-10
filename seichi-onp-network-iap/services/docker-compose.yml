@@ -7,5 +7,4 @@ services:
     volumes:
       - cloudflared-home:/root
       - ./cloudflared/tunnel-config.yml:/image/tunnel-config.yml
-    networks:
-      - cloudflared-internet
+    network_mode: "host"
