@@ -1,4 +1,8 @@
+no-autoupdate: true
+
 ingress:
+  # minecraft-server
+  # cloudflare-service-tokenによるアクセス制御を行う
   - hostname: mcserver--cre.tcp-prod-network.seichi.click
     service: "tcp://192.168.1.187:25568"
   - hostname: mcserver--eve.tcp-prod-network.seichi.click
@@ -25,8 +29,47 @@ ingress:
     service: "tcp://192.168.2.7:25565"
   - hostname: mcserver--spade.tcp-prod-network.seichi.click
     service: "tcp://192.168.1.187:25501"
+  
+  # dynmap-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: s1-map-gigantic.seichi.click
+    service: "http://192.168.2.1:80"
+  - hostname: s2-map-gigantic.seichi.click
+    service: "http://192.168.2.2:80"
+  - hostname: s3-map-gigantic.seichi.click
+    service: "http://192.168.2.3:80"
+  - hostname: s5-map-gigantic.seichi.click
+    service: "http://192.168.2.5:80"
+  - hostname: s7-map-gigantic.seichi.click
+    service: "http://192.168.2.7:80"
+  - hostname: cre-map-gigantic.seichi.click
+    service: "http://192.168.1.187:80"
+  - hostname: h1-map-spring.seichi.click
+    service: "http://192.168.1.187:82"
+  
+  # votelitener-server
+  # nuVotifierが待ち受けておりminecraft.jpやmonocraft.netで投票されるとここに投票パケットが飛ぶ
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: votelitener.public-tcp-prod-network.seichi.click
+    service: "tcp://192.168.2.99:32957"
+
+  # redis-server
+  # cloudflare-service-tokenによるアクセス制御を行う
   - hostname: redis--bungeesemaphore.tcp-prod-network.seichi.click
     service: "tcp://192.168.1.188:11788"
   - hostname: redis--redisbungee.tcp-prod-network.seichi.click
     service: "tcp://192.168.1.188:11787"
+
+  # redmine-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: redmine.seichi.click
+    service: "https://192.168.1.187:3443"
+    originRequest:
+      noTLSVerify: true
+  
+  # seichiranking-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: ranking-gigantic.seichi.click
+    service: "http://192.168.1.187:8086"
+  
   - service: http_status:404
