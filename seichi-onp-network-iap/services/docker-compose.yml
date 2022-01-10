@@ -1,6 +1,3 @@
-networks:
-  cloudflared-internet:
-
 volumes:
   cloudflared-home:
 
