@@ -3,6 +3,11 @@ set -e
 
 SYNC_TARGET_REPOSITORY=GiganticMinecraft/seichi_infra
 
+# variable using `compose-cd install`
+export SEARCH_ROOT=/root/seichi_infra/seichi-onp-network-iap
+export GIT_PULL_USER=root
+export -n DISCORD_WEBHOOK
+
 # This is an idempotent script that
 # - installs all the required toolchains
 # - clones the latest revision of seichi_infra to /root/seichi_infra/
@@ -27,10 +32,13 @@ sudo git clone --depth 1 "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /roo
 sudo rm -r /root/compose-cd || true
 sudo git clone --depth 1 https://github.com/GiganticMinecraft/compose-cd.git /root/compose-cd
 
-# You should input to stdin:
-# - search root> /root/seichi_infra/seichi-onp-network-iap
-# - git pull user> root
-# - Discord webhook URL> ***
+echo """
+======================================
+Installing compose-cd.
+You should input to stdin:
+- Discord webhook URL> ***
+======================================
+"""
 sudo /root/compose-cd/compose-cd install
 
 # endregion
