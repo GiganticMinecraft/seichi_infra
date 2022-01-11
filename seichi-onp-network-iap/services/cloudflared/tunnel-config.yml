@@ -47,8 +47,11 @@ ingress:
   
   # votelitener-server
   # nuVotifierが待ち受けておりminecraft.jpやmonocraft.netで投票されるとここに投票パケットが飛ぶ
-  # cloudflare-service-tokenによるアクセス制御はしない
-  - hostname: votelitener.public-tcp-prod-network.seichi.click
+  # cloudflaredの仕様としてtcpトンネルの対向はcloudflared access tcpで終端してやる必要がある為
+  # proxy-kubernetes上にcloudflaredを配置して終端し、そのポイントをService(Type: LoadBalancer)で公開する
+  # よってここで指定するエンドポイントはproxy-kubernetes上のcloudflaredからしかアクセスしないため
+  # cloudflare-service-tokenによるアクセス制御の範囲に含めて良い
+  - hostname: votelitener.tcp-prod-network.seichi.click
     service: "tcp://192.168.2.99:32957"
 
   # redis-server
