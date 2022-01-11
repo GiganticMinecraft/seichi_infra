@@ -13,6 +13,12 @@ unchama宅のルーター配下のLAN (subnet 192.168.0.0/20)。マイクラサ�
 ## [Terraform](./terraform) 管理下にあるもの
 
  - Cloudflare周りの設定
+ - GitHub Teamsの定義
+ - Cloudflare周りの設定
+   - 証明書の管理
+   - GitHub Teamsを用いたアクセス制御の定義
+ - LKE上の一部オブジェクトの管理
+   - Cloudflareが発行したトークンを含むSecretリソース
 
 ## サーバー一覧
 
