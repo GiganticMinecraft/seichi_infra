@@ -1,5 +1,3 @@
-no-autoupdate: true
-
 ingress:
   # minecraft-server
   # cloudflare-service-tokenによるアクセス制御を行う
