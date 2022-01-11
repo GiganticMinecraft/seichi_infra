@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+SYNC_TARGET_REPOSITORY=GiganticMinecraft/seichi_infra
+
 # This is an idempotent script that
 # - installs all the required toolchains
 # - clones the latest revision of seichi_infra to /root/seichi_infra/
@@ -16,7 +18,7 @@ sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get install git
 # region clone the latest revision of seichi_infra
 
 sudo rm -r /root/seichi_infra || true
-sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_infra.git /root/seichi_infra
+sudo git clone --depth 1 "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /root/seichi_infra
 
 # endregion
 
