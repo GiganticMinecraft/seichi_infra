@@ -22,12 +22,14 @@ sudo git clone --depth 1 https://github.com/GiganticMinecraft/seichi_infra.git /
 
 # region setup compose-cd for continuous deployment
 
+sudo rm -r /root/compose-cd || true
 sudo git clone --depth 1 https://github.com/sksat/compose-cd.git /root/compose-cd
-sudo /root/compose-cd/compose-cd install
+
 # plz input stdin:
-# - search root> /root/seichi_infra/services
-# - git pull user> ***
+# - search root> /root/seichi_infra/seichi-onp-network-iap
+# - git pull user> root
 # - Discord webhook URL> ***
+sudo /root/compose-cd/compose-cd install
 sudo /root/compose-cd/compose-cd update
 
 # endregion
