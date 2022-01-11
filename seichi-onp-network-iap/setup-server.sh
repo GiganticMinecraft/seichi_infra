@@ -25,7 +25,7 @@ sudo git clone --depth 1 "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /roo
 # region setup compose-cd for continuous deployment
 
 sudo rm -r /root/compose-cd || true
-sudo git clone --depth 1 https://github.com/sksat/compose-cd.git /root/compose-cd
+sudo git clone --depth 1 https://github.com/GiganticMinecraft/compose-cd.git /root/compose-cd
 
 # You should input to stdin:
 # - search root> /root/seichi_infra/seichi-onp-network-iap
