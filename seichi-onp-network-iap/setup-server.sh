@@ -3,7 +3,7 @@ set -e
 
 SYNC_TARGET_REPOSITORY=GiganticMinecraft/seichi_infra
 
-# variable using `compose-cd install`
+# variables read by `compose-cd install`
 export SEARCH_ROOT=/root/seichi_infra/seichi-onp-network-iap
 export GIT_PULL_USER=root
 export -n DISCORD_WEBHOOK
