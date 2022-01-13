@@ -30,8 +30,9 @@ sudo git clone --depth 1 --branch ${SYNC_TARGET_BRANCH} "https://github.com/${SY
 
 # region setup compose-cd for continuous deployment
 
-sudo rm -r /root/compose-cd || true
-sudo git clone --depth 1 https://github.com/GiganticMinecraft/compose-cd.git /root/compose-cd
+sudo rm -r ~/install-compose-cd || true
+sudo git clone --depth 1 https://github.com/GiganticMinecraft/compose-cd.git ~/install-compose-cd
+cd ~/install-compose-cd
 
 echo """
 ======================================
@@ -40,7 +41,7 @@ You should input to stdin:
 - Discord webhook URL> ***
 ======================================
 """
-sudo /root/compose-cd/compose-cd install
+sudo ./compose-cd install
 
 # endregion
 
