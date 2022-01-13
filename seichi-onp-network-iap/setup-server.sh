@@ -25,6 +25,7 @@ sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get install git
 
 sudo rm -r /root/seichi_infra || true
 sudo git clone --depth 1 --branch ${SYNC_TARGET_BRANCH} "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /root/seichi_infra
+sudo docker compose -f /root/seichi_infra/seichi-onp-network-iap/services/docker-compose.yml up -d
 
 # endregion
 
