@@ -2,6 +2,7 @@
 set -e
 
 SYNC_TARGET_REPOSITORY=GiganticMinecraft/seichi_infra
+SYNC_TARGET_BRANCH=main
 
 # variables read by `compose-cd install`
 export SEARCH_ROOT=/root/seichi_infra/seichi-onp-network-iap
@@ -15,7 +16,7 @@ export -n DISCORD_WEBHOOK
 # - reboots the server to reinitialize everything
 
 # install docker-ce and docker-compose
-bash <(wget -qO- https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/util-scripts/setup/docker-ce-and-compose.sh)
+bash <(wget -qO- https://raw.githubusercontent.com/${SYNC_TARGET_REPOSITORY}/${SYNC_TARGET_BRANCH}/util-scripts/setup/docker-ce-and-compose.sh)
 
 # install toolchains
 sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get install git
@@ -23,7 +24,7 @@ sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get install git
 # region clone the latest revision of seichi_infra
 
 sudo rm -r /root/seichi_infra || true
-sudo git clone --depth 1 "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /root/seichi_infra
+sudo git clone --depth 1 --branch ${SYNC_TARGET_BRANCH} "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /root/seichi_infra
 
 # endregion
 
