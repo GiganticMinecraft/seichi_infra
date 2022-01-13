@@ -8,3 +8,4 @@ services:
       - cloudflared-home:/root
       - ./cloudflared/tunnel-config.yml:/image/tunnel-config.yml
     network_mode: "host"
+    restart: always
