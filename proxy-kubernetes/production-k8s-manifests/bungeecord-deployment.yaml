@@ -9,7 +9,7 @@ metadata:
     app: bungeecord
     env: prod
 spec:
-  replicas: 0
+  replicas: 
   selector:
     matchLabels:
       app: bungeecord
