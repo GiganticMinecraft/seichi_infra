@@ -5,6 +5,7 @@ resource "cloudflare_certificate_pack" "advanced_cert_for_admin_network" {
   type                  = "advanced"
   hosts                 = [
     local.root_domain,
+    "*.onp.admin.${local.root_domain}",
     "*.debug.admin.${local.root_domain}",
   ]
   validation_method     = "txt"
