@@ -29,6 +29,6 @@ spec:
           - --loglevel
           - debug
           - --hostname
-          - votelitener.tcp-prod-network.seichi.click
+          - votelistener.tcp-prod-network.seichi.click
           - --url
           - 0.0.0.0:32957
