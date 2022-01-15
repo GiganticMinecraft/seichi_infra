@@ -3,7 +3,7 @@ volumes:
 
 services:
   cloudflared:
-    image: ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:b471d0c
+    image: ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2f9a183
     volumes:
       - cloudflared-home:/root
       - ./cloudflared/tunnel-config.yml:/image/tunnel-config.yml
