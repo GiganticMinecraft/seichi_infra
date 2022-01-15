@@ -29,6 +29,31 @@ spec:
           - --loglevel
           - debug
           - --hostname
-          - votelitener.tcp-prod-network.seichi.click
+          - votelistener.tcp-prod-network.seichi.click
           - --url
           - 0.0.0.0:32957
+        env:
+        - name: TUNNEL_SERVICE_TOKEN_ID
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_ID
+        - name: TUNNEL_SERVICE_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_SECRET
+        ports:
+        - containerPort: 32957
+          name: votelistener
+        readinessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 2
+          failureThreshold: 2
+          tcpSocket:
+            port: 32957
+        resources:
+          requests:
+            memory: 64Mi
