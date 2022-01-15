@@ -3,7 +3,7 @@ data "github_repository" "seichi_infra" {
 }
 
 resource "github_branch_protection" "example" {
-  repository_id = github_repository.seichi_infra.node_id
+  repository_id = data.github_repository.seichi_infra.node_id
 
   pattern          = "main"
   enforce_admins   = true
