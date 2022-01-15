@@ -73,6 +73,9 @@ spec:
       containers:
         - name: origin-cloudflared
           image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2f9a183"
+          env:
+          - name: TUNNEL_NAME
+            value: "proxy-kubernetes-origin-cloudflared-tunnel"
           volumeMounts:
           - mountPath: "/root/.cloudflared"
             name: origin-cloudflared-authorization-certificate
