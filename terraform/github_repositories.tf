@@ -11,11 +11,7 @@ resource "github_branch_protection" "example" {
 
   required_status_checks {
     strict   = true
-    contexts = [
-        "Terraform Cloud/GiganticMinecraft/seichi_infra",
-        "shellcheck with reviewdog",
-        "runner/tflint"
-    ]
+    contexts = []
   }
 
   required_pull_request_reviews {
