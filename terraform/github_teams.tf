@@ -29,6 +29,12 @@ resource "github_team" "debug_admin_jmx" {
   privacy     = "closed"
 }
 
+resource "github_team" "onp_admin_grafana_team" {
+  name        = "onp-admin-grafana"
+  description = "オンプレミス環境のgrafanaに接続できるTeam"
+  privacy     = "closed"
+}
+
 resource "github_team" "springer" {
   name        = "Springer"
   description = "整地鯖(春)のデベロッパー"
