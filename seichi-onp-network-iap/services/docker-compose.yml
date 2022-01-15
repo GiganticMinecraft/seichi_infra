@@ -9,3 +9,5 @@ services:
       - ./cloudflared/tunnel-config.yml:/image/tunnel-config.yml
     network_mode: "host"
     restart: always
+    environment:
+      TUNNEL_NAME: seichi-onp-network-iap-tunnel
