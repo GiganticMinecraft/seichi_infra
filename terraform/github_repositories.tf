@@ -14,7 +14,7 @@ resource "github_branch_protection" "example" {
     contexts = [
         "Terraform Cloud/GiganticMinecraft/seichi_infra",
         "shellcheck with reviewdog",
-        "runner/tflint"
+        "runner / tflint"
     ]
   }
 
