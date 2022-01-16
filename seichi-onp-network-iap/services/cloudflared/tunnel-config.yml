@@ -77,5 +77,11 @@ ingress:
   # cloudflare-service-tokenによるアクセス制御はしない(grafana側でGitHub-SSO認証かけてる)
   - hostname: grafana.onp.admin.seichi.click
     service: "http://192.168.3.20:3000"
+  
+  # elasticsearch-server
+  # k8s上のfilebeatなどからのログ連携を想定
+  # cloudflare-service-tokenによるアクセス制御を行う
+  - hostname: elasticsearch.tcp-prod-network.seichi.click
+    service: "tcp://192.168.3.20:9200"
 
   - service: http_status:404
