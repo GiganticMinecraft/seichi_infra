@@ -71,7 +71,7 @@ ingress:
   # seichiranking-webserver
   # cloudflare-service-tokenによるアクセス制御はしない
   - hostname: ranking-gigantic.seichi.click
-    service: "http://192.168.1.187:8086"
+    service: "http://192.168.3.1:80"
   
   # onp-admin-grafana-webserver
   # cloudflare-service-tokenによるアクセス制御はしない(grafana側でGitHub-SSO認証かけてる)
