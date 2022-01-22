@@ -2,7 +2,7 @@ data "github_repository" "seichi_infra" {
   full_name = "GiganticMinecraft/seichi_infra"
 }
 
-resource "github_branch_protection" "example" {
+resource "github_branch_protection" "seichi_infra_main" {
   repository_id = data.github_repository.seichi_infra.node_id
 
   pattern          = "main"
