@@ -8,7 +8,7 @@ spec:
   source:
     chart: argo-cd
     repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: 3.29.4
+    targetRevision: 3.33.5
     helm:
       releaseName: argocd
       values: |
@@ -103,15 +103,8 @@ spec:
             #   g, subject, inherited-subject
             # See https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md for additional information.
             policy.csv: |
-              p, role:org-admin, applications, *, */*, allow
-              p, role:org-admin, clusters, get, *, allow
-              p, role:org-admin, repositories, get, *, allow
-              p, role:org-admin, repositories, create, *, allow
-              p, role:org-admin, repositories, update, *, allow
-              p, role:org-admin, repositories, delete, *, allow
-
-              g, GiganticMinecraft:admin-team, role:org-admin
-              g, GiganticMinecraft:infra-collaborator, role:org-admin
+              g, GiganticMinecraft:admin-team, role:admin
+              g, GiganticMinecraft:infra-collaborator, role:admin
             # policy.default is the name of the default role which Argo CD will falls back to, when
             # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
             # but will see no apps, projects, etc...
