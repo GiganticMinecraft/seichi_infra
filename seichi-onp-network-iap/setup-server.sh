@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# This is an idempotent script that
+# - installs all the required toolchains
+# - clones the latest revision of seichi_infra to /root/seichi_infra/
+# - configures compose-cd to automatically sync services to the remote git repository
+# - reboots the server to reinitialize everything
+
+# region script constants
+
 # revision at which util scripts are present (main on 2022/03/17)
 UTIL_SCRIPTS_REV=GiganticMinecraft/seichi_infra/d457d6dfe71b0542c64c79ed77d3b250601f037d
 
@@ -12,11 +20,7 @@ export SEARCH_ROOT=/root/seichi_infra/seichi-onp-network-iap
 export GIT_PULL_USER=root
 export -n DISCORD_WEBHOOK
 
-# This is an idempotent script that
-# - installs all the required toolchains
-# - clones the latest revision of seichi_infra to /root/seichi_infra/
-# - configures compose-cd to automatically sync services to the remote git repository
-# - reboots the server to reinitialize everything
+# endregion
 
 # install docker-ce and docker-compose
 bash <(wget -qO- https://raw.githubusercontent.com/${UTIL_SCRIPTS_REV}/util-scripts/setup/docker-ce-and-compose.sh)
@@ -24,7 +28,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/${UTIL_SCRIPTS_REV}/util-scri
 # install toolchains
 sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get install git
 
-# region clone the latest revision of seichi_infra
+# region clone seichi_infra repository on the specified branch
 
 sudo rm -r /root/seichi_infra || true
 sudo git clone --depth 1 --branch ${SYNC_TARGET_BRANCH} "https://github.com/${SYNC_TARGET_REPOSITORY}.git" /root/seichi_infra
