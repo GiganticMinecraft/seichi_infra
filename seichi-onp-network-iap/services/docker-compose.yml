@@ -6,7 +6,7 @@ services:
     image: ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2f9a183
     volumes:
       - cloudflared-home:/root
-      - ./cloudflared/tunnel-config.yml:/etc/cloudflared/tunnel-config.yml
+      - ./cloudflared-tunnel-config.yml:/etc/cloudflared/tunnel-config.yml
     network_mode: "host"
     restart: always
     environment:
