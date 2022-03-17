@@ -10,4 +10,4 @@ services:
     network_mode: "host"
     restart: always
     environment:
-      TUNNEL_NAME: seichi-onp-network-iap-tunnel
+      TUNNEL_NAME: seichi-onp-network-iap-redis-servers-tunnel

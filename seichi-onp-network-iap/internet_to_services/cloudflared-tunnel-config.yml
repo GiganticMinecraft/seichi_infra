@@ -1,0 +1,31 @@
+ingress:
+  # dynmap-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: s1-map-gigantic.seichi.click
+    service: "http://192.168.2.1:80"
+  - hostname: s2-map-gigantic.seichi.click
+    service: "http://192.168.2.2:80"
+  - hostname: s3-map-gigantic.seichi.click
+    service: "http://192.168.2.3:80"
+  - hostname: s5-map-gigantic.seichi.click
+    service: "http://192.168.2.5:80"
+  - hostname: s7-map-gigantic.seichi.click
+    service: "http://192.168.2.7:80"
+  - hostname: cre-map-gigantic.seichi.click
+    service: "http://192.168.1.187:80"
+  - hostname: h1-map-spring.seichi.click
+    service: "http://192.168.1.187:82"
+
+  # redmine-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: redmine.seichi.click
+    service: "https://192.168.1.187:3443"
+    originRequest:
+      noTLSVerify: true
+  
+  # seichiranking-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない
+  - hostname: ranking-gigantic.seichi.click
+    service: "http://192.168.3.1:80"
+  
+  - service: http_status:404
