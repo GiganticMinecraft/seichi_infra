@@ -56,13 +56,13 @@ to which compose-cd should notify its actions.
 """
 
 installation_temp_dir=$(mktemp -d)
-cd installation_temp_dir
+cd "${installation_temp_dir}"
 
 wget "https://github.com/sksat/compose-cd/releases/download/${COMPOSE_CD_RELEASE_TAG}/compose-cd.tar.gz"
 tar -zxvf compose-cd.tar.gz
 
 sudo ./compose-cd install \
-  --search-root "${COMPOSE_CD_SEARCH_ROOT}"
+  --search-root "${COMPOSE_CD_SEARCH_ROOT}" \
   --git-pull-user root
 
 # endregion
