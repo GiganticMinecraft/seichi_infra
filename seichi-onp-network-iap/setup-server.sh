@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# revision at which util scripts are present (main on 2022/03/17)
+UTIL_SCRIPTS_REV=GiganticMinecraft/seichi_infra/d457d6dfe71b0542c64c79ed77d3b250601f037d
+
 SYNC_TARGET_REPOSITORY=GiganticMinecraft/seichi_infra
 SYNC_TARGET_BRANCH=main
 
@@ -16,7 +19,7 @@ export -n DISCORD_WEBHOOK
 # - reboots the server to reinitialize everything
 
 # install docker-ce and docker-compose
-bash <(wget -qO- https://raw.githubusercontent.com/${SYNC_TARGET_REPOSITORY}/${SYNC_TARGET_BRANCH}/util-scripts/setup/docker-ce-and-compose.sh)
+bash <(wget -qO- https://raw.githubusercontent.com/${UTIL_SCRIPTS_REV}/util-scripts/setup/docker-ce-and-compose.sh)
 
 # install toolchains
 sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get install git
