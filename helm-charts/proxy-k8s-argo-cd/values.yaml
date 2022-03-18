@@ -239,12 +239,12 @@ argo-cd:
   ##   to manage a group of applications in our cluster.
   ## This is the only application in this deployment.
   additionalApplications:
-    - name: argo-cd
-      namespace: argo-cd
+    - name: argocd
+      namespace: argocd
       finalizers:
         - resources-finalizer.argocd.argoproj.io
       destination:
-        namespace: argo-cd
+        namespace: argocd
         server: https://kubernetes.default.svc
       project: default
       source:
