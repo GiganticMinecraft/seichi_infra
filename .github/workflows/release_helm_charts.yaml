@@ -9,6 +9,7 @@ on:
 jobs:
   lint-test:
     runs-on: ubuntu-latest
+    env:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,7 +38,7 @@ jobs:
 
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct lint --chart-dirs helm-charts
+        run: ct lint --target-branch main --chart-dirs helm-charts
 
       - name: Create kind cluster
         if: steps.list-changed.outputs.changed == 'true'
@@ -45,7 +46,7 @@ jobs:
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --chart-dirs helm-charts
+        run: ct install --target-branch main --chart-dirs helm-charts
 
   release:
     runs-on: ubuntu-latest
