@@ -2,11 +2,9 @@ name: "Helm chart を更新・公開する"
 
 on:
   push:
-    # branches:
-    #   - main
     # Only when a helm-chart is updated
-    # paths:
-    #   - 'helm-charts/**'
+    paths:
+      - 'helm-charts/**'
 
 jobs:
   lint-test:
@@ -43,13 +41,13 @@ jobs:
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.2.0
-        if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
         run: ct install
 
   release:
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: ["lint-test"]
     steps:
       - name: Checkout
