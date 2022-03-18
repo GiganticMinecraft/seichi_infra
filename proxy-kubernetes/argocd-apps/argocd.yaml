@@ -92,7 +92,7 @@ spec:
                   name: GitHub
                   config:
                     clientID: 6d77699f96a51159ce39
-                    clientSecret: $dex.github.clientSecret
+                    clientSecret: $argocd-github-client-secret:dex.github.clientSecret
                     orgs:
                     - name: GiganticMinecraft
           rbacConfig:
@@ -248,3 +248,17 @@ spec:
       prune: true
     syncOptions:
     - CreateNamespace=true
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: argocd-github-client-secret
+  namespace: argocd
+spec:
+  encryptedData:
+    dex.github.clientSecret: AgAiKdiKEUldBBAtjjei6wOD4gPu+w+Vt/6Pahxpwx6VE9gRMm+p29yFMeJKv9VRsZRJ+Gu6rsRgGSP1fu+yM5QMt5SGipv+rabxt5UuRC6zlU+hk1RI0m0tojE2sjsslvclqqmDfqPnNGLOz0CXyUsIOdm18WqjYKM67D+HKbXNuXHE8okhki37z3ABK91z8BBw0tQaU8D6Os/ZVuo2baAXBkUb+6OBY6SCMt1mIfQhNYU9qgMa0Lq2Xm55ZPgSorad0JKw1Ah2hAP6xEx9c36gv240kbpuSzdQgw8iTabutyMva0QNeiQT3oZ8KGGyUkYyVfZSsC8BT2j0R2WC/VKuBxevpBs5MDSmvncQxb7aYmwdQB6+X9lkCC0NgmeR/TB4XS2IGWPuZ9hmsTAZT2hb9id6SWra6aNq0Uf11TJRwc4JpQL2iJwc1Ao/lDKWIdy5lzjnI65xeajiUrdgo6IBIMBSMIjbxgeVpBL+hd0yhJ4cn1pOIpHcpsSGtnsfbvSfRozAvtvYpviYEzX8pi7P37+dnsEFciuZnZPbRcJRqgD2HGTIt5BrUDZ64nd1l7909ZYAEYmwKTX0sB2lLUQTgR5d2K2wDM+XV
+  template:
+    type: Opaque
+    metadata:
+      labels:
+        "app.kubernetes.io/part-of": argocd
