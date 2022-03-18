@@ -9,7 +9,7 @@
     ```
     Host seichi-onp-network-iap
         HostName 192.168.3.22
-        User unchama
+        User cloudinit
         Port 22
     ```
 
