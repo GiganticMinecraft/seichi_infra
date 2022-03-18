@@ -30,7 +30,7 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --target-branch main)
+          changed=$(ct list-changed --target-branch main --chart-dirs helm-charts)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
