@@ -38,6 +38,7 @@ jobs:
           fi
 
       - name: Run chart-testing (lint)
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct lint
 
       - name: Create kind cluster
