@@ -16,6 +16,9 @@ unchama宅のルーター配下のLAN (subnet 192.168.0.0/20)。マイクラサ�
    - 概要図、ネットワーク構成図などの図を draw.io で描いて管理するディレクトリ。
    - 2022/03/18現在、GitHubがmermaidのレンダリングを正式にサポートしたため、新しい図はmermaidで作成して良いかも
 
+ - [`helm-charts`](./helm-charts/)
+   - [`proxy-kubernetes`](./proxy-kubernetes/) 等で使用できる汎用的な [Helm chart repository](https://helm.sh/docs/topics/chart_repository/)。
+
  - [`proxy-kubernetes`](./proxy-kubernetes/)
    - Linode Kubernetes Engine(LKE) 上の k8s クラスタの定義を管理するディレクトリ。詳細は [README](./proxy-kubernetes/README.md) を参照してください。
  

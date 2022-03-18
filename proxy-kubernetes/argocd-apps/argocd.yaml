@@ -6,85 +6,24 @@ metadata:
 spec:
   project: default
   source:
-    chart: argo-cd
-    repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: 3.33.5
+    chart: proxy-k8s-argo-cd
+    repoURL: https://giganticminecraft.github.io/seichi_infra
+    targetRevision: 1.0.0
     helm:
-      releaseName: argocd
+      releaseName: proxy-k8s-argo-cd
       values: |
-        controller:
-          ## Application controller metrics configuration
-          metrics:
-            # -- Deploy metrics service
-            enabled: true
-            service:
-              # -- Metrics service annotations
-              annotations: {}
-              # -- Metrics service labels
-              labels: {}
-              # -- Metrics service port
-              servicePort: 8082
-            serviceMonitor:
-              # -- Enable a prometheus ServiceMonitor
-              enabled: true
-              # -- Prometheus ServiceMonitor interval
-              interval: 30s
-              # -- Prometheus [RelabelConfigs] to apply to samples before scraping
-              relabelings: []
-              # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
-              metricRelabelings: []
-              # -- Prometheus ServiceMonitor selector
-              selector:
-                prometheus: kube-prometheus
-
-              # -- Prometheus ServiceMonitor namespace
-              namespace: "argocd"
-              # -- Prometheus ServiceMonitor labels
-              additionalLabels: {}
-            rules:
-              # -- Deploy a PrometheusRule for the application controller
-              enabled: true
-              # -- PrometheusRule.Spec for the application controller
-              spec:
-              - alert: ArgoAppMissing
-                expr: |
-                  absent(argocd_app_info)
-                for: 15m
-                labels:
-                  severity: critical
-                annotations:
-                  summary: "[ArgoCD] No reported applications"
-                  description: >
-                    ArgoCD has not reported any applications data for the past 15 minutes which
-                    means that it must be down or not functioning properly.  This needs to be
-                    resolved for this cloud to continue to maintain state.
-              - alert: ArgoAppNotSynced
-                expr: |
-                  argocd_app_info{sync_status!="Synced"} == 1
-                for: 12h
-                labels:
-                  severity: warning
-                annotations:
-                  summary: "[{{`{{$labels.name}}`}}] Application not synchronized"
-                  description: >
-                    The application [{{`{{$labels.name}}`}} has not been synchronized for over
-                    12 hours which means that the state of this cloud has drifted away from the
-                    state inside Git.
-              selector:
-                prometheus: kube-prometheus
-              namespace: monitoring
-              additionalLabels: {}
         server:
           configEnabled: true
           # -- [General Argo CD configuration]
           # @default -- See [values.yaml]
           config:
-            # Argo CD's externally facing base URL (optional). Required when configuring SSO
-            url: https://argocd.bungee-proxy-public.seichi.click
             # Argo CD instance label key
             application.instanceLabelKey: argocd.argoproj.io/instance
             kustomize.buildOptions: --load-restrictor LoadRestrictionsNone
             kustomize.buildOptions.v4.4.0: --output /tmp
+            ## Following settings are required when configuring SSO
+            # Argo CD's externally facing base URL (optional).
+            url: https://argocd.bungee-proxy-public.seichi.click
             dex.config: |
               connectors:
                 - type: github
@@ -95,6 +34,7 @@ spec:
                     clientSecret: $argocd-github-client-secret:dex.github.clientSecret
                     orgs:
                     - name: GiganticMinecraft
+
           rbacConfig:
             # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
             # Policy rules are in the form:
@@ -109,137 +49,6 @@ spec:
             # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
             # but will see no apps, projects, etc...
             policy.default: role:readonly
-          ## Server metrics service configuration
-          metrics:
-            # -- Deploy metrics service
-            enabled: true
-            service:
-              # -- Metrics service annotations
-              annotations: {}
-              # -- Metrics service labels
-              labels: {}
-              # -- Metrics service port
-              servicePort: 8083
-            serviceMonitor:
-              # -- Enable a prometheus ServiceMonitor
-              enabled: true
-              # -- Prometheus ServiceMonitor interval
-              interval: 30s
-              # -- Prometheus [RelabelConfigs] to apply to samples before scraping
-              relabelings: []
-              # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
-              metricRelabelings: []
-              # -- Prometheus ServiceMonitor selector
-              selector:
-                prometheus: kube-prometheus
-
-              # -- Prometheus ServiceMonitor namespace
-              namespace: "argocd"
-              # -- Prometheus ServiceMonitor labels
-              additionalLabels: {}
-        ## Dex
-        dex:
-          metrics:
-            # -- Deploy metrics service
-            enabled: true
-            serviceMonitor:
-              # -- Enable a prometheus ServiceMonitor
-              enabled: true
-              # -- Prometheus ServiceMonitor interval
-              interval: 30s
-              # -- Prometheus [RelabelConfigs] to apply to samples before scraping
-              relabelings: []
-              # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
-              metricRelabelings: []
-              # -- Prometheus ServiceMonitor selector
-              selector:
-                prometheus: kube-prometheus
-
-              # -- Prometheus ServiceMonitor namespace
-              namespace: "argocd"
-              # -- Prometheus ServiceMonitor labels
-              additionalLabels: {}
-        redis:
-          metrics:
-            # -- Deploy metrics service and redis-exporter sidecar
-            enabled: true
-            image:
-              # -- redis-exporter image repository
-              repository: quay.io/bitnami/redis-exporter
-              # -- redis-exporter image tag
-              tag: 1.26.0-debian-10-r2
-              # -- redis-exporter image PullPolicy
-              imagePullPolicy: IfNotPresent
-            # -- Port to use for redis-exporter sidecar
-            containerPort: 9121
-            # -- Resource limits and requests for redis-exporter sidecar
-            resources:
-              limits:
-                cpu: 100m
-                memory: 128Mi
-              requests:
-                cpu: 50m
-                memory: 64Mi
-            service:
-              # -- Metrics service type
-              type: ClusterIP
-              # -- Metrics service clusterIP. `None` makes a "headless service" (no virtual IP)
-              clusterIP: None
-              # -- Metrics service annotations
-              annotations: {}
-              # -- Metrics service labels
-              labels: {}
-              # -- Metrics service port
-              servicePort: 9121
-              # -- Metrics service port name
-              portName: http-metrics
-            serviceMonitor:
-              # -- Enable a prometheus ServiceMonitor
-              enabled: true
-              # -- Interval at which metrics should be scraped
-              interval: 30s
-              # -- Prometheus [RelabelConfigs] to apply to samples before scraping
-              relabelings: []
-              # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
-              metricRelabelings: []
-              # -- Prometheus ServiceMonitor selector
-              selector:
-                prometheus: kube-prometheus
-
-              # -- Prometheus ServiceMonitor namespace
-              namespace: "argocd"
-              # -- Prometheus ServiceMonitor labels
-              additionalLabels: {}
-        ## Repo Server
-        repoServer:
-          ## Repo server metrics service configuration
-          metrics:
-            # -- Deploy metrics service
-            enabled: true
-            service:
-              # -- Metrics service annotations
-              annotations: {}
-              # -- Metrics service labels
-              labels: {}
-              # -- Metrics service port
-              servicePort: 8084
-            serviceMonitor:
-              # -- Enable a prometheus ServiceMonitor
-              enabled: true
-              # -- Prometheus ServiceMonitor interval
-              interval: 30s
-              # -- Prometheus [RelabelConfigs] to apply to samples before scraping
-              relabelings: []
-              # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
-              metricRelabelings: []
-              # -- Prometheus ServiceMonitor selector
-              selector:
-                prometheus: kube-prometheus
-
-              # -- Prometheus ServiceMonitor namespace
-              namespace: "argocd"
-              # -- Prometheus ServiceMonitor labels
-              additionalLabels: {}
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
