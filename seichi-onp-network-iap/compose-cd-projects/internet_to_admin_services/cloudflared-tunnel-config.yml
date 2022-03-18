@@ -1,0 +1,7 @@
+ingress:
+  # onp-admin-grafana-webserver
+  # cloudflare-service-tokenによるアクセス制御はしない(grafana側でGitHub-SSO認証かけてる)
+  - hostname: grafana.onp.admin.seichi.click
+    service: "http://192.168.3.20:3000"
+    
+  - service: http_status:404

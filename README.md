@@ -4,6 +4,12 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
 
 概要図は [`diagrams`](./diagrams) 以下で、 draw.io によってパース可能なsvgファイルとして管理されています。これらを編集する場合は [Draw.io VS Code Integration](https://github.com/hediet/vscode-drawio) の利用を推奨します。
 
+## 用語の定義
+
+### `seichi-onp-network` / OnPネットワーク
+
+unchama宅のルーター配下のLAN (subnet 192.168.0.0/20)。マイクラサーバーや一部のウェブサーバーなどはこのネットワークに属する(物理、及び仮想)サーバー達により提供されている。
+
 ## ディレクトリ構成
 
  - [`diagrams`](./diagrams/)
@@ -25,6 +31,9 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
        - GitHub Teamsを用いたアクセス制御の定義
      - LKE上の一部オブジェクトの管理
        - Cloudflareが発行したトークンを含むSecretリソース
+
+ - [seichi-onp-network-iap](./seichi-onp-network-iap/README.md)
+   - OnPネットワーク内に置いてあるサービスを公開するためのプロキシの設定
 
  - [`util-scripts`](./util-scripts/)
    - サーバーなどが利用できるように組まれた雑多なインストールスクリプト等を管理しています。

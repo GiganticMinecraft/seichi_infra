@@ -1,0 +1,9 @@
+ingress:
+  # redis-server
+  # cloudflare-service-tokenによるアクセス制御を行う
+  - hostname: redis--bungeesemaphore.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.188:11788"
+  - hostname: redis--redisbungee.tcp-prod-network.seichi.click
+    service: "tcp://192.168.1.188:11787"
+
+  - service: http_status:404
