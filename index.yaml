@@ -1,0 +1,17 @@
+apiVersion: v1
+entries:
+  proxy-k8s-argo-cd:
+  - apiVersion: v2
+    created: "2022-03-18T22:04:04.735474337Z"
+    dependencies:
+    - name: argo-cd
+      repository: https://argoproj.github.io/argo-helm
+      version: 4.2.0
+    digest: 1ab06aa243d7b5e789f843c9b7710e054ca68f69dabcafd14bd848fa516eddae
+    maintainers:
+    - name: GiganticMinecraft
+    name: proxy-k8s-argo-cd
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-k8s-argo-cd-1.0.0/proxy-k8s-argo-cd-1.0.0.tgz
+    version: 1.0.0
+generated: "2022-03-18T22:04:04.735484937Z"
