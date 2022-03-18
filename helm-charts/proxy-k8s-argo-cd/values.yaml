@@ -64,6 +64,7 @@ argo-cd:
           prometheus: kube-prometheus
         namespace: monitoring
         additionalLabels: {}
+
   server:
     configEnabled: true
     # -- [General Argo CD configuration]
@@ -127,6 +128,7 @@ argo-cd:
         namespace: "argocd"
         # -- Prometheus ServiceMonitor labels
         additionalLabels: {}
+
   ## Dex
   dex:
     metrics:
@@ -149,6 +151,7 @@ argo-cd:
         namespace: "argocd"
         # -- Prometheus ServiceMonitor labels
         additionalLabels: {}
+
   redis:
     metrics:
       # -- Deploy metrics service and redis-exporter sidecar
@@ -200,6 +203,7 @@ argo-cd:
         namespace: "argocd"
         # -- Prometheus ServiceMonitor labels
         additionalLabels: {}
+
   ## Repo Server
   repoServer:
     ## Repo server metrics service configuration
@@ -230,3 +234,20 @@ argo-cd:
         namespace: "argocd"
         # -- Prometheus ServiceMonitor labels
         additionalLabels: {}
+
+  ## We will be using the App of Apps pattern (https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/)
+  ##   to manage a group of applications in our cluster.
+  ## This is the only application in this deployment.
+  additionalApplications:
+    - name: argo-cd
+      namespace: argo-cd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      destination:
+        namespace: argo-cd
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: proxy-kubernetes/argocd-apps
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        targetRevision: HEAD
