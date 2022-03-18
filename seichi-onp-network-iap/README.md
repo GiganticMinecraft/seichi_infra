@@ -20,3 +20,11 @@
     ```bash
     ssh seichi-onp-network-iap -t 'bash <(wget -qO- https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/seichi-onp-network-iap/setup-server.sh)'
     ```
+
+3. 再起動後、 `cloudflared` の認証を通してください。
+
+    ```bash
+    ssh seichi-onp-network-iap -t 'sudo docker ps --format "{{.ID}}" | while read -r cid ; do sudo docker logs $cid | less ; done'
+    ```
+
+   で各コンテナのログを見て、Cloudflareの認証用のURLがあればそれで認証してください。認証が終わった後は、 `q` で次のコンテナのログに移動できます。
