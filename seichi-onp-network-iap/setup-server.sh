@@ -43,7 +43,7 @@ sudo git clone \
   "${REPOSITORY_LOCAL_DIRECTORY}"
 
 # start all projects
-composecd_cfgs=$(find "${COMPOSE_CD_SEARCH_ROOT}" -maxdepth 5 -type f -name '.compose-cd')
+composecd_cfgs=$(sudo find "${COMPOSE_CD_SEARCH_ROOT}" -maxdepth 5 -type f -name '.compose-cd')
 for composecd_config in $composecd_cfgs; do
   sudo docker compose -f "$(dirname "$composecd_config")/docker-compose.yml" up -d
 done
