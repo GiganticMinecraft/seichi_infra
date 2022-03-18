@@ -2,7 +2,7 @@ data "github_repository" "seichi_infra" {
   full_name = "GiganticMinecraft/seichi_infra"
 }
 
-resource "github_branch_protection" "seichi_infra_main" {
+resource "github_branch_protection" "seichi_infra_main_for_everybody" {
   repository_id = data.github_repository.seichi_infra.node_id
 
   pattern          = "main"
@@ -16,7 +16,7 @@ resource "github_branch_protection" "seichi_infra_main" {
 
 }
 
-resource "github_branch_protection" "seichi_infra_main" {
+resource "github_branch_protection" "seichi_infra_main_except_admin" {
   repository_id = data.github_repository.seichi_infra.node_id
 
   pattern          = "main"
