@@ -41,7 +41,13 @@ sudo git clone \
   --branch ${SYNC_TARGET_BRANCH} \
   "https://github.com/${SYNC_TARGET_REPOSITORY}.git" \
   "${REPOSITORY_LOCAL_DIRECTORY}"
-sudo docker compose -f "${COMPOSE_CD_SEARCH_ROOT}/services/docker-compose.yml" up -d
+
+# start all projects
+composecd_cfgs=$(find "${COMPOSE_CD_SEARCH_ROOT}" -maxdepth 5 -type f -name '.compose-cd')
+for c in $composecd_cfgs; do
+  local project=$(dirname "$c")
+  sudo docker compose -f "${project}/docker-compose.yml" up -d
+done
 
 # endregion
 
