@@ -6,7 +6,7 @@ resource "github_branch_protection" "seichi_infra_main" {
   repository_id = data.github_repository.seichi_infra.node_id
 
   pattern          = "main"
-  enforce_admins   = true
+  enforce_admins   = false
   allows_deletions = false
 
   required_status_checks {
