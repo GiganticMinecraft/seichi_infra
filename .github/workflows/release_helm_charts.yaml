@@ -40,9 +40,11 @@ jobs:
         run: ct lint
 
       - name: Create kind cluster
+        if: steps.list-changed.outputs.changed == 'true'
         uses: helm/kind-action@v1.2.0
 
       - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct install
 
   release:
