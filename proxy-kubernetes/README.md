@@ -58,10 +58,17 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 
 するようにしてください。
 
-# 構築上の注意点
+# ArgoCD のブートストラッピング
 
 Kubernetesマニフェストの管理でArgoCDを利用する都合上、クラスターを1から再構築する際にはまず以下のコマンドにてArgoCDのインストールを実施してください。
 
 ```bash
-helm upgrade --install argocd -n argocd argo/argo-cd --create-namespace
+# 必要なら kubeconfig を --kubeconfig オプションで指定してください
+helm upgrade --install \
+  -n argocd \
+  --create-namespace \
+  --repo https://giganticminecraft.github.io/seichi_infra \
+  argocd proxy-k8s-argo-cd
 ```
+
+このコマンドでインストールされた ArgoCD は、[この定義](https://github.com/GiganticMinecraft/seichi_infra/blob/9f69953431f23a1002386a105418405e503844ec/proxy-kubernetes/argocd-apps/argocd.yaml)に追従して自身を自動更新します。
