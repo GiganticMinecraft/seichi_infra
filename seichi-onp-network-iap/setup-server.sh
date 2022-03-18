@@ -44,9 +44,8 @@ sudo git clone \
 
 # start all projects
 composecd_cfgs=$(find "${COMPOSE_CD_SEARCH_ROOT}" -maxdepth 5 -type f -name '.compose-cd')
-for c in $composecd_cfgs; do
-  local project=$(dirname "$c")
-  sudo docker compose -f "${project}/docker-compose.yml" up -d
+for composecd_config in $composecd_cfgs; do
+  sudo docker compose -f "$(dirname "$composecd_config")/docker-compose.yml" up -d
 done
 
 # endregion
