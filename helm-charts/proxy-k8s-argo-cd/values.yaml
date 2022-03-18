@@ -2,44 +2,6 @@
 # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
 # for default values.
 argo-cd:
-  server:
-    configEnabled: true
-    # -- [General Argo CD configuration]
-    # @default -- See [values.yaml]
-    config:
-      # Argo CD instance label key
-      application.instanceLabelKey: argocd.argoproj.io/instance
-      kustomize.buildOptions: --load-restrictor LoadRestrictionsNone
-      kustomize.buildOptions.v4.4.0: --output /tmp
-      ## Following settings are required when configuring SSO
-      # Argo CD's externally facing base URL (optional).
-      url: https://argocd.bungee-proxy-public.seichi.click
-      dex.config: |
-        connectors:
-          - type: github
-            id: github
-            name: GitHub
-            config:
-              clientID: 6d77699f96a51159ce39
-              clientSecret: $argocd-github-client-secret:dex.github.clientSecret
-              orgs:
-              - name: GiganticMinecraft
-
-    rbacConfig:
-      # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
-      # Policy rules are in the form:
-      #   p, subject, resource, action, object, effect
-      # Role definitions and bindings are in the form:
-      #   g, subject, inherited-subject
-      # See https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md for additional information.
-      policy.csv: |
-        g, GiganticMinecraft:admin-team, role:admin
-        g, GiganticMinecraft:infra-collaborator, role:admin
-      # policy.default is the name of the default role which Argo CD will falls back to, when
-      # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
-      # but will see no apps, projects, etc...
-      policy.default: role:readonly
-
   ## We will be using the App of Apps pattern (https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/)
   ##   to manage a group of applications in our cluster.
   ## This is the only application in this deployment.
