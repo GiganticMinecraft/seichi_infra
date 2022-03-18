@@ -37,7 +37,10 @@ jobs:
 
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct lint --target-branch main --chart-dirs helm-charts
+        run: |
+          ct lint \
+            --target-branch main --chart-dirs helm-charts \
+            --validate-maintainers false
 
       - name: Create kind cluster
         if: steps.list-changed.outputs.changed == 'true'
