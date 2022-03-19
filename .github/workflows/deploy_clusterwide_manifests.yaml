@@ -8,7 +8,6 @@ on:
     paths:
       - '.github/workflows/deploy_clusterwide_manifests.yaml'
       - 'proxy-kubernetes/clusterwide-k8s-manifests/**'
-      - 'proxy-kubernetes/argocd-apps/**'
 
 env:
   KUBECONFIG: kubeconfig.yaml
@@ -32,5 +31,3 @@ jobs:
             do
                 kubectl apply -k $dir
             done
-            echo "deploy argocd apps"
-            kubectl apply -f proxy-kubernetes/argocd-apps
