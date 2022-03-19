@@ -25,9 +25,9 @@ data:
         service: http://grafana.monitoring:3000
 
       - hostname: argocd.bungee-proxy-public.seichi.click
-        service: https://argocd-server.argocd:443
+        service: https://argocd-server.argo-cd:443
         originRequest:
-          originServerName: argocd-server.argocd
+          originServerName: argocd-server.argo-cd
           noTLSVerify: true
 
       # ArgoCD CLIはgRPCでArgoCDと通信するが、
@@ -39,7 +39,7 @@ data:
       #  cloudflared access tcp --hostname argocd-tcp.bungee-proxy-public.seichi.click --url localhost:8081
       # を実行し、 localhost:8081 にArgoCDの接続先を向けるだけでよい。
       - hostname: argocd-tcp.bungee-proxy-public.seichi.click
-        service: tcp://argocd-server.argocd:443
+        service: tcp://argocd-server.argo-cd:443
 
       - service: http_status:404
 
