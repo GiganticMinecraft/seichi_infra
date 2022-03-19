@@ -31,5 +31,3 @@ jobs:
             do
                 kubectl diff -k $dir || true
             done
-            echo "validate argocd apps"
-            kubectl diff -f proxy-kubernetes/argocd-apps || true
