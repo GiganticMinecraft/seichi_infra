@@ -65,7 +65,7 @@ Kubernetesマニフェストの管理でArgoCDを利用する都合上、クラ�
 ```bash
 # 必要なら kubeconfig を --kubeconfig オプションで指定してください
 helm upgrade --install \
-  -n argocd \
+  -n argo-cd \
   --create-namespace \
   --repo https://giganticminecraft.github.io/seichi_infra \
   argocd proxy-k8s-argo-cd
