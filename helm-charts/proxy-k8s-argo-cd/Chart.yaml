@@ -5,5 +5,6 @@ dependencies:
   - name: argo-cd
     version: 4.2.0
     repository: https://argoproj.github.io/argo-helm
+    alias: argocd
 maintainers:
   - name: GiganticMinecraft

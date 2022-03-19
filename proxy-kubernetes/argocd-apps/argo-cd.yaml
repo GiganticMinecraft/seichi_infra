@@ -1,8 +1,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argo-cd
-  namespace: argo-cd
+  name: argocd
+  namespace: argocd
 spec:
   project: default
   source:
@@ -14,7 +14,7 @@ spec:
       values: |
         # argo-cd is a dependency chart so we must override values like this
         # https://helm.sh/docs/chart_template_guide/subcharts_and_globals/
-        argo-cd:
+        argocd:
           server:
             configEnabled: true
             # -- [General Argo CD configuration]
@@ -34,7 +34,7 @@ spec:
                     name: GitHub
                     config:
                       clientID: 6d77699f96a51159ce39
-                      clientSecret: $argo-cd-github-client-secret:dex.github.clientSecret
+                      clientSecret: $argocd-github-client-secret:dex.github.clientSecret
                       orgs:
                       - name: GiganticMinecraft
 
@@ -54,7 +54,7 @@ spec:
               policy.default: role:readonly
   destination:
     server: https://kubernetes.default.svc
-    namespace: argo-cd
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
@@ -64,8 +64,8 @@ spec:
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
-  name: argo-cd-github-client-secret
-  namespace: argo-cd
+  name: argocd-github-client-secret
+  namespace: argocd
 spec:
   encryptedData:
     dex.github.clientSecret: AgAhwGEL/UUKTZAJ7uTSOEcgU8W0m5XAmJgITx5AGdthhwEr5zyIVJQbw2t59gkcIti+rcI6n41SeTK7RoJCYrDBEbgfV8cv54T8Rla5cCdvJuJ3xd3gwgk1lgeU4m7q//Bz/+JCqzpPCD5HHwCJyjQGG8iLCu2pSo5yS2mmxS+/kewJZoiM0lz9lYGO7iY/OGWFPsZes4RGaB7Ijy+DdRTlnBhT7ilIcBFknJM2J8AsplocCx42u8hTNZVCzg5S8m6OIDunn+VhPuADrXAfnEkF2MLUXcNzhY2sR5hLsof1CXHLOOpGmTAZ4CE4JuVE9oAPnMKlr8HG2sWnAoCL1d6fLpHTzzo3fUhypcsVkp6FZk6/73yw5C35dhoZIq1Xt/0vRrf3RbChtRJui7BXKfkPHkrlq23R0E/bPvwUnAOurQhjmJlp5HAGuVpAuQlqkq+PAoAqtgq7fwQi+rifIoS7Gyn5IFO+Ep4SDK7LMnP7Apl5pvc8yU8es02qBDvztXzyAEu4Y/Vyt0qH4Dk25TCxcMMUD2V+N8Rx/RvorX2wKKh8YnFfxiYoix4wTvSjF1HpmsMDgmBUK2otqIGyO0mEH4RZ1uMBe37wn/IA2bQNzCFyFvt2NHkn8p8ZKTWEKunoTpvdmW1bViiU3f7EWYFpsAQUzgMHvIfFahOrtrHneDRX/e3QirkyrXl1SZkaFa7wHkHqj69IQDegi7ShpbljbP2onWf90DQ0dvbgJyLY8znVxLWVQMz6
@@ -73,4 +73,4 @@ spec:
     type: Opaque
     metadata:
       labels:
-        "app.kubernetes.io/part-of": argo-cd
+        "app.kubernetes.io/part-of": argocd
