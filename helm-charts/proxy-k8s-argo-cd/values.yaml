@@ -22,9 +22,6 @@ argocd:
           path: proxy-kubernetes/argocd-apps
           repoURL: https://github.com/GiganticMinecraft/seichi_infra
           targetRevision: HEAD
-        syncPolicy:
-          automated:
-            prune: true
 
     additionalProjects:
       - name: argocd
