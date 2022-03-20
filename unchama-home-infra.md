@@ -18,6 +18,8 @@
 ### Networking
 
 - segmentationを導入し、`Service Network`と`SAN(Storage Area Network)`,`Management Network`など、用途ごとに分離する
+- 検証環境に10Gを導入(スイッチ入替前提)
+- 検証環境と本番環境の`Management Network`は分離するか一緒にするか検討の余地あり(両環境は目的が違うインフラなのでACLは別々が良さそうと思っている)
 
 ### Storage
 
