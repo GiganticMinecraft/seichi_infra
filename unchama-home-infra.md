@@ -24,6 +24,7 @@
 ### Storage
 
 - 共用ストレージとして10GAll-FlashNASを全面導入する
+  - 本番環境の移行対象は20220321現在で2TiB程度(Ceph上のVMデータとLocalDiskのVMデータの合算)
 - cephは廃止の方向とする
 
 ![図](./diagrams/unchama-home-infra-gen02.drawio.svg)
