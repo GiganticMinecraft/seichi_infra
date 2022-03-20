@@ -17,8 +17,23 @@ argocd:
         destination:
           namespace: argocd
           server: https://kubernetes.default.svc
-        project: default
+        project: argocd
         source:
           path: proxy-kubernetes/argocd-apps
           repoURL: https://github.com/GiganticMinecraft/seichi_infra
           targetRevision: HEAD
+
+    additionalProjects:
+      - name: argocd
+        namespace: argocd
+        description: The Top-Level Project
+        sourceRepos:
+          - '*'
+        destinations:
+          - namespace: argocd
+            server: https://kubernetes.default.svc
+        clusterResourceWhitelist:
+          - group: '*'
+            kind: '*'
+        orphanedResources:
+          warn: true
