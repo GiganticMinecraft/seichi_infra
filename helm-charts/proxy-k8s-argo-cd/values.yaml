@@ -3,19 +3,22 @@
 # for default values.
 # argo-cd is aliased to argocd
 argocd:
-  ## We will be using the App of Apps pattern (https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/)
-  ##   to manage a group of applications in our cluster.
-  ## This is the only application in this deployment.
-  additionalApplications:
-    - name: argocd
-      namespace: argocd
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io
-      destination:
+  # config of server
+  # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml#L781
+  server:
+    ## We will be using the App of Apps pattern (https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/)
+    ##   to manage a group of applications in our cluster.
+    ## This is the only application in this deployment.
+    additionalApplications:
+      - name: argocd
         namespace: argocd
-        server: https://kubernetes.default.svc
-      project: default
-      source:
-        path: proxy-kubernetes/argocd-apps
-        repoURL: https://github.com/GiganticMinecraft/seichi_infra
-        targetRevision: HEAD
+        finalizers:
+          - resources-finalizer.argocd.argoproj.io
+        destination:
+          namespace: argocd
+          server: https://kubernetes.default.svc
+        project: default
+        source:
+          path: proxy-kubernetes/argocd-apps
+          repoURL: https://github.com/GiganticMinecraft/seichi_infra
+          targetRevision: HEAD
