@@ -58,8 +58,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-    syncOptions:
-    - CreateNamespace=true
 ---
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret

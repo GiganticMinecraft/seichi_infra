@@ -25,8 +25,6 @@ argocd:
         syncPolicy:
           automated:
             prune: true
-          syncOptions:
-            - CreateNamespace=true
 
     additionalProjects:
       - name: argocd
