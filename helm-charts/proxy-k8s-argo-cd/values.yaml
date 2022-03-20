@@ -23,7 +23,7 @@ argocd:
           repoURL: https://github.com/GiganticMinecraft/seichi_infra
           targetRevision: HEAD
 
-    additionalProjects: 
+    additionalProjects:
       - name: argocd
         namespace: argocd
         description: The Top-Level Project
