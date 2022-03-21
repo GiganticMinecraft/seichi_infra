@@ -113,6 +113,20 @@ entries:
     version: 1.0.0
   proxy-k8s-argo-cd-bootstrapping:
   - apiVersion: v2
+    created: "2022-03-21T02:34:51.700058764Z"
+    dependencies:
+    - alias: argocd
+      name: argo-cd
+      repository: https://argoproj.github.io/argo-helm
+      version: 4.2.0
+    digest: b6ceddc8409fef63ad49da8926f87ce764804a0e717e1f8c14c73d0a2e540e81
+    maintainers:
+    - name: GiganticMinecraft
+    name: proxy-k8s-argo-cd-bootstrapping
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-k8s-argo-cd-bootstrapping-0.1.1/proxy-k8s-argo-cd-bootstrapping-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     created: "2022-03-21T01:42:46.121720178Z"
     dependencies:
     - alias: argocd
@@ -126,4 +140,4 @@ entries:
     urls:
     - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-k8s-argo-cd-bootstrapping-0.1.0/proxy-k8s-argo-cd-bootstrapping-0.1.0.tgz
     version: 0.1.0
-generated: "2022-03-21T01:42:46.121879581Z"
+generated: "2022-03-21T02:34:51.700250879Z"
