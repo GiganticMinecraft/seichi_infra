@@ -11,7 +11,7 @@
 - 共用ストレージとしてProxmoxクラスター上にcephクラスターが存在 ただしcephはIOが出ないので実質ほとんどローカルで持ってる
 - 10GAll-FlashNASを買ったけど現在は検証環境Proxmoxクラスターの共用ストレージとしてのみ利用
 
-## Virtualization
+### Virtualization
 
 - Proxmox
 - 検証環境でkubevirt検証
@@ -34,7 +34,7 @@
   - 本番環境の移行対象は20220321現在で2TiB程度(Ceph上のVMデータとLocalDiskのVMデータの合算)
 - cephは廃止の方向とする
 
-## Virtualization
+### Virtualization
 
 - Proxmox
 - kubevirtの適用範囲要検討(検証次第)
