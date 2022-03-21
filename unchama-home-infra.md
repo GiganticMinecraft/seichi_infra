@@ -27,4 +27,11 @@
   - 本番環境の移行対象は20220321現在で2TiB程度(Ceph上のVMデータとLocalDiskのVMデータの合算)
 - cephは廃止の方向とする
 
+### 要追加機材
+
+- 検証環境 Proxmox 10G NIM x3
+  - 付随するSFP+トランシーバーとケーブルも必要(対向分も)
+- 本番環境 Proxmox 1G NIC x3
+- 検証環境 AT-x510-28GTX x1
+
 ![図](./diagrams/unchama-home-infra-gen02.drawio.svg)
