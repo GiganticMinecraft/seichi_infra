@@ -69,7 +69,7 @@ helm upgrade --install \
   --create-namespace \
   --repo https://argoproj.github.io/argo-helm \
   --version 4.2.0 \
-  --values https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/proxy-kubernetes/argocd-bootstrapping.yaml
+  --values https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/proxy-kubernetes/argocd/argocd-bootstrapping.yaml
   argocd argo-cd
 ```
 
