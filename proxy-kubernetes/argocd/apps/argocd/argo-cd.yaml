@@ -6,9 +6,6 @@ metadata:
 spec:
   project: argocd
   source:
-    # proxy-k8s-argo-cd-bootstrapping はブートストラッピングにのみ用いるchartなので、
-    # proxy-k8s-argo-cd-bootstrapping は利用せずに直接ArgoCDのチャートを使う
-    # (注：むしろ、proxy-k8s-argo-cd-bootstrapping の特定リビジョンを使うと永遠にreconcilationが走ってしまう)
     chart: argo-cd
     repoURL: https://argoproj.github.io/argo-helm
     targetRevision: 4.2.0
