@@ -4,7 +4,7 @@ metadata:
   name: argocd
   namespace: argocd
 spec:
-  project: default
+  project: argocd
   source:
     # proxy-k8s-argo-cd-bootstrapping はブートストラッピングにのみ用いるchartなので、
     # proxy-k8s-argo-cd-bootstrapping は利用せずに直接ArgoCDのチャートを使う
@@ -15,8 +15,8 @@ spec:
     helm:
       releaseName: argo-cd
       values: |
-        # config of server
-        # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml#L781
+        # Config of server
+        # See https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml#L781
         server:
           configEnabled: true
           # -- [General Argo CD configuration]
