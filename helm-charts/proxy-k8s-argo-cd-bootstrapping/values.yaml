@@ -6,9 +6,9 @@ argocd:
   # config of server
   # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml#L781
   server:
-    ## We will only configure ArgoCD itself here, and expect definition at
-    ## proxy-kubernetes/argocd-apps of https://github.com/GiganticMinecraft/seichi_infra
-    ## to further configure the ArgoCD application (via App of Apps pattern)
+    # We will only configure ArgoCD itself here, and expect definition at
+    # proxy-kubernetes/argocd-apps of https://github.com/GiganticMinecraft/seichi_infra
+    # to further configure the ArgoCD application (via App of Apps pattern)
     additionalApplications:
       - name: argocd
         namespace: argocd
