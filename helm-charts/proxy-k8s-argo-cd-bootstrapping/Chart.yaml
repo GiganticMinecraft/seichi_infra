@@ -1,6 +1,6 @@
 apiVersion: v2
-name: proxy-k8s-argo-cd
-version: 1.0.7
+name: proxy-k8s-argo-cd-bootstrapping
+version: 0.1.0
 dependencies:
   - name: argo-cd
     version: 4.2.0

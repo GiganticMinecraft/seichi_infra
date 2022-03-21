@@ -1,4 +1,4 @@
-# values for argocd. See
+# Values for argocd. See
 # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
 # for default values.
 # argo-cd is aliased to argocd
@@ -6,9 +6,9 @@ argocd:
   # config of server
   # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml#L781
   server:
-    ## We will be using the App of Apps pattern (https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/)
-    ##   to manage a group of applications in our cluster.
-    ## This is the only application in this deployment.
+    ## We will only configure ArgoCD itself here, and expect definition at
+    ## proxy-kubernetes/argocd-apps of https://github.com/GiganticMinecraft/seichi_infra
+    ## to further configure the ArgoCD application (via App of Apps pattern)
     additionalApplications:
       - name: argocd
         namespace: argocd
@@ -21,8 +21,10 @@ argocd:
         source:
           path: proxy-kubernetes/argocd-apps
           repoURL: https://github.com/GiganticMinecraft/seichi_infra
-          targetRevision: HEAD
-
+          targetRevision: main
+        syncPolicy:
+          automated:
+            prune: true
     additionalProjects:
       - name: argocd
         namespace: argocd
