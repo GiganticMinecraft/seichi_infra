@@ -33,5 +33,8 @@
   - 付随するSFP+トランシーバーとケーブルも必要(対向分も)
 - 本番環境 Proxmox 1G NIC x3
 - 検証環境 AT-x510-28GTX x1
+- ログイン踏み台 x1
+  - 置き方を要検討(VM？物理？)
+  - 1個じゃなくて2個必要かも(本番環境と検証環境でACL分ける)
 
 ![図](./diagrams/unchama-home-infra-gen02.drawio.svg)
