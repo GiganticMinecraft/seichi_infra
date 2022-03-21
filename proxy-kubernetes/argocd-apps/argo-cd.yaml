@@ -6,11 +6,85 @@ metadata:
 spec:
   project: argocd
   source:
+    # proxy-k8s-argo-cd-bootstrapping はブートストラッピングにのみ用いるchartなので、
+    # proxy-k8s-argo-cd-bootstrapping は利用せずに直接ArgoCDのチャートを使う
+    # (注：むしろ、proxy-k8s-argo-cd-bootstrapping の特定リビジョンを使うと永遠にreconcilationが走ってしまう)
     chart: argo-cd
     repoURL: https://argoproj.github.io/argo-helm
     targetRevision: 4.2.0
     helm:
       releaseName: argo-cd
+      # valuesのデフォルト値は
+      # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
+      # を参照してください。
+      values: |
+        server:
+          configEnabled: true
+          # -- [General Argo CD configuration]
+          # @default -- See [values.yaml]
+          config:
+            # Argo CD instance label key
+            application.instanceLabelKey: argocd.argoproj.io/instance
+            kustomize.buildOptions: --load-restrictor LoadRestrictionsNone
+            kustomize.buildOptions.v4.4.0: --output /tmp
+            ## Following settings are required when configuring SSO
+            # Argo CD's externally facing base URL (optional).
+            url: https://argocd.bungee-proxy-public.seichi.click
+            dex.config: |
+              connectors:
+                - type: github
+                  id: github
+                  name: GitHub
+                  config:
+                    clientID: 6d77699f96a51159ce39
+                    clientSecret: $argocd-github-client-secret:dex.github.clientSecret
+                    orgs:
+                    - name: GiganticMinecraft
+
+          rbacConfig:
+            # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
+            # Policy rules are in the form:
+            #   p, subject, resource, action, object, effect
+            # Role definitions and bindings are in the form:
+            #   g, subject, inherited-subject
+            # See https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md for additional information.
+            policy.csv: |
+              g, GiganticMinecraft:admin-team, role:admin
+              g, GiganticMinecraft:infra-collaborator, role:admin
+            # policy.default is the name of the default role which Argo CD will falls back to, when
+            # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
+            # but will see no apps, projects, etc...
+            policy.default: role:readonly
+          
+          additionalApplications:
+            - name: argocd
+              namespace: argocd
+              finalizers:
+                - resources-finalizer.argocd.argoproj.io
+              destination:
+                namespace: argocd
+                server: https://kubernetes.default.svc
+              project: argocd
+              source:
+                path: proxy-kubernetes/argocd-apps
+                repoURL: https://github.com/GiganticMinecraft/seichi_infra
+                targetRevision: main
+
+          additionalProjects:
+            - name: argocd
+              namespace: argocd
+              description: The Top-Level Project
+              sourceRepos:
+                - '*'
+              destinations:
+                - namespace: argocd
+                  server: https://kubernetes.default.svc
+              clusterResourceWhitelist:
+                - group: '*'
+                  kind: '*'
+              orphanedResources:
+                warn: true
+
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
