@@ -68,7 +68,7 @@ helm upgrade --install \
   -n argocd \
   --create-namespace \
   --repo https://giganticminecraft.github.io/seichi_infra \
-  argocd proxy-k8s-argo-cd
+  argocd proxy-k8s-argo-cd-bootstrapping --version 0.1.0
 ```
 
 このコマンドでインストールされた ArgoCD は、[この定義](https://github.com/GiganticMinecraft/seichi_infra/blob/9f69953431f23a1002386a105418405e503844ec/proxy-kubernetes/argocd-apps/argocd.yaml)に追従して自身を自動更新します。
