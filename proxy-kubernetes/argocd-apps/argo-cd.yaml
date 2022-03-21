@@ -14,9 +14,10 @@ spec:
     targetRevision: 4.2.0
     helm:
       releaseName: argo-cd
+      # valuesのデフォルト値は
+      # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
+      # を参照してください。
       values: |
-        # デフォルト値は https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
-        # を参照してください。
         server:
           configEnabled: true
           # -- [General Argo CD configuration]
