@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeseal
+  namespace: argocd
+spec:
+  project: argocd-root
+  source:
+    # https://github.com/bitnami-labs/sealed-secrets/releases/tag/helm-v2.1.4
+    repoURL: https://bitnami-labs.github.io/sealed-secrets
+    chart: sealed-secrets
+    targetRevision: "2.1.4"
+    helm:
+      releaseName: sealed-secrets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd

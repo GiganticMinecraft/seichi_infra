@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: argocd-root
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: proxy-kubernetes/argocd/apps/root
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: argocd-root
+  source:
+    path: proxy-kubernetes/argocd/apps/argocd
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
