@@ -1,0 +1,36 @@
+# The root project residing in argocd namespace.
+#
+# Any application that introduces a CustomResourceDefinition
+# should be included within this project, or else we will fail to bootstrap
+# subproject's applications.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argocd-root
+  namespace: argocd
+spec:
+  description: The top-level project
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  description: Project to self-manage ArgoCD
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: 'argocd'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
