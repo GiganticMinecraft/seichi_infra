@@ -3,23 +3,21 @@
 # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
 server:
   additionalApplications:
-    - name: argocd
+    - name: argocd-root
       namespace: argocd
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io
-      destination:
-        namespace: argocd
-        server: https://kubernetes.default.svc
-      project: argocd
+      project: argocd-root
       source:
-        path: proxy-kubernetes/argocd/apps/argocd
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         targetRevision: main
+        path: proxy-kubernetes/argocd/apps/root
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
 
   additionalProjects:
-    - name: argocd
+    - name: argocd-root
       namespace: argocd
-      description: Project to manage ArgoCD-related resources
+      description: The top-level project
       sourceRepos:
         - '*'
       destinations:
