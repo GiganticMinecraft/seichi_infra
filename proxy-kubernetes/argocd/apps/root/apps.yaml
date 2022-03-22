@@ -16,19 +16,6 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-      allowEmpty: true
-    syncOptions:
-      - CreateNamespace=true
-    retry:
-      limit: -1
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 2h
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -46,16 +33,3 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-      allowEmpty: true
-    syncOptions:
-      - CreateNamespace=true
-    retry:
-      limit: -1
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 2h
