@@ -15,7 +15,7 @@ spec:
     namespace: argocd
 ---
 apiVersion: argoproj.io/v1alpha1
-kind: Project
+kind: AppProject
 metadata:
   name: argocd
   namespace: argocd
