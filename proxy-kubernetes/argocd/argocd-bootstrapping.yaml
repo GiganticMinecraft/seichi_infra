@@ -28,5 +28,3 @@ server:
       clusterResourceWhitelist:
         - group: '*'
           kind: '*'
-      orphanedResources:
-        warn: true
