@@ -1,7 +1,8 @@
 # The root project residing in argocd namespace.
 #
-# Any application that introduces a CustomResourceDefinition
-# should be included within this project, or else we will fail to bootstrap
+# Any application that is needed to bootstrap the ArgoCD
+# (e.g. an application that introduces a CustomResourceDefinition)
+# should be included within this project, otherwise we will fail to bootstrap
 # subproject's applications.
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
