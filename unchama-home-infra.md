@@ -26,7 +26,7 @@
 
 - segmentationを導入し、`Service Network`と`SAN(Storage Area Network)`,`Management Network`など、用途ごとに分離する
 - 検証環境に10Gを導入(スイッチ入替前提)
-- 検証環境と本番環境の`Management Network`は分離するか一緒にするか検討の余地あり(両環境は目的が違うインフラなのでACLは別々が良さそうと思っている)
+- 本番環境と検証環境のネットワークはアクセス制御の観点から完全分離する(相互環境に跨ぐセグメントは作らない)
 
 ### Storage
 
@@ -43,10 +43,13 @@
 
 - 検証環境 Proxmox 10G NIM x3
   - 付随するSFP+トランシーバーとケーブルも必要(対向分も)
-- 本番環境 Proxmox 1G NIC x3
+  - 10G NIMの調達が難しいと思うので一旦1G NICで代用
+- 本番環境 Proxmox 1G NIC x2
+  - unchama-sv-prox01 x1
+  - unchama-sv-prox02 x1
 - 検証環境 AT-x510-28GTX x1
-- ログイン踏み台 x1
-  - 置き方を要検討(VM？物理？)
-  - 1個じゃなくて2個必要かも(本番環境と検証環境でACL分ける)
+- ログイン用踏み台サーバー
+  - Proxmoxクラスター上のVMとして用意
+  - 2個用意済(本番環境1VM,検証環境1VM)
 
 ![図](./diagrams/unchama-home-infra-gen02.drawio.svg)
