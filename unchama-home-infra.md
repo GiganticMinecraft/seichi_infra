@@ -20,6 +20,22 @@
 
 ![図](./diagrams/unchama-home-infra-gen01.drawio.svg)
 
+| hostname | 名称 | 形態 | CPU | MEM | NIC | 備考 |
+| -------- | --- | ---- | --- | --- | --- | --- |
+| unchama-sv-prox01 | 本番proxmox#1 | 自作PC | AMD Ryzen 5 3600 (6C12T) | 64GB DDR4 | Onboard:1Gx1,PCI:10Gx1 | |
+| unchama-sv-prox02 | 本番proxmox#2 | 自作PC | Intel Core i7-8700K (6C12T) | 64GB DDR4 | Onboard:1Gx1,PCI:10Gx1 | |
+| unchama-sv-prox04 | 本番proxmox#4 | 自作PC | Intel Core i7-6800K (6C12T) | 64GB DDR4 | Onboard:1Gx2,PCI:10Gx1 | |
+| seichi-cloud | 10G ALL Flash NAS 本番/検証併用 | NAS | AMD Ryzen V1500B quad-core 2.2 GHz | 4GB DDR4 ECC SODIMM | Onboard:1Gx4,PCI:10Gx2 | Synology DS1621+ |
+| unchama-sv-dt2 | 本番ubuntu機 | 自作PC | Intel Core i5-6600K (4C4T) | DDR4 48GB | Onboard:1Gx1 | 上のサービスを移行次第廃止予定 |
+| unchama-sv-nas3 | 本番NAS DS218+ | NAS | Intel Celeron J3355 (2C2T) | DDR4 18GB(Onboard:2GB,ext:16GB) SODIMM | Onboard:1Gx1 | Synology DS218+ |
+| seichi-nas04 | 本番NAS DS216j | NAS | Marvell Armada 385 88F6820 dual-core 1.0GHz | DDR3 512MB | Onboard:1Gx1 | Synology DS216j |
+| unchama-tst-prox01 | 検証proxmox#1 | 自作PC | Intel Core i5 9500  (6C6T)  | 32GB DDR4 | Onboard:1Gx1,PCI:1Gx1 | |
+| unchama-tst-prox03 | 検証proxmox#3 | 自作PC | Intel Core i7 8700K (6C12T) | 32GB DDR4 | Onboard:1Gx1,PCI:1Gx1 | |
+| unchama-tst-prox04 | 検証proxmox#4 | 自作PC | Intel Core i3 6100  (2C4T)  | 32GB DDR4 | Onboard:1Gx1,PCI:1Gx1 | |
+| - | 検証用NAS DS116 | NAS | Marvell ARMADA 385 88F6820 dual-core 1.8GHz | 1GB DDR3 | Onboard:1Gx1 | Synology DS116 |
+| unchama-tst-kubevirt01 | kubevirt検証用ubuntu#1 | Intel NUC | intel Core i5 10210U (4C8T) | 32GB DDR4 | Onboard:1Gx1,USB:1Gx1 | |
+| unchama-tst-kubevirt02 | kubevirt検証用ubuntu#2 | Intel NUC | intel Core i5 10210U (4C8T) | 32GB DDR4 | Onboard:1Gx1,USB:1Gx1 | |
+
 ## gen02(次期構想)
 
 ### Networking
