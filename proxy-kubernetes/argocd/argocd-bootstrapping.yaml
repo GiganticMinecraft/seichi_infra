@@ -3,7 +3,7 @@
 # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
 server:
   additionalApplications:
-    - name: argocd-root
+    - name: argocd-root-app-of-apps
       namespace: argocd
       project: argocd-root
       source:
