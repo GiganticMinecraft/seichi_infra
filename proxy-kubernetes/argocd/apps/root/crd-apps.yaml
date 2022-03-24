@@ -1,3 +1,8 @@
+# Any application that is needed to bootstrap the ArgoCD
+# (e.g. an application that introduces a CustomResourceDefinition)
+# should be included within argocd-root project, otherwise we may fail to bootstrap
+# subproject's applications.
+
 # See the following file for documentations
 # https://github.com/argoproj/argo-cd/blob/a6c664b2aefc513936e9f56c1a373bdbddcd5727/docs/operator-manual/application.yaml
 apiVersion: argoproj.io/v1alpha1

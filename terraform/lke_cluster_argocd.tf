@@ -10,4 +10,8 @@ resource "helm_release" "lke_cluster_argocd" {
   reset_values    = true
   recreate_pods   = true
   cleanup_on_fail = true
+
+  values = [
+    file("../proxy-kubernetes/argocd/argocd-helm-chart-values.yaml")
+  ]
 }
