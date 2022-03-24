@@ -2,8 +2,8 @@ resource "helm_release" "lke_cluster_argocd" {
   depends_on = [kubernetes_namespace.argocd]
 
   repository = "https://argoproj.github.io/argo-helm"
-  name       = "argo-cd"
   chart      = "argo-cd"
+  name       = "argocd"
   namespace  = "argocd"
   version    = "4.2.0"
 
