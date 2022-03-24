@@ -58,19 +58,20 @@ spec:
     spec:
       containers:
         - name: origin-cloudflared
-          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-0bbfe85"
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-ebd970b"
           env:
             - name: TUNNEL_NAME
               value: "proxy-kubernetes-origin-cloudflared-tunnel"
             # cloudflared tunnel が実行された時、 cloudflared は Tunnel credential を
-            # /root/.cloudflared/<tunnel-id>.json
-            # に書き込む。
+            # $TUNNEL_CRED_FILE に書き込む。
             # また、tunnel origin certificate は k8s の Secret によって提供されるため、
             # どこかにread-onlyでマウントする必要がある。
-            # そのため、 TUNNEL_ORIGIN_CERT を /root/.cloudflared-origin-cert/cert.pem に設定し、
-            # cloudflared に /root/.cloudflared への書き込みを許す必要がある。
+            # そのため、 TUNNEL_ORIGIN_FILE を TUNNEL_ORIGIN_CERT のマウントパス外に
+            # 設定する必要がある
             - name: TUNNEL_ORIGIN_CERT
               value: "/root/.cloudflared-origin-cert/cert.pem"
+            - name: TUNNEL_CRED_FILE
+              value: "/root/.cloudflared/tunnel-cred.json"
           volumeMounts:
             - mountPath: "/root/.cloudflared-origin-cert"
               name: origin-cloudflared-authorization-certificate
