@@ -110,10 +110,24 @@ variable "lke_k8s_kubeconfig" {
 # 保持している。
 # LKE以外のmanaged k8s環境へ乗り換える際には、クラスタから得られるkubeconfigが含む情報が異なる可能性があるので注意。
 
+locals {
+  lke_kubenetes_cluster_host           = yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.server
+  lke_kubenetes_cluster_token          = yamldecode(var.lke_k8s_kubeconfig).users[0].user.token
+  lke_kubenetes_cluster_ca_certificate = base64decode(yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
+}
+
 provider "kubernetes" {
-  host                   = yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.server
-  token                  = yamldecode(var.lke_k8s_kubeconfig).users[0].user.token
-  cluster_ca_certificate = base64decode(yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
+  host                   = local.lke_kubenetes_cluster_host
+  token                  = local.lke_kubenetes_cluster_token
+  cluster_ca_certificate = local.lke_kubenetes_cluster_ca_certificate
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = local.lke_kubenetes_cluster_host
+    token                  = local.lke_kubenetes_cluster_token
+    cluster_ca_certificate = local.lke_kubenetes_cluster_ca_certificate
+  }
 }
 
 # endregion
