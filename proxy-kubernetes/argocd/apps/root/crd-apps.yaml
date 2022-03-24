@@ -24,3 +24,15 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2h
+
