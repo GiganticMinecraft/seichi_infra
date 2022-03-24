@@ -9,3 +9,9 @@ resource "kubernetes_namespace" "seichi_gateway" {
     name = "seichi-gateway"
   }
 }
+
+resource "kubernetes_namespace" "argocd" {
+  metadata {
+    name = "argocd"
+  }
+}
