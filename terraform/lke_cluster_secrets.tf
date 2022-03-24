@@ -1,7 +1,11 @@
 resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
+  depends_on = [
+    kubernetes_namespace.seichi_debug_gateway,
+  ]
+
   metadata {
     name      = "cloudflared-access-token"
-    namespace = "haproxy-debug-gw"
+    namespace = "seichi-debug-gateway"
   }
 
   data = {
@@ -13,9 +17,13 @@ resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
 }
 
 resource "kubernetes_secret" "prod_cloudflared_access_service_token" {
+  depends_on = [
+    kubernetes_namespace.seichi_gateway,
+  ]
+
   metadata {
     name      = "cloudflared-access-token"
-    namespace = "haproxy-gw"
+    namespace = "seichi-gateway"
   }
 
   data = {
