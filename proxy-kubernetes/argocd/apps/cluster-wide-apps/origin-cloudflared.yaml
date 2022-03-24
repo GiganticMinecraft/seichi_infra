@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
         - name: origin-cloudflared
-          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-ebd970b"
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-5b17cf6"
           env:
             - name: TUNNEL_NAME
               value: "proxy-kubernetes-origin-cloudflared-tunnel"
