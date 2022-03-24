@@ -1,8 +1,4 @@
 resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
-  depends_on = [
-    kubernetes_namespace.seichi_debug_gateway,
-  ]
-
   metadata {
     name      = "cloudflared-access-token"
     namespace = kubernetes_namespace.seichi_debug_gateway.metadata.name
@@ -17,10 +13,6 @@ resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
 }
 
 resource "kubernetes_secret" "prod_cloudflared_access_service_token" {
-  depends_on = [
-    kubernetes_namespace.seichi_gateway,
-  ]
-
   metadata {
     name      = "cloudflared-access-token"
     namespace = kubernetes_namespace.seichi_gateway.metadata.name
