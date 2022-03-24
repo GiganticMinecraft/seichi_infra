@@ -132,6 +132,9 @@ variable "lke_k8s_argocd_github_oauth_app_secret" {
 
 # プロキシ層の k8s で走る cloudflared の認証情報。
 # cloudflared login で得られる .pem ファイルの中身を設定してください。 
+#
+# 2022/03/25 現在、適切な権限を持った Cloduflare ユーザーが
+# https://dash.cloudflare.com/argotunnel にアクセスして seichi-network を対象に認証することでも .pem が得られます。
 variable "lke_k8s_cloudflare_argo_tunnel_credential" {
   description   = "The credential used by proxy-layer's cloudflared. This can be obtained using cloudflared login command."
   type          = string
