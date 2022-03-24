@@ -5,7 +5,7 @@ resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
 
   metadata {
     name      = "cloudflared-access-token"
-    namespace = "seichi-debug-gateway"
+    namespace = kubernetes_namespace.seichi_debug_gateway.metadata.name
   }
 
   data = {
@@ -23,7 +23,7 @@ resource "kubernetes_secret" "prod_cloudflared_access_service_token" {
 
   metadata {
     name      = "cloudflared-access-token"
-    namespace = "seichi-gateway"
+    namespace = kubernetes_namespace.seichi_gateway.metadata.name
   }
 
   data = {
