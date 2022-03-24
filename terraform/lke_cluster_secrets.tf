@@ -1,7 +1,9 @@
 resource "kubernetes_secret" "cloudflared_tunnel_credential" {
+  depends_on = [kubernetes_namespace.cluster_wide_apps]
+
   metadata {
     name      = "cloudflared-tunnel-credential"
-    namespace = "kube-system"
+    namespace = "cluster-wide-apps"
   }
 
   data = {

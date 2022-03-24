@@ -15,3 +15,9 @@ resource "kubernetes_namespace" "argocd" {
     name = "argocd"
   }
 }
+
+resource "kubernetes_namespace" "cluster_wide_apps" {
+  metadata {
+    name = "cluster-wide-apps"
+  }
+}
