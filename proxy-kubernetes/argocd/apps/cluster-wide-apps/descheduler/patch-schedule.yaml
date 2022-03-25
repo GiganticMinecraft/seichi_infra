@@ -1,0 +1,6 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: descheduler-cronjob
+spec:
+  schedule: "0 20 * * *"
