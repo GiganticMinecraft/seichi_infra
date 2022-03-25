@@ -1,5 +1,3 @@
-# See the following file for documentations
-# https://github.com/argoproj/argo-cd/blob/a6c664b2aefc513936e9f56c1a373bdbddcd5727/docs/operator-manual/application.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -38,4 +36,33 @@ spec:
             duration: 5s
             factor: 2
             maxDuration: 2m
-
+---
+# See the following file for documentations
+# https://github.com/argoproj/argo-cd/blob/a6c664b2aefc513936e9f56c1a373bdbddcd5727/docs/operator-manual/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-wide-app-resources
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: proxy-kubernetes/argocd/apps/cluster-wide-app-resources
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: 'cluster-wide-apps'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m

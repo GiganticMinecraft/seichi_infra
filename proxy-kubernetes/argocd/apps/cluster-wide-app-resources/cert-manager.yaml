@@ -1,0 +1,23 @@
+# See the following file for documentations
+# https://github.com/argoproj/argo-cd/blob/a6c664b2aefc513936e9f56c1a373bdbddcd5727/docs/operator-manual/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+spec:
+  project: argocd-root
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.7.1
+    helm:
+      releaseName: cert-manager
+      values: |
+        installCRDs: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cluster-wide-apps
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
