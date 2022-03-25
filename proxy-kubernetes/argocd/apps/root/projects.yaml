@@ -8,7 +8,7 @@ spec:
   sourceRepos:
     - '*'
   destinations:
-    - namespace: '*'
+    - namespace: 'cluster-wide-apps'
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
