@@ -2,9 +2,9 @@
 # (e.g. an application that introduces a CustomResourceDefinition)
 # should be included within argocd-root project, otherwise we may fail to bootstrap
 # subproject's applications.
-
 # See the following file for documentations
 # https://github.com/argoproj/argo-cd/blob/a6c664b2aefc513936e9f56c1a373bdbddcd5727/docs/operator-manual/application.yaml
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -28,11 +28,36 @@ spec:
     automated:
       prune: true
       selfHeal: true
-      allowEmpty: true
-    retry:
-      limit: -1
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 2m
-
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+spec:
+  project: argocd-root
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.7.1
+    helm:
+      releaseName: cert-manager
+      values: |
+        installCRDs: true
+        prometheus:
+          enabled: true
+          servicemonitor:
+            enabled: true
+            prometheusInstance: default
+            targetPort: 9402
+            path: /metrics
+            interval: 60s
+            scrapeTimeout: 30s
+            labels: {}
+            honorLabels: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
