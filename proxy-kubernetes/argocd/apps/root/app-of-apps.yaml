@@ -3,7 +3,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: app-of-cluster-wide-apps
+  name: cluster-wide-apps
   namespace: argocd
 spec:
   generators:
@@ -16,8 +16,6 @@ spec:
     metadata:
       name: "{{path.basenameNormalized}}"
       namespace: cluster-wide-apps
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io
     spec:
       project: cluster-wide-apps
       source:
