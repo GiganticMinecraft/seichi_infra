@@ -16,8 +16,6 @@ spec:
     metadata:
       name: "{{path.basenameNormalized}}"
       namespace: cluster-wide-apps
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io
     spec:
       project: cluster-wide-apps
       source:
