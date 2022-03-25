@@ -1,0 +1,2 @@
+spec:
+  schedule: "0 20 * * *"
