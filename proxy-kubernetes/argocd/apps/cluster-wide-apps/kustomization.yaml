@@ -9,10 +9,5 @@ resources:
   # descheduler
   - github.com/kubernetes-sigs/descheduler/kubernetes/cronjob?ref=v0.23.1
 
-patches:
-  - path: ./descheduler/patch.yaml
-    target:
-      group: batch
-      version: v1
-      kind: CronJob
-      name: descheduler-cronjob
+patchesStrategicMerge:
+  - ./descheduler/patch.yaml
