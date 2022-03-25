@@ -18,6 +18,14 @@
   - `Control Plane`はProxmox上にVM建てる
   - `node`は`unchama-tst-kubevirt01`と`unchama-tst-kubevirt02`を利用(intel NUC)
 
+### 外部からの管理アクセス
+
+- ログイン用SSH踏み台サーバー
+  - Proxmoxクラスター上のVMとして用意
+  - 2個用意済(本番環境1VM,検証環境1VM)
+    - 本番環境はインターネットからNAPTで公開
+    - 検証環境はcloudflared経由で公開
+
 ![図](./diagrams/unchama-home-infra-gen01.drawio.svg)
 
 #### 本番用コンピュートリソース
@@ -52,7 +60,7 @@
 
 ### Networking
 
-- segmentationを導入し、`Service Network`と`SAN(Storage Area Network)`,`Management Network`など、用途ごとに分離する
+- segmentationを導入し、`Service Network`と`SAN(Storage Area Network)`など、用途ごとに分離する
 - 検証環境に10Gを導入(スイッチ入替前提)
 - 本番環境と検証環境のネットワークはアクセス制御の観点から完全分離する(相互環境に跨ぐセグメントは作らない)
 
@@ -67,17 +75,19 @@
 - Proxmox
 - kubevirtの適用範囲要検討(検証次第)
 
+### 外部からの管理アクセス
+
+- ログイン用SSH踏み台サーバー
+  - Proxmoxクラスター上のVMとして用意
+  - 2個用意済(本番環境1VM,検証環境1VM)
+    - 本番環境はインターネットからNAPTで公開
+    - 検証環境はcloudflared経由で公開
+
 ### 要追加機材
 
 - 検証環境 Proxmox 10G NIM x3
   - 付随するSFP+トランシーバーとケーブルも必要(対向分も)
-  - 10G NIMの調達が難しいと思うので一旦1G NICで代用
-- 本番環境 Proxmox 1G NIC x2
-  - unchama-sv-prox01 x1
-  - unchama-sv-prox02 x1
+  - 20220326時点では10G NIMの調達が難しいと思うので一旦1G NICで代用
 - 検証環境 AT-x510-28GTX x1
-- ログイン用踏み台サーバー
-  - Proxmoxクラスター上のVMとして用意
-  - 2個用意済(本番環境1VM,検証環境1VM)
 
 ![図](./diagrams/unchama-home-infra-gen02.drawio.svg)
