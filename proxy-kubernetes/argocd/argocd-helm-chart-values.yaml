@@ -38,7 +38,7 @@ server:
           backoff:
             duration: 5s
             factor: 2
-            maxDuration: 2h
+            maxDuration: 2m
 
   configEnabled: true
   # -- [General Argo CD configuration]
