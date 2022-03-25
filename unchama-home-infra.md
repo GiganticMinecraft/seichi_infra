@@ -14,9 +14,6 @@
 ### Virtualization
 
 - Proxmox
-- 検証環境でkubevirt検証
-  - `Control Plane`はProxmox上にVM建てる
-  - `node`は`unchama-tst-kubevirt01`と`unchama-tst-kubevirt02`を利用(intel NUC)
 
 ### 外部からの管理アクセス
 
@@ -73,7 +70,9 @@
 ### Virtualization
 
 - Proxmox
-- kubevirtの適用範囲要検討(検証次第)
+- 検証環境でkubevirt検証したいわね
+  - `Control Plane`はProxmox上にVM建てる
+  - `node`は`unchama-tst-kubevirt01`と`unchama-tst-kubevirt02`を利用(intel NUC)
 
 ### 外部からの管理アクセス
 
