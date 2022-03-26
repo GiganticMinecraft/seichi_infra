@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: seichi-gateway
 resources:
   - "../../../kustomize-bases/minecraft-gateway-bungeecord-loadbalancer"
-  
