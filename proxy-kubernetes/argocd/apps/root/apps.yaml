@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: cluster-wide-apps
-  namespace: cluster-wide-apps
+  namespace: argocd
 spec:
   generators:
     - git:
@@ -72,7 +72,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: seichi-debug-gateway-apps
-  namespace: seichi-debug-gateway
+  namespace: argocd
 spec:
   generators:
     - git:
@@ -112,7 +112,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: seichi-gateway-apps
-  namespace: seichi-gateway
+  namespace: argocd
 spec:
   generators:
     - git:
