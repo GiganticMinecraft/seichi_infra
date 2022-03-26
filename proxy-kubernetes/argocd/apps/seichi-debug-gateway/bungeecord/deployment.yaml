@@ -43,7 +43,7 @@ spec:
           requests:
             memory: 768Mi
       imagePullSecrets:
-      - name: seichi-network-gcr-private-image
+      - name: gcr-bungeecord-image-pull-secret
       initContainers:
       - command:
         - sysctl
