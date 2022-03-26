@@ -5,7 +5,7 @@ kind: Application
 metadata:
   name: cert-manager
 spec:
-  project: argocd-root
+  project: cluster-wide-apps
   source:
     repoURL: https://charts.jetstack.io
     chart: cert-manager
