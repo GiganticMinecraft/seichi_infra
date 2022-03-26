@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   labels:
     app: bungeecord
-    env: debug
   name: bungeecord
   namespace: seichi-debug-gateway
 spec:
@@ -11,12 +10,10 @@ spec:
   selector:
     matchLabels:
       app: bungeecord
-      env: debug
   template:
     metadata:
       labels:
         app: bungeecord
-        env: debug
     spec:
       containers:
       - command:
@@ -70,11 +67,9 @@ spec:
     - podSelector:
         matchLabels:
           appgroup: cloudflared
-          env: debug
   podSelector:
     matchLabels:
       app: bungeecord
-      env: debug
   policyTypes:
   - Egress
 ---
@@ -96,7 +91,6 @@ spec:
   podSelector:
     matchLabels:
       app: bungeecord
-      env: debug
   policyTypes:
   - Egress
 ---
@@ -118,7 +112,6 @@ spec:
   podSelector:
     matchLabels:
       app: bungeecord
-      env: debug
   policyTypes:
   - Egress
 ---
@@ -131,6 +124,5 @@ spec:
   podSelector:
     matchLabels:
       app: bungeecord
-      env: debug
   policyTypes:
   - Egress
