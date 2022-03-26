@@ -5,7 +5,7 @@ metadata:
   labels:
     app: cloudflared-mcserver--{{ .Values.MCServerName }}
     appgroup: cloudflared
-    release-namespace: {{ Release.Namespace }}
+    release-namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:

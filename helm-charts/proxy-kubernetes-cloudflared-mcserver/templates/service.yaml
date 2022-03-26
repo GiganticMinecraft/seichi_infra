@@ -12,4 +12,4 @@ spec:
   selector:
     app: cloudflared-mcserver--{{ .Values.MCServerName }}
     appgroup: cloudflared
-    release-namespace: {{ Release.Namespace }}
+    release-namespace: {{ .Release.Namespace }}
