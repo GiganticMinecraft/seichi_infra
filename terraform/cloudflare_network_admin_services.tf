@@ -21,7 +21,7 @@ resource "cloudflare_access_application" "debug_admin_jmx" {
   type                      = "self_hosted"
   session_duration          = "24h"
 
-  http_only_cookie_attribute = false
+  http_only_cookie_attribute = true
 }
 
 resource "cloudflare_access_policy" "debug_admin_jmx" {
