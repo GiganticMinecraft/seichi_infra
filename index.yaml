@@ -140,4 +140,14 @@ entries:
     urls:
     - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-k8s-argo-cd-bootstrapping-0.1.0/proxy-k8s-argo-cd-bootstrapping-0.1.0.tgz
     version: 0.1.0
-generated: "2022-03-21T02:34:51.700250879Z"
+  proxy-kubernetes-cloudflared-mcserver:
+  - apiVersion: v2
+    created: "2022-03-26T10:53:43.023386709Z"
+    digest: 044c21ef076d7120ec35dd7b3473e77893f2678f291d803fc49cc8cc4e93f554
+    maintainers:
+    - name: GiganticMinecraft
+    name: proxy-kubernetes-cloudflared-mcserver
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-kubernetes-cloudflared-mcserver-1.0.0/proxy-kubernetes-cloudflared-mcserver-1.0.0.tgz
+    version: 1.0.0
+generated: "2022-03-26T10:53:43.023419909Z"
