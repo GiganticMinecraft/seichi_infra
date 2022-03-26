@@ -1,5 +1,0 @@
-apiVersion: v2
-name: proxy-kubernetes-cloudflared-redis
-version: "1.0.0"
-maintainers:
-  - name: GiganticMinecraft

@@ -1,7 +1,0 @@
-# プロキシされる先のRedisサーバーの識別子。
-RedisServerName: "redisbungee"
-# ホスト名の seichi.click 以下のサブドメイン名。
-subdomain: "tcp-network"
-# この二つの設定で、プロキシ先の hostname が
-# redis--{{ .Values.RedisServerName }}.{{ .Values.subdomain }}.seichi.click
-# のように設定される。
