@@ -17,12 +17,6 @@ resource "github_team" "infra_collaborator" {
   privacy     = "closed"
 }
 
-resource "github_team" "nginx_test_connection_team" {
-  name        = "nginx-test-connection-team"
-  description = "テスト用のTeam。このTeamのメンバーのみ public-nginx.test.seichi.click にアクセスできるはず。"
-  privacy     = "closed"
-}
-
 resource "github_team" "debug_admin_jmx" {
   name        = "debug-admin-jmx"
   description = "デバッグサーバーのJMXに接続できるTeam"
