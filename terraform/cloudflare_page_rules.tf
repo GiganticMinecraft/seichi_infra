@@ -30,6 +30,7 @@ resource "cloudflare_page_rule" "spring_maps" {
   depends_on = [cloudflare_page_rule.resource_packs]
 
   zone_id = local.cloudflare_zone_id
+  priority = 3
   target = "*-map-spring.${local.root_domain}/*"
 
   actions {
@@ -41,6 +42,7 @@ resource "cloudflare_page_rule" "seichi_ranking" {
   depends_on = [cloudflare_page_rule.spring_maps]
 
   zone_id = local.cloudflare_zone_id
+  priority = 4
   target = "ranking-gigantic.${local.root_domain}/*"
 
   actions {
