@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: cluster-wide-apps
-  namespace: argocd
+  namespace: cluster-wide-apps
 spec:
   generators:
     - git:
@@ -12,7 +12,8 @@ spec:
           - path: proxy-kubernetes/argocd/apps/cluster-wide-apps/*
   template:
     metadata:
-      name: "{{path.basenameNormalized}}"
+      # 各Application が argocd namespace に配置されるため prefix した方が安全
+      name: "cluster-wide-apps-{{path.basenameNormalized}}"
       namespace: argocd
     spec:
       project: cluster-wide-apps
@@ -66,3 +67,83 @@ spec:
         duration: 5s
         factor: 2
         maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: seichi-debug-gateway-apps
+  namespace: seichi-debug-gateway
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        revision: main
+        directories:
+          - path: proxy-kubernetes/argocd/apps/seichi-debug-gateway/*
+  template:
+    metadata:
+      # 各Application が argocd namespace に配置されるため prefix した方が安全
+      name: "seichi-debug-gateway-{{path.basenameNormalized}}"
+      namespace: argocd
+    spec:
+      project: seichi-debug-gateway
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: seichi-debug-gateway
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: seichi-gateway-apps
+  namespace: seichi-gateway
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        revision: main
+        directories:
+          - path: proxy-kubernetes/argocd/apps/seichi-gateway/*
+  template:
+    metadata:
+      # 各Application が argocd namespace に配置されるため prefix した方が安全
+      name: "seichi-gateway-{{path.basenameNormalized}}"
+      namespace: argocd
+    spec:
+      project: seichi-gateway
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: seichi-gateway
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m

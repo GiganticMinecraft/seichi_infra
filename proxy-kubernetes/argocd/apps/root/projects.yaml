@@ -20,3 +20,44 @@ spec:
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: seichi-debug-gateway
+  namespace: argocd
+spec:
+  description: The project of gateway system for the seichi-network (debug)
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: seichi-debug-gateway
+      server: https://kubernetes.default.svc
+    # Application リソースは argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    # (慣習として ApplicationSet も argocd に配置するようしているが、これは別の namespace においても良い)
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: seichi-gateway
+  namespace: argocd
+spec:
+  description: The project of gateway system for the seichi-network
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: seichi-gateway
+      server: https://kubernetes.default.svc
+    # Application リソースは argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
