@@ -1,0 +1,23 @@
+# TCPShield から BungeeCord へと接続を受け取るための
+# LKE ロードバランサのサービス設定
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-gateway-bungeecord-loadbalancer
+  annotations:
+    # LKE ロードバランサー向けのannotation。
+    # 2022/03/27現在のドキュメントは以下のURLを参照してください。
+    # https://github.com/linode/linode-cloud-controller-manager/tree/d2a6c523a074653e012c264d5b543a901d1822f4#annotations
+    service.beta.kubernetes.io/linode-loadbalancer-check-type: none
+    service.beta.kubernetes.io/linode-loadbalancer-default-protocol: tcp
+    service.beta.kubernetes.io/linode-loadbalancer-default-proxy-protocol: v2
+    service.beta.kubernetes.io/linode-loadbalancer-throttle: "0"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: bungee
+      port: 25565
+      protocol: TCP
+      targetPort: 25577
+  selector:
+    app: bungeecord
