@@ -45,7 +45,7 @@ metadata:
   name: cluster-wide-app-resources
   namespace: argocd
 spec:
-  project: cluster-wide-apps
+  project: argocd-root
   source:
     repoURL: https://github.com/GiganticMinecraft/seichi_infra
     targetRevision: main
