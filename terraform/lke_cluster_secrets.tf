@@ -65,3 +65,31 @@ resource "kubernetes_secret" "prod_cloudflared_access_service_token" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "seichi_gateway_gcr_image_pull_secret" {
+  depends_on = [kubernetes_namespace.seichi_gateway]
+
+  metadata {
+    name      = "gcr-bungeecord-image-pull-secret"
+    namespace = "seichi-gateway"
+  }
+
+  data = {
+    ".dockerconfigjson" = var.lke_k8s_gcr_image_pull_secret
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}
+resource "kubernetes_secret" "seichi_gateway_gcr_image_pull_secret" {
+  depends_on = [kubernetes_namespace.seichi_debug_gateway]
+
+  metadata {
+    name      = "gcr-bungeecord-image-pull-secret"
+    namespace = "seichi-debug-gateway"
+  }
+
+  data = {
+    ".dockerconfigjson" = var.lke_k8s_gcr_image_pull_secret
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}

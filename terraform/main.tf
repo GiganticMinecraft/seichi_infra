@@ -156,3 +156,16 @@ variable "lke_k8s_cloudflare_argo_tunnel_credential" {
 }
 
 # endregion
+
+# region proxy-layer's k8s cluster to Google Container Registry integration
+
+# GCR の image pull secret。
+# この値は APIs and Services -> Credentials -> create a new Service account key で得られる。
+# 参考: https://blog.container-solutions.com/using-google-container-registry-with-kubernetes
+variable "lke_k8s_gcr_image_pull_secret" {
+  description = "The image pull secret to pull private BungeeCord images on GCR"
+  type        = string
+  sensitive   = true
+}
+
+# endregion
