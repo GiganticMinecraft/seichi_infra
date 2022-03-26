@@ -25,7 +25,7 @@ server:
         path: proxy-kubernetes/argocd/apps/root
       destination:
         server: https://kubernetes.default.svc
-        namespace: '*'
+        namespace: argocd
       syncPolicy:
         automated:
           prune: true
