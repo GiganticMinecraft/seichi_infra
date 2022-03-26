@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-mcserver--{{ .Values.MCServerName }}
+  labels:
+    app: cloudflared-mcserver--{{ .Values.MCServerName }}
+    appgroup: cloudflared
+    release-namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared-mcserver--{{ .Values.MCServerName }}
+      appgroup: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared-mcserver--{{ .Values.MCServerName }}
+        appgroup: cloudflared
+        env: prod
+    spec:
+      containers:
+      - name: cloudflared-mcserver--{{ .Values.MCServerName }}
+        image: cloudflare/cloudflared:2021.12.1
+        args:
+          - access
+          - tcp
+          - --loglevel
+          - debug
+          - --hostname
+          - mcserver--{{ .Values.MCServerName }}.{{ .Values.subdomain }}.seichi.click
+          - --url
+          - 0.0.0.0:25565
+        env:
+        - name: TUNNEL_SERVICE_TOKEN_ID
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_ID
+        - name: TUNNEL_SERVICE_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_SECRET
+        ports:
+        - containerPort: 25565
+          name: minecraft
+        readinessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 2
+          failureThreshold: 2
+          tcpSocket:
+            port: 25565
+        resources:
+          requests:
+            memory: 64Mi
