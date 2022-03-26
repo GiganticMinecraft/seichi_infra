@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       name: "{{path.basenameNormalized}}"
-      namespace: cluster-wide-apps
+      namespace: argocd
     spec:
       project: cluster-wide-apps
       source:
