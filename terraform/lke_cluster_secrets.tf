@@ -79,7 +79,7 @@ resource "kubernetes_secret" "seichi_gateway_gcr_image_pull_secret" {
 
   type = "kubernetes.io/dockerconfigjson"
 }
-resource "kubernetes_secret" "seichi_gateway_gcr_image_pull_secret" {
+resource "kubernetes_secret" "seichi_debug_gateway_gcr_image_pull_secret" {
   depends_on = [kubernetes_namespace.seichi_debug_gateway]
 
   metadata {
