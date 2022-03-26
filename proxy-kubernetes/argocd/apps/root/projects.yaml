@@ -10,6 +10,13 @@ spec:
   destinations:
     - namespace: 'cluster-wide-apps'
       server: https://kubernetes.default.svc
+    # ./cluster-wide-app-resources でインストールされる
+    #  - cert-manager
+    #  - sealed-secrets
+    #
+    # の二つはkube-systemにもリソースインストールを行うため、許可する必要がある
+    - namespace: 'kube-system'
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
