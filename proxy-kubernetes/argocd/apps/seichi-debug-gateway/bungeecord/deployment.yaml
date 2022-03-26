@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bungeecord
+  name: bungeecord
+  namespace: seichi-debug-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bungeecord
+  template:
+    metadata:
+      labels:
+        app: bungeecord
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - eval "echo \"$(cat /plugins/RedisBungee/config.yml)\"" > /plugins/RedisBungee/config.yml;
+          /usr/bin/run-bungeecord.sh
+        env:
+        - name: MEMORY
+          value: 768m
+        - name: TYPE
+          value: WATERFALL
+        image: gcr.io/manifest-shell-237511/seichi-debug-gw-bungeecord:latest
+        name: bungeecord
+        ports:
+        - containerPort: 25577
+          name: minecraft
+        readinessProbe:
+          failureThreshold: 2
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          successThreshold: 2
+          tcpSocket:
+            port: 25577
+          timeoutSeconds: 1
+        resources:
+          requests:
+            memory: 768Mi
+      imagePullSecrets:
+      - name: gcr-bungeecord-image-pull-secret
+      initContainers:
+      - command:
+        - sysctl
+        - -w
+        - net.core.somaxconn=65535
+        image: busybox
+        name: init-sysctl
+        securityContext:
+          privileged: true
+          runAsNonRoot: false
+          runAsUser: 0
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--allow-egress-cloudflared
+  namespace: seichi-debug-gateway
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          appgroup: cloudflared
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--allow-egress-dns
+  namespace: seichi-debug-gateway
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--allow-egress-www
+  namespace: seichi-debug-gateway
+spec:
+  egress:
+  - ports:
+    - port: 80
+      protocol: TCP
+    - port: 443
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--default-deny-egress-all
+  namespace: seichi-debug-gateway
+spec:
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
