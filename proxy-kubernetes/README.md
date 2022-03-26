@@ -58,19 +58,10 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 
 するようにしてください。
 
-# ArgoCD のブートストラッピング
+# LKE クラスタのブートストラップについて
 
-Kubernetesマニフェストの管理でArgoCDを利用する都合上、クラスターを1から再構築する際にはまず以下のコマンドにてArgoCDのインストールを実施してください。
+LKE 上で動いている(ArgoCD 以外の)すべての追加リソースはPull型の同期を行う ArgoCD によって管理されており、[`apps`](./apps/) ディレクトリ以下の特定のパスに対して行われた変更は ArgoCD によって自動的にクラスタに反映されます。
 
-```bash
-# 必要なら kubeconfig を --kubeconfig オプションで指定してください
-helm upgrade --install \
-  -n argocd \
-  --create-namespace \
-  --repo https://argoproj.github.io/argo-helm \
-  --version 4.2.0 \
-  --values https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/proxy-kubernetes/argocd/argocd-bootstrapping.yaml
-  argocd argo-cd
-```
+クラスタのブートストラップ、つまり ArgoCD 自体の管理は [Terraform](../terraform/) + [Helm Provider](https://registry.terraform.io/providers/hashicorp/helm/latest/docs) により行われています。そのため、クラスタを新規に作成した時は、LKE にアクセスするための認証情報を Terraform Cloud のシークレットに登録し、Plan + Apply を行うことで ArgoCD とルートプロジェクトを初期化してください。
 
-このコマンドでインストールされた ArgoCD は、[この定義](https://github.com/GiganticMinecraft/seichi_infra/blob/9f69953431f23a1002386a105418405e503844ec/proxy-kubernetes/argocd-apps/argocd.yaml)に追従して自身を自動更新します。
+Terraform Cloud に登録すべき認証情報等のより詳細な情報は [`main.tf`](../terraform/main.tf) の variable 定義を参照してください。
