@@ -33,9 +33,9 @@ spec:
   destinations:
     - namespace: seichi-debug-gateway
       server: https://kubernetes.default.svc
-    # Application リソースは argocd namespace に置かないとArgoCDに認識されないため、
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
     # argocd namespace へのデプロイも許可する。
-    # (慣習として ApplicationSet も argocd に配置するようしているが、これは別の namespace においても良い)
     - namespace: argocd
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
@@ -54,7 +54,8 @@ spec:
   destinations:
     - namespace: seichi-gateway
       server: https://kubernetes.default.svc
-    # Application リソースは argocd namespace に置かないとArgoCDに認識されないため、
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
     # argocd namespace へのデプロイも許可する。
     - namespace: argocd
       server: https://kubernetes.default.svc

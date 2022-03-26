@@ -1,7 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: cloudflared-mcserver-appset
+  # 各ApplicationSet は argocd namespace に配置されるため prefix する
+  name: seichi-debug-gateway--cloudflared-mcserver-appset
+  namespace: argocd
 spec:
   generators:
     - list:
