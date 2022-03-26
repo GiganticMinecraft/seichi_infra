@@ -1,5 +1,5 @@
 # プロキシされる先のマインクラフトサーバーの識別子。
-mcserver-name: "s0"
+MCServerName: "s0"
 # ホスト名の seichi.click 以下のサブドメイン名。
 subdomain: "tcp-network"
 # この二つの設定で、プロキシ先の hostname が

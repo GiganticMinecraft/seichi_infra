@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cloudflared-mcserver--{{ .Values.mcserver-name }}
+  name: cloudflared-mcserver--{{ .Values.MCServerName }}
 spec:
   type: ClusterIP
   ports:
@@ -10,6 +10,6 @@ spec:
       protocol: TCP
       targetPort: 25565
   selector:
-    app: cloudflared-mcserver--{{ .Values.mcserver-name }}
+    app: cloudflared-mcserver--{{ .Values.MCServerName }}
     appgroup: cloudflared
     release-namespace: {{ Release.Namespace }}
