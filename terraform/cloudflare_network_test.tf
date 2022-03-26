@@ -14,6 +14,8 @@ resource "cloudflare_access_application" "test_nginx_application" {
   domain                    = "public-nginx.test.${local.root_domain}"
   type                      = "self_hosted"
   session_duration          = "1h"
+
+  http_only_cookie_attribute = false
 }
 
 resource "cloudflare_access_policy" "test_nginx_application" {

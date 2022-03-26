@@ -20,6 +20,8 @@ resource "cloudflare_access_application" "debug_admin_jmx" {
   domain                    = "jmx.debug.admin.${local.root_domain}"
   type                      = "self_hosted"
   session_duration          = "24h"
+
+  http_only_cookie_attribute = false
 }
 
 resource "cloudflare_access_policy" "debug_admin_jmx" {
