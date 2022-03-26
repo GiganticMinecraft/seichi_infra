@@ -59,6 +59,7 @@ server:
             clientSecret: $argocd-github-oauth-app-secret:ARGOCD_GITHUB_OAUTH_APP_SECRET
             orgs:
             - name: GiganticMinecraft
+    admin.enabled: "false"
 
   rbacConfig:
     # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
