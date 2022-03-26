@@ -13,6 +13,6 @@ resource "helm_release" "lke_cluster_argocd" {
   cleanup_on_fail = true
 
   values = [
-    file("../proxy-kubernetes/argocd/argocd-helm-chart-values.yaml")
+    file("../proxy-kubernetes/argocd-helm-chart-values.yaml")
   ]
 }

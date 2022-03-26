@@ -22,7 +22,7 @@ server:
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         targetRevision: main
-        path: proxy-kubernetes/argocd/apps/root
+        path: proxy-kubernetes/apps/root
       destination:
         server: https://kubernetes.default.svc
         namespace: argocd
