@@ -18,7 +18,7 @@ resource "cloudflare_access_application" "debug_vps_to_op_network" {
   # オンプレ側が1日に1回再起動するのでセッション長は高々24時間になる
   session_duration          = "30h"
 
-  http_only_cookie_attribute = false
+  http_only_cookie_attribute = true
 }
 
 resource "cloudflare_access_service_token" "debug_linode_to_onp" {
