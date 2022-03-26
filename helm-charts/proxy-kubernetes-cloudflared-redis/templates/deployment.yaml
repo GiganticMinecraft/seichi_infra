@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-redis--{{ .Values.RedisServerName }}
+  labels:
+    app: cloudflared-redis--{{ .Values.RedisServerName }}
+    appgroup: cloudflared
+    release-namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared-redis--{{ .Values.RedisServerName }}
+      appgroup: cloudflared
+      release-namespace: {{ .Release.Namespace }}
+  template:
+    metadata:
+      labels:
+        app: cloudflared-redis--{{ .Values.RedisServerName }}
+        appgroup: cloudflared
+        release-namespace: {{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: cloudflared-redis--{{ .Values.RedisServerName }}
+        image: cloudflare/cloudflared:2021.12.1
+        args:
+          - access
+          - tcp
+          - --loglevel
+          - debug
+          - --hostname
+          - redis--{{ .Values.RedisServerName }}.{{ .Values.subdomain }}.seichi.click
+          - --url
+          - 0.0.0.0:6379
+        env:
+        - name: TUNNEL_SERVICE_TOKEN_ID
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_ID
+        - name: TUNNEL_SERVICE_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-access-token
+              key: TUNNEL_SERVICE_TOKEN_SECRET
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 2
+          failureThreshold: 2
+          tcpSocket:
+            port: 6379
+        resources:
+          requests:
+            memory: 64Mi
