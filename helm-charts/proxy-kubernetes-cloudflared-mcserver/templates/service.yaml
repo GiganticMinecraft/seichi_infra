@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared-mcserver--{{ .Values.mcserver-name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: minecraft
+      port: 25565
+      protocol: TCP
+      targetPort: 25565
+  selector:
+    app: cloudflared-mcserver--{{ .Values.mcserver-name }}
+    appgroup: cloudflared
+    release-namespace: {{ Release.Namespace }}
