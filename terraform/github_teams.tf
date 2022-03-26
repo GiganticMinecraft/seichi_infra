@@ -6,13 +6,13 @@
 #  (https://docs.github.com/en/organizations/organizing-members-into-teams/changing-team-visibility)
 
 resource "github_team" "admin_team" {
-  name        = "Admin team"
+  name        = "admin-team"
   description = "運営チーム"
   privacy     = "closed"
 }
 
 resource "github_team" "infra_collaborator" {
-  name        = "Infra Collaborator"
+  name        = "infra-collaborator"
   description = "インフラ関連の外部コラボレーター"
   privacy     = "closed"
 }
