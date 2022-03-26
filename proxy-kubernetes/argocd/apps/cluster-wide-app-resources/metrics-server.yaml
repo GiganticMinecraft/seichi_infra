@@ -7,7 +7,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
 spec:
   destination:
-    namespace: argocd
+    namespace: cluster-wide-apps
     server: https://kubernetes.default.svc
   project: cluster-wide-apps
   source:
