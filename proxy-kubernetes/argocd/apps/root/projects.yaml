@@ -56,7 +56,6 @@ spec:
       server: https://kubernetes.default.svc
     # Application リソースは argocd namespace に置かないとArgoCDに認識されないため、
     # argocd namespace へのデプロイも許可する。
-    # (慣習として ApplicationSet も argocd に配置するようしているが、これは別の namespace においても良い)
     - namespace: argocd
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
