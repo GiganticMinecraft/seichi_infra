@@ -32,7 +32,7 @@ unchama宅のルーター配下のLAN (subnet 192.168.0.0/20)。マイクラサ�
      - LKE上の一部オブジェクトの管理
        - Cloudflareが発行したトークンを含むSecretリソース
 
- - [seichi-onp-network-iap](./seichi-onp-network-iap/README.md)
+ - [`seichi-onp-network-iap`](./seichi-onp-network-iap/README.md)
    - OnPネットワーク内に置いてあるサービスを公開するためのプロキシの設定
 
  - [`util-scripts`](./util-scripts/)
