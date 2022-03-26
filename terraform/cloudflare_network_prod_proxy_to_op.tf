@@ -17,6 +17,8 @@ resource "cloudflare_access_application" "prod_vps_to_op_network" {
   type                      = "self_hosted"
   # オンプレ側が1日に1回再起動するのでセッション長は高々24時間になる
   session_duration          = "30h"
+
+  http_only_cookie_attribute = false
 }
 
 resource "cloudflare_access_service_token" "prod_linode_to_onp" {
