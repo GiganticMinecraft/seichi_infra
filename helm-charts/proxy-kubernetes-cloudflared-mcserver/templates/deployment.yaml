@@ -12,12 +12,13 @@ spec:
     matchLabels:
       app: cloudflared-mcserver--{{ .Values.MCServerName }}
       appgroup: cloudflared
+      release-namespace: {{ .Release.Namespace }}
   template:
     metadata:
       labels:
         app: cloudflared-mcserver--{{ .Values.MCServerName }}
         appgroup: cloudflared
-        env: prod
+        release-namespace: {{ .Release.Namespace }}
     spec:
       containers:
       - name: cloudflared-mcserver--{{ .Values.MCServerName }}
