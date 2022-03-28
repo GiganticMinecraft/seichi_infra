@@ -7,16 +7,16 @@ server:
     minReplicas: 2
     maxReplicas: 5
     # -- Average CPU utilization percentage for the Argo CD server [HPA]
-    targetCPUUtilizationPercentage: 50
+    targetCPUUtilizationPercentage: 70
     # -- Average memory utilization percentage for the Argo CD server [HPA]
-    targetMemoryUtilizationPercentage: 50
+    targetMemoryUtilizationPercentage: 70
   resources:
    limits:
+     cpu: 200m
+     memory: 256Mi
+   requests:
      cpu: 100m
      memory: 128Mi
-   requests:
-     cpu: 50m
-     memory: 64Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -126,7 +126,7 @@ redis:
   resources:
    limits:
      cpu: 200m
-     memory: 128Mi
+     memory: 256Mi
    requests:
      cpu: 100m
      memory: 64Mi
@@ -141,16 +141,16 @@ repoServer:
     minReplicas: 2
     maxReplicas: 5
     # -- Average CPU utilization percentage for the repo server [HPA]
-    targetCPUUtilizationPercentage: 50
+    targetCPUUtilizationPercentage: 70
     # -- Average memory utilization percentage for the repo server [HPA]
-    targetMemoryUtilizationPercentage: 50
+    targetMemoryUtilizationPercentage: 70
   resources:
+   limits:
+     cpu: 100m
+     memory: 256Mi
    limits:
      cpu: 50m
      memory: 128Mi
-   requests:
-     cpu: 10m
-     memory: 64Mi
   pdb:
     enabled: true
     minAvailable: 1
