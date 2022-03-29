@@ -58,11 +58,11 @@ spec:
               port: 25577
             timeoutSeconds: 1
       initContainers:
-        - command:
+        - image: busybox
+          command:
             - sysctl
             - -w
             - net.core.somaxconn=65535
-          image: busybox
           name: init-sysctl
           securityContext:
             privileged: true
