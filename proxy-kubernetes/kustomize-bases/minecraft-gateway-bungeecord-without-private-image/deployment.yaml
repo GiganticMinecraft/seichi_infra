@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bungeecord
+  name: bungeecord
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bungeecord
+  template:
+    metadata:
+      labels:
+        app: bungeecord
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: 768Mi
+          env:
+            - name: MEMORY
+              value: 768m
+            - name: TYPE
+              value: WATERFALL
+            - name: PLUGINS
+              # BungeeKick:
+              #   https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar
+              # BungeeHubCommand:
+              #   https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-a33b73f258de7d484fa961d000921275fb51c45b/bungeehubcommand-1.jar
+              # RedisBungee:
+              #   https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+              # TCPShield (RealIP):
+              #   https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+              value: >-
+                https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
+                https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-a33b73f258de7d484fa961d000921275fb51c45b/bungeehubcommand-1.jar,
+                https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
+                https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+
+            # BungeeYAML (depended by SwiftMOTD):
+            #   https://www.spigotmc.org/resources/bungeeyaml-original.13068/
+            # SwiftMOTD:
+            #   https://www.spigotmc.org/resources/swiftmotd.221/
+            - name: SPIGET_PLUGINS
+              values: 13068,221
+          image: itzg/bungeecord
+          name: bungeecord
+          ports:
+            - containerPort: 25577
+              name: minecraft
+          readinessProbe:
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            successThreshold: 2
+            tcpSocket:
+              port: 25577
+            timeoutSeconds: 1
+      initContainers:
+        - command:
+            - sysctl
+            - -w
+            - net.core.somaxconn=65535
+          image: busybox
+          name: init-sysctl
+          securityContext:
+            privileged: true
+            runAsNonRoot: false
+            runAsUser: 0
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--allow-egress-cloudflared
+spec:
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          appgroup: cloudflared
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--allow-egress-dns
+spec:
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--allow-egress-www
+spec:
+  egress:
+  - ports:
+    - port: 80
+      protocol: TCP
+    - port: 443
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bungeecord--default-deny-egress-all
+spec:
+  podSelector:
+    matchLabels:
+      app: bungeecord
+  policyTypes:
+  - Egress
