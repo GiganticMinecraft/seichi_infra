@@ -1,6 +1,6 @@
-# s1, s2, ...
 # Needs override.
 # Provide a regex to match servers that needs a semaphore guard.
+# s1, s2, ...
 synchronized-server-regex: "^(s\\d+)$"
 
 redis:
