@@ -1,3 +1,5 @@
+# TODO:
+#   This should be a StatefulSet because RedisBungee is using Pod's HOSTNAME as an identity.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
