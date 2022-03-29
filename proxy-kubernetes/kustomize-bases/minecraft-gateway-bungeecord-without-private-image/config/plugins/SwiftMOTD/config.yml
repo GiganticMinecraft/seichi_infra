@@ -1,0 +1,20 @@
+# Override if necessary.
+motds:
+  generic:
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fあ く し ろ は た ら け'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fVERY VELL. THEN LET IT BE SEICHI.'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fよろしい、ならば整地だ'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地の聖地へヨウコソ'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fすごーい！君は整地ができるフレンズなんだね！'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地にする？整地にする？それとも…セ・イ・チ？'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f用法用量を守って正しく整地しましょう'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fYou have a pickaxe. You have a time. Oh! Seichi Love.'
+  dynamic:
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fあ く し ろ は た ら け'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fVERY VELL. THEN LET IT BE SEICHI.'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fよろしい、ならば整地だ'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地の聖地へヨウコソ'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fすごーい！君は整地ができるフレンズなんだね！'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地にする？整地にする？それとも…セ・イ・チ？'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f用法用量を守って正しく整地しましょう'
+    - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fYou have a pickaxe. You have a time. Oh! Seichi Love.'
