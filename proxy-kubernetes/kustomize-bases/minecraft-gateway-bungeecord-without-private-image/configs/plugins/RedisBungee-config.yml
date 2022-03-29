@@ -6,6 +6,11 @@
 #   This field must be unique among multiple BungeeCord instances
 #     that connect to the redis instance.
 #   In k8s context, substituting a HOSTNAME (name of the pod) here solves the issue.
+#
+#   In fact, itzg/bungeecord can expand environment variable references as long as
+#     configs are placed in /config/plugins/RedisBungee directory.
+#   See https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#replacing-variables-inside-configs
+#     for more details.
 server-id: ${HOSTNAME}
 
 redis-server: cloudflared-redis--redisbungee
