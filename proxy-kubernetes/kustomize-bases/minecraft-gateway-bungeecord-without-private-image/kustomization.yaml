@@ -2,4 +2,23 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - "./deployment.yaml"
+  - "./networkpolicies.yaml"
   - "./service-loadbalancer.yaml"
+
+configMapGenerator:
+  # bungeecord-config / bungeecord-plugins-config という名前の ConfigMap オブジェクトが
+  # Kustomization によって生成される。
+  # debug/productionの間の差異は、これら ConfigMap への差分として表現されるべき。
+  - name: bungeecord-config
+    files:
+      - config.yml=configs/bungeecord-config.yml
+  - name: bungeecord-plugins-config
+    files:
+      # この ConfigMap は Pod へのマウント先に /config/plugins を指定するので、
+      # <Plugin名>/<プラグインが予期する設定ファイル名>.yml をキーとする
+      - BungeeHubCommand/config.yml=configs/plugins/BungeeHubCommand-config.yml
+      - BungeeKick/config.yml=configs/plugins/BungeeKick-config.yml
+      - BungeeSemaphore/config.yml=configs/plugins/BungeeSemaphore-config.yml
+      - RedisBungee/config.yml=configs/plugins/RedisBungee-config.yml
+      - SwiftMOTD/config.yml=configs/plugins/SwiftMOTD-config.yml
+      - TCPShield/config.yml=configs/plugins/TCPShield-config.yml
