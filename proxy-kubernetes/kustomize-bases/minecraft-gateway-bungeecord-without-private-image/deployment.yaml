@@ -14,6 +14,17 @@ spec:
       labels:
         app: bungeecord
     spec:
+      initContainers:
+        - image: busybox
+          command:
+            - sysctl
+            - -w
+            - net.core.somaxconn=65535
+          name: init-sysctl
+          securityContext:
+            privileged: true
+            runAsNonRoot: false
+            runAsUser: 0
       containers:
         - resources:
             requests:
@@ -57,14 +68,19 @@ spec:
             tcpSocket:
               port: 25577
             timeoutSeconds: 1
-      initContainers:
-        - image: busybox
-          command:
-            - sysctl
-            - -w
-            - net.core.somaxconn=65535
-          name: init-sysctl
-          securityContext:
-            privileged: true
-            runAsNonRoot: false
-            runAsUser: 0
+          volumeMounts:
+            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピー+環境変数の展開をしてくれる。
+            # https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#volumes
+            - name: bungeecord-config
+              mountPath: /config/config.yml
+              subPath: config.yml
+            - name: bungee-plugin-config
+              mountPath: /config/plugins
+      volumes:
+        # ConfigMap の定義は kustomization.yaml の configMapGenerator を参照のこと。
+        - name: bungeecord-config
+          configMap:
+            name: bungeecord-config
+        - name: bungeecord-plugins-config
+          configMap:
+            name: bungeecord-plugins-config
