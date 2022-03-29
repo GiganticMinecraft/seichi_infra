@@ -2,21 +2,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: seichi-debug-gateway
 resources:
-  - "../../../kustomize-bases/minecraft-gateway-bungeecord"
-
-patchesJson6902:
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      name: bungeecord
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/image
-        value: gcr.io/manifest-shell-237511/seichi-debug-gw-bungeecord:latest
-      - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/memory
-        value: 768Mi
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: 768m
+  - "../../../kustomize-bases/minecraft-gateway-bungeecord-without-private-image"
