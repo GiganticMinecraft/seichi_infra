@@ -5,7 +5,8 @@ resources:
   - "../../../kustomize-bases/minecraft-gateway-bungeecord-without-private-image"
 
 patchesStrategicMerge:
-  - "configmap-patches.yaml"
+  - "bungeecord-config-patch.yaml"
+  - "bungeecord-plugins-config-patch.yaml"
 
 patchesJson6902:
   - target:
@@ -23,3 +24,8 @@ patchesJson6902:
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: 768m
+  - target:
+      version: v1
+      kind: ConfigMap
+      name: bungeecord-config
+    path: bungeecord-config-jsonpatch.yaml

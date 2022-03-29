@@ -3,22 +3,6 @@ kind: ConfigMap
 metadata:
   name: bungeecord-plugins-config
 data:
-  config.yml:
-    servers:
-      deb-s1:
-        address: cloudflared-mcserver--deb-112-1:25565
-        restricted: false
-        motd: ''
-      deb-s2:
-        address: cloudflared-mcserver--deb-112-2:25565
-        restricted: false
-        motd: ''
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: bungeecord-config
-data:
   BungeeHubCommand/config.yml:
     hub-server-name: "deb-s1"
   BungeeKick/config.yml:
