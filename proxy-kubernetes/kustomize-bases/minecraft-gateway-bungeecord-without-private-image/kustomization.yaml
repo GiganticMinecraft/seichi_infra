@@ -11,7 +11,7 @@ configMapGenerator:
   # debug/productionの間の差異は、これら ConfigMap への差分として表現されるべき。
   - name: bungeecord-config
     files:
-      - config.yml=configs/bungeecord-config.yml
+      - config.yml=configs/bungeecord-config.yaml
   - name: bungeecord-plugins-config
     files:
       # この ConfigMap は Pod へのマウント先に /config/plugins を指定するので、
