@@ -56,7 +56,7 @@ spec:
             # SwiftMOTD:
             #   https://www.spigotmc.org/resources/swiftmotd.221/
             - name: SPIGET_PLUGINS
-              values: 13068,221
+              value: 13068,221
           image: itzg/bungeecord:java17-2022.1.0
           name: bungeecord
           ports:
