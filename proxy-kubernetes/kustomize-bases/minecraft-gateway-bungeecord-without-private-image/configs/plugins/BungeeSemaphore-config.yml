@@ -1,7 +1,6 @@
 # Needs override.
 # Provide a regex to match servers that needs a semaphore guard.
-# s1, s2, ...
-synchronized-server-regex: "^(s\\d+)$"
+synchronized-server-regex:
 
 redis:
   host: cloudflared-redis--bungeesemaphore
