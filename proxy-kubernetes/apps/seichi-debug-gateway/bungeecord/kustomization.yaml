@@ -6,7 +6,7 @@ resources:
 
 patchesStrategicMerge:
   - "bungeecord-config-patch.yaml"
-  - "bungeecord-plugins-config-patch.yaml"
+  - "bungeecord-plugin-configs-patch.yaml"
 
 patchesJson6902:
   - target:

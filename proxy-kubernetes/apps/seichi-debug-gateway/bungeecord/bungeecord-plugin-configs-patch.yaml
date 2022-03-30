@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: bungeecord-plugins-config
+  name: bungeecord-plugin-configs
 data:
   BungeeHubCommand/config.yml:
     hub-server-name: "deb-s1"

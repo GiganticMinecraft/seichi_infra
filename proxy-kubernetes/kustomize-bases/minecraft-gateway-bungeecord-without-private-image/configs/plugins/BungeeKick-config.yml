@@ -1,9 +1,0 @@
-# Needs override.
-# This is where the player is kicked to. This is usually the lobby/hub server
-ServerName:
-
-# Message to be sent to the player who has been kicked. This message is followed by the kick reason
-KickMessage: '&6You have been kicked! Reason:&4 '
-
-# Set this to True if you want the kicked player to be able to see the kick reason.
-ShowKickMessage: True
