@@ -146,9 +146,9 @@ repoServer:
     targetMemoryUtilizationPercentage: 70
   resources:
    limits:
-     cpu: 100m
+     cpu: 200m
      memory: 256Mi
-   limits:
+   requests:
      cpu: 50m
      memory: 128Mi
   pdb:
