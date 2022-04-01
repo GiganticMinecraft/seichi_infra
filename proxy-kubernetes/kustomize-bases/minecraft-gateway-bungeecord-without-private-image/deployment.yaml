@@ -1,14 +1,11 @@
 apiVersion: apps/v1
-# RedisBungee インスタンスが Pod HOSTNAME を identity として使ってるので、
-# Deployment ではなく StatefulSet にするのが望ましい
-kind: StatefulSet
+kind: Deployment
 metadata:
   labels:
     app: bungeecord
   name: bungeecord
 spec:
   replicas: 2
-  serviceName: bungeecord
   selector:
     matchLabels:
       app: bungeecord
@@ -50,9 +47,7 @@ spec:
             #   https://www.spigotmc.org/resources/swiftmotd.221/
             - name: SPIGET_PLUGINS
               value: 13068,221
-            # デフォルトは "CFG_"。すべての環境変数が展開されてほしいので空に
-            - name: ENV_VARIABLE_PREFIX 
-              value: ""
+
           image: itzg/bungeecord:java17-2022.1.0
           name: bungeecord
           ports:
@@ -67,7 +62,8 @@ spec:
               port: 25577
             timeoutSeconds: 1
           volumeMounts:
-            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピー+環境変数の展開をしてくれる。
+            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
             # https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#volumes
             - name: bungeecord-config
               mountPath: /config/config.yml
