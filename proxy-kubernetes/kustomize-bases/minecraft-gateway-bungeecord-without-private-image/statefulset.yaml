@@ -51,7 +51,7 @@ spec:
             - name: SPIGET_PLUGINS
               value: 13068,221
             # デフォルトは "CFG_"。すべての環境変数が展開されてほしいので空に
-            - name: REPLACE_ENV_VARIABLE_PREFIX 
+            - name: ENV_VARIABLE_PREFIX 
               value: ""
           image: itzg/bungeecord:java17-2022.1.0
           name: bungeecord
