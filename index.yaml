@@ -142,6 +142,15 @@ entries:
     version: 0.1.0
   proxy-kubernetes-cloudflared-mcserver:
   - apiVersion: v2
+    created: "2022-04-01T14:26:39.496245781Z"
+    digest: 2fd2e4f07b1cd6bba71ac676d79d79a35df619117749236748c4c4fe37b8d616
+    maintainers:
+    - name: GiganticMinecraft
+    name: proxy-kubernetes-cloudflared-mcserver
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-kubernetes-cloudflared-mcserver-1.0.2/proxy-kubernetes-cloudflared-mcserver-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
     created: "2022-03-27T22:50:22.644925609Z"
     digest: 11124fdabd04354d6591fdc856e488fdb67f27233ac9d374621e240606b97056
     maintainers:
@@ -161,6 +170,15 @@ entries:
     version: 1.0.0
   proxy-kubernetes-cloudflared-redis:
   - apiVersion: v2
+    created: "2022-04-01T14:26:39.72099011Z"
+    digest: 39214e132bacef8a451852421af6ff589800e201142cfac9b35a4b97754ad08d
+    maintainers:
+    - name: GiganticMinecraft
+    name: proxy-kubernetes-cloudflared-redis
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-kubernetes-cloudflared-redis-1.0.1/proxy-kubernetes-cloudflared-redis-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     created: "2022-03-26T15:58:30.834884739Z"
     digest: 082338ed0690c9f730f896254cb2545544654fd2070e4965602a3e181e399423
     maintainers:
@@ -169,4 +187,4 @@ entries:
     urls:
     - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-kubernetes-cloudflared-redis-1.0.0/proxy-kubernetes-cloudflared-redis-1.0.0.tgz
     version: 1.0.0
-generated: "2022-03-27T22:50:22.64503401Z"
+generated: "2022-04-01T14:26:39.72102881Z"
