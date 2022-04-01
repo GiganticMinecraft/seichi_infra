@@ -8,6 +8,7 @@ metadata:
   name: bungeecord
 spec:
   replicas: 2
+  serviceName: bungeecord
   selector:
     matchLabels:
       app: bungeecord
