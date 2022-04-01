@@ -18,7 +18,7 @@ data:
       - priorities:
           - deb-s1
         forced_hosts:
-          play-debug.seichi.click: lobby
+          play-debug.seichi.click: deb-s1
 
         query_port: 25565
         motd: ''
