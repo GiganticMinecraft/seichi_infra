@@ -72,8 +72,32 @@ spec:
             - name: bungeecord-config
               mountPath: /config/config.yml
               subPath: config.yml
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/bungeecord が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
             - name: bungeecord-plugin-configs
-              mountPath: /config/plugins
+              mountPath: /config/plugins/BungeeHubCommand/config.yml
+              subPath: BungeeHubCommand-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeKick/config.yml
+              subPath: BungeeKick-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeSemaphore/config.yml
+              subPath: BungeeSemaphore-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/RedisBungee/config.yml
+              subPath: RedisBungee-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/SwiftMOTD/config.yml
+              subPath: SwiftMOTD-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/TCPShield/config.yml
+              subPath: TCPShield-config.yml
       volumes:
         - name: bungeecord-config
           configMap:
@@ -81,16 +105,3 @@ spec:
         - name: bungeecord-plugin-configs
           configMap:
             name: bungeecord-plugin-configs
-            items:
-              - key: "BungeeHubCommand-config.yml"
-                path: "BungeeHubCommand/config.yml"
-              - key: "BungeeKick-config.yml"
-                path: "BungeeKick/config.yml"
-              - key: "BungeeSemaphore-config.yml"
-                path: "BungeeSemaphore/config.yml"
-              - key: "RedisBungee-config.yml"
-                path: "RedisBungee/config.yml"
-              - key: "SwiftMOTD-config.yml"
-                path: "SwiftMOTD/config.yml"
-              - key: "TCPShield-config.yml"
-                path: "TCPShield/config.yml"
