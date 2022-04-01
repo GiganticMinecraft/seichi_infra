@@ -69,7 +69,7 @@ spec:
             - name: bungeecord-config
               mountPath: /config/config.yml
               subPath: config.yml
-            - name: bungee-plugin-config
+            - name: bungeecord-plugin-configs
               mountPath: /config/plugins
       volumes:
         - name: bungeecord-config
@@ -88,6 +88,6 @@ spec:
                 path: "SwiftMOTD/config.yml"
               - key: "TCPShield-config.yml"
                 path: "TCPShield/config.yml"
-        - name: bungeecord-plugins-config
+        - name: bungeecord-plugin-configs
           configMap:
-            name: bungeecord-plugins-config
+            name: bungeecord-plugin-configs
