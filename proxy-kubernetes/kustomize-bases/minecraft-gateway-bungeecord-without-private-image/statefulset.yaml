@@ -16,17 +16,6 @@ spec:
       labels:
         app: bungeecord
     spec:
-      initContainers:
-        - image: busybox
-          command:
-            - sysctl
-            - -w
-            - net.core.somaxconn=65535
-          name: init-sysctl
-          securityContext:
-            privileged: true
-            runAsNonRoot: false
-            runAsUser: 0
       containers:
         - resources:
             requests:
