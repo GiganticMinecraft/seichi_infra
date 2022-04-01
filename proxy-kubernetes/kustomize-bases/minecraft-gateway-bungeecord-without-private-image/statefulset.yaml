@@ -30,7 +30,7 @@ spec:
               # BungeeKick:
               #   https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar
               # BungeeHubCommand:
-              #   https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-a33b73f258de7d484fa961d000921275fb51c45b/bungeehubcommand-1.jar
+              #   https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-9788dae6596769537e7f1a95f1e0c2603c543e98/bungeehubcommand-1.jar
               # BungeeSemaphore:
               #   https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar
               # RedisBungee:
@@ -39,7 +39,7 @@ spec:
               #   https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
               value: >-
                 https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
-                https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-a33b73f258de7d484fa961d000921275fb51c45b/bungeehubcommand-1.jar,
+                https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-9788dae6596769537e7f1a95f1e0c2603c543e98/bungeehubcommand-1.jar,
                 https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar,
                 https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
                 https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
