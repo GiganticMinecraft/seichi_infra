@@ -75,6 +75,9 @@ spec:
         - name: bungeecord-config
           configMap:
             name: bungeecord-config
+        - name: bungeecord-plugin-configs
+          configMap:
+            name: bungeecord-plugin-configs
             items:
               - key: "BungeeHubCommand-config.yml"
                 path: "BungeeHubCommand/config.yml"
@@ -88,6 +91,3 @@ spec:
                 path: "SwiftMOTD/config.yml"
               - key: "TCPShield-config.yml"
                 path: "TCPShield/config.yml"
-        - name: bungeecord-plugin-configs
-          configMap:
-            name: bungeecord-plugin-configs
