@@ -61,10 +61,6 @@ data:
         address: cloudflared-mcserver--petra:25565
         restricted: false
         motd: ''
-      tm1:
-        address: vps1.megumiso.com:35946
-        restricted: false
-        motd: ''
 
     listeners:
       - priorities:
