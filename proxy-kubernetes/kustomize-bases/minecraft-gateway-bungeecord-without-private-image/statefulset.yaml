@@ -82,7 +82,6 @@ spec:
             - name: bungee-plugin-config
               mountPath: /config/plugins
       volumes:
-        # ConfigMap の定義は kustomization.yaml の configMapGenerator を参照のこと。
         - name: bungeecord-config
           configMap:
             name: bungeecord-config
