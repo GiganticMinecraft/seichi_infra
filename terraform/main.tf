@@ -156,34 +156,3 @@ variable "lke_k8s_cloudflare_argo_tunnel_credential" {
 }
 
 # endregion
-
-# region proxy-layer's k8s cluster to Google Container Registry integration
-
-# GCR の image pull secret。
-# IAM & Admin -> Service Accounts
-#   -> <サービスアカウントを選択>
-#   -> Keys タブ -> ADD KEY -> Create new Key -> JSON
-# で得られる JSON ファイルを(ローカルの) ./key.json にダウンロードしたうえで
-# 
-# kubectl create secret docker-registry gcr-access-token \
-#    --docker-server=gcr.io \
-#    --docker-username=_json_key \
-#    --docker-password="$(cat ./key.json)" \
-#    --docker-email=any@valid.email
-#
-# したうえで
-#
-# kubectl get secret gcr-access-token --output="jsonpath={.data.\.dockerconfigjson}" | base64 --decode
-#
-# することでこの値を生成できる。
-#
-# 参考:
-#  - https://blog.container-solutions.com/using-google-container-registry-with-kubernetes
-#  - https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-variable "lke_k8s_gcr_image_pull_secret" {
-  description = "The image pull secret to pull private BungeeCord images on GCR"
-  type        = string
-  sensitive   = true
-}
-
-# endregion
