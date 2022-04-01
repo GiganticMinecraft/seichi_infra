@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+# RedisBungee インスタンスが Pod HOSTNAME を identity として使ってるので、
+# Deployment ではなく StatefulSet にするのが望ましい
+kind: StatefulSet
+metadata:
+  labels:
+    app: bungeecord
+  name: bungeecord
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bungeecord
+  template:
+    metadata:
+      labels:
+        app: bungeecord
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: 768Mi
+          env:
+            - name: MEMORY
+              value: 768m
+            - name: TYPE
+              value: WATERFALL
+            - name: PLUGINS
+              # BungeeKick:
+              #   https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar
+              # BungeeHubCommand:
+              #   https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-a33b73f258de7d484fa961d000921275fb51c45b/bungeehubcommand-1.jar
+              # RedisBungee:
+              #   https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+              # TCPShield (RealIP):
+              #   https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+              value: >-
+                https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
+                https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-a33b73f258de7d484fa961d000921275fb51c45b/bungeehubcommand-1.jar,
+                https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
+                https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+
+            # BungeeYAML (depended by SwiftMOTD):
+            #   https://www.spigotmc.org/resources/bungeeyaml-original.13068/
+            # SwiftMOTD:
+            #   https://www.spigotmc.org/resources/swiftmotd.221/
+            - name: SPIGET_PLUGINS
+              value: 13068,221
+            # デフォルトは "CFG_"。すべての環境変数が展開されてほしいので空に
+            - name: REPLACE_ENV_VARIABLE_PREFIX 
+              value: ""
+          image: itzg/bungeecord:java17-2022.1.0
+          name: bungeecord
+          ports:
+            - containerPort: 25577
+              name: minecraft
+          readinessProbe:
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            successThreshold: 2
+            tcpSocket:
+              port: 25577
+            timeoutSeconds: 1
+          volumeMounts:
+            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピー+環境変数の展開をしてくれる。
+            # https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#volumes
+            - name: bungeecord-config
+              mountPath: /config/config.yml
+              subPath: config.yml
+            - name: bungee-plugin-config
+              mountPath: /config/plugins
+      volumes:
+        - name: bungeecord-config
+          configMap:
+            name: bungeecord-config
+            items:
+              - key: "BungeeHubCommand-config.yml"
+                path: "BungeeHubCommand/config.yml"
+              - key: "BungeeKick-config.yml"
+                path: "BungeeKick/config.yml"
+              - key: "BungeeSemaphore-config.yml"
+                path: "BungeeSemaphore/config.yml"
+              - key: "RedisBungee-config.yml"
+                path: "RedisBungee/config.yml"
+              - key: "SwiftMOTD-config.yml"
+                path: "SwiftMOTD/config.yml"
+              - key: "TCPShield-config.yml"
+                path: "TCPShield/config.yml"
+        - name: bungeecord-plugins-config
+          configMap:
+            name: bungeecord-plugins-config

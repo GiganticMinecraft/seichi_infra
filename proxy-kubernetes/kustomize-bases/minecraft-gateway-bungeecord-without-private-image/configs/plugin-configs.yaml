@@ -1,0 +1,103 @@
+kind: ConfigMap
+metadata:
+  name: bungeecord-plugin-configs
+apiVersion: v1
+data:
+  BungeeHubCommand-config.yml: |
+    # https://github.com/GiganticMinecraft/BungeeHubCommand/blob/a33b73f258de7d484fa961d000921275fb51c45b/src/main/resources/config.yml
+    # Needs override.
+    # Provide name of the server to which players are sent when executing the "hub" command
+    hub-server-name:
+
+    # The message to be shown when a player already connected to the hub server tryed to run the "hub" command.
+    already-connected-message: "You are already at the hub server!"
+
+  BungeeKick-config.yml: |
+    # Needs override.
+    # This is where the player is kicked to. This is usually the lobby/hub server
+    ServerName:
+
+    # Message to be sent to the player who has been kicked. This message is followed by the kick reason
+    KickMessage: '&6You have been kicked! Reason:&4 '
+
+    # Set this to True if you want the kicked player to be able to see the kick reason.
+    ShowKickMessage: True
+
+  BungeeSemaphore-config.yml: |
+    # Needs override.
+    # Provide a regex to match servers that needs a semaphore guard.
+    synchronized-server-regex:
+
+    redis:
+      host: cloudflared-redis--bungeesemaphore
+      port: 6379
+
+    locale:
+      error:
+        failed-saving-data: "Spigotサーバーがデータの保存に失敗しました！"
+
+    timeout:
+      # Timeout for locking out players from servers when downstream saves are not confirmed.
+      # Once this duration passes, a locked out player is able to join the target downstream server.
+      # Default is 60 seconds timeout. Specify negative values to disable timeouts.
+      millis: 4000
+
+  RedisBungee-config.yml: |
+    # RedisBungee configuration file.
+    # PLEASE READ THE WIKI: https://github.com/minecrafter/RedisBungee/wiki
+
+    # An identifier for this BungeeCord instance.
+    # NOTE:
+    #   This field must be unique among multiple BungeeCord instances
+    #     that connect to the redis instance.
+    #   In k8s context, substituting a HOSTNAME (name of the pod) here solves the issue.
+    #
+    #   In fact, itzg/bungeecord can expand environment variable references as long as
+    #     configs are placed in /config/plugins/RedisBungee directory.
+    #   See https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#replacing-variables-inside-configs
+    #     for more details.
+    server-id: ${HOSTNAME}
+
+    redis-server: cloudflared-redis--redisbungee
+    redis-port: 6379
+    # OPTIONAL: If your Redis server uses AUTH, set the password required.
+    redis-password: ""
+
+    # Maximum connections that will be maintained to the Redis server.
+    # The default is 8. This setting should be left as-is unless you have some wildly
+    # inefficient plugins or a lot of players.
+    max-redis-connections: 8
+
+    # Whether or not RedisBungee should install its version of regular BungeeCord commands.
+    # Often, the RedisBungee commands are desired, but in some cases someone may wish to
+    # override the commands using another plugin.
+    #
+    # If you are just denying access to the commands, RedisBungee uses the default BungeeCord
+    # permissions - just deny them and access will be denied.
+    #
+    # Please note that with build 787+, most commands overridden by RedisBungee were moved to
+    # modules, and these must be disabled or overridden yourself.
+    register-bungee-commands: true
+
+    # A list of IP addresses for which RedisBungee will not modify the response for, useful for automatic
+    # restart scripts.
+    exempt-ip-addresses: []
+
+  SwiftMOTD-config.yml: |
+    # Override if necessary.
+    motds:
+      generic: []
+      dynamic: []
+
+  TCPShield-config.yml: |
+    # Please keep this as true in while using TCPShield!
+    only-allow-proxy-connections: true
+
+    # available modes: system (uses the system time), htpdate (uses a synchronized date) & off (deactivates timestamp validation)
+    timestamp-validation: 'htpdate'
+
+    # Turn on to diagnose connection issues
+    debug-mode: false
+
+    # Toggle to enable support for Geyser/Floodgate v2
+    enable-geyser-support: false
