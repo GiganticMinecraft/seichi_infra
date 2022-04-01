@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bungeecord-config
+data:
+  config.yml: |
+    servers:
+      lobby:
+        address: cloudflared-mcserver--lobby:25565
+        restricted: false
+        motd: ''
+      s1:
+        address: cloudflared-mcserver--s1:25565
+        restricted: false
+        motd: ''
+      s2:
+        address: cloudflared-mcserver--s2:25565
+        restricted: false
+        motd: ''
+      s3:
+        address: cloudflared-mcserver--s3:25565
+        restricted: false
+        motd: ''
+      s5:
+        address: cloudflared-mcserver--s5:25565
+        restricted: false
+        motd: ''
+      s7:
+        address: cloudflared-mcserver--s7:25565
+        restricted: false
+        motd: ''
+      cre:
+        address: cloudflared-mcserver--cre:25565
+        restricted: false
+        motd: ''
+      eve:
+        address: cloudflared-mcserver--eve:25565
+        restricted: false
+        motd: ''
+      eve02:
+        address: cloudflared-mcserver--eve02:25565
+        restricted: false
+        motd: ''
+      h1:
+        address: cloudflared-mcserver--h1:25565
+        restricted: false
+        motd: ''
+      spade:
+        address: cloudflared-mcserver--spade:25565
+        restricted: false
+        motd: ''
+      reset:
+        address: cloudflared-mcserver--reset:25565
+        restricted: false
+        motd: ''
+      kagawa:
+        address: cloudflared-mcserver--kagawa:25565
+        restricted: false
+        motd: ''
+      petra:
+        address: cloudflared-mcserver--petra:25565
+        restricted: false
+        motd: ''
+      tm1:
+        address: vps1.megumiso.com:35946:25565
+        restricted: false
+        motd: ''
+
+    listeners:
+      - priorities:
+          - lobby
+        forced_hosts:
+          play.seichi.click: lobby
+
+        query_port: 25565
+        motd: ''
+        bind_local_address: true
+        tab_list: GLOBAL_PING
+        query_enabled: false
+        host: 0.0.0.0:25577
+
+        max_players: 256
+        tab_size: 60
+        ping_passthrough: false
+        force_default_server: true
+        proxy_protocol: true
+
+    # Warning: asterisk cannot be used for permissions setting
+    permissions:
+      default:
+        - bungeecord.command.list
+        - bungeecord.command.server
+      admin:
+        - bungeecord.command.list
+        - bungeecord.command.server
+
+        - bungeecord.command.alert
+        - bungeecord.command.send
+        - redisbungee.command.lastseen
+        - redisbungee.command.sendtoall
+        - redisbungee.command.serverid
+        - redisbungee.command.serverids
+        - redisbungee.command.pproxy
+        - redisbungee.command.plist
+
+    groups:
+      unchama:
+        - admin
+
+    custom_server_name: HexaCord
+    player_limit: -1
+    online_mode: true
+    forge_support: false
+    stats: 752477ce-c5e9-4e37-9361-2d4f26f65f14
+
+    ip_forward: true
+    prevent_proxy_connections: true
+    always_handle_packets: false
+    remote_ping_timeout: 5000
+    remote_ping_cache: -1
+    # The timeout value must be set shorter than the upper network
+    timeout: 20000
+    server_connect_timeout: 5000
+    connection_throttle: 2000
+    connection_throttle_limit: 16
+    network_compression_threshold: 256
+    log_pings: false
+
+    disabled_commands:
+    log_commands: true
+    inject_commands: false
