@@ -26,13 +26,13 @@ data:
       millis: 4000
 
   RedisBungee-config.yml: |
-    server-id: ${HOSTNAME}
-
+    server-id: ""
+    use-random-id-string: true
     redis-server: cloudflared-redis--redisbungee
     redis-port: 6379
     redis-password: ""
-
     max-redis-connections: 8
+    useSSL: false
     register-bungee-commands: true
     exempt-ip-addresses: []
 
