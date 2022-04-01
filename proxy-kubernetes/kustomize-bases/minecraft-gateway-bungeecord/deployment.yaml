@@ -5,7 +5,7 @@ metadata:
     app: bungeecord
   name: bungeecord
 spec:
-  replicas: 0
+  replicas: 2
   selector:
     matchLabels:
       app: bungeecord
@@ -15,12 +15,7 @@ spec:
         app: bungeecord
     spec:
       containers:
-        - command:
-            - sh
-            - -c
-            - eval "echo \"$(cat /plugins/RedisBungee/config.yml)\"" > /plugins/RedisBungee/config.yml;
-              /usr/bin/run-bungeecord.sh
-          resources:
+        - resources:
             requests:
               memory: 768Mi
           env:
@@ -28,8 +23,32 @@ spec:
               value: 768m
             - name: TYPE
               value: WATERFALL
-          # NOTE: production向けとdebug向けで変更すべき
-          image: gcr.io/manifest-shell-237511/seichi-debug-gw-bungeecord:latest
+            - name: PLUGINS
+              # BungeeKick:
+              #   https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar
+              # BungeeHubCommand:
+              #   https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-4c5449d8aecf6bf5a6b810fb85a1bfa75c0fd03f/bungeehubcommand-1.jar
+              # BungeeSemaphore:
+              #   https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar
+              # RedisBungee:
+              #   https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+              # TCPShield (RealIP):
+              #   https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+              value: >-
+                https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
+                https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-4c5449d8aecf6bf5a6b810fb85a1bfa75c0fd03f/bungeehubcommand-1.jar,
+                https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar,
+                https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
+                https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+
+            # BungeeYAML (depended by SwiftMOTD):
+            #   https://www.spigotmc.org/resources/bungeeyaml-original.13068/
+            # SwiftMOTD:
+            #   https://www.spigotmc.org/resources/swiftmotd.221/
+            - name: SPIGET_PLUGINS
+              value: 13068,221
+
+          image: itzg/bungeecord:java17-2022.1.0
           name: bungeecord
           ports:
             - containerPort: 25577
@@ -42,83 +61,43 @@ spec:
             tcpSocket:
               port: 25577
             timeoutSeconds: 1
-      imagePullSecrets:
-        - name: gcr-bungeecord-image-pull-secret
-      initContainers:
-        - command:
-            - sysctl
-            - -w
-            - net.core.somaxconn=65535
-          image: busybox
-          name: init-sysctl
-          securityContext:
-            privileged: true
-            runAsNonRoot: false
-            runAsUser: 0
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: bungeecord--allow-egress-cloudflared
-spec:
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          appgroup: cloudflared
-  podSelector:
-    matchLabels:
-      app: bungeecord
-  policyTypes:
-  - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: bungeecord--allow-egress-dns
-spec:
-  egress:
-  - ports:
-    - port: 53
-      protocol: UDP
-    - port: 53
-      protocol: TCP
-    to:
-    - ipBlock:
-        cidr: 0.0.0.0/0
-  podSelector:
-    matchLabels:
-      app: bungeecord
-  policyTypes:
-  - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: bungeecord--allow-egress-www
-spec:
-  egress:
-  - ports:
-    - port: 80
-      protocol: TCP
-    - port: 443
-      protocol: TCP
-    to:
-    - ipBlock:
-        cidr: 0.0.0.0/0
-  podSelector:
-    matchLabels:
-      app: bungeecord
-  policyTypes:
-  - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: bungeecord--default-deny-egress-all
-spec:
-  podSelector:
-    matchLabels:
-      app: bungeecord
-  policyTypes:
-  - Egress
+          volumeMounts:
+            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#volumes
+            - name: bungeecord-config
+              mountPath: /config/config.yml
+              subPath: config.yml
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/bungeecord が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeHubCommand/config.yml
+              subPath: BungeeHubCommand-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeKick/config.yml
+              subPath: BungeeKick-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeSemaphore/config.yml
+              subPath: BungeeSemaphore-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/RedisBungee/config.yml
+              subPath: RedisBungee-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/SwiftMOTD/config.yml
+              subPath: SwiftMOTD-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/TCPShield/config.yml
+              subPath: TCPShield-config.yml
+      volumes:
+        - name: bungeecord-config
+          configMap:
+            name: bungeecord-config
+        - name: bungeecord-plugin-configs
+          configMap:
+            name: bungeecord-plugin-configs
