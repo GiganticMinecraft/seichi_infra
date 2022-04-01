@@ -74,6 +74,19 @@ spec:
         - name: bungeecord-config
           configMap:
             name: bungeecord-config
+            items:
+              - key: "BungeeHubCommand-config.yml"
+                path: "BungeeHubCommand/config.yml"
+              - key: "BungeeKick-config.yml"
+                path: "BungeeKick/config.yml"
+              - key: "BungeeSemaphore-config.yml"
+                path: "BungeeSemaphore/config.yml"
+              - key: "RedisBungee-config.yml"
+                path: "RedisBungee/config.yml"
+              - key: "SwiftMOTD-config.yml"
+                path: "SwiftMOTD/config.yml"
+              - key: "TCPShield-config.yml"
+                path: "TCPShield/config.yml"
         - name: bungeecord-plugins-config
           configMap:
             name: bungeecord-plugins-config
