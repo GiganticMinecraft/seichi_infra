@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cloudflared-redis--{{ .Values.RedisServerName }}
+  # We wish this deployment to be updated
+  # when "cloudflared-access-token" secret is updated
+  annotations:
+    configmap.reloader.stakater.com/reload: "cloudflared-access-token"
   labels:
     app: cloudflared-redis--{{ .Values.RedisServerName }}
     appgroup: cloudflared
