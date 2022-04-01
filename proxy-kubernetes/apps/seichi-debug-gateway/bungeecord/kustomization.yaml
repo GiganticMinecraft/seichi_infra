@@ -24,8 +24,3 @@ patchesJson6902:
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: 768m
-  - target:
-      version: v1
-      kind: ConfigMap
-      name: bungeecord-config
-    path: bungeecord-config-jsonpatch.yaml

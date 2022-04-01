@@ -3,15 +3,48 @@ kind: ConfigMap
 metadata:
   name: bungeecord-plugin-configs
 data:
-  BungeeHubCommand/config.yml:
-    hub-server-name: "deb-s1"
-  BungeeKick/config.yml:
-    ServerName: "deb-s1"
-  BungeeSemaphore/config.yml:
+  BungeeHubCommand/config.yml: |
+    hub-server-name: deb-s1
+    already-connected-message: "You are already at the hub server!"
+
+  BungeeKick/config.yml: |
+    ServerName: deb-s1
+    KickMessage: '&6You have been kicked! Reason:&4 '
+    ShowKickMessage: True
+
+  BungeeSemaphore/config.yml: |
     synchronized-server-regex: "^(deb-s\\d+)$"
-  SwiftMOTD/config.yml:
+    redis:
+      host: cloudflared-redis--bungeesemaphore
+      port: 6379
+
+    locale:
+      error:
+        failed-saving-data: "Spigotサーバーがデータの保存に失敗しました！"
+
+    timeout:
+      millis: 4000
+
+  RedisBungee/config.yml: |
+    server-id: ${HOSTNAME}
+
+    redis-server: cloudflared-redis--redisbungee
+    redis-port: 6379
+    redis-password: ""
+
+    max-redis-connections: 8
+    register-bungee-commands: true
+    exempt-ip-addresses: []
+
+  SwiftMOTD/config.yml: |
     motds:
       generic:
         - 'seichi.click network for debug 3TBUkfU6'
       dynamic:
         - 'seichi.click network for debug 3TBUkfU6'
+
+  TCPShield/config.yml: |
+    only-allow-proxy-connections: true
+    timestamp-validation: 'htpdate'
+    debug-mode: false
+    enable-geyser-support: false

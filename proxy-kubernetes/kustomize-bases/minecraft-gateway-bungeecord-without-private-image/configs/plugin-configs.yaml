@@ -3,7 +3,7 @@ metadata:
   name: bungeecord-plugin-configs
 apiVersion: v1
 data:
-  BungeeHubCommand/config.yml:
+  BungeeHubCommand/config.yml: |
     # https://github.com/GiganticMinecraft/BungeeHubCommand/blob/a33b73f258de7d484fa961d000921275fb51c45b/src/main/resources/config.yml
     # Needs override.
     # Provide name of the server to which players are sent when executing the "hub" command
@@ -12,7 +12,7 @@ data:
     # The message to be shown when a player already connected to the hub server tryed to run the "hub" command.
     already-connected-message: "You are already at the hub server!"
 
-  BungeeKick/config.yml:
+  BungeeKick/config.yml: |
     # Needs override.
     # This is where the player is kicked to. This is usually the lobby/hub server
     ServerName:
@@ -23,7 +23,7 @@ data:
     # Set this to True if you want the kicked player to be able to see the kick reason.
     ShowKickMessage: True
 
-  BungeeSemaphore/config.yml:
+  BungeeSemaphore/config.yml: |
     # Needs override.
     # Provide a regex to match servers that needs a semaphore guard.
     synchronized-server-regex:
@@ -42,7 +42,7 @@ data:
       # Default is 60 seconds timeout. Specify negative values to disable timeouts.
       millis: 4000
 
-  RedisBungee/config.yml:
+  RedisBungee/config.yml: |
     # RedisBungee configuration file.
     # PLEASE READ THE WIKI: https://github.com/minecrafter/RedisBungee/wiki
 
@@ -83,12 +83,13 @@ data:
     # restart scripts.
     exempt-ip-addresses: []
 
-  SwiftMOTD/config.yml:
+  SwiftMOTD/config.yml: |
     # Override if necessary.
     motds:
       generic: []
       dynamic: []
-  TCPShield/config.yml:
+
+  TCPShield/config.yml: |
     # Please keep this as true in while using TCPShield!
     only-allow-proxy-connections: true
 

@@ -1,8 +1,0 @@
-- op: replace
-  path: /data/config.yml/listeners/0/priorities
-  value:
-    - deb-s1
-- op: replace
-  path: /data/config.yml/listeners/0/forced_hosts
-  value:
-    play-debug.seichi.click: lobby
