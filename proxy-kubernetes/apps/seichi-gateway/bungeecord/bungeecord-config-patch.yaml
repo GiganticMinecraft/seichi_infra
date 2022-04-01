@@ -62,7 +62,7 @@ data:
         restricted: false
         motd: ''
       tm1:
-        address: vps1.megumiso.com:35946:25565
+        address: vps1.megumiso.com:35946
         restricted: false
         motd: ''
 
