@@ -65,7 +65,7 @@ variable "github_cloudflare_oauth_client_secret" {
 # region terraform-github integration settings
 
 variable "terraform_github_app_id" {
-  description = "Client ID of the GitHub App used for Terraform automation"
+  description = "App ID of the GitHub App used for Terraform automation"
   type        = string
   sensitive   = true
 }
