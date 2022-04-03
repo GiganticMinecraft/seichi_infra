@@ -86,9 +86,11 @@ data:
       default:
         - bungeecord.command.list
         - bungeecord.command.server
+        - bungeehubcommand.hub
       admin:
         - bungeecord.command.list
         - bungeecord.command.server
+        - bungeehubcommand.hub
 
         - bungeecord.command.alert
         - bungeecord.command.send
