@@ -42,27 +42,12 @@ data:
         force_default_server: true
         proxy_protocol: true
 
+    # Needs override. By default we don't grant any permission node,
+    # but they can be given to groups (such as default or admin) as an array of strings.
     # Warning: asterisk cannot be used for permissions setting
     permissions:
-      default:
-        - bungeecord.command.list
-        - bungeecord.command.server
-      admin:
-        - bungeecord.command.alert
-        - bungeecord.command.end
-        - bungeecord.command.ip
-        - bungeecord.command.reload
-        - bungeecord.command.server
-        - bungeecord.command.list
-        - bungeecord.command.send
-        - SwiftMOTD.reload
-        - redisbungee.command.lastseen
-        - redisbungee.command.ip
-        - redisbungee.command.sendtoall
-        - redisbungee.command.serverid
-        - redisbungee.command.serverids
-        - redisbungee.command.pproxy
-        - redisbungee.command.plist
+      default: []
+      admin: []
 
     groups:
       unchama:
