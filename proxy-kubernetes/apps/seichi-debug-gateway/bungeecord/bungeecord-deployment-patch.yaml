@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bungeecord
+  # TODO: apply this diff to base
+  # We wish this deployment to be updated
+  # when "bungeecord-config" and "bungeecord-plugin-configs" ConfigMap are updated
+  annotations:
+    configmap.reloader.stakater.com/reload: "bungeecord-config,bungeecord-plugin-configs"
