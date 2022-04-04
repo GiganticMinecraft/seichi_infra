@@ -37,10 +37,6 @@ data:
         address: cloudflared-mcserver--eve:25565
         restricted: false
         motd: ''
-      eve02:
-        address: cloudflared-mcserver--eve02:25565
-        restricted: false
-        motd: ''
       h1:
         address: cloudflared-mcserver--h1:25565
         restricted: false
