@@ -31,7 +31,7 @@ spec:
           command:
             - 'sh'
             - '-c'
-            - "wget \"${SERVER_ICON_URL}\" /root/server-icon-download/server-icon.png"
+            - "wget -O /root/server-icon-download/server-icon.png \"${SERVER_ICON_URL}\""
       containers:
         - resources:
             requests:
