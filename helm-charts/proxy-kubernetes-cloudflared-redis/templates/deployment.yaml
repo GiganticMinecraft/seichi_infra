@@ -60,4 +60,8 @@ spec:
             port: 6379
         resources:
           requests:
+            # 実際のところは接続が増えるとCPU負荷の方が高くなりがち。
+            # メモリ利用は18Mi程度からそこまで増えないのでrequestsを24Miに落としておく。
+            memory: 24Mi
+          limits:
             memory: 64Mi
