@@ -11,11 +11,11 @@ server:
     # -- Average memory utilization percentage for the Argo CD server [HPA]
     targetMemoryUtilizationPercentage: 70
   resources:
-   limits:
-     cpu: 200m
-     memory: 256Mi
    requests:
      cpu: 100m
+     memory: 48Mi
+   limits:
+     cpu: 200m
      memory: 128Mi
   pdb:
     enabled: true
