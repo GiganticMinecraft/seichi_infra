@@ -74,9 +74,9 @@ spec:
           startupProbe:
             tcpSocket:
               port: 25577
-            # 最大20秒待つ
-            failureThreshold: 4
-            periodSeconds: 5
+            # 最大120秒待つ
+            failureThreshold: 6
+            periodSeconds: 20
           volumeMounts:
             # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピーをしてくれる。
             # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
