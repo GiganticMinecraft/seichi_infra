@@ -71,14 +71,12 @@ spec:
           ports:
             - containerPort: 25577
               name: minecraft
-          readinessProbe:
-            failureThreshold: 2
-            initialDelaySeconds: 15
-            periodSeconds: 5
-            successThreshold: 2
+          startupProbe:
             tcpSocket:
               port: 25577
-            timeoutSeconds: 1
+            # 最大20秒待つ
+            failureThreshold: 4
+            periodSeconds: 5
           volumeMounts:
             # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピーをしてくれる。
             # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
