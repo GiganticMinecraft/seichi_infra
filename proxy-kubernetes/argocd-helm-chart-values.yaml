@@ -103,7 +103,7 @@ controller:
      memory: 512Mi
    requests:
      cpu: 250m
-     memory: 256Mi
+     memory: 128Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -126,45 +126,30 @@ redis:
   resources:
    limits:
      cpu: 200m
-     memory: 256Mi
+     memory: 64Mi
    requests:
      cpu: 100m
-     memory: 64Mi
-  pdb:
-    enabled: true
-    minAvailable: 1
-    maxUnavailable: 0
+     memory: 16Mi
 
 repoServer:
-  autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    # -- Average CPU utilization percentage for the repo server [HPA]
-    targetCPUUtilizationPercentage: 70
-    # -- Average memory utilization percentage for the repo server [HPA]
-    targetMemoryUtilizationPercentage: 70
+  replicaCount: 1
   resources:
    limits:
      cpu: 200m
-     memory: 256Mi
+     memory: 128Mi
    requests:
      cpu: 50m
-     memory: 128Mi
-  pdb:
-    enabled: true
-    minAvailable: 1
-    maxUnavailable: 0
+     memory: 48Mi
 
 applicationSet:
-  replicaCount: 2
+  replicaCount: 1
   resources:
     limits:
       cpu: 100m
       memory: 128Mi
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 64Mi
 
 notifications:
   resources:
