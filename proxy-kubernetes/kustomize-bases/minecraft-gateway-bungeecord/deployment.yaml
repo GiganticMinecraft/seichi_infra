@@ -18,6 +18,20 @@ spec:
       labels:
         app: bungeecord
     spec:
+      initContainers:
+        - name: server-icon-downloader
+          image: busybox:1.35.0
+          env:
+            - name: SERVER_ICON_URL
+              # https://github.com/GiganticMinecraft/branding/blob/01438e6d18c3a2824e39e73354ab4105c9e8a89c/server-icon.png
+              value: https://raw.githubusercontent.com/GiganticMinecraft/branding/01438e6d18c3a2824e39e73354ab4105c9e8a89c/server-icon.png
+          volumeMounts:
+            - name: server-icon-download-volume
+              mountPath: /root/server-icon-download
+          command:
+            - 'sh'
+            - '-c'
+            - "wget \"${SERVER_ICON_URL}\" /root/server-icon-download/server-icon.png"
       containers:
         - resources:
             requests:
@@ -72,6 +86,9 @@ spec:
             - name: bungeecord-config
               mountPath: /config/config.yml
               subPath: config.yml
+            - name: server-icon-download-volume
+              mountPath: /config/server-icon.png
+              subPath: server-icon.png
             # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
             # 提供するために symlink による一時ディレクトリがマウントされることになるが、
             # itzg/bungeecord が利用するファイル同期の仕組み (itzg/mc-image-helper) は
@@ -105,3 +122,6 @@ spec:
         - name: bungeecord-plugin-configs
           configMap:
             name: bungeecord-plugin-configs
+        # サーバーアイコンをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
+        - name: server-icon-download-volume
+          emptyDir: {}

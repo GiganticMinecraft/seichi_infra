@@ -37,3 +37,11 @@ unchama宅のルーター配下のLAN (subnet 192.168.0.0/20)。マイクラサ�
 
  - [`util-scripts`](./util-scripts/)
    - サーバーなどが利用できるように組まれた雑多なインストールスクリプト等を管理しています。
+
+## ライセンスについて
+
+本リポジトリで記述されている設定自体は[ライセンス](./LICENSE.md)の範囲内で利用していただけます。
+
+ただし、BungeeCordのサービス定義は、[著作権で保護されている、まいんちゃんのサーバーアイコン](https://github.com/GiganticMinecraft/branding)をダウンロードして利用するように設定されています。当該設定を流用する場合は[`branding` レポジトリ](https://github.com/GiganticMinecraft/branding)の利用許諾に記載されている条件に従う必要があるため、以下のどちらかを満たすように設定してください：
+ - BungeeCord の Deployment リソースでのサーバーアイコンのURL指定(`SERVER_ICON_URL` 環境変数)をまいんちゃんアイコン以外のものに差し替える
+ - 不特定多数が BungeeCord に接続できないようにする
