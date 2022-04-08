@@ -79,7 +79,9 @@ spec:
               name: origin-cloudflared-config
           resources:
             requests:
-              memory: 128Mi
+              memory: 32Mi
+            limits:
+              memory: 64Mi
       volumes:
         - name: origin-cloudflared-authorization-certificate
           secret:
