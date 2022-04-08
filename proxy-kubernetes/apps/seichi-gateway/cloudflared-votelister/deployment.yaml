@@ -53,4 +53,4 @@ spec:
             port: 32957
         resources:
           requests:
-            memory: 64Mi
+            memory: 24Mi
