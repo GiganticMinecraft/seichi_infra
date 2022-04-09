@@ -7,7 +7,7 @@ metadata:
   # We wish this deployment to be reloaded
   # when "bungeecord-config" and "bungeecord-plugin-configs" ConfigMap are updated
   annotations:
-    configmap.reloader.stakater.com/reload: "bungeecord-config,bungeecord-plugin-configs"
+    configmap.reloader.stakater.com/reload: "jmx-exporter-config,bungeecord-config,bungeecord-plugin-configs"
 spec:
   replicas: 2
   revisionHistoryLimit: 0
