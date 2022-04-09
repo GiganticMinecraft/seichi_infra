@@ -10,6 +10,7 @@ metadata:
     configmap.reloader.stakater.com/reload: "bungeecord-config,bungeecord-plugin-configs"
 spec:
   replicas: 2
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: bungeecord
