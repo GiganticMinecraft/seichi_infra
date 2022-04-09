@@ -1,3 +1,19 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmx-exporter-config
+data:
+  # https://github.com/prometheus/jmx_exporter/tree/ca972bfe693cca03d3a0fac802968e33828a1dd9#configuration
+  jmx-exporter-config.yaml: |
+    ---
+    startDelaySeconds: 0
+    lowercaseOutputName: false
+    lowercaseOutputLabelNames: false
+    whitelistObjectNames: []
+    blacklistObjectNames: []
+    rules: []
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -32,6 +48,19 @@ spec:
             - 'sh'
             - '-c'
             - "wget -O /root/server-icon-download/server-icon.png \"${SERVER_ICON_URL}\""
+        - name: jmx-exporter-downloader
+          image: busybox:1.35.0
+          env:
+            - name: JMX_EXPORTER_URL
+              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar"
+          volumeMounts:
+            - name: jmx-exporter-download-volume
+              mountPath: /root/jmx-exporter-download
+          command:
+            - 'sh'
+            - '-c'
+            - "wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar \"${JMX_EXPORTER_URL}\""
+
       containers:
         - resources:
             requests:
@@ -41,6 +70,7 @@ spec:
               value: 768m
             - name: TYPE
               value: WATERFALL
+
             - name: PLUGINS
               # BungeeKick:
               #   https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar
@@ -65,6 +95,10 @@ spec:
             #   https://www.spigotmc.org/resources/swiftmotd.221/
             - name: SPIGET_PLUGINS
               value: 13068,221
+
+            - name: JVM_OPTS
+              value: >-
+                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=8080:/jmx-exporter/jmx-exporter-config.yaml
 
           image: itzg/bungeecord:java17-2022.1.0
           name: bungeecord
@@ -113,6 +147,14 @@ spec:
             - name: bungeecord-plugin-configs
               mountPath: /config/plugins/TCPShield/config.yml
               subPath: TCPShield-config.yml
+
+            # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
+            - name: jmx-exporter-download-volume
+              mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
+              subPath: jmx-exporter-javaagent.jar
+            - name: jmx-exporter-config
+              mountPath: /jmx-exporter/jmx-exporter-config.yaml
+              subPath: jmx-exporter-config.yaml
       volumes:
         - name: bungeecord-config
           configMap:
@@ -123,3 +165,9 @@ spec:
         # サーバーアイコンをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: server-icon-download-volume
           emptyDir: {}
+        # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
+        - name: jmx-exporter-download-volume
+          emptyDir: {}
+        - name: jmx-exporter-config
+          configMap:
+            name: jmx-exporter-config
