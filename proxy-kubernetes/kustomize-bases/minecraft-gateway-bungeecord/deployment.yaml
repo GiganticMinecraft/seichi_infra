@@ -98,13 +98,15 @@ spec:
 
             - name: JVM_OPTS
               value: >-
-                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=8080:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
 
           image: itzg/bungeecord:java17-2022.1.0
           name: bungeecord
           ports:
             - containerPort: 25577
-              name: minecraft
+              name: bungeecord-port
+            - containerPort: 18321
+              name: bungeecord-jmx-port
           startupProbe:
             tcpSocket:
               port: 25577

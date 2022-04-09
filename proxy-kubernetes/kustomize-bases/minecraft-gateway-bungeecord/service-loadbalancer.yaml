@@ -18,6 +18,6 @@ spec:
     - name: bungee
       port: 25565
       protocol: TCP
-      targetPort: 25577
+      targetPort: bungeecord-port
   selector:
     app: bungeecord
