@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmx-exporter-config
+data:
+  # https://github.com/prometheus/jmx_exporter/tree/ca972bfe693cca03d3a0fac802968e33828a1dd9#configuration
+  jmx-exporter-config.yaml: |
+    ---
+    startDelaySeconds: 0
+    lowercaseOutputName: false
+    lowercaseOutputLabelNames: false
+    whitelistObjectNames: []
+    blacklistObjectNames: []
+    rules: []

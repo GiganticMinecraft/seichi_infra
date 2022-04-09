@@ -6,3 +6,4 @@ resources:
   - "./service-loadbalancer.yaml"
   - "./configs/bungeecord-config.yaml"
   - "./configs/plugin-configs.yaml"
+  - "./configs/jmx-exporter-config.yaml"
