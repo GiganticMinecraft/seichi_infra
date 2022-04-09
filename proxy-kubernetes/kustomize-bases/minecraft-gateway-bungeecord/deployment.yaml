@@ -88,9 +88,9 @@ spec:
           name: bungeecord
           ports:
             - containerPort: 25577
-              name: bungeecord-port
+              name: bungeecord
             - containerPort: 18321
-              name: bungeecord-jmx-metrics-port
+              name: jmx-metrics
           startupProbe:
             tcpSocket:
               port: 25577

@@ -5,9 +5,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - name: bungeecord-jmx-metrics-port
+    - name: jmx-metrics
       port: 18321
       protocol: TCP
-      targetPort: bungeecord-jmx-metrics-port
+      targetPort: jmx-metrics
   selector:
     app: bungeecord
