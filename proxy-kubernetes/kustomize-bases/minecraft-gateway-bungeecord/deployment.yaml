@@ -90,7 +90,7 @@ spec:
             - containerPort: 25577
               name: bungeecord-port
             - containerPort: 18321
-              name: bungeecord-jmx-port
+              name: bungeecord-jmx-metrics-port
           startupProbe:
             tcpSocket:
               port: 25577
