@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
   - "./deployment.yaml"
   - "./networkpolicies.yaml"
-  - "./service-loadbalancer.yaml"
+  - "./service-bungeecord-loadbalancer.yaml"
+  - "./service-bungeecord-jmx-cluster-ip.yaml"
   - "./configs/bungeecord-config.yaml"
   - "./configs/plugin-configs.yaml"
   - "./configs/jmx-exporter-config.yaml"
