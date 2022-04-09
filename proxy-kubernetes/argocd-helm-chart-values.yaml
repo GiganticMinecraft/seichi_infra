@@ -6,10 +6,10 @@ server:
     enabled: true
     minReplicas: 2
     maxReplicas: 5
-    # -- Average CPU utilization percentage for the Argo CD server [HPA]
-    targetCPUUtilizationPercentage: 70
-    # -- Average memory utilization percentage for the Argo CD server [HPA]
-    targetMemoryUtilizationPercentage: 70
+    # -- Average CPU utilization percentage (to the requested resource) for the Argo CD server [HPA]
+    targetCPUUtilizationPercentage: 90
+    # -- Average memory utilization percentage (to the requested resource) for the Argo CD server [HPA]
+    targetMemoryUtilizationPercentage: 175
   resources:
    requests:
      cpu: 100m
