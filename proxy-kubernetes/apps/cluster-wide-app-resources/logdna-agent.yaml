@@ -19,7 +19,7 @@ spec:
         valueFrom:
           secretKeyRef:
             # defined in terraform/lke_cluster_secrets.tf
-            name: logdna-agent-certificate
+            name: logdna-agent-ingestion-key
             key: INGESTION_KEY
       releaseName: logdna-agent
   destination:

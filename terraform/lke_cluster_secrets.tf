@@ -13,16 +13,16 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "logdna_agent_credential" {
+resource "kubernetes_secret" "logdna_agent_ingestion_key" {
   depends_on = [kubernetes_namespace.cluster_wide_apps]
 
   metadata {
-    name      = "logdna-agent-certificate"
+    name      = "logdna-agent-ingestion-key"
     namespace = "cluster-wide-apps"
   }
 
   data = {
-    TUNNEL_CREDENTIAL = var.lke_k8s_cloudflare_argo_tunnel_credential
+    TUNNEL_CREDENTIAL = var.lke_k8s_logdna_agent_ingestion_key
   }
 
   type = "Opaque"
