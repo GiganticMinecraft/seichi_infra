@@ -13,6 +13,21 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "logdna_agent_credential" {
+  depends_on = [kubernetes_namespace.cluster_wide_apps]
+
+  metadata {
+    name      = "logdna-agent-certificate"
+    namespace = "cluster-wide-apps"
+  }
+
+  data = {
+    TUNNEL_CREDENTIAL = var.lke_k8s_cloudflare_argo_tunnel_credential
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "argocd_github_oauth_app_secret" {
   depends_on = [kubernetes_namespace.argocd]
 
