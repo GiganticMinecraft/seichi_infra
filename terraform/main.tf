@@ -156,3 +156,16 @@ variable "lke_k8s_cloudflare_argo_tunnel_credential" {
 }
 
 # endregion
+
+# region logdna-agent settings
+
+# logdna-agentが収集した情報をログ収集プラットフォームであるLogDNAへ取り込むために必要となる認証キー。
+# 
+# https://app.logdna.com/manage/api-keys にアクセスして発行したIngestion Keyを指定してください。
+variable "lke_k8s_logdna_agent_ingestion_key" {
+  description   = "The key are used by logdna-agent for ingestion to logdna platform."
+  type          = string
+  sensitive     = true
+}
+
+# endregion
