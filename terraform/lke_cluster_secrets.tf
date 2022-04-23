@@ -13,6 +13,24 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "logdna_agent_ingestion_key" {
+  depends_on = [kubernetes_namespace.cluster_wide_apps]
+
+  # name と data の指定は LOGDNA_INGESTION_KEY の参照指定による
+  # https://github.com/logdna/logdna-agent-v2/blob/442810f18f4ea44c71bedff01c12795223b0e41e/k8s/agent-resources.yaml#L114-L118
+
+  metadata {
+    namespace = "cluster-wide-apps"
+    name      = "logdna-agent-key"
+  }
+
+  data = {
+    "logdna-agent-key" = var.lke_k8s_logdna_agent_ingestion_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "argocd_github_oauth_app_secret" {
   depends_on = [kubernetes_namespace.argocd]
 
