@@ -29,6 +29,12 @@ resource "github_team" "onp_admin_grafana_team" {
   privacy     = "closed"
 }
 
+resource "github_team" "onp_admin_proxmox_team" {
+  name        = "onp-admin-proxmox"
+  description = "オンプレミス環境のproxmoxに接続できるTeam"
+  privacy     = "closed"
+}
+
 resource "github_team" "springer" {
   name        = "Springer"
   description = "整地鯖(春)のデベロッパー"
