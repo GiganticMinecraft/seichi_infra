@@ -4,6 +4,7 @@ on:
   push:
     # Only when a helm-chart is updated
     paths:
+     - '.github/workflows/release_helm_charts.yaml'
      - 'helm-charts/**'
 
 jobs:
