@@ -3,8 +3,8 @@ name: "Helm chart を更新・公開する"
 on:
   push:
     # Only when a helm-chart is updated
-    # paths:
-    #  - 'helm-charts/**'
+    paths:
+     - 'helm-charts/**'
 
 jobs:
   lint:
