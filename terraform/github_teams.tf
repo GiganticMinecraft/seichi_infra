@@ -29,7 +29,7 @@ resource "github_team" "onp_admin_grafana_team" {
   privacy     = "closed"
 }
 
-resource "github_team" "onp_admin_proxmox_team" {
+resource "github_team" "onp_admin_proxmox" {
   name        = "onp-admin-proxmox"
   description = "オンプレミス環境のproxmoxに接続できるTeam"
   privacy     = "closed"
