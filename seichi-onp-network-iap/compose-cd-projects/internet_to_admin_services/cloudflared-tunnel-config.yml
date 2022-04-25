@@ -4,4 +4,15 @@ ingress:
   - hostname: grafana.onp.admin.seichi.click
     service: "http://192.168.3.20:3000"
     
+  # Proxmox VEの露出
+  # 管理者からの直アクセスを想定するため、GitHub TeamsによるSSOを設定している
+  # (terraform/cloudflare_network_admin_services.yaml 参照)
+  - hostname: proxmox.onp.admin.seichi.click
+    service: "https://192.168.1.150:8006"
+    originRequest:
+      # 現時点(2022/04/25)ではproxmoxはHTTPS**しか**サポートしないらしく、
+      # (https://forum.proxmox.com/threads/disabling-ssl-on-latest-proxmox-ve.42889/post-205902)
+      # 自己署名証明書で保護されているため、これを無視する
+      noTLSVerify: true
+
   - service: http_status:404
