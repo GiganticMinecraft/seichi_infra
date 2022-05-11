@@ -18,8 +18,8 @@ SNIPPET_TARGET_PATH=/mnt/pve/seichi-prox-bkup04/snippets
 wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 
 # create a new VM and attach Network Adaptor
-# vmbr0=Service Network Segment (172.16.0.0/20)
-# vmbr1=Storage Network Segment (172.16.16.0/22)
+# vmbr0=Service Network Segment (192.168.0.0/20)
+# vmbr1=Storage Network Segment (192.168.16.0/22)
 qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --name seichi-onp-k8s-template
 
 # import the downloaded disk to $BOOT_IMAGE_TARGET_VOLUME storage
