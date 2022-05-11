@@ -6,7 +6,7 @@ TEMPLATE_VMID=9050
 CLOUDINIT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
 BOOT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
 SNIPPET_TARGET_VOLUME=seichi-prox-bkup04
-SNIPPET_TARGET_PATH=/mnt/pve/seichi-prox-bkup04/snippets
+SNIPPET_TARGET_PATH=/mnt/pve/seichi-prox-backup04/snippets
 
 # end region
 
