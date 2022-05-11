@@ -10,7 +10,7 @@
 - Ubuntu 20.04 LTS (cloud-init image)
   - kubernetes VMのベースとして使用
 - Network Addressing(うんちゃま自宅鯖本番環境)
-  - Service Network Segment (192.168.8.0/20)
+  - Service Network Segment (192.168.0.0/20)
   - Storage Network Segment (192.168.16.0/22)
   - kubernetes
     - Internal
