@@ -1,0 +1,34 @@
+#cloud-config
+hostname: seichi-onp-k8s-cp-1
+timezone: Asia/Tokyo
+manage_etc_hosts: true
+chpasswd:
+  expire: False
+users:
+  - default
+  - name: cloudinit
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    # mkpasswd --method=SHA-512 --rounds=4096
+    # password is zaq12wsx
+    passwd: $6$rounds=4096$Xlyxul70asLm$9tKm.0po4ZE7vgqc.grptZzUU9906z/.vjwcqz/WYVtTwc5i2DWfjVpXb8HBtoVfvSY61rvrs/iwHxREKl3f20
+ssh_pwauth: false
+ssh_authorized_keys: []
+package_upgrade: true
+runcmd:
+  # set ssh_authorized_keys
+  - su - cloudinit -c "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
+  - su - cloudinit -c "curl -sS https://github.com/unchama.keys >> ~/.ssh/authorized_keys"
+  - su - cloudinit -c "curl -sS https://github.com/inductor.keys >> ~/.ssh/authorized_keys"
+  - su - cloudinit -c "curl -sS https://github.com/kory33.keys >> ~/.ssh/authorized_keys"
+  - su - cloudinit -c "chmod 600 ~/.ssh/authorized_keys"
+  # run install scripts
+  - su - cloudinit -c "curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/scripts/k8s-node-setup.sh > ~/k8s-node-setup.sh"
+  - su - cloudinit -c "sudo bash ~/k8s-node-setup.sh k8s-cp-1"
+  # add kubeconfig to cloudinit user
+  - su - cloudinit -c "mkdir -p ~/.kube"
+  - su - cloudinit -c "sudo cp /etc/kubernetes/admin.conf ~/.kube/config"
+  - su - cloudinit -c "sudo chown cloudinit:cloudinit ~/.kube/config"
+  # copy kubeadm-join-config to cloudinit user home directory
+  - su - cloudinit -c "sudo cp /root/join_kubeadm_cp.yaml ~/join_kubeadm_cp.yaml"
+  - su - cloudinit -c "sudo cp /root/join_kubeadm_wk.yaml ~/join_kubeadm_wk.yaml"
