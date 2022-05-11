@@ -54,8 +54,8 @@ qm clone $TEMPLATE_VMID 1001 --name seichi-onp-k8s-cp-1 --full true --cores 4 --
 # resize disk (Resize after cloning, because it takes time to clone a large disk)
 qm resize 1001 scsi0 30G
 # set snippets
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-1-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-1-user.yaml
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-1-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-1-network.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-1-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-1-user.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-1-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-1-network.yaml
 qm set 1001 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-1-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-1-network.yaml"
 
 # clone from template
@@ -63,8 +63,8 @@ qm clone $TEMPLATE_VMID 1002 --name seichi-onp-k8s-cp-2 --full true --cores 4 --
 # resize disk (Resize after cloning, because it takes time to clone a large disk)
 qm resize 1002 scsi0 30G
 # set snippets
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-2-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-2-user.yaml
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-2-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-2-network.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-2-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-2-user.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-2-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-2-network.yaml
 qm set 1002 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-2-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-2-network.yaml"
 
 # clone from template
@@ -72,8 +72,8 @@ qm clone $TEMPLATE_VMID 1003 --name seichi-onp-k8s-cp-3 --full true --cores 4 --
 # resize disk (Resize after cloning, because it takes time to clone a large disk)
 qm resize 1003 scsi0 30G
 # set snippets
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-3-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-3-user.yaml
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-3-network.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-3-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-3-user.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-cp-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-3-network.yaml
 qm set 1003 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-3-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-3-network.yaml"
 
 # clone from template
@@ -81,8 +81,8 @@ qm clone $TEMPLATE_VMID 1101 --name seichi-onp-k8s-wk-1 --full true --cores 6 --
 # resize disk (Resize after cloning, because it takes time to clone a large disk)
 qm resize 1101 scsi0 30G
 # set snippets
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-1-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-1-user.yaml
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-1-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-1-network.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-1-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-1-user.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-1-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-1-network.yaml
 qm set 1101 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-1-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-1-network.yaml"
 
 # clone from template
@@ -90,8 +90,8 @@ qm clone $TEMPLATE_VMID 1102 --name seichi-onp-k8s-wk-2 --full true --cores 6 --
 # resize disk (Resize after cloning, because it takes time to clone a large disk)
 qm resize 1102 scsi0 30G
 # set snippets
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-2-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-2-user.yaml
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-2-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-2-network.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-2-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-2-user.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-2-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-2-network.yaml
 qm set 1102 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-2-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-2-network.yaml"
 
 # clone from template
@@ -99,8 +99,8 @@ qm clone $TEMPLATE_VMID 1103 --name seichi-onp-k8s-wk-3 --full true --cores 6 --
 # resize disk (Resize after cloning, because it takes time to clone a large disk)
 qm resize 1103 scsi0 30G
 # set snippets
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-3-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-user.yaml
-curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-network.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-3-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-user.yaml
+curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/snippets/seichi-onp-k8s-wk-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-network.yaml
 qm set 1103 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-3-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-3-network.yaml"
 
 # end region

@@ -37,7 +37,7 @@
 
 - proxmoxのホストコンソール上で`deploy-vm.sh`を実行すると、各種VMが沸く
 
-  `/bin/bash <(curl -s https://raw.githubusercontent.com/giganticminecraft/seichi_infra/deploy-k8s-on-premiss/seichi-onp-k8s/deploy-vm.sh)`
+  `/bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/deploy-vm.sh)`
 
 - proxmoxのホストコンソール上で以下コマンド実行。(AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可)
 
