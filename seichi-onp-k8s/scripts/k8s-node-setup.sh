@@ -1,4 +1,4 @@
-#/bin/bash -eu
+#!/usr/bin/env bash -eu
 
 # special thanks!: https://gist.github.com/inductor/32116c486095e5dde886b55ff6e568c8
 
