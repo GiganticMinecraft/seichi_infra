@@ -80,7 +80,7 @@ sudo apt-get update && sudo apt-get install -y containerd
 
 # Configure containerd
 sudo mkdir -p /etc/containerd
-sudo containerd config default > /etc/containerd/config.toml
+sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
 
 if grep -q "SystemdCgroup = true" "/etc/containerd/config.toml"; then
 echo "Config found, skip rewriting..."
