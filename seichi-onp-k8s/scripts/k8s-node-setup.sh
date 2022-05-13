@@ -224,6 +224,9 @@ EOF
 systemctl enable keepalived --now
 systemctl enable haproxy --now
 
+# Pull images first
+kubeadm config images pull
+
 # Ends except first-control-plane
 case $1 in
     k8s-cp-1)
@@ -263,9 +266,6 @@ kind: KubeletConfiguration
 cgroupDriver: "systemd"
 protectKernelDefaults: true
 EOF
-
-# Pull images first
-kubeadm config images pull
 
 # Install Kubernetes without kube-proxy
 kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem
