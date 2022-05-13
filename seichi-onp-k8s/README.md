@@ -36,7 +36,7 @@
 
 ログイン可能な公開鍵は"クラスタ作成時"に[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)の`runcmd:`に定義されている公開鍵に基づいています。
 
-クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorize_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)への追記も行ってください。
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorized_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)への追記も行ってください。
 
 ログイン可能な公開鍵を確認したら、以下の手順でログインが可能です：
 
