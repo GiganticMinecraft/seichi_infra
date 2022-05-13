@@ -272,7 +272,7 @@ kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy -
 
 mkdir -p "$HOME"/.kube
 cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
-chown $(id -u):$(id -g) "$HOME"/.kube/config
+chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
 
 # Install Helm CLI
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
