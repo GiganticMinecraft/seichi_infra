@@ -1,5 +1,8 @@
 # seichi-onp-k8s
 
+オンプレミス上に整地鯖用のkubernetesクラスタをデプロイする為のスクリプト群です。
+前提としている環境については、以下前提条件を参照してください。
+
 # 前提条件
 
 - Proxmox Virtual Environment 7.1-11
@@ -26,6 +29,44 @@
   - kubelet,kubeadm,kubectl v1.23.6
   - cillium (Container Network Interface)
   - MetalLB (for LoadBalancer,L2 mode)
+
+# クラスタ操作
+
+作成フロー完了後は`seichi-onp-k8s-cp-1`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
+
+ログイン可能な公開鍵は"クラスタ作成時"に[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)の`runcmd:`に定義されている公開鍵に基づいています。
+
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorize_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)への追記も行ってください。
+
+ログイン可能な公開鍵を確認したら、以下の手順でログインが可能です：
+
+- ローカル端末上で`~/.ssh/config`をセットアップ
+
+```
+Host <踏み台サーバーホスト名>
+  HostName <踏み台サーバーホスト名>
+  User <踏み台サーバーユーザー名>
+  IdentityFile ~/.ssh/id_ed25519
+
+Host seichi-onp-k8s-cp-1
+  HostName 192.168.18.11
+  User cloudinit
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+```
+
+- (Option)初回接続後クラスターが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
+
+```
+ssh-keygen -R 192.168.18.11
+```
+
+- 接続チェック
+
+```
+ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
+```
+
 
 # 作成フロー
 
