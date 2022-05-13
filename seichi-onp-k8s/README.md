@@ -21,7 +21,7 @@
         - Service Network (192.168.8.0-192.168.8.127)
         - Storage Network (192.168.18.0-192.168.18.127)
       - API Endpoint (192.168.18.100)
-      - NodeBalancer VIP (192.168.8.128-192.168.8.255)
+      - LoadBalancer VIP (192.168.8.128-192.168.8.255)
 - kubernetes構成情報
   - kubelet,kubeadm,kubectl v1.23.6
   - cillium (Container Network Interface)
