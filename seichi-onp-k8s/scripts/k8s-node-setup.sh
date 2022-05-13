@@ -240,7 +240,7 @@ esac
 KUBEADM_BOOTSTRAP_TOKEN=$(openssl rand -hex 3).$(openssl rand -hex 8)
 
 # Set init configuration for the first control plane
-cat > $HOME/init_kubeadm.yaml <<EOF
+cat > "$HOME"/init_kubeadm.yaml <<EOF
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 bootstrapTokens:
@@ -268,11 +268,11 @@ EOF
 kubeadm config images pull
 
 # Install Kubernetes without kube-proxy
-kubeadm init --config $HOME/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem
+kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem
 
-mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p "$HOME"/.kube
+cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
+chown $(id -u):$(id -g) "$HOME"/.kube/config
 
 # Install Helm CLI
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
@@ -286,7 +286,7 @@ helm install cilium cilium/cilium \
     --set k8sServicePort=6443
 
 # Install MetalLB Helm Chart
-cat > $HOME/metallb_values.yaml <<EOF
+cat > "$HOME"/metallb_values.yaml <<EOF
 configInline:
   address-pools:
    - name: default
@@ -295,13 +295,13 @@ configInline:
      - 192.168.8.128/25
 EOF
 helm repo add metallb https://metallb.github.io/metallb
-helm install metallb metallb/metallb -f $HOME/metallb_values.yaml
+helm install metallb metallb/metallb -f "$HOME"/metallb_values.yaml
 
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
 
 # Set join configuration for other control plane nodes
-cat > $HOME/join_kubeadm_cp.yaml <<EOF
+cat > "$HOME"/join_kubeadm_cp.yaml <<EOF
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 cgroupDriver: "systemd"
@@ -321,7 +321,7 @@ controlPlane:
 EOF
 
 # Set join configuration for worker nodes
-cat > $HOME/join_kubeadm_wk.yaml <<EOF
+cat > "$HOME"/join_kubeadm_wk.yaml <<EOF
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 cgroupDriver: "systemd"
