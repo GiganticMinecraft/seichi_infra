@@ -101,14 +101,14 @@ qm migrate 1103 unchama-sv-prox04
 ```sh
 # start vm
 ## on unchama-sv-prox01
-qm start 1001
-qm start 1101
+ssh 192.168.16.150 qm start 1001
+ssh 192.168.16.150 qm start 1101
 ## on unchama-sv-prox02
-qm start 1002
-qm start 1102
+ssh 192.168.16.151 qm start 1002
+ssh 192.168.16.151 qm start 1102
 ## on unchama-sv-prox04
-qm start 1003
-qm start 1103
+ssh 192.168.16.153 qm start 1003
+ssh 192.168.16.153 qm start 1103
 ```
 
 - ローカル端末上で`~/.ssh/config`をセットアップ
@@ -224,26 +224,26 @@ ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
 ```sh
 # stop vm
 ## on unchama-sv-prox01
-qm stop 1001
-qm stop 1101
+ssh 192.168.16.150 qm stop 1001
+ssh 192.168.16.150 qm stop 1101
 ## on unchama-sv-prox02
-qm stop 1002
-qm stop 1102
+ssh 192.168.16.151 qm stop 1002
+ssh 192.168.16.151 qm stop 1102
 ## on unchama-sv-prox04
-qm stop 1003
-qm stop 1103
+ssh 192.168.16.153 qm stop 1003
+ssh 192.168.16.153 qm stop 1103
 
 # delete vm
 ## on unchama-sv-prox01
-qm destroy 9050 --destroy-unreferenced-disks true --purge true
-qm destroy 1001 --destroy-unreferenced-disks true --purge true
-qm destroy 1101 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.150 qm destroy 9050 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.150 qm destroy 1001 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.150 qm destroy 1101 --destroy-unreferenced-disks true --purge true
 ## on unchama-sv-prox02
-qm destroy 1102 --destroy-unreferenced-disks true --purge true
-qm destroy 1002 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.151 qm destroy 1102 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.151 qm destroy 1002 --destroy-unreferenced-disks true --purge true
 ## on unchama-sv-prox04
-qm destroy 1003 --destroy-unreferenced-disks true --purge true
-qm destroy 1103 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.153 qm destroy 1003 --destroy-unreferenced-disks true --purge true
+ssh 192.168.16.153 qm destroy 1103 --destroy-unreferenced-disks true --purge true
 ```
 
 - cleanup後、同じVMIDでVMを再作成できなくなることがあるが、proxmoxホストの再起動で解決する。(複数ノードで平行してcleanupコマンド実行するとだめっぽい)
