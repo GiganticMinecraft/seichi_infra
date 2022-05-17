@@ -3,7 +3,7 @@
 オンプレミス上に整地鯖用のkubernetesクラスタをデプロイする為のスクリプト群です。
 前提としている環境については、以下前提条件を参照してください。
 
-# 前提条件
+## 前提条件
 
 - Proxmox Virtual Environment 7.1-11
   - 3ノードクラスタ構成
@@ -30,7 +30,7 @@
   - cillium (Container Network Interface)
   - MetalLB (for LoadBalancer,L2 mode)
 
-# クラスタ操作
+## クラスタ操作
 
 作成フロー完了後は`seichi-onp-k8s-cp-1`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
 
@@ -57,18 +57,18 @@ Host seichi-onp-k8s-cp-1
 
 - (Option)初回接続後クラスターが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
 
-```
+```sh
 ssh-keygen -R 192.168.18.11
 ```
 
 - 接続チェック
 
-```
+```sh
 ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
 ```
 
 
-# 作成フロー
+## 作成フロー
 
 - 以下は本リポジトリのサクッと作ってサクッと壊す対象外なので別途用意しておく
   - ベアメタルなProxmox環境の構築
@@ -82,7 +82,7 @@ ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
 
 - proxmoxのホストコンソール上で以下コマンド実行。(AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可)
 
-```
+```sh
 # migrate vm
 qm migrate 1001 unchama-sv-prox01
 qm migrate 1002 unchama-sv-prox02
@@ -94,7 +94,7 @@ qm migrate 1103 unchama-sv-prox04
 
 - proxmoxのホストコンソール上で以下コマンド実行。ノードローカルにいるVMしか操作できない為、全てのノードで打って回る。
 
-```
+```sh
 # start vm
 qm start 1001
 qm start 1002
@@ -151,7 +151,7 @@ Host seichi-onp-k8s-wk-3
 
 - ローカル端末上でコマンド実行
 
-```
+```sh
 # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わる為)
 ssh-keygen -R 192.168.18.11
 ssh-keygen -R 192.168.18.12
@@ -182,7 +182,7 @@ ssh seichi-onp-k8s-wk-3 "sudo cat /var/log/cloud-init-output.log"
 
 - ローカル端末上でコマンド実行
 
-```
+```sh
 # join_kubeadm_cp.yaml を seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 にコピー
 scp seichi-onp-k8s-cp-1:~/join_kubeadm_cp.yaml ./
 scp ./join_kubeadm_cp.yaml seichi-onp-k8s-cp-2:~/
@@ -206,15 +206,15 @@ ssh seichi-onp-k8s-wk-3 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
 
 - 軽い動作チェック
 
-```
+```sh
 ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
 ```
 
-# cleanup
+## cleanup
 
 - proxmoxのホストコンソール上で以下コマンド実行。ノードローカルにいるVMしか操作できない為、全てのノードで打って回る。
 
-```
+```sh
 # stop vm
 qm stop 1001
 qm stop 1002

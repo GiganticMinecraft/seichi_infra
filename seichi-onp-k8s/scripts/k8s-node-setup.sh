@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+
+set -eu
 
 # special thanks!: https://gist.github.com/inductor/32116c486095e5dde886b55ff6e568c8
 
@@ -110,7 +112,7 @@ cat <<EOF | tee /etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 apt-get update
-apt-get install -y kubelet=1.23.6-00 kubeadm=1.23.6-00 kubectl=1.23.6-00
+apt-get install -y kubelet=1.24.0-00 kubeadm=1.24.0-00 kubectl=1.24.0-00
 apt-mark hold kubelet kubeadm kubectl
 
 # Disable swap
@@ -159,7 +161,7 @@ defaults
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
 frontend k8s-api
-    bind ${KUBE_API_SERVER_VIP}:6443
+    bind ${KUBE_API_SERVER_VIP}:8443
     mode tcp
     option tcplog
     default_backend k8s-api
@@ -258,8 +260,8 @@ kind: ClusterConfiguration
 networking:
   serviceSubnet: "10.96.0.0/16"
   podSubnet: "10.128.0.0/16"
-kubernetesVersion: "v1.23.6"
-controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:6443"
+kubernetesVersion: "v1.24.0"
+controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
@@ -283,19 +285,7 @@ helm install cilium cilium/cilium \
     --namespace kube-system \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=${KUBE_API_SERVER_VIP} \
-    --set k8sServicePort=6443
-
-# Install MetalLB Helm Chart
-cat > "$HOME"/metallb_values.yaml <<EOF
-configInline:
-  address-pools:
-   - name: default
-     protocol: layer2
-     addresses:
-     - 192.168.8.128/25
-EOF
-helm repo add metallb https://metallb.github.io/metallb
-helm install metallb metallb/metallb -f "$HOME"/metallb_values.yaml
+    --set k8sServicePort=8443
 
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
@@ -313,7 +303,7 @@ nodeRegistration:
   criSocket: "/var/run/containerd/containerd.sock"
 discovery:
   bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:6443"
+    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
     token: "$KUBEADM_BOOTSTRAP_TOKEN"
     unsafeSkipCAVerification: true
 controlPlane:
@@ -333,7 +323,7 @@ nodeRegistration:
   criSocket: "/var/run/containerd/containerd.sock"
 discovery:
   bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:6443"
+    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
     token: "$KUBEADM_BOOTSTRAP_TOKEN"
     unsafeSkipCAVerification: true
 EOF
