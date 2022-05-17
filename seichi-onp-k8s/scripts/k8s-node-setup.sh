@@ -29,6 +29,7 @@ esac
 
 # Set global variables
 KUBE_API_SERVER_VIP=192.168.18.100
+KUBE_API_SERVER_PORT=8443
 NODE_IPS=( 192.168.18.11 192.168.18.12 192.168.18.13 )
 EXTERNAL_KUBE_API_SERVER="$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click"
 
@@ -162,7 +163,7 @@ defaults
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
 frontend k8s-api
-    bind ${KUBE_API_SERVER_VIP}:8443
+    bind ${KUBE_API_SERVER_VIP}:${KUBE_API_SERVER_PORT}
     mode tcp
     option tcplog
     default_backend k8s-api
@@ -173,9 +174,9 @@ backend k8s-api
     option tcp-check
     balance roundrobin
     default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
-    server k8s-api-1 ${NODE_IPS[0]}:6443 check
-    server k8s-api-2 ${NODE_IPS[1]}:6443 check
-    server k8s-api-3 ${NODE_IPS[2]}:6443 check
+    server k8s-api-1 ${NODE_IPS[0]}:${KUBE_API_SERVER_PORT} check
+    server k8s-api-2 ${NODE_IPS[1]}:${KUBE_API_SERVER_PORT} check
+    server k8s-api-3 ${NODE_IPS[2]}:${KUBE_API_SERVER_PORT} check
 EOF
 
 # Install Keepalived
@@ -262,7 +263,7 @@ networking:
   serviceSubnet: "10.96.0.0/16"
   podSubnet: "10.128.0.0/16"
 kubernetesVersion: "v1.24.0"
-controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
+controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:${KUBE_API_SERVER_PORT}"
 apiServer:
   certSANs:
   - "${EXTERNAL_KUBE_API_SERVER}" # generate random FQDN to prevent malicious DoS attack
@@ -289,7 +290,7 @@ helm install cilium cilium/cilium \
     --namespace kube-system \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=${KUBE_API_SERVER_VIP} \
-    --set k8sServicePort=8443
+    --set k8sServicePort=${KUBE_API_SERVER_PORT}
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -305,7 +306,7 @@ metadata:
 type: kubernetes.io/basic-auth
 stringData:
   fqdn: ${EXTERNAL_KUBE_API_SERVER}
-  port: 8443
+  port: ${KUBE_API_SERVER_PORT}
 EOF
 
 # Generate control plane certificate
@@ -324,7 +325,7 @@ nodeRegistration:
   criSocket: "/var/run/containerd/containerd.sock"
 discovery:
   bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
+    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:${KUBE_API_SERVER_PORT}"
     token: "$KUBEADM_BOOTSTRAP_TOKEN"
     unsafeSkipCAVerification: true
 controlPlane:
@@ -344,7 +345,7 @@ nodeRegistration:
   criSocket: "/var/run/containerd/containerd.sock"
 discovery:
   bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
+    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:${KUBE_API_SERVER_PORT}"
     token: "$KUBEADM_BOOTSTRAP_TOKEN"
     unsafeSkipCAVerification: true
 EOF
