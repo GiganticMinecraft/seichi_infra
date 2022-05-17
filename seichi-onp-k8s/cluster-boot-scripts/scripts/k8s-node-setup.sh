@@ -223,9 +223,13 @@ vrrp_instance LB_VIP {
 }
 EOF
 
-# Enable VIP services
+# Enable and Start VIP services (if already enabled, do nothing)
 systemctl enable keepalived --now
 systemctl enable haproxy --now
+
+# Reload VIP services
+systemctl reload keepalived
+systemctl reload haproxy
 
 # Pull images first
 kubeadm config images pull
