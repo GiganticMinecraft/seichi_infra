@@ -308,8 +308,8 @@ metadata:
   namespace: seichi-systems
 type: kubernetes.io/basic-auth
 stringData:
-  fqdn: ${EXTERNAL_KUBE_API_SERVER}
-  port: 8443
+  fqdn: "${EXTERNAL_KUBE_API_SERVER}"
+  port: "8443"
 EOF
 
 # Generate control plane certificate
