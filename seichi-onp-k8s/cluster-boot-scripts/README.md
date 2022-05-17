@@ -84,33 +84,6 @@ FQDNについては公開しない前提ですが、クラスターへのアク�
 
   `/bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh)`
 
-- proxmoxのホストコンソール上で以下コマンド実行。(AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可)
-
-```sh
-# migrate vm
-qm migrate 1001 unchama-sv-prox01
-qm migrate 1002 unchama-sv-prox02
-qm migrate 1003 unchama-sv-prox04
-qm migrate 1101 unchama-sv-prox01
-qm migrate 1102 unchama-sv-prox02
-qm migrate 1103 unchama-sv-prox04
-```
-
-- proxmoxのホストコンソール上で以下コマンド実行。ノードローカルにいるVMしか操作できない為、全てのノードで打って回る。
-
-```sh
-# start vm
-## on unchama-sv-prox01
-ssh 192.168.16.150 qm start 1001
-ssh 192.168.16.150 qm start 1101
-## on unchama-sv-prox02
-ssh 192.168.16.151 qm start 1002
-ssh 192.168.16.151 qm start 1102
-## on unchama-sv-prox04
-ssh 192.168.16.153 qm start 1003
-ssh 192.168.16.153 qm start 1103
-```
-
 - ローカル端末上で`~/.ssh/config`をセットアップ
 
 ```

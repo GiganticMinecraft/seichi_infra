@@ -110,4 +110,23 @@ curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-3-user.yaml > $SNIPPET_TARGET_PATH
 curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-network.yaml
 qm set 1103 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-3-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-3-network.yaml"
 
+# migrate vm
+qm migrate 1001 unchama-sv-prox01
+qm migrate 1002 unchama-sv-prox02
+qm migrate 1003 unchama-sv-prox04
+qm migrate 1101 unchama-sv-prox01
+qm migrate 1102 unchama-sv-prox02
+qm migrate 1103 unchama-sv-prox04
+
+# start vm
+## on unchama-sv-prox01
+ssh 192.168.16.150 qm start 1001
+ssh 192.168.16.150 qm start 1101
+## on unchama-sv-prox02
+ssh 192.168.16.151 qm start 1002
+ssh 192.168.16.151 qm start 1102
+## on unchama-sv-prox04
+ssh 192.168.16.153 qm start 1003
+ssh 192.168.16.153 qm start 1103
+
 # end region
