@@ -306,7 +306,7 @@ kind: Secret
 metadata:
   name: external-k8s-endpoint
   namespace: seichi-systems
-type: kubernetes.io/basic-auth
+type: Opaque
 stringData:
   fqdn: "${EXTERNAL_KUBE_API_SERVER}"
   port: "8443"
