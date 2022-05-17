@@ -264,7 +264,7 @@ kubernetesVersion: "v1.24.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
-  - "$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click"
+  - "$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click" # generate random FQDN to prevent malicious DoS attack
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
