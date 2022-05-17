@@ -1,6 +1,6 @@
 # seichi-onp-k8s
 
-オンプレミス上に整地鯖用のkubernetesクラスタをデプロイする為のスクリプト群です。
+オンプレミス上に整地鯖用のKubernetesクラスタをデプロイする為のスクリプト群です。
 前提としている環境については、以下前提条件を参照してください。
 
 ## 前提条件
@@ -11,11 +11,11 @@
 - Synology NAS(DS1621+)
   - 共有ストレージとして利用
 - Ubuntu 20.04 LTS (cloud-init image)
-  - kubernetes VMのベースとして使用
+  - Kubernetes VMのベースとして使用
 - Network Addressing(うんちゃま自宅鯖本番環境)
   - Service Network Segment (192.168.0.0/20)
   - Storage Network Segment (192.168.16.0/22)
-  - kubernetes
+  - Kubernetes
     - Internal
       - Pod Network (10.128.0.0/16)
       - Service Network (10.96.0.0/16)
@@ -25,10 +25,9 @@
         - Storage Network (192.168.18.0-192.168.18.127)
       - API Endpoint (192.168.18.100)
       - LoadBalancer VIP (192.168.8.128-192.168.8.255)
-- kubernetes構成情報
-  - kubelet,kubeadm,kubectl v1.23.6
-  - cillium (Container Network Interface)
-  - MetalLB (for LoadBalancer,L2 mode)
+- Kubernetes構成情報
+  - kubeadm, kubectl, kubelet v1.24.0
+  - Cillium (Container Network Interface)
 
 ## クラスタ操作
 
@@ -67,6 +66,11 @@ ssh-keygen -R 192.168.18.11
 ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
 ```
 
+### クラスタのエンドポイントについて
+
+踏み台より先(内部NW)でクラスターを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
+
+FQDNについては公開しない前提ですが、クラスターへのアクセス権限がある場合は`seichi-systems` Namespace内の`external-k8s-endpoint`というSecretリソースを参照することでFQDNを取得可能です。
 
 ## 作成フロー
 

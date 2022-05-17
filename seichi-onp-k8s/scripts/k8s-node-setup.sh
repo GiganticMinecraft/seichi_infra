@@ -30,6 +30,7 @@ esac
 # Set global variables
 KUBE_API_SERVER_VIP=192.168.18.100
 NODE_IPS=( 192.168.18.11 192.168.18.12 192.168.18.13 )
+EXTERNAL_KUBE_API_SERVER="$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click"
 
 # set per-node variables
 case $1 in
@@ -264,7 +265,7 @@ kubernetesVersion: "v1.24.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
-  - "$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click" # generate random FQDN to prevent malicious DoS attack
+  - "${EXTERNAL_KUBE_API_SERVER}" # generate random FQDN to prevent malicious DoS attack
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
@@ -289,6 +290,23 @@ helm install cilium cilium/cilium \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=${KUBE_API_SERVER_VIP} \
     --set k8sServicePort=8443
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: seichi-systems
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-k8s-endpoint
+  namespace: seichi-systems
+type: kubernetes.io/basic-auth
+stringData:
+  fqdn: ${EXTERNAL_KUBE_API_SERVER}
+  port: 8443
+EOF
 
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
