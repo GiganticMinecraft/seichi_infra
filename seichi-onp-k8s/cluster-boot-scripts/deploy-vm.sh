@@ -7,7 +7,7 @@ CLOUDINIT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
 BOOT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
 SNIPPET_TARGET_VOLUME=seichi-prox-backup04
 SNIPPET_TARGET_PATH=/mnt/pve/seichi-prox-backup04/snippets
-SNIPPET_SOURCE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/cluster-boot-scripts/snippets"
+SNIPPET_SOURCE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/seichi-onp-k8s/cluster-boot-scripts/snippets"
 
 # end region
 

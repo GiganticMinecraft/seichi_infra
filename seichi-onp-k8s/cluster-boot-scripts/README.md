@@ -82,7 +82,7 @@ FQDNについては公開しない前提ですが、クラスターへのアク�
 
 - proxmoxのホストコンソール上で`deploy-vm.sh`を実行すると、各種VMが沸く
 
-  `/bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/deploy-k8s-on-premises/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh)`
+  `/bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh)`
 
 - ローカル端末上で`~/.ssh/config`をセットアップ
 
