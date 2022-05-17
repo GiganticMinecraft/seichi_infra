@@ -262,6 +262,9 @@ networking:
   podSubnet: "10.128.0.0/16"
 kubernetesVersion: "v1.24.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
+apiServer:
+  certSANs:
+  - "$(tr -dc 'a-z' </dev/urandom | head -c 1)$(tr -dc 'a-z0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click"
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
