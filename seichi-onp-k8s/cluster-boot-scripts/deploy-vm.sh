@@ -2,12 +2,22 @@
 
 # region00 : set variables
 
+TARGET_BRANCH=$1
 TEMPLATE_VMID=9050
 CLOUDINIT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
 BOOT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
 SNIPPET_TARGET_VOLUME=seichi-prox-backup04
-SNIPPET_TARGET_PATH=/mnt/pve/seichi-prox-backup04/snippets
-SNIPPET_SOURCE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/main/seichi-onp-k8s/cluster-boot-scripts/snippets"
+SNIPPET_TARGET_PATH=/mnt/pve/${SNIPPET_TARGET_VOLUME}/snippets
+REPOSITORY_RAW_SOURCE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}"
+VM_LIST=(
+    #vmid #vmname             #cpu #mem
+    "1001 seichi-onp-k8s-cp-1 4    8192 "
+    "1002 seichi-onp-k8s-cp-2 4    8192 "
+    "1003 seichi-onp-k8s-cp-3 4    8192 "
+    "1101 seichi-onp-k8s-wk-1 6    12288"
+    "1102 seichi-onp-k8s-wk-2 6    12288"
+    "1103 seichi-onp-k8s-wk-3 6    12288"
+)
 
 # end region
 
@@ -50,65 +60,78 @@ rm focal-server-cloudimg-amd64.img
 
 # region02 : create vm from template
 
-# clone from template
-qm clone $TEMPLATE_VMID 1001 --name seichi-onp-k8s-cp-1 --full true 
-qm set 1001 --cores 4 --memory 8192
-# resize disk (Resize after cloning, because it takes time to clone a large disk)
-qm resize 1001 scsi0 30G
-# set snippets
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-cp-1-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-1-user.yaml
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-cp-1-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-1-network.yaml
-qm set 1001 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-1-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-1-network.yaml"
+for array in "${VM_LIST[@]}"
+do
+    echo "${array}" | while read -r vmid vmname cpu mem
+    do
+        # clone from template
+        qm clone "${TEMPLATE_VMID}" "${vmid}" --name "${vmname}" --full true 
+        qm set "${vmid}" --cores "${cpu}" --memory "${mem}"
 
-# clone from template
-qm clone $TEMPLATE_VMID 1002 --name seichi-onp-k8s-cp-2 --full true
-qm set 1002 --cores 4 --memory 8192
-# resize disk (Resize after cloning, because it takes time to clone a large disk)
-qm resize 1002 scsi0 30G
-# set snippets
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-cp-2-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-2-user.yaml
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-cp-2-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-2-network.yaml
-qm set 1002 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-2-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-2-network.yaml"
+        # resize disk (Resize after cloning, because it takes time to clone a large disk)
+        qm resize "${vmid}" scsi0 30G
 
-# clone from template
-qm clone $TEMPLATE_VMID 1003 --name seichi-onp-k8s-cp-3 --full true
-qm set 1003 --cores 4 --memory 8192
-# resize disk (Resize after cloning, because it takes time to clone a large disk)
-qm resize 1003 scsi0 30G
-# set snippets
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-cp-3-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-3-user.yaml
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-cp-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-cp-3-network.yaml
-qm set 1003 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-3-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-cp-3-network.yaml"
+        # create snippet for cloud-init(user-config)
+        # START irregular indent because heredoc
+# ----- #
+cat > "$SNIPPET_TARGET_PATH"/"$vmname"-user.yaml << EOF
+#cloud-config
+hostname: ${vmname}
+timezone: Asia/Tokyo
+manage_etc_hosts: true
+chpasswd:
+  expire: False
+users:
+  - default
+  - name: cloudinit
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    # mkpasswd --method=SHA-512 --rounds=4096
+    # password is zaq12wsx
+    passwd: \$6\$rounds=4096\$Xlyxul70asLm\$9tKm.0po4ZE7vgqc.grptZzUU9906z/.vjwcqz/WYVtTwc5i2DWfjVpXb8HBtoVfvSY61rvrs/iwHxREKl3f20
+ssh_pwauth: false
+ssh_authorized_keys: []
+package_upgrade: true
+runcmd:
+  # set ssh_authorized_keys
+  - su - cloudinit -c "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
+  - su - cloudinit -c "curl -sS https://github.com/unchama.keys >> ~/.ssh/authorized_keys"
+  - su - cloudinit -c "curl -sS https://github.com/inductor.keys >> ~/.ssh/authorized_keys"
+  - su - cloudinit -c "curl -sS https://github.com/kory33.keys >> ~/.ssh/authorized_keys"
+  - su - cloudinit -c "chmod 600 ~/.ssh/authorized_keys"
+  # run install scripts
+  - su - cloudinit -c "curl -s ${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-scripts/scripts/k8s-node-setup.sh > ~/k8s-node-setup.sh"
+  - su - cloudinit -c "sudo bash ~/k8s-node-setup.sh ${vmname}"
+EOF
+# ----- #
+        # END irregular indent because heredoc
 
-# clone from template
-qm clone $TEMPLATE_VMID 1101 --name seichi-onp-k8s-wk-1 --full true
-qm set 1101 --cores 6 --memory 12288
-# resize disk (Resize after cloning, because it takes time to clone a large disk)
-qm resize 1101 scsi0 30G
-# set snippets
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-1-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-1-user.yaml
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-1-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-1-network.yaml
-qm set 1101 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-1-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-1-network.yaml"
+        # only seichi-onp-k8s-cp-1, append snippet for cloud-init(user-config)
+        if [ "${vmname}" = "seichi-onp-k8s-cp-1" ]
+        then
+            # START irregular indent because heredoc
+# --------- #
+cat >> "$SNIPPET_TARGET_PATH"/"$vmname"-user.yaml << EOF
+  # add kubeconfig to cloudinit user
+  - su - cloudinit -c "mkdir -p ~/.kube"
+  - su - cloudinit -c "sudo cp /etc/kubernetes/admin.conf ~/.kube/config"
+  - su - cloudinit -c "sudo chown cloudinit:cloudinit ~/.kube/config"
+  # copy kubeadm-join-config to cloudinit user home directory
+  - su - cloudinit -c "sudo cp /root/join_kubeadm_cp.yaml ~/join_kubeadm_cp.yaml"
+  - su - cloudinit -c "sudo cp /root/join_kubeadm_wk.yaml ~/join_kubeadm_wk.yaml"
+EOF
+# --------- #
+            # END irregular indent because heredoc
+        fi
+        
+        # download snippet for cloud-init(network)
+        curl -s "${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-scripts/snippets/${vmname}-network.yaml" > "${SNIPPET_TARGET_PATH}"/"${vmname}"-network.yaml
 
-# clone from template
-qm clone $TEMPLATE_VMID 1102 --name seichi-onp-k8s-wk-2 --full true
-qm set 1102 --cores 6 --memory 12288
-# resize disk (Resize after cloning, because it takes time to clone a large disk)
-qm resize 1102 scsi0 30G
-# set snippets
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-2-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-2-user.yaml
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-2-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-2-network.yaml
-qm set 1102 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-2-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-2-network.yaml"
+        # set snippet to vm
+        qm set "${vmid}" --cicustom "user=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-user.yaml,network=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-network.yaml"
 
-# clone from template
-qm clone $TEMPLATE_VMID 1103 --name seichi-onp-k8s-wk-3 --full true
-qm set 1103 --cores 6 --memory 12288
-# resize disk (Resize after cloning, because it takes time to clone a large disk)
-qm resize 1103 scsi0 30G
-# set snippets
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-3-user.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-user.yaml
-curl -s $SNIPPET_SOURCE_URL/seichi-onp-k8s-wk-3-network.yaml > $SNIPPET_TARGET_PATH/seichi-onp-k8s-wk-3-network.yaml
-qm set 1103 --cicustom "user=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-3-user.yaml,network=$SNIPPET_TARGET_VOLUME:snippets/seichi-onp-k8s-wk-3-network.yaml"
+    done
+done
 
 # migrate vm
 qm migrate 1001 unchama-sv-prox01

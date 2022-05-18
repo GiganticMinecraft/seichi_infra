@@ -8,14 +8,14 @@ function usage() {
     echo "usage> k8s-node-setup.sh [COMMAND]"
     echo "[COMMAND]:"
     echo "  help        show command usage"
-    echo "  k8s-cp-1    run setup script for k8s-cp-1"
-    echo "  k8s-cp-2    run setup script for k8s-cp-2"
-    echo "  k8s-cp-3    run setup script for k8s-cp-3"
-    echo "  k8s-wk-*    run setup script for k8s-wk-*"
+    echo "  seichi-onp-k8s-cp-1    run setup script for seichi-onp-k8s-cp-1"
+    echo "  seichi-onp-k8s-cp-2    run setup script for seichi-onp-k8s-cp-2"
+    echo "  seichi-onp-k8s-cp-3    run setup script for seichi-onp-k8s-cp-3"
+    echo "  seichi-onp-k8s-wk-*    run setup script for seichi-onp-k8s-wk-*"
 }
 
 case $1 in
-    k8s-cp-1|k8s-cp-2|k8s-cp-3|k8s-wk-*)
+    seichi-onp-k8s-cp-1|seichi-onp-k8s-cp-2|seichi-onp-k8s-cp-3|seichi-onp-k8s-wk-*)
         ;;
     help)
         usage
@@ -35,25 +35,25 @@ EXTERNAL_KUBE_API_SERVER="$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -d
 
 # set per-node variables
 case $1 in
-    k8s-cp-1)
+    seichi-onp-k8s-cp-1)
         KEEPALIVED_STATE=MASTER
         KEEPALIVED_PRIORITY=101
         KEEPALIVED_UNICAST_SRC_IP=${NODE_IPS[0]}
         KEEPALIVED_UNICAST_PEERS=( "${NODE_IPS[1]}" "${NODE_IPS[2]}" )
         ;;
-    k8s-cp-2)
+    seichi-onp-k8s-cp-2)
         KEEPALIVED_STATE=BACKUP
         KEEPALIVED_PRIORITY=99
         KEEPALIVED_UNICAST_SRC_IP=${NODE_IPS[1]}
         KEEPALIVED_UNICAST_PEERS=( "${NODE_IPS[0]}" "${NODE_IPS[2]}" )
         ;;
-    k8s-cp-3)
+    seichi-onp-k8s-cp-3)
         KEEPALIVED_STATE=BACKUP
         KEEPALIVED_PRIORITY=97
         KEEPALIVED_UNICAST_SRC_IP=${NODE_IPS[2]}
         KEEPALIVED_UNICAST_PEERS=( "${NODE_IPS[0]}" "${NODE_IPS[1]}" )
         ;;
-    k8s-wk-*)
+    seichi-onp-k8s-wk-*)
         ;;
     *)
         exit 1
@@ -122,10 +122,10 @@ swapoff -a
 
 # Ends except worker-plane
 case $1 in
-    k8s-wk-*)
+    seichi-onp-k8s-wk-*)
         exit 0
         ;;
-    k8s-cp-1|k8s-cp-2|k8s-cp-3)
+    seichi-onp-k8s-cp-1|seichi-onp-k8s-cp-2|seichi-onp-k8s-cp-3)
         ;;
     *)
         exit 1
@@ -243,9 +243,9 @@ kubeadm config images pull
 
 # Ends except first-control-plane
 case $1 in
-    k8s-cp-1)
+    seichi-onp-k8s-cp-1)
         ;;
-    k8s-cp-2|k8s-cp-3)
+    seichi-onp-k8s-cp-2|seichi-onp-k8s-cp-3)
         exit 0
         ;;
     *)
