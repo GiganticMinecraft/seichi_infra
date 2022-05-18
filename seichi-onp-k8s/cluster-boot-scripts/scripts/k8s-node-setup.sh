@@ -188,7 +188,7 @@ apt-get update && apt-get -y install keepalived
 cat > /etc/keepalived/keepalived.conf <<EOF
 # Define the script used to check if haproxy is still working
 vrrp_script chk_haproxy { 
-    script "/usr/bin/killall -0 haproxy"
+    script "sudo /usr/bin/killall -0 haproxy"
     interval 2 
     weight 2 
 }
@@ -227,6 +227,8 @@ EOF
 # Create keepalived user
 groupadd -r keepalived_script
 useradd -r -s /sbin/nologin -g keepalived_script -M keepalived_script
+
+echo "keepalived_script ALL=(ALL) NOPASSWD: /usr/bin/killall" >> /etc/sudoers
 
 # Enable VIP services
 systemctl enable keepalived --now
