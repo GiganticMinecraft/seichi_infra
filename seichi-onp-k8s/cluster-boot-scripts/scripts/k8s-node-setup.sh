@@ -29,6 +29,7 @@ esac
 
 # Set global variables
 KUBE_API_SERVER_VIP=192.168.18.100
+VIP_INTERFACE=ens19
 NODE_IPS=( 192.168.18.11 192.168.18.12 192.168.18.13 )
 EXTERNAL_KUBE_API_SERVER="$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click"
 
@@ -194,7 +195,7 @@ vrrp_script chk_haproxy {
 
 # Configuration for Virtual Interface
 vrrp_instance LB_VIP {
-    interface ens19
+    interface ${VIP_INTERFACE}
     state ${KEEPALIVED_STATE}
     priority ${KEEPALIVED_PRIORITY}
     virtual_router_id 51
@@ -223,7 +224,11 @@ vrrp_instance LB_VIP {
 }
 EOF
 
-# Enable and Start VIP services (if already enabled, do nothing)
+# Create keepalived user
+groupadd -r keepalived_script
+useradd -r -s /sbin/nologin -g keepalived_script -M keepalived_script
+
+# Enable VIP services
 systemctl enable keepalived --now
 systemctl enable haproxy --now
 
@@ -258,7 +263,7 @@ bootstrapTokens:
   description: "kubeadm bootstrap token"
   ttl: "24h"
 nodeRegistration:
-  criSocket: "/var/run/containerd/containerd.sock"
+  criSocket: "unix:///var/run/containerd/containerd.sock"
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
@@ -325,7 +330,7 @@ protectKernelDefaults: true
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: JoinConfiguration
 nodeRegistration:
-  criSocket: "/var/run/containerd/containerd.sock"
+  criSocket: "unix:///var/run/containerd/containerd.sock"
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
@@ -345,7 +350,7 @@ protectKernelDefaults: true
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: JoinConfiguration
 nodeRegistration:
-  criSocket: "/var/run/containerd/containerd.sock"
+  criSocket: "unix:///var/run/containerd/containerd.sock"
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
