@@ -1,4 +1,4 @@
-# seichi-onp-k8s
+# seichi-onp-k8s / cluster-boot-scripts
 
 オンプレミス上に整地鯖用のKubernetesクラスタをデプロイする為のスクリプト群です。
 前提としている環境については、以下前提条件を参照してください。
@@ -31,11 +31,11 @@
 
 ## クラスタ操作
 
-作成フロー完了後は`seichi-onp-k8s-cp-1`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
+作成フロー完了後は`seichi-onp-k8s-cp-[1-3]`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
 
-ログイン可能な公開鍵は"クラスタ作成時"に[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)の`runcmd:`に定義されている公開鍵に基づいています。
+ログイン可能な公開鍵は"クラスタ作成時"に[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`に定義されている公開鍵に基づいています。
 
-クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorized_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`seichi-onp-k8s-cp-1`のcloud-config(userdata)](./snippets/seichi-onp-k8s-cp-1-user.yaml)への追記も行ってください。
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorized_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`への追記も行ってください。
 
 ログイン可能な公開鍵を確認したら、以下の手順でログインが可能です：
 
@@ -52,18 +52,34 @@ Host seichi-onp-k8s-cp-1
   User cloudinit
   IdentityFile ~/.ssh/id_ed25519
   ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+
+Host seichi-onp-k8s-cp-2
+  HostName 192.168.18.12
+  User cloudinit
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+
+Host seichi-onp-k8s-cp-3
+  HostName 192.168.18.13
+  User cloudinit
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 ```
 
 - (Option)初回接続後クラスターが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
 
 ```sh
 ssh-keygen -R 192.168.18.11
+ssh-keygen -R 192.168.18.12
+ssh-keygen -R 192.168.18.13
 ```
 
 - 接続チェック
 
 ```sh
-ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
+ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
+ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ```
 
 ### クラスタのエンドポイントについて
@@ -80,7 +96,8 @@ FQDNについては公開しない前提ですが、クラスターへのアク�
   - VM Diskが配置可能な共有ストレージの構築
   - Network周りの構築
 
-- proxmoxのホストコンソール上で`deploy-vm.sh`を実行すると、各種VMが沸く
+- proxmoxのホストコンソール上で`deploy-vm.sh`を実行すると、各種VMが沸きます。`TARGET_BRANCH`はデプロイ対象のコードが反映されたブランチ名に変更してください。
+
 
 ```sh
 export TARGET_BRANCH=main
@@ -152,7 +169,7 @@ ssh seichi-onp-k8s-wk-2 "hostname"
 ssh seichi-onp-k8s-wk-3 "hostname"
 
 # 最初のコントロールプレーンのkubeadm initが終わっているかチェック
-ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
+ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
 
 # cloudinitの実行ログチェック(トラブルシュート用)
 ssh seichi-onp-k8s-cp-1 "sudo cat /var/log/cloud-init-output.log"
@@ -175,6 +192,10 @@ scp ./join_kubeadm_cp.yaml seichi-onp-k8s-cp-3:~/
 ssh seichi-onp-k8s-cp-2 "sudo kubeadm join --config ~/join_kubeadm_cp.yaml"
 ssh seichi-onp-k8s-cp-3 "sudo kubeadm join --config ~/join_kubeadm_cp.yaml"
 
+# seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 で cloudinitユーザー用にkubeconfigを準備
+ssh seichi-onp-k8s-cp-2 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
+ssh seichi-onp-k8s-cp-3 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
+
 # join_kubeadm_wk.yaml を seichi-onp-k8s-wk-1 と seichi-onp-k8s-wk-2 と seichi-onp-k8s-wk-3 にコピー
 scp seichi-onp-k8s-cp-1:~/join_kubeadm_wk.yaml ./
 scp ./join_kubeadm_wk.yaml seichi-onp-k8s-wk-1:~/
@@ -190,10 +211,14 @@ ssh seichi-onp-k8s-wk-3 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
 - 軽い動作チェック
 
 ```sh
-ssh seichi-onp-k8s-cp-1 "kubectl get node && kubectl get pod -A"
+ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
+ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ```
 
 ## cleanup
+
+クラスターを再作成する場合は、事前に以下の手順でクラスターの削除を行って下さい。
 
 - proxmoxのホストコンソール上で以下コマンド実行。ノードローカルにいるVMしか操作できない為、全てのノードで打って回る。
 
@@ -222,4 +247,4 @@ ssh 192.168.16.153 qm destroy 1003 --destroy-unreferenced-disks true --purge tru
 ssh 192.168.16.153 qm destroy 1103 --destroy-unreferenced-disks true --purge true
 ```
 
-- cleanup後、同じVMIDでVMを再作成できなくなることがあるが、proxmoxホストの再起動で解決する。(複数ノードで平行してcleanupコマンド実行するとだめっぽい)
+- cleanup後、同じVMIDでVMを再作成できなくなることがあるが、proxmoxホストの再起動で解決する。(複数ノードで平行してqm destroyコマンド実行すると 不整合が起こる模様)
