@@ -120,6 +120,12 @@ apt-mark hold kubelet kubeadm kubectl
 # Disable swap
 swapoff -a
 
+cat > /etc/crictl.yaml <<EOF
+runtime-endpoint: unix:///var/run/containerd/containerd.sock
+image-endpoint: unix:///var/run/containerd/containerd.sock
+timeout: 10
+EOF
+
 # Ends except worker-plane
 case $1 in
     seichi-onp-k8s-wk-*)
