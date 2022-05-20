@@ -38,7 +38,7 @@ data:
         restricted: false
         motd: ''
       h1:
-        address: cloudflared-mcserver--h1:25565
+        address: 192.168.1.187:25567
         restricted: false
         motd: ''
       spade:
