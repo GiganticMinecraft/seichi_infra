@@ -52,11 +52,6 @@ spec:
                 secretKeyRef:
                   name: external-k8s-endpoint
                   key: fqdn
-            - name: EXTERNAL_K8S_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: external-k8s-endpoint
-                  key: port
           volumeMounts:
             - mountPath: "/tmp/cloudflared"
               name: cloudflared-k8s-endpoint-config
