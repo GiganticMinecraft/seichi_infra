@@ -312,13 +312,13 @@ cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: seichi-systems
+  name: cluster-wide-apps
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: external-k8s-endpoint
-  namespace: seichi-systems
+  namespace: cluster-wide-apps
 type: Opaque
 stringData:
   fqdn: "${EXTERNAL_KUBE_API_SERVER}"
