@@ -6,11 +6,11 @@ data:
   config.yml: |
     servers:
       deb-s1:
-        address: cloudflared-mcserver--deb-112-1:25565
+        address: 192.168.2.122:25561
         restricted: false
         motd: ''
       deb-s2:
-        address: cloudflared-mcserver--deb-112-2:25565
+        address: 192.168.2.122:25562
         restricted: false
         motd: ''
 
