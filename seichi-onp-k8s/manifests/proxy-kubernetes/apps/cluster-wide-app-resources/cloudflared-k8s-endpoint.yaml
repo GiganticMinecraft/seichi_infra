@@ -45,7 +45,7 @@ spec:
         - name: replace-yaml-with-secret
           image: mikefarah/yq:4
           command: ['/bin/sh']
-          args: ['-c', 'yq ".ingress[0].hostname = \"$(EXTERNAL_K8S_HOST):$(EXTERNAL_K8S_PORT)\"" /tmp/cloudflared/tunnel-config.yml > /etc/cloudflared/tunnel-config.yml']
+          args: ['-c', 'yq ".ingress[0].hostname = \"$(EXTERNAL_K8S_HOST)\"" /tmp/cloudflared/tunnel-config.yml > /etc/cloudflared/tunnel-config.yml']
           env:
             - name: EXTERNAL_K8S_HOST
               valueFrom:
@@ -78,16 +78,6 @@ spec:
               value: "/root/.cloudflared-origin-cert/cert.pem"
             - name: TUNNEL_CRED_FILE
               value: "/root/.cloudflared/tunnel-cred.json"
-            - name: EXTERNAL_K8S_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: external-k8s-endpoint
-                  key: fqdn
-            - name: EXTERNAL_K8S_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: external-k8s-endpoint
-                  key: port
           volumeMounts:
             - mountPath: "/root/.cloudflared-origin-cert"
               name: cloudflared-k8s-endpoint-authorization-certificate
