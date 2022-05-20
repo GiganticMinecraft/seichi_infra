@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bungeecord-jmx-metrics
+spec:
+  type: ClusterIP
+  ports:
+    - name: jmx-metrics
+      port: 18321
+      protocol: TCP
+      targetPort: jmx-metrics
+  selector:
+    app: bungeecord
