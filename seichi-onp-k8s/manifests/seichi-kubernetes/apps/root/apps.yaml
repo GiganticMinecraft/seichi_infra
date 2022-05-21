@@ -9,7 +9,7 @@ spec:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         revision: main
         directories:
-          - path: seichi-onp-k8s/manifests/proxy-kubernetes/apps/cluster-wide-apps/*
+          - path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/*
   template:
     metadata:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
@@ -50,7 +50,7 @@ spec:
   source:
     repoURL: https://github.com/GiganticMinecraft/seichi_infra
     targetRevision: main
-    path: seichi-onp-k8s/manifests/proxy-kubernetes/apps/cluster-wide-app-resources
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-app-resources
   destination:
     server: https://kubernetes.default.svc
     namespace: 'cluster-wide-apps'
@@ -79,7 +79,7 @@ spec:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         revision: main
         directories:
-          - path: seichi-onp-k8s/manifests/proxy-kubernetes/apps/seichi-debug-gateway/*
+          - path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/*
   template:
     metadata:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
@@ -119,7 +119,7 @@ spec:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         revision: main
         directories:
-          - path:seichi-onp-k8s/manifests/proxy-kubernetes/apps/seichi-gateway/*
+          - path:seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/*
   template:
     metadata:
       # 各Application が argocd namespace に配置されるため prefix した方が安全

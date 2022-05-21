@@ -1,6 +1,6 @@
-# proxy-kubernetes
+# seichi-kubernetes
 
-seichi.click network 向けの Linode Kubernetes Engine(LKE) のクラスタ定義を管理するディレクトリです。
+seichi.click network 向けの Kubernetes のクラスタ定義を管理するディレクトリです。
 
 Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本リポジトリのGithub Actionsによって再起動されています。
 

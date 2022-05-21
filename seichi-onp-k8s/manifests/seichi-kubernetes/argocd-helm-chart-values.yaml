@@ -41,7 +41,7 @@ server:
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         targetRevision: main
-        path: seichi-onp-k8s/manifests/proxy-kubernetes/apps/root
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/root
       destination:
         server: https://kubernetes.default.svc
         namespace: argocd
