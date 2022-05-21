@@ -18,45 +18,6 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 - 外部コントリビュータからpullreqを受けた場合は、workflowが承認待ち状態(※1)となります。pullreqに含まれるコードがworkflow等を通じて意図的に秘匿情報にアクセスしようとしていないか、必ずコードレビューをした上でworkflowのrunを承認するようお願いします。<br>
 ※1 Githubのリポジトリ設定で実現しています。具体的にはこちら：`Settings -> Actions -> General -> Fork pull request workflows from outside collaborators -> Require approval for all outside collaborators`
 
-# `sealed-secrets` によるシークレット管理
-
-本リポジトリでは [`sealed-secrets`](https://github.com/bitnami-labs/sealed-secrets)を用いることで、クラスタ上のアプリケーションの動作に必要なシークレットを秘匿しつつGit管理する方法を取っています。
-
-アプリケーションの設定等でシークレットを追加する必要があるときは
- - <details>
-     <summary>kubeseal CLI をローカル環境にインストール</summary>
-
-      ```sh
-      # kubesealのバージョン (https://github.com/bitnami-labs/sealed-secrets/releases を参照のこと)
-      KUBESEAL_VERSION=0.17.3
-      KUBESEAL_PLATFORM=linux-arm64
-
-      KUBESEAL_ARCHIVE_FILENAME=kubeseal-${KUBESEAL_VERSION}-${KUBESEAL_PLATFORM}.tar.gz
-
-      cd "$(mktemp -d)"
-      wget "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/${KUBESEAL_ARCHIVE_FILENAME}"
-      tar -xzvf "${KUBESEAL_ARCHIVE_FILENAME}"
-      sudo mv kubeseal /usr/local/bin
-      ```
-    </details>
-
- - [クラスタ上に置いてある暗号化用の鍵ペアの公開鍵](https://sealed-secrets.bungee-proxy-public.seichi.click/v1/cert.pem)でシークレットを暗号化
-
-   ```sh
-   # --namespace には、このシークレットを読み取ることのできる範囲であるnamespaceの名前を入力
-   kubeseal \
-     --cert https://sealed-secrets.bungee-proxy-public.seichi.click/v1/cert.pem \
-     --raw --from-file=/dev/stdin \
-     --namespace <my-namespace> \
-     --scope namespace-wide
-
-   # 標準入力から暗号化が受け付けらるので、平文を入力し、Ctrl+Dで入力を終える
-   ```
-
- - `SealedSecret` リソースを追加(例えば、 [./argocd-apps/argocd.yaml](./argocd-apps/argocd.yaml)の後半などに例があります)
-
-するようにしてください。
-
 # LKE クラスタのブートストラップについて
 
 LKE 上で動いている(ArgoCD 以外の)すべての追加リソースはPull型の同期を行う ArgoCD によって管理されており、[`apps`](./apps/) ディレクトリ以下の特定のパスに対して行われた変更は ArgoCD によって自動的にクラスタに反映されます。
