@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: cluster-wide-apps
 resources:
   # https://github.com/logdna/logdna-agent-v2/blob/3.4.0/k8s/agent-resources.yaml
-  - https://raw.githubusercontent.com/logdna/logdna-agent-v2/3.4.0/k8s/agent-resources.yaml
+  - https://raw.githubusercontent.com/logdna/logdna-agent-v2/3.5.0/k8s/agent-resources.yaml
 
 patches:
 - patch: |-
