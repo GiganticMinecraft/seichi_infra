@@ -5,9 +5,6 @@ metadata:
 data:
   tunnel-config.yml: |
     ingress:
-      - hostname: sealed-secrets.bungee-proxy-public.seichi.click
-        service: http://sealed-secrets-controller:8080
-
       - hostname: grafana.bungee-proxy-public.seichi.click
         service: http://grafana.monitoring:3000
 
