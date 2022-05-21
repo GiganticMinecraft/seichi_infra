@@ -71,8 +71,8 @@ data:
     # The timeout value must be set shorter than the upper network
     timeout: 20000
     server_connect_timeout: 5000
-    connection_throttle: 2000
-    connection_throttle_limit: 16
+    connection_throttle: -1
+    connection_throttle_limit: -1
     network_compression_threshold: 256
     log_pings: false
 
