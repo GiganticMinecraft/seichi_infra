@@ -39,9 +39,9 @@ data:
   SwiftMOTD-config.yml: |
     motds:
       generic:
-        - 'seichi.click network for debug 3TBUkfU6'
+        - 'seichi.click network for debug pWL-aZx8'
       dynamic:
-        - 'seichi.click network for debug 3TBUkfU6'
+        - 'seichi.click network for debug pWL-aZx8'
 
   TCPShield-config.yml: |
     only-allow-proxy-connections: true
