@@ -317,7 +317,7 @@ helm install argocd argo/argo-cd \
 # Install kube-prometheus-stack Helm chart
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm install prometheus prometheus-community/kube-prometheus-stack \
-    --create-namespace
+    --create-namespace \
     --namespace monitoring
 
 cat <<EOF | kubectl apply -f -
