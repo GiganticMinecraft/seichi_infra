@@ -6,7 +6,6 @@ metadata:
 data:
   tunnel-config.yml: |
     ingress:
-
       - hostname: 
         service: https://kubernetes.default:443
         originRequest:
@@ -44,8 +43,12 @@ spec:
       initContainers:
         - name: replace-yaml-with-secret
           image: mikefarah/yq:4
-          command: ['/bin/sh']
-          args: ['-c', 'yq ".ingress[0].hostname = \"$(EXTERNAL_K8S_HOST)\"" /tmp/cloudflared/tunnel-config.yml > /etc/cloudflared/tunnel-config.yml']
+          command: ["/bin/sh"]
+          args:
+            [
+              "-c",
+              'yq ".ingress[0].hostname = \"$(EXTERNAL_K8S_HOST)\"" /tmp/cloudflared/tunnel-config.yml > /etc/cloudflared/tunnel-config.yml',
+            ]
           env:
             - name: EXTERNAL_K8S_HOST
               valueFrom:
