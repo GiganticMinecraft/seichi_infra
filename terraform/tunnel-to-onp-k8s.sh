@@ -45,7 +45,7 @@ reroute_tunnel_domain_to_localhost
 # https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
 result=$(cat <<EOF
   {
-    host: "${tunnel_domain}:${free_port}"
+    "host": "${tunnel_domain}:${free_port}"
   }
 EOF
 )
