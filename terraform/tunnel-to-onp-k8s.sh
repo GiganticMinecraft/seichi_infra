@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Script to spawn a child process to keep cloudflare tunnel alive.
 
 #region constants
@@ -12,7 +14,7 @@ cloudflared_binary="https://github.com/cloudflare/cloudflared/releases/download/
 
 function pick_free_port () {
   # ref. https://stackoverflow.com/a/1365284
-  cat <<EOF | python3
+  cat <<EOF | python
 import socket
 sock = socket.socket()
 sock.bind(("", 0))
