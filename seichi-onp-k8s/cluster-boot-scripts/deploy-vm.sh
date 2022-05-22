@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# region00 : set variables
+#region set variables
 
 TARGET_BRANCH=$1
 TEMPLATE_VMID=9050
@@ -19,11 +19,11 @@ VM_LIST=(
     "1103 seichi-onp-k8s-wk-3 6    12288"
 )
 
-# end region
+#endregion
 
 # ---
 
-# region01 : create-template
+#region create-template
 
 # download the image(ubuntu 20.04 LTS)
 wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
@@ -54,11 +54,11 @@ qm template $TEMPLATE_VMID
 # cleanup
 rm focal-server-cloudimg-amd64.img
 
-# end region
+#endregion
 
 # ---
 
-# region02 : create vm from template
+# region create vm from template
 
 for array in "${VM_LIST[@]}"
 do
@@ -152,4 +152,4 @@ ssh 192.168.16.151 qm start 1102
 ssh 192.168.16.153 qm start 1003
 ssh 192.168.16.153 qm start 1103
 
-# end region
+# endregion
