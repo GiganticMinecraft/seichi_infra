@@ -25,7 +25,7 @@ locals {
   github_org_name = "GiganticMinecraft"
 }
 
-# region cloudflare provider
+#region cloudflare provider
 
 variable "cloudflare_email" {
   description = "email used for Cloudflare API authentication"
@@ -44,9 +44,9 @@ provider "cloudflare" {
   api_key = var.cloudflare_api_key
 }
 
-# endregion
+#endregion
 
-# region cloudflare-github integration settings
+#region cloudflare-github integration settings
 
 variable "github_cloudflare_oauth_client_id" {
   description = "Client ID of Cloudflare as seens as an OAuth App on GitHub"
@@ -60,9 +60,9 @@ variable "github_cloudflare_oauth_client_secret" {
   sensitive   = true
 }
 
-# endregion
+#endregion
 
-# region terraform-github integration settings
+#region terraform-github integration settings
 
 variable "terraform_github_app_id" {
   description = "App ID of the GitHub App used for Terraform automation"
@@ -93,9 +93,9 @@ provider "github" {
   }
 }
 
-# endregion
+#endregion
 
-# region proxy-layer's k8s access configuration
+#region proxy-layer's k8s access configuration
 
 variable "lke_k8s_kubeconfig" {
   description   = "LKE cluster's kubeconfig.yaml content"
@@ -130,9 +130,9 @@ provider "helm" {
   }
 }
 
-# endregion
+#endregion
 
-# region proxy-layer's ArgoCD to GitHub integration
+#region proxy-layer's ArgoCD to GitHub integration
 
 variable "lke_k8s_argocd_github_oauth_app_secret" {
   description   = "The OAuth app secret for ArgoCD-GitHub integration on Kube cluster of proxy-layer"
@@ -140,9 +140,9 @@ variable "lke_k8s_argocd_github_oauth_app_secret" {
   sensitive     = true
 }
 
-# endregion
+#endregion
 
-# region proxy-layer's k8s cluster to Cloudflare integration
+#region proxy-layer's k8s cluster to Cloudflare integration
 
 # プロキシ層の k8s で走る cloudflared の認証情報。
 # cloudflared login で得られる .pem ファイルの中身を設定してください。 
@@ -155,9 +155,9 @@ variable "lke_k8s_cloudflare_argo_tunnel_credential" {
   sensitive     = true
 }
 
-# endregion
+#endregion
 
-# region logdna-agent settings
+#region logdna-agent settings
 
 # logdna-agentが収集した情報をログ収集プラットフォームであるLogDNAへ取り込むために必要となる認証キー。
 # 
@@ -168,4 +168,4 @@ variable "lke_k8s_logdna_agent_ingestion_key" {
   sensitive     = true
 }
 
-# endregion
+#endregion
