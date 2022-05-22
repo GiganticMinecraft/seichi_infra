@@ -6,8 +6,14 @@ metadata:
 data:
   tunnel-config.yml: |
     ingress:
-      # APIエンドポイントはクライアント証明書による認証を行うので、tcpトンネルを張る
-      - hostname: 
+      # このホストはDoS攻撃を防ぐためにサービストークン等による保護を行うべき。
+      # 
+      # 2022/05/22 NOTE: サービストークンは1年に1度手動入れ替えをする必要があるが、
+      # 影響範囲がCIに閉じている上に、もし止まっても、
+      # Secretの更新ができなかったりArgoCDのバージョンが上がらない程度の
+      # 影響しかないと見込めるため、当面はこのような運用で問題は生じないと判断した。
+      - hostname: tunnel.k8s-api.onp-k8s.seichi.click.local
+        # APIエンドポイントはクライアント証明書による認証を行うので、tcpトンネルを張る。
         service: tcp://kubernetes.default:443
 
       - service: http_status:404
@@ -39,32 +45,12 @@ spec:
         appgroup: cloudflared-k8s-endpoint
         env: cluster-wide
     spec:
-      initContainers:
-        - name: replace-yaml-with-secret
-          image: mikefarah/yq:4
-          command: ["/bin/sh"]
-          args:
-            [
-              "-c",
-              'yq ".ingress[0].hostname = \"$(EXTERNAL_K8S_HOST)\"" /tmp/cloudflared/tunnel-config.yml > /etc/cloudflared/tunnel-config.yml',
-            ]
-          env:
-            - name: EXTERNAL_K8S_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: external-k8s-endpoint
-                  key: fqdn
-          volumeMounts:
-            - mountPath: "/tmp/cloudflared"
-              name: cloudflared-k8s-endpoint-config
-            - mountPath: "/etc/cloudflared"
-              name: cloudflared-k8s-endpoint-config-replaced
       containers:
         - name: cloudflared-k8s-endpoint
           image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-6455b98"
           env:
             - name: TUNNEL_NAME
-              value: "proxy-kubernetes-cloudflared-k8s-endpoint-tunnel"
+              value: "onp-kubernetes-api-endpoint-tunnel"
             # cloudflared tunnel が実行された時、 cloudflared は Tunnel credential を
             # $TUNNEL_CRED_FILE に書き込む。
             # また、tunnel origin certificate は k8s の Secret によって提供されるため、
@@ -78,10 +64,8 @@ spec:
           volumeMounts:
             - mountPath: "/root/.cloudflared-origin-cert"
               name: cloudflared-k8s-endpoint-authorization-certificate
-            - mountPath: "/tmp/cloudflared"
-              name: cloudflared-k8s-endpoint-config
             - mountPath: "/etc/cloudflared"
-              name: cloudflared-k8s-endpoint-config-replaced
+              name: cloudflared-k8s-endpoint-config
           resources:
             requests:
               memory: 32Mi
@@ -90,7 +74,7 @@ spec:
       volumes:
         - name: cloudflared-k8s-endpoint-authorization-certificate
           secret:
-            # defined in terraform/lke_cluster_secrets.tf
+            # このシークレットはクラスタセットアップ作業手順により注入されているべき。
             secretName: cloudflared-tunnel-credential
             items:
               - key: TUNNEL_CREDENTIAL
@@ -98,5 +82,3 @@ spec:
         - name: cloudflared-k8s-endpoint-config
           configMap:
             name: cloudflared-k8s-endpoint-configmap
-        - name: cloudflared-k8s-endpoint-config-replaced
-          emptyDir: {}
