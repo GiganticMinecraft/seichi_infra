@@ -41,8 +41,14 @@ nohup "${tmp_workdir}/cloudflared" access tcp \
 
 reroute_tunnel_domain_to_localhost
 
-echo <<EOF
+# External Program Protocol
+# https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
+result=$(cat <<EOF
   {
     host: "${tunnel_domain}:${free_port}"
   }
 EOF
+)
+
+
+echo "$result"
