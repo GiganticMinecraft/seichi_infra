@@ -31,7 +31,6 @@ esac
 KUBE_API_SERVER_VIP=192.168.18.100
 VIP_INTERFACE=ens19
 NODE_IPS=( 192.168.18.11 192.168.18.12 192.168.18.13 )
-EXTERNAL_KUBE_API_SERVER="$(tr -dc '[:lower:]' </dev/urandom | head -c 1)$(tr -dc '[:lower:]0-9' </dev/urandom | head -c 7).k8s-api.onp-k8s.admin.seichi.click"
 
 # set per-node variables
 case $1 in
@@ -282,7 +281,12 @@ kubernetesVersion: "v1.24.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
-  - "${EXTERNAL_KUBE_API_SERVER}" # generate random FQDN to prevent malicious DoS attack
+  # We can add the following url to SAN,
+  # so that a client accessing the API can forward
+  # tunnel.k8s-api.onp-k8s.seichi.click.local
+  # to a TCP tunnel running somewhere else (e.g. 127.0.0.1)
+  # by appending "127.0.0.1   tunnel.k8s-api.onp-k8s.seichi.click.local" to /etc/hosts
+  - tunnel.k8s-api.onp-k8s.seichi.click.local
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
@@ -319,23 +323,6 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm install prometheus prometheus-community/kube-prometheus-stack \
     --create-namespace \
     --namespace monitoring
-
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cluster-wide-apps
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: external-k8s-endpoint
-  namespace: cluster-wide-apps
-type: Opaque
-stringData:
-  fqdn: "${EXTERNAL_KUBE_API_SERVER}"
-  port: "8443"
-EOF
 
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
