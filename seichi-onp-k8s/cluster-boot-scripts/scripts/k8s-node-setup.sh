@@ -282,7 +282,14 @@ kubernetesVersion: "v1.24.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
-  - "${EXTERNAL_KUBE_API_SERVER}" # generate random FQDN to prevent malicious DoS attack
+  # generate random FQDN to prevent malicious DoS attack
+  - "${EXTERNAL_KUBE_API_SERVER}"
+  # We can add the following url to SAN,
+  # so that a client accessing the API can forward
+  # tunnel.k8s-api.onp-k8s.seichi.click.local
+  # to a TCP tunnel running somewhere else (e.g. 127.0.0.1)
+  # by appending "127.0.0.1   tunnel.k8s-api.onp-k8s.seichi.click.local" to `/etc/hosts` file.
+  - tunnel.k8s-api.onp-k8s.seichi.click.local
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
