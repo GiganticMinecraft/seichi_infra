@@ -288,7 +288,7 @@ apiServer:
   # so that a client accessing the API can forward
   # tunnel.k8s-api.onp-k8s.seichi.click.local
   # to a TCP tunnel running somewhere else (e.g. 127.0.0.1)
-  # by appending "127.0.0.1   tunnel.k8s-api.onp-k8s.seichi.click.local" to `/etc/hosts` file.
+  # by appending "127.0.0.1   tunnel.k8s-api.onp-k8s.seichi.click.local" to /etc/hosts
   - tunnel.k8s-api.onp-k8s.seichi.click.local
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
