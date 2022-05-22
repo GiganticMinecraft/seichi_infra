@@ -13,14 +13,17 @@ cloudflared_binary="https://github.com/cloudflare/cloudflared/releases/download/
 #endregion
 
 function pick_free_port () {
-  # ref. https://stackoverflow.com/a/1365284
-  cat <<EOF | python
-import socket
-sock = socket.socket()
-sock.bind(("", 0))
-print(str(s.getsockname()[1]))
-s.close()
-EOF
+  # ref. https://stackoverflow.com/a/35338833
+  for i in {10000..65535}; do
+    # continue if the port accepts some input
+    (exec 2>&- echo > "/dev/tcp/localhost/$i") && continue;
+
+    echo "$i"
+    return 0
+  done
+
+  # no port is open
+  return 1
 }
 
 function reroute_tunnel_domain_to_localhost () {
