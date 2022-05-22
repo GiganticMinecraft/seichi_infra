@@ -27,7 +27,7 @@ function pick_free_port () {
 }
 
 function reroute_tunnel_domain_to_localhost () {
-  echo "127.0.0.1  ${tunnel_domain}" >> /etc/hosts
+  sudo -- sh -c "echo \"127.0.0.1  ${tunnel_domain}\" >> /etc/hosts"
 }
 
 tmp_workdir=$(mktemp -d)
@@ -36,6 +36,7 @@ tmp_workdir=$(mktemp -d)
 wget \
   "${cloudflared_binary}" \
   -O "${tmp_workdir}/cloudflared"
+chmod 700 "${tmp_workdir}/cloudflared"
 
 free_port=$(pick_free_port)
 
