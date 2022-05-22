@@ -6,10 +6,9 @@ metadata:
 data:
   tunnel-config.yml: |
     ingress:
+      # APIエンドポイントはクライアント証明書による認証を行うので、tcpトンネルを張る
       - hostname: 
-        service: https://kubernetes.default:443
-        originRequest:
-          noTLSVerify: true
+        service: tcp://kubernetes.default:443
 
       - service: http_status:404
 ---
