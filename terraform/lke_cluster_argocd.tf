@@ -1,4 +1,6 @@
 resource "helm_release" "lke_cluster_argocd" {
+  provider = helm.lke_cluster
+
   depends_on = [kubernetes_namespace.argocd]
 
   # https://github.com/argoproj/argo-helm/releases/tag/argo-cd-4.2.2

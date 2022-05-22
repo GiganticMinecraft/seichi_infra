@@ -1,4 +1,6 @@
 resource "kubernetes_secret" "cloudflared_tunnel_credential" {
+  provider = kubernetes.lke_cluster
+
   depends_on = [kubernetes_namespace.cluster_wide_apps]
 
   metadata {
@@ -14,6 +16,8 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
 }
 
 resource "kubernetes_secret" "logdna_agent_ingestion_key" {
+  provider = kubernetes.lke_cluster
+
   depends_on = [kubernetes_namespace.cluster_wide_apps]
 
   # name と data の指定は LOGDNA_INGESTION_KEY の参照指定による
@@ -32,6 +36,8 @@ resource "kubernetes_secret" "logdna_agent_ingestion_key" {
 }
 
 resource "kubernetes_secret" "argocd_github_oauth_app_secret" {
+  provider = kubernetes.lke_cluster
+
   depends_on = [kubernetes_namespace.argocd]
 
   metadata {
@@ -52,6 +58,8 @@ resource "kubernetes_secret" "argocd_github_oauth_app_secret" {
 }
 
 resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
+  provider = kubernetes.lke_cluster
+
   depends_on = [kubernetes_namespace.seichi_debug_gateway]
 
   metadata {
@@ -68,6 +76,8 @@ resource "kubernetes_secret" "debug_cloudflared_access_service_token" {
 }
 
 resource "kubernetes_secret" "prod_cloudflared_access_service_token" {
+  provider = kubernetes.lke_cluster
+
   depends_on = [kubernetes_namespace.seichi_gateway]
 
   metadata {

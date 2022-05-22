@@ -117,12 +117,16 @@ locals {
 }
 
 provider "kubernetes" {
+  alias = "lke_cluster"
+
   host                   = local.lke_kubenetes_cluster_host
   token                  = local.lke_kubenetes_cluster_token
   cluster_ca_certificate = local.lke_kubenetes_cluster_ca_certificate
 }
 
 provider "helm" {
+  alias = "lke_cluster"
+
   kubernetes {
     host                   = local.lke_kubenetes_cluster_host
     token                  = local.lke_kubenetes_cluster_token
