@@ -1,6 +1,6 @@
-# proxy-kubernetes
+# seichi-kubernetes
 
-seichi.click network 向けの Linode Kubernetes Engine(LKE) のクラスタ定義を管理するディレクトリです。
+seichi.click network 向けの Kubernetes のクラスタ定義を管理するディレクトリです。
 
 Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本リポジトリのGithub Actionsによって再起動されています。
 
@@ -11,7 +11,6 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 | フルネーム  | 役割                                                                           | 
 | ----------- | ------------------------------------------------------------------------------ | 
 |  BungeeCord | Minecraftプロトコル用プロキシ                                                  | 
-| cloudflared | Cloudflare Argo Tunnelを利用したオンプレ(うんちゃまクラウド)環境との接続に使用 | 
 
 # 注意事項(主にレビュアーや運営チームな方向け)
 本リポジトリはPublicリポジトリを想定し、seichi.click networkに関する公開可能なインフラ構成についての情報を取り扱っています。コントリビュート/レビューにあたっては以下の点に留意してください。

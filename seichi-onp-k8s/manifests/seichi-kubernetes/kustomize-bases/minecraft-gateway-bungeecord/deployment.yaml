@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bungeecord
+  name: bungeecord
+  # We wish this deployment to be reloaded
+  # when "bungeecord-config" and "bungeecord-plugin-configs" ConfigMap are updated
+  annotations:
+    configmap.reloader.stakater.com/reload: "jmx-exporter-config,bungeecord-config,bungeecord-plugin-configs"
+spec:
+  replicas: 2
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: bungeecord
+  template:
+    metadata:
+      labels:
+        app: bungeecord
+    spec:
+      initContainers:
+        - name: server-icon-downloader
+          image: busybox:1.35.0
+          env:
+            - name: SERVER_ICON_URL
+              # https://github.com/GiganticMinecraft/branding/blob/01438e6d18c3a2824e39e73354ab4105c9e8a89c/server-icon.png
+              value: https://raw.githubusercontent.com/GiganticMinecraft/branding/01438e6d18c3a2824e39e73354ab4105c9e8a89c/server-icon.png
+          volumeMounts:
+            - name: server-icon-download-volume
+              mountPath: /root/server-icon-download
+          command:
+            - 'sh'
+            - '-c'
+            - "wget -O /root/server-icon-download/server-icon.png \"${SERVER_ICON_URL}\""
+        - name: jmx-exporter-downloader
+          image: busybox:1.35.0
+          env:
+            - name: JMX_EXPORTER_URL
+              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar"
+          volumeMounts:
+            - name: jmx-exporter-download-volume
+              mountPath: /root/jmx-exporter-download
+          command:
+            - 'sh'
+            - '-c'
+            - "wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar \"${JMX_EXPORTER_URL}\""
+
+      containers:
+        - resources:
+            requests:
+              memory: 768Mi
+          env:
+            - name: MEMORY
+              value: 768m
+            - name: TYPE
+              value: WATERFALL
+
+            - name: PLUGINS
+              # BungeeKick:
+              #   https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar
+              # BungeeHubCommand:
+              #   https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-4c5449d8aecf6bf5a6b810fb85a1bfa75c0fd03f/bungeehubcommand-1.jar
+              # BungeeSemaphore:
+              #   https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar
+              # RedisBungee:
+              #   https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+              # TCPShield (RealIP):
+              #   https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+              value: >-
+                https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
+                https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-4c5449d8aecf6bf5a6b810fb85a1bfa75c0fd03f/bungeehubcommand-1.jar,
+                https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar,
+                https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
+                https://github.com/TCPShield/RealIP/releases/download/2.5.6/TCPShield-2.5.6.jar
+
+            # BungeeYAML (depended by SwiftMOTD):
+            #   https://www.spigotmc.org/resources/bungeeyaml-original.13068/
+            # SwiftMOTD:
+            #   https://www.spigotmc.org/resources/swiftmotd.221/
+            - name: SPIGET_PLUGINS
+              value: 13068,221
+
+            - name: JVM_OPTS
+              value: >-
+                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+
+          image: itzg/bungeecord:java17-2022.1.0
+          name: bungeecord
+          ports:
+            - containerPort: 25577
+              name: bungeecord
+            - containerPort: 18321
+              name: jmx-metrics
+          startupProbe:
+            tcpSocket:
+              port: 25577
+            # 最大120秒待つ
+            failureThreshold: 6
+            periodSeconds: 20
+          volumeMounts:
+            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#volumes
+            - name: bungeecord-config
+              mountPath: /config/config.yml
+              subPath: config.yml
+            - name: server-icon-download-volume
+              mountPath: /config/server-icon.png
+              subPath: server-icon.png
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/bungeecord が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeHubCommand/config.yml
+              subPath: BungeeHubCommand-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeKick/config.yml
+              subPath: BungeeKick-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeSemaphore/config.yml
+              subPath: BungeeSemaphore-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/RedisBungee/config.yml
+              subPath: RedisBungee-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/SwiftMOTD/config.yml
+              subPath: SwiftMOTD-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/TCPShield/config.yml
+              subPath: TCPShield-config.yml
+
+            # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
+            - name: jmx-exporter-download-volume
+              mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
+              subPath: jmx-exporter-javaagent.jar
+            - name: jmx-exporter-config
+              mountPath: /jmx-exporter/jmx-exporter-config.yaml
+              subPath: jmx-exporter-config.yaml
+      volumes:
+        - name: bungeecord-config
+          configMap:
+            name: bungeecord-config
+        - name: bungeecord-plugin-configs
+          configMap:
+            name: bungeecord-plugin-configs
+        # サーバーアイコンをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
+        - name: server-icon-download-volume
+          emptyDir: {}
+        # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
+        - name: jmx-exporter-download-volume
+          emptyDir: {}
+        - name: jmx-exporter-config
+          configMap:
+            name: jmx-exporter-config

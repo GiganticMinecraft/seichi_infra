@@ -308,17 +308,29 @@ helm install cilium cilium/cilium \
     --set k8sServiceHost=${KUBE_API_SERVER_VIP} \
     --set k8sServicePort=8443
 
+# Install ArgoCD Helm chart
+helm repo add argo https://argoproj.github.io/argo-helm
+helm install argocd argo/argo-cd \
+    --create-namespace \
+    --namespace argocd
+
+# Install kube-prometheus-stack Helm chart
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/kube-prometheus-stack \
+    --create-namespace \
+    --namespace monitoring
+
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: seichi-systems
+  name: cluster-wide-apps
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: external-k8s-endpoint
-  namespace: seichi-systems
+  namespace: cluster-wide-apps
 type: Opaque
 stringData:
   fqdn: "${EXTERNAL_KUBE_API_SERVER}"

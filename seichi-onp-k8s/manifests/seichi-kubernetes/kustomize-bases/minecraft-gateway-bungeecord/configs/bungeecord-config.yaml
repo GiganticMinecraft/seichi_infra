@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bungeecord-config
+data:
+  config.yml: |
+    # Needs override.
+    # Provide a map of server-name to server information.
+    servers:
+      # [Example config]
+      # lobby:
+      #   address: 192.168.2.100:25565
+      #   restricted: false
+      #   motd: ''
+      # s1:
+      #   address: 192.168.2.1:25565
+      #   restricted: false
+      #   motd: ''
+
+    listeners:
+      - # Needs override.
+        # Provide an array of names of servers in the decreasing order of priority.
+        priorities: []
+          # [Example config]
+          # - lobby
+        # Needs override.
+        # Provide a map of external (forced) server address to associated target servers
+        forced_hosts:
+          # [Example config]
+          # play.seichi.click: lobby
+
+        query_port: 25565
+        motd: ''
+        bind_local_address: true
+        tab_list: GLOBAL_PING
+        query_enabled: false
+        host: 0.0.0.0:25577
+
+        max_players: 256
+        tab_size: 60
+        ping_passthrough: false
+        force_default_server: true
+        proxy_protocol: true
+
+    # Needs override. By default we don't grant any permission node,
+    # but they can be given to groups (such as default or admin) as an array of strings.
+    # Warning: asterisk cannot be used for permissions setting
+    permissions:
+      default: []
+      admin: []
+
+    groups:
+      unchama:
+        - admin
+
+    custom_server_name: HexaCord
+    player_limit: -1
+    online_mode: true
+    forge_support: false
+    stats: 752477ce-c5e9-4e37-9361-2d4f26f65f14
+
+    ip_forward: true
+    prevent_proxy_connections: true
+    always_handle_packets: false
+    remote_ping_timeout: 5000
+    remote_ping_cache: -1
+    # The timeout value must be set shorter than the upper network
+    timeout: 20000
+    server_connect_timeout: 5000
+    connection_throttle: 2000
+    connection_throttle_limit: 16
+    network_compression_threshold: 256
+    log_pings: false
+
+    disabled_commands:
+    log_commands: true
+    inject_commands: false

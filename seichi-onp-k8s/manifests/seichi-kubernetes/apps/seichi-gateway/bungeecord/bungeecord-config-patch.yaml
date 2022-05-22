@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bungeecord-config
+data:
+  config.yml: |
+    servers:
+      lobby:
+        address: 192.168.2.100:25565
+        restricted: false
+        motd: ''
+      s1:
+        address: 192.168.2.1:25565
+        restricted: false
+        motd: ''
+      s2:
+        address:192.168.2.2:25565
+        restricted: false
+        motd: ''
+      s3:
+        address: 192.168.2.3:25565
+        restricted: false
+        motd: ''
+      s5:
+        address: 192.168.2.5:25565
+        restricted: false
+        motd: ''
+      s7:
+        address: 192.168.2.7:25565
+        restricted: false
+        motd: ''
+      cre:
+        address: 192.168.1.187:25568
+        restricted: false
+        motd: ''
+      eve:
+        address: 192.168.1.187:25574
+        restricted: false
+        motd: ''
+      h1:
+        address: 192.168.1.187:25567
+        restricted: false
+        motd: ''
+      spade:
+        address: 192.168.1.187:25501
+        restricted: false
+        motd: ''
+      reset:
+        address: 192.168.1.187:25591
+        restricted: false
+        motd: ''
+      kagawa:
+        address: 192.168.1.187:25593
+        restricted: false
+        motd: ''
+      petra:
+        address: 192.168.1.187:25585
+        restricted: false
+        motd: ''
+
+    listeners:
+      - priorities:
+          - lobby
+        forced_hosts:
+          play.seichi.click: lobby
+
+        query_port: 25565
+        motd: ''
+        bind_local_address: true
+        tab_list: GLOBAL_PING
+        query_enabled: false
+        host: 0.0.0.0:25577
+
+        max_players: 256
+        tab_size: 60
+        ping_passthrough: false
+        force_default_server: true
+        proxy_protocol: true
+
+    # Warning: asterisk cannot be used for permissions setting
+    permissions:
+      default:
+        - bungeecord.command.list
+        - bungeecord.command.server
+        - bungeehubcommand.hub
+      admin:
+        - bungeecord.command.list
+        - bungeecord.command.server
+        - bungeehubcommand.hub
+
+        - bungeecord.command.alert
+        - bungeecord.command.send
+        - redisbungee.command.lastseen
+        - redisbungee.command.sendtoall
+        - redisbungee.command.serverid
+        - redisbungee.command.serverids
+        - redisbungee.command.pproxy
+        - redisbungee.command.plist
+
+    groups:
+      unchama:
+        - admin
+
+    custom_server_name: HexaCord
+    player_limit: -1
+    online_mode: true
+    forge_support: false
+    stats: 752477ce-c5e9-4e37-9361-2d4f26f65f14
+
+    ip_forward: true
+    prevent_proxy_connections: true
+    always_handle_packets: false
+    remote_ping_timeout: 5000
+    remote_ping_cache: -1
+    # The timeout value must be set shorter than the upper network
+    timeout: 20000
+    server_connect_timeout: 5000
+    connection_throttle: 2000
+    connection_throttle_limit: 16
+    network_compression_threshold: 256
+    log_pings: false
+
+    disabled_commands:
+    log_commands: true
+    inject_commands: false

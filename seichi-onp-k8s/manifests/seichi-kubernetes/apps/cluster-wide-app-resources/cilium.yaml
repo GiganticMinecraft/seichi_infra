@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  project: infra
+  source:
+    chart: cilium
+    repoURL: https://helm.cilium.io/
+    targetRevision: 1.11.5
+    helm:
+      releaseName: cilium
+      values: |
+        kubeProxyReplacement: strict
+        k8sServiceHost: 192.168.18.100 # modify it if necessary
+        k8sServicePort: 8443
+        loadBalancer:
+          algorithm: maglev
+        hubble:
+          enabled: true
+          metrics:
+            enabled:
+            - dns:query;ignoreAAAA
+            - drop
+            - tcp
+            - flow
+            - icmp
+            - http
+            - port-distribution
+            serviceMonitor:
+              enabled: true
+        operator:
+          prometheus:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+        prometheus:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
