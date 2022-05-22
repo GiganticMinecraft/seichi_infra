@@ -10,14 +10,6 @@ cloudflared_binary="https://github.com/cloudflare/cloudflared/releases/download/
 
 #endregion
 
-#region misc
-
-function echo_err () {
-  echo $1 >&2
-}
-
-#endregion
-
 function pick_free_port () {
   # ref. https://stackoverflow.com/a/1365284
   cat <<EOF | python3
