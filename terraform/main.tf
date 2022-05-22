@@ -95,6 +95,57 @@ provider "github" {
 
 #endregion
 
+#region on-premise k8s access configuration
+
+variable "onp_k8s_kubeconfig" {
+  description   = "On-premise cluster's kubeconfig.yaml content"
+  type          = string
+  sensitive     = true
+}
+
+# トンネルをcloudflaredで張る external data
+data "external" "cloudflare_tunnel_to_onp_k8s_api" {
+  program = [
+    "bash",
+    "${path.module}/tunnel-to-onp-k8s.sh"
+  ]
+}
+
+# オンプレクラスタの kubeconfig.yaml は、cluster CA certificate、client certificate、client keyをそれぞれ
+#  - clusters[?].cluster.certificate-authority-data に
+#  - users[?].user.client-certificate-data に
+#  - users[?].user.client-key-data に
+# base64で保持している。
+
+locals {
+  onp_kubenetes_cluster_host           = data.external.cloudflare_tunnel_to_onp_k8s_api.result.host
+  onp_kubenetes_cluster_ca_certificate = base64decode(yamldecode(var.onp_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
+  onp_kubenetes_client_certificate     = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-certificate-data)
+  onp_kubenetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
+}
+
+provider "kubernetes" {
+  alias = "onp_cluster"
+
+  host                   = local.onp_kubenetes_cluster_host
+  cluster_ca_certificate = local.onp_kubenetes_cluster_ca_certificate
+  client_certificate     = local.onp_kubenetes_client_certificate
+  client_key             = local.onp_kubenetes_client_key
+}
+
+provider "helm" {
+  alias = "onp_cluster"
+
+  kubernetes {
+    host                   = local.onp_kubenetes_cluster_host
+    cluster_ca_certificate = local.onp_kubenetes_cluster_ca_certificate
+    client_certificate     = local.onp_kubenetes_client_certificate
+    client_key             = local.onp_kubenetes_client_key
+  }
+}
+
+#endregion
+
 #region proxy-layer's k8s access configuration
 
 variable "lke_k8s_kubeconfig" {
