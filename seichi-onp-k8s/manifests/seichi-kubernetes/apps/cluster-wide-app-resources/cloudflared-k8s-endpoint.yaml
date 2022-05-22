@@ -61,7 +61,7 @@ spec:
               name: cloudflared-k8s-endpoint-config-replaced
       containers:
         - name: cloudflared-k8s-endpoint
-          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-5b17cf6"
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-6455b98"
           env:
             - name: TUNNEL_NAME
               value: "proxy-kubernetes-cloudflared-k8s-endpoint-tunnel"
