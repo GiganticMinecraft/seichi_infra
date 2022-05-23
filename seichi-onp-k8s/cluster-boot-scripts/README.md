@@ -44,64 +44,6 @@ KubernetesノードのVMは cloudinit イメージで作成されている。
 
 Container Network Interface には Cilium を利用しています。
 
-## クラスタ操作
-
-作成フロー完了後は`seichi-onp-k8s-cp-[1-3]`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
-
-ログイン可能な公開鍵は"クラスタ作成時"に[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`に定義されている公開鍵に基づいています。
-
-クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorized_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`への追記も行ってください。
-
-ログイン可能な公開鍵を確認したら、以下の手順でログインが可能です：
-
-- ローカル端末上で`~/.ssh/config`をセットアップ
-
-```
-Host <踏み台サーバーホスト名>
-  HostName <踏み台サーバーホスト名>
-  User <踏み台サーバーユーザー名>
-  IdentityFile ~/.ssh/id_ed25519
-
-Host seichi-onp-k8s-cp-1
-  HostName 192.168.18.11
-  User cloudinit
-  IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
-
-Host seichi-onp-k8s-cp-2
-  HostName 192.168.18.12
-  User cloudinit
-  IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
-
-Host seichi-onp-k8s-cp-3
-  HostName 192.168.18.13
-  User cloudinit
-  IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
-```
-
-- (Option)初回接続後クラスタが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
-
-```sh
-ssh-keygen -R 192.168.18.11
-ssh-keygen -R 192.168.18.12
-ssh-keygen -R 192.168.18.13
-```
-
-- 接続チェック
-
-```sh
-ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
-ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
-ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
-```
-
-### クラスタのエンドポイントについて
-
-踏み台より先(内部NW)でクラスタを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
-
-FQDNについては公開しない前提ですが、クラスタへのアクセス権限がある場合は`seichi-systems` Namespace内の`external-k8s-endpoint`というSecretリソースを参照することでFQDNを取得可能です。
 
 ## 作成フロー
 
@@ -228,6 +170,65 @@ ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ```
+
+## クラスタ操作
+
+作成フロー完了後は`seichi-onp-k8s-cp-[1-3]`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
+
+ログイン可能な公開鍵は"クラスタ作成時"に[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`に定義されている公開鍵に基づいています。
+
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorized_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`への追記も行ってください。
+
+ログイン可能な公開鍵を確認したら、以下の手順でログインが可能です：
+
+- ローカル端末上で`~/.ssh/config`をセットアップ
+
+```
+Host <踏み台サーバーホスト名>
+  HostName <踏み台サーバーホスト名>
+  User <踏み台サーバーユーザー名>
+  IdentityFile ~/.ssh/id_ed25519
+
+Host seichi-onp-k8s-cp-1
+  HostName 192.168.18.11
+  User cloudinit
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+
+Host seichi-onp-k8s-cp-2
+  HostName 192.168.18.12
+  User cloudinit
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+
+Host seichi-onp-k8s-cp-3
+  HostName 192.168.18.13
+  User cloudinit
+  IdentityFile ~/.ssh/id_ed25519
+  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+```
+
+- (Option)初回接続後クラスタが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
+
+```sh
+ssh-keygen -R 192.168.18.11
+ssh-keygen -R 192.168.18.12
+ssh-keygen -R 192.168.18.13
+```
+
+- 接続チェック
+
+```sh
+ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
+ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
+```
+
+### クラスタのエンドポイントについて
+
+踏み台より先(内部NW)でクラスタを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
+
+FQDNについては公開しない前提ですが、クラスタへのアクセス権限がある場合は`seichi-systems` Namespace内の`external-k8s-endpoint`というSecretリソースを参照することでFQDNを取得可能です。
 
 ## クラスタの削除
 
