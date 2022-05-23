@@ -50,14 +50,14 @@ free_port=$(pick_free_port)
 echo_to_err "$("${tmp_workdir}"/cloudflared --version)"
 echo_to_err "Using port: ${free_port}"
 
+exit 1
+
 # create tunnel entry on localhost
 nohup "${tmp_workdir}/cloudflared" access tcp \
   --hostname "${tunnel_host_name}" \
   --url "localhost:${free_port}" &
 
 echo_to_err "Started a tunnel to ${tunnel_host_name} at localhost:${free_port}"
-
-exit 1
 
 # External Program Protocol
 # https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
