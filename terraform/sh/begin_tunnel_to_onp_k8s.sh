@@ -42,7 +42,7 @@ echo_to_err "$("${tmp_workdir}"/cloudflared --version)"
 timeout 10s "${tmp_workdir}/cloudflared" access tcp \
   --hostname "${tunnel_host_name}" \
   --url "${tunnel_url}" \
-  1>&logfile 2>&1 || true
+  1>&logfile 2>&1
   
 echo_to_err "Log of spawned process:"
 echo_to_err "$(cat "${logfile}")"
