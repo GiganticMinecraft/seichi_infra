@@ -57,11 +57,11 @@ Container Network Interface には Cilium を利用しています。
 
 後述する手順で `deploy-vm.sh` を実行すると、k8sクラスタの構築に利用するVMテンプレートが作成されたのち、k8sクラスタのノードとなるVMが沸きます。
 
-その後、クラスタに各ノードを参加させるために、ローカル端末から
+その後、`cp-1` を最初のマスターノードとして、作成した全ノードをクラスタ内に引き込みます。
 
 ### 手順
 
- 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトにより `deploy-vm.sh` を実行します。
+ 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトで `deploy-vm.sh` を実行します。
  
     `TARGET_BRANCH` は、デプロイ対象のコード(`deploy-vm.sh` 及び `scripts/` 内のスクリプト)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
 
@@ -70,83 +70,89 @@ Container Network Interface には Cilium を利用しています。
     /bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh) ${TARGET_BRANCH}
     ```
 
- 1. ローカル端末上で`~/.ssh/config`をセットアップ
+ 1. ローカル端末から全ノードに接続できるようにします。
 
-    ```
-    Host <踏み台サーバーホスト名>
-      HostName <踏み台サーバーホスト名>
-      User <踏み台サーバーユーザー名>
-      IdentityFile ~/.ssh/id_ed25519
+    1. `~/.ssh/config` に以下を追記してください。
 
-    Host seichi-onp-k8s-cp-1
-      HostName 192.168.18.11
-      User cloudinit
-      IdentityFile ~/.ssh/id_ed25519
-      ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+        ```
+        Host <踏み台サーバーホスト名>
+          HostName <踏み台サーバーホスト名>
+          User <踏み台サーバーユーザー名>
+          IdentityFile ~/.ssh/id_ed25519
 
-    Host seichi-onp-k8s-cp-2
-      HostName 192.168.18.12
-      User cloudinit
-      IdentityFile ~/.ssh/id_ed25519
-      ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+        Host seichi-onp-k8s-cp-1
+          HostName 192.168.18.11
+          User cloudinit
+          IdentityFile ~/.ssh/id_ed25519
+          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 
-    Host seichi-onp-k8s-cp-3
-      HostName 192.168.18.13
-      User cloudinit
-      IdentityFile ~/.ssh/id_ed25519
-      ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+        Host seichi-onp-k8s-cp-2
+          HostName 192.168.18.12
+          User cloudinit
+          IdentityFile ~/.ssh/id_ed25519
+          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 
-    Host seichi-onp-k8s-wk-1
-      HostName 192.168.18.21
-      User cloudinit
-      IdentityFile ~/.ssh/id_ed25519
-      ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+        Host seichi-onp-k8s-cp-3
+          HostName 192.168.18.13
+          User cloudinit
+          IdentityFile ~/.ssh/id_ed25519
+          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 
-    Host seichi-onp-k8s-wk-2
-      HostName 192.168.18.22
-      User cloudinit
-      IdentityFile ~/.ssh/id_ed25519
-      ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+        Host seichi-onp-k8s-wk-1
+          HostName 192.168.18.21
+          User cloudinit
+          IdentityFile ~/.ssh/id_ed25519
+          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 
-    Host seichi-onp-k8s-wk-3
-      HostName 192.168.18.23
-      User cloudinit
-      IdentityFile ~/.ssh/id_ed25519
-      ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
-    ```
+        Host seichi-onp-k8s-wk-2
+          HostName 192.168.18.22
+          User cloudinit
+          IdentityFile ~/.ssh/id_ed25519
+          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 
- 1. ローカル端末上でコマンド実行
+        Host seichi-onp-k8s-wk-3
+          HostName 192.168.18.23
+          User cloudinit
+          IdentityFile ~/.ssh/id_ed25519
+          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+        ```
 
-    ```sh
-    # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わる為)
-    ssh-keygen -R 192.168.18.11
-    ssh-keygen -R 192.168.18.12
-    ssh-keygen -R 192.168.18.13
-    ssh-keygen -R 192.168.18.21
-    ssh-keygen -R 192.168.18.22
-    ssh-keygen -R 192.168.18.23
+    1. 以下のコマンドをローカル端末で実行してください。
 
-    # 接続チェック(ホスト公開鍵の登録も兼ねる)
-    ssh seichi-onp-k8s-cp-1 "hostname"
-    ssh seichi-onp-k8s-cp-2 "hostname"
-    ssh seichi-onp-k8s-cp-3 "hostname"
-    ssh seichi-onp-k8s-wk-1 "hostname"
-    ssh seichi-onp-k8s-wk-2 "hostname"
-    ssh seichi-onp-k8s-wk-3 "hostname"
+        ```bash
+        # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わる為)
+        ssh-keygen -R 192.168.18.11
+        ssh-keygen -R 192.168.18.12
+        ssh-keygen -R 192.168.18.13
+        ssh-keygen -R 192.168.18.21
+        ssh-keygen -R 192.168.18.22
+        ssh-keygen -R 192.168.18.23
 
-    # 最初のコントロールプレーンのkubeadm initが終わっているかチェック
-    ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+        # 接続チェック(ホスト公開鍵の登録も兼ねる)
+        ssh seichi-onp-k8s-cp-1 "hostname"
+        ssh seichi-onp-k8s-cp-2 "hostname"
+        ssh seichi-onp-k8s-cp-3 "hostname"
+        ssh seichi-onp-k8s-wk-1 "hostname"
+        ssh seichi-onp-k8s-wk-2 "hostname"
+        ssh seichi-onp-k8s-wk-3 "hostname"
+        ```
 
-    # cloudinitの実行ログチェック(トラブルシュート用)
-    ssh seichi-onp-k8s-cp-1 "sudo cat /var/log/cloud-init-output.log"
-    ssh seichi-onp-k8s-cp-2 "sudo cat /var/log/cloud-init-output.log"
-    ssh seichi-onp-k8s-cp-3 "sudo cat /var/log/cloud-init-output.log"
-    ssh seichi-onp-k8s-wk-1 "sudo cat /var/log/cloud-init-output.log"
-    ssh seichi-onp-k8s-wk-2 "sudo cat /var/log/cloud-init-output.log"
-    ssh seichi-onp-k8s-wk-3 "sudo cat /var/log/cloud-init-output.log"
-    ```
+        ```bash
+        # 最初のコントロールプレーンのkubeadm initが終わっているかチェック
+        ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
 
- 1. ローカル端末上でコマンド実行
+        # cloudinitの実行ログチェック(トラブルシュート用)
+        ssh seichi-onp-k8s-cp-1 "sudo cat /var/log/cloud-init-output.log"
+        ssh seichi-onp-k8s-cp-2 "sudo cat /var/log/cloud-init-output.log"
+        ssh seichi-onp-k8s-cp-3 "sudo cat /var/log/cloud-init-output.log"
+        ssh seichi-onp-k8s-wk-1 "sudo cat /var/log/cloud-init-output.log"
+        ssh seichi-onp-k8s-wk-2 "sudo cat /var/log/cloud-init-output.log"
+        ssh seichi-onp-k8s-wk-3 "sudo cat /var/log/cloud-init-output.log"
+        ```
+
+ 1. 作成した全ノードをクラスタ内に引き込みます。
+
+    以下のコマンドをローカル端末で実行してください。
 
     ```sh
     # join_kubeadm_cp.yaml を seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 にコピー
@@ -156,10 +162,6 @@ Container Network Interface には Cilium を利用しています。
     # seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 で kubeadm join
     ssh seichi-onp-k8s-cp-2 "sudo kubeadm join --config ~/join_kubeadm_cp.yaml"
     ssh seichi-onp-k8s-cp-3 "sudo kubeadm join --config ~/join_kubeadm_cp.yaml"
-
-    # seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 で cloudinitユーザー用にkubeconfigを準備
-    ssh seichi-onp-k8s-cp-2 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
-    ssh seichi-onp-k8s-cp-3 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
 
     # join_kubeadm_wk.yaml を seichi-onp-k8s-wk-1 と seichi-onp-k8s-wk-2 と seichi-onp-k8s-wk-3 にコピー
     scp -3 seichi-onp-k8s-cp-1:~/join_kubeadm_wk.yaml seichi-onp-k8s-wk-1:~/
@@ -172,7 +174,18 @@ Container Network Interface には Cilium を利用しています。
     ssh seichi-onp-k8s-wk-3 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
     ```
 
- 1. ローカル端末上で軽い動作チェック
+ 1. コントロールプレーンの全ノードにkubeconfigを配布します。
+
+    以下のコマンドをローカル端末で実行してください。
+
+    ```bash
+    ssh seichi-onp-k8s-cp-2 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
+    ssh seichi-onp-k8s-cp-3 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
+    ```
+
+ 1. 軽い動作チェック
+
+    以下のコマンドをローカル端末で実行してください。
 
     ```sh
     ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
