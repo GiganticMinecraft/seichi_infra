@@ -105,6 +105,8 @@ variable "onp_k8s_kubeconfig" {
 
 # トンネルをcloudflaredで張る external data
 data "external" "cloudflare_tunnel_to_onp_k8s_api" {
+  depends_on = [cloudflare_record.local_tunnels]
+
   program = [
     "bash",
     "${path.module}/tunnel-to-onp-k8s.sh"
