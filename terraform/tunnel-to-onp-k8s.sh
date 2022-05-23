@@ -10,7 +10,7 @@ cloudflared_release="2022.5.1"
 cloudflared_binary="https://github.com/cloudflare/cloudflared/releases/download/${cloudflared_release}/cloudflared-linux-amd64"
 
 # Domain at which the api endpoint should be visible
-tunnel_domain="tunnel.k8s-api.onp-k8s.seichi.click.local"
+tunnel_domain="k8s-api.onp-k8s.admin.local-tunnels.seichi.click"
 
 # Domain at which the tunnel connection can be established
 tunnel_host_name="k8s-api.onp-k8s.admin.seichi.click"
@@ -39,10 +39,6 @@ function pick_free_port () {
 
 #endregion
 
-function reroute_tunnel_domain_to_localhost () {
-  sudo -- sh -c "echo \"127.0.0.1  ${tunnel_domain}\" >> /etc/hosts"
-}
-
 tmp_workdir=$(mktemp -d)
 
 # download cloudflared
@@ -54,17 +50,14 @@ free_port=$(pick_free_port)
 echo_to_err "$(${tmp_workdir}/cloudflared --version)"
 echo_to_err "Using port: ${free_port}"
 
-reroute_tunnel_domain_to_localhost
-echo_to_err "Rerouted ${tunnel_domain} to 127.0.0.1"
-
-exit 1
-
 # create tunnel entry on localhost
 nohup "${tmp_workdir}/cloudflared" access tcp \
   --hostname "${tunnel_host_name}" \
   --url "localhost:${free_port}" &
 
 echo_to_err "Started a tunnel to ${tunnel_host_name} at localhost:${free_port}"
+
+exit 1
 
 # External Program Protocol
 # https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
