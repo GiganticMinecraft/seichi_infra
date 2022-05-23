@@ -6,8 +6,8 @@
 
 クラスタ内に置かれるリソースの設定は、 [`manifests/seichi-kubernetes`](./manifests/seichi-kubernetes) を参照してください。
 
-注意点として、クラスタ内に置かれるリソースは、[`manifests/seichi-kubernetes`](./manifests/seichi-kubernetes) で管理されるもの以外に
+クラスタ内に置かれるリソースは、[`manifests/seichi-kubernetes`](./manifests/seichi-kubernetes) で管理されるもの以外にも
  - クラスタ作成時に注入されるもの
  - [Terraform](../terraform/) により Secret 等として注入されるもの
 
-等があります。
+等があることに注意してください。
