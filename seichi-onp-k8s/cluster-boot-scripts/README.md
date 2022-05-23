@@ -72,50 +72,63 @@ CNI には Cilium を利用しています。
 
  1. ローカル端末から全ノードに接続できるようにします。
 
-    1. `~/.ssh/config` に以下を追記してください。
+    1. ターミナルで次のスクリプトを実行し、必要なパラメータをセットする。
 
+        ```bash
+        IDENTITY_FILE_PATH=<接続に利用する秘密鍵へのパス>
+        BASTION_HOST_NAME=<踏み台サーバーのホスト名>
         ```
-        Host <踏み台サーバーホスト名>
-          HostName <踏み台サーバーホスト名>
-          User <踏み台サーバーユーザー名>
-          IdentityFile ~/.ssh/id_ed25519
 
+    1. 次のスクリプトを実行し、踏み台サーバーを介した接続に必要な設定を生成する。
+
+        ```bash
+        ssh_additional_config=$(cat <<EOF
         Host seichi-onp-k8s-cp-1
           HostName 192.168.18.11
           User cloudinit
-          IdentityFile ~/.ssh/id_ed25519
-          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
         Host seichi-onp-k8s-cp-2
           HostName 192.168.18.12
           User cloudinit
-          IdentityFile ~/.ssh/id_ed25519
-          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
         Host seichi-onp-k8s-cp-3
           HostName 192.168.18.13
           User cloudinit
-          IdentityFile ~/.ssh/id_ed25519
-          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
         Host seichi-onp-k8s-wk-1
           HostName 192.168.18.21
           User cloudinit
-          IdentityFile ~/.ssh/id_ed25519
-          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
         Host seichi-onp-k8s-wk-2
           HostName 192.168.18.22
           User cloudinit
-          IdentityFile ~/.ssh/id_ed25519
-          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
         Host seichi-onp-k8s-wk-3
           HostName 192.168.18.23
           User cloudinit
-          IdentityFile ~/.ssh/id_ed25519
-          ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        EOF
+        )
         ```
+
+    1. 次のスクリプトを実行して、`~/.ssh/config` に設定を追記してください。
+
+        ```bash
+        echo "${ssh_additional_config}" >> ~/.ssh/config
+        ```
+
+       もし生成された設定を確認したい場合は、 `echo "${ssh_additional_config}"` のみを実行してください。
 
     1. 以下のコマンドをローカル端末で実行してください。
 
@@ -137,18 +150,23 @@ CNI には Cilium を利用しています。
         ssh seichi-onp-k8s-wk-3 "hostname"
         ```
 
-        ```bash
-        # 最初のコントロールプレーンのkubeadm initが終わっているかチェック
-        ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+  1. クラスタの基点となる cp-1 の初期化が終わっていることをチェックします。
 
-        # cloudinitの実行ログチェック(トラブルシュート用)
-        ssh seichi-onp-k8s-cp-1 "sudo cat /var/log/cloud-init-output.log"
-        ssh seichi-onp-k8s-cp-2 "sudo cat /var/log/cloud-init-output.log"
-        ssh seichi-onp-k8s-cp-3 "sudo cat /var/log/cloud-init-output.log"
-        ssh seichi-onp-k8s-wk-1 "sudo cat /var/log/cloud-init-output.log"
-        ssh seichi-onp-k8s-wk-2 "sudo cat /var/log/cloud-init-output.log"
-        ssh seichi-onp-k8s-wk-3 "sudo cat /var/log/cloud-init-output.log"
-        ```
+      ```bash
+      # 最初のコントロールプレーンのkubeadm initが終わっているかチェック
+      ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+      ```
+
+  1. 各VMの実行ログをチェックします。
+
+      ```bash
+      ssh seichi-onp-k8s-cp-1 "sudo cat /var/log/cloud-init-output.log"
+      ssh seichi-onp-k8s-cp-2 "sudo cat /var/log/cloud-init-output.log"
+      ssh seichi-onp-k8s-cp-3 "sudo cat /var/log/cloud-init-output.log"
+      ssh seichi-onp-k8s-wk-1 "sudo cat /var/log/cloud-init-output.log"
+      ssh seichi-onp-k8s-wk-2 "sudo cat /var/log/cloud-init-output.log"
+      ssh seichi-onp-k8s-wk-3 "sudo cat /var/log/cloud-init-output.log"
+      ```
 
  1. 作成した全ノードをクラスタ内に引き込みます。
 
