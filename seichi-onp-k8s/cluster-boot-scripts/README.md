@@ -42,7 +42,7 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
 クラスタの作成は以下のツール群で行っています。
   - kubeadm, kubectl, kubelet v1.24.0
 
-Container Network Interface には Cilium を利用しています。
+CNI には Cilium を利用しています。
 
 
 ## 作成フロー
