@@ -1,33 +1,48 @@
 # seichi-onp-k8s / cluster-boot-scripts
 
 オンプレミス上に整地鯖用のKubernetesクラスタをデプロイする為のスクリプト群です。
-前提としている環境については、以下前提条件を参照してください。
+前提としている環境については、[環境の前提条件](#環境の前提条件)を参照してください。
 
-## 前提条件
+## 環境の前提条件
 
-- Proxmox Virtual Environment 7.1-11
-  - 3ノードクラスタ構成
-  - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可
-- Synology NAS(DS1621+)
-  - 共有ストレージとして利用
-- Ubuntu 20.04 LTS (cloud-init image)
-  - Kubernetes VMのベースとして使用
-- Network Addressing(うんちゃま自宅鯖本番環境)
-  - Service Network Segment (192.168.0.0/20)
-  - Storage Network Segment (192.168.16.0/22)
-  - Kubernetes
-    - Internal
-      - Pod Network (10.128.0.0/16)
-      - Service Network (10.96.0.0/16)
-    - External
-      - Node IP
-        - Service Network (192.168.8.0-192.168.8.127)
-        - Storage Network (192.168.18.0-192.168.18.127)
-      - API Endpoint (192.168.18.100)
-      - LoadBalancer VIP (192.168.8.128-192.168.8.255)
-- Kubernetes構成情報
+### VM 環境
+
+VM環境は `Proxmox Virtual Environment 7.1-11` を利用している。
+ - 3ノードクラスタ構成
+ - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可である。
+
+KubernetesノードのVMは cloudinit イメージで作成されている。
+この cloudinit イメージのベースには `Ubuntu 20.04 LTS` を利用している。
+
+### ストレージ
+
+以下のストレージを共有ストレージとして使用している。
+ - Synology NAS(DS1621+)
+
+### ネットワーク
+
+以下のセグメントを切っている。
+ - Service Network (192.168.0.0/20)
+ - Storage Network (192.168.16.0/22)
+ - Kubernetes
+   - Internal
+     - Pod Network (10.128.0.0/16)
+     - Service Network (10.96.0.0/16)
+   - External
+     - Node IP
+       - Service Network (192.168.8.0-192.168.8.127)
+       - Storage Network (192.168.18.0-192.168.18.127)
+     - API Endpoint (192.168.18.100)
+     - LoadBalancer VIP (192.168.8.128-192.168.8.255)
+
+## Kubernetesクラスタの構成
+
+2022/05/23現在、クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L14-L19)。
+
+クラスタの作成は以下のツール群で行っています。
   - kubeadm, kubectl, kubelet v1.24.0
-  - Cillium (Container Network Interface)
+
+Container Network Interface には Cilium を利用しています。
 
 ## クラスタ操作
 
@@ -66,7 +81,7 @@ Host seichi-onp-k8s-cp-3
   ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
 ```
 
-- (Option)初回接続後クラスターが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
+- (Option)初回接続後クラスタが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
 
 ```sh
 ssh-keygen -R 192.168.18.11
@@ -84,9 +99,9 @@ ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
 
 ### クラスタのエンドポイントについて
 
-踏み台より先(内部NW)でクラスターを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
+踏み台より先(内部NW)でクラスタを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
 
-FQDNについては公開しない前提ですが、クラスターへのアクセス権限がある場合は`seichi-systems` Namespace内の`external-k8s-endpoint`というSecretリソースを参照することでFQDNを取得可能です。
+FQDNについては公開しない前提ですが、クラスタへのアクセス権限がある場合は`seichi-systems` Namespace内の`external-k8s-endpoint`というSecretリソースを参照することでFQDNを取得可能です。
 
 ## 作成フロー
 
@@ -214,9 +229,9 @@ ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
 ```
 
-## cleanup
+## クラスタの削除
 
-クラスターを再作成する場合は、事前に以下の手順でクラスターの削除を行って下さい。
+クラスタを再作成する場合は、事前に以下の手順でクラスタの削除を行って下さい。
 
 - proxmoxのホストコンソール上で以下コマンド実行。ノードローカルにいるVMしか操作できない為、全てのノードで打って回る。
 
