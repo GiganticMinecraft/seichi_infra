@@ -120,7 +120,7 @@ CNI には Cilium を利用しています。
     1. 以下のコマンドをローカル端末で実行してください。
 
         ```bash
-        # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わる為)
+        # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わるため)
         ssh-keygen -R 192.168.18.11
         ssh-keygen -R 192.168.18.12
         ssh-keygen -R 192.168.18.13
