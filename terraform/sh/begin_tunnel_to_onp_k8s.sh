@@ -50,7 +50,7 @@ echo_to_err "Started a tunnel to ${tunnel_host_name} at ${tunnel_url}"
 
 sleep 3
 echo_to_err "Processes after 3 seconds:"
-echo_to_err "$(ps -al)"
+echo_to_err "$(ps -Al)"
 echo_to_err ""
 echo_to_err "Log of spawned process:"
 echo_to_err "$(cat "${logfile}")"
