@@ -281,12 +281,15 @@ kubernetesVersion: "v1.24.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
-  # We can add the following url to SAN,
-  # so that a client accessing the API can forward
-  # tunnel.k8s-api.onp-k8s.seichi.click.local
-  # to a TCP tunnel running somewhere else (e.g. 127.0.0.1)
-  # by appending "127.0.0.1   tunnel.k8s-api.onp-k8s.seichi.click.local" to /etc/hosts
-  - tunnel.k8s-api.onp-k8s.seichi.click.local
+  # We are directing the A-record of
+  #   k8s-api.onp-k8s.admin.local-tunnels.seichi.click
+  # to 127.0.0.1 (see terraform/cloudflare_dns_records.tf for details).
+  #
+  # So a client accessing the API can establish a tunneled connection from
+  # their local machine to the API endpoint, which then becomes visible at 
+  #   https://k8s-api.onp-k8s.admin.local-tunnels.seichi.click:PORT
+  # where PORT is the port at which the local tunnel is running.
+  - k8s-api.onp-k8s.admin.local-tunnels.seichi.click
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration

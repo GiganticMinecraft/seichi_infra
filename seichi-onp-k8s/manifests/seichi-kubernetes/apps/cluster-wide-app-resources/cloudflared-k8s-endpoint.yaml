@@ -6,13 +6,13 @@ metadata:
 data:
   tunnel-config.yml: |
     ingress:
-      # このホストはDoS攻撃を防ぐためにサービストークン等による保護を行うべき。
+      # このホストはDoS攻撃を防ぐために、サービストークン等による保護を行うべき。
       # 
       # 2022/05/22 NOTE: サービストークンは1年に1度手動入れ替えをする必要があるが、
       # 影響範囲がCIに閉じている上に、もし止まっても、
       # Secretの更新ができなかったりArgoCDのバージョンが上がらない程度の
       # 影響しかないと見込めるため、当面はこのような運用で問題は生じないと判断した。
-      - hostname: tunnel.k8s-api.onp-k8s.seichi.click.local
+      - hostname: k8s-api.onp-k8s.admin.seichi.click
         # APIエンドポイントはクライアント証明書による認証を行うので、tcpトンネルを張る。
         service: tcp://kubernetes.default:443
 
