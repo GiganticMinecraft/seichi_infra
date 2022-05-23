@@ -34,10 +34,7 @@ tmp_workdir=$(mktemp -d)
 wget "${cloudflared_binary}" -O "${tmp_workdir}/cloudflared"
 chmod 700 "${tmp_workdir}/cloudflared"
 
-free_port=$(pick_free_port)
-
 echo_to_err "$("${tmp_workdir}"/cloudflared --version)"
-echo_to_err "Using port: ${free_port}"
 
 # create tunnel entry on localhost
 # close all of stdin/stdout/stderr off and fork
