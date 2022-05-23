@@ -178,58 +178,104 @@ proxmoxをホストしている物理マシンのターミナルで以下のよ�
 
 ## クラスタ操作
 
-作成フロー完了後は`seichi-onp-k8s-cp-[1-3]`に公開鍵認証でSSHログイン後`kubectl`を利用したクラスタ操作が可能です。
+### コントロールプレーンのノード上から直接操作する
 
-ログイン可能な公開鍵は"クラスタ作成時"に[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`に定義されている公開鍵に基づいています。
+作成フローが完了した時点で、Proxmox上に `seichi-onp-k8s-cp-[1-3]` で識別される VM が作成されているはずです。以下、これらの VM の事を「CPノード」と呼びます。CPノードである VM は、k8s クラスタのコントロールプレーンノードとして機能しています。
 
-クラスタの再作成を伴わずにログイン可能な公開鍵を追加する場合は、直接`~/.ssh/authorized_keys`に追記してください。合わせて、次回クラスタ作成時に反映されるように[`deploy-vm.sh`](./deploy-vm.sh)で作成されるcloud-config(userdata)の中の`runcmd:`への追記も行ってください。
+3 つあるCPノードのうちの一つにSSHでログインし、 `kubectl` を利用することでクラスタを操作することができます。
 
-ログイン可能な公開鍵を確認したら、以下の手順でログインが可能です：
+---
 
-- ローカル端末上で`~/.ssh/config`をセットアップ
+__**アクセス権限について**__
 
-```
-Host <踏み台サーバーホスト名>
-  HostName <踏み台サーバーホスト名>
-  User <踏み台サーバーユーザー名>
-  IdentityFile ~/.ssh/id_ed25519
+CPノードにアクセスするのに必要な権限は、
+ - 「オンプレネットワークの踏み台サーバー」へのSSH権限
+ - CPノードの `cloudinit` ユーザーの `authorized_keys` に自身の公開鍵が登録されている ([CPノードのログインに利用できる公開鍵について](#CPノードのログインに利用できる公開鍵について)を参照)
 
-Host seichi-onp-k8s-cp-1
-  HostName 192.168.18.11
-  User cloudinit
-  IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+の二つです。もし権限が不足している場合は、サーバー管理者に権限を要求してください。
 
-Host seichi-onp-k8s-cp-2
-  HostName 192.168.18.12
-  User cloudinit
-  IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
+---
 
-Host seichi-onp-k8s-cp-3
-  HostName 192.168.18.13
-  User cloudinit
-  IdentityFile ~/.ssh/id_ed25519
-  ProxyCommand ssh -W %h:%p <踏み台サーバーホスト名>
-```
+以下、前提として、踏み台サーバーへの接続情報は `~/.ssh/config` にすでに記載されているものとします。
+CPノードへSSHでログインするには、作業者のローカル端末で以下の手順を実行してください。
 
-- (Option)初回接続後クラスタが再作成された場合はknown_hosts登録削除が必要(VM作り直す度にホスト公開鍵が変わる為)
+ 1. `~/.ssh/config` にCPノードへの接続情報を追記する
 
-```sh
-ssh-keygen -R 192.168.18.11
-ssh-keygen -R 192.168.18.12
-ssh-keygen -R 192.168.18.13
-```
+    もしCPノードへの接続情報が `~/.ssh/config` にすでに記載されていない場合、以下の手順を実行してください。
 
-- 接続チェック
+    1. ターミナルで次のスクリプトを実行し、必要なパラメータをセットする。
 
-```sh
-ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
-ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
-ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
-```
+        ```bash
+        IDENTITY_FILE_PATH=<接続に利用する秘密鍵へのパス>
+        BASTION_HOST_NAME=<踏み台サーバーのホスト名>
+        ```
 
-### クラスタのエンドポイントについて
+    1. 次のスクリプトを実行し、踏み台サーバーを介した接続に必要な設定を生成する。
+
+        ```bash
+        ssh_additional_config=$(cat <<EOF
+        Host seichi-onp-k8s-cp-1
+          HostName 192.168.18.11
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+
+        Host seichi-onp-k8s-cp-2
+          HostName 192.168.18.12
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+
+        Host seichi-onp-k8s-cp-3
+          HostName 192.168.18.13
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        EOF
+        )
+        ```
+
+    1. 次のスクリプトを実行する。
+
+        ```bash
+        echo "${ssh_additional_config}" >> ~/.ssh/config
+        ```
+
+       もし生成された設定を確認したい場合は、 `echo "${ssh_additional_config}"` のみを実行してください。
+
+ 1. 前回接続した後にクラスタが再作成されている場合は、以下のコマンドで `known_hosts` の登録を削除してください。
+
+    ```sh
+    ssh-keygen -R 192.168.18.11
+    ssh-keygen -R 192.168.18.12
+    ssh-keygen -R 192.168.18.13
+    ```
+
+    `known_hosts` の登録を削除する必要がある理由は、VMを作り直す度にホストの公開鍵が変わる為です。
+
+ 1. 以下のコマンドを実行して接続チェック、及びクラスタへのアクセスができることの確認を行ってください。
+
+    ```sh
+    ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
+    ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
+    ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
+    ```
+
+---
+
+#### CPノードのログインに利用できる公開鍵について
+
+CPノードへのログインに利用できる鍵ペアは、クラスタを作成するタイミングで固定されています。
+
+より具体的には、[`deploy-vm.sh`](./deploy-vm.sh)で作成される cloud-config (特に、user-config) で、GitHubに登録してある、CPノードへのアクセス権を与えたいユーザーの公開鍵を `/home/cloudinit/.ssh/authorized_keys` に書き込むように[設定](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L98-L100)しています。
+
+---
+
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加したい場合は、**全CPノード**の `/home/cloudinit/.ssh/authorized_keys` に追記してください。
+
+合わせて、次回のクラスタ作成時に反映されるよう、[`deploy-vm.sh`](./deploy-vm.sh)で作成される user-config の `runcmd:` 内への追記も行ってください。
+
+### インターネットを介してクラスタを操作する
 
 踏み台より先(内部NW)でクラスタを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
 
