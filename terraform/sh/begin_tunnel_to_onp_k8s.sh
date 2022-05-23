@@ -42,9 +42,7 @@ echo_to_err "$("${tmp_workdir}"/cloudflared --version)"
 nohup "${tmp_workdir}/cloudflared" access tcp \
   --hostname "${tunnel_host_name}" \
   --url "${tunnel_url}" \
-  0<&- 1>&logfile 2>&logfile &
-  
-disown
+  0<&- 1>logfile 2>&1 & disown
 
 echo_to_err "Started a tunnel to ${tunnel_host_name} at ${tunnel_url}"
 
