@@ -39,15 +39,21 @@ echo_to_err "$("${tmp_workdir}"/cloudflared --version)"
 
 # create tunnel entry on localhost
 # close all of stdin/stdout/stderr off and fork
-timeout 10s "${tmp_workdir}/cloudflared" access tcp \
+nohup "${tmp_workdir}/cloudflared" access tcp \
   --hostname "${tunnel_host_name}" \
   --url "${tunnel_url}" \
-  1>&logfile 2>&1
+  0<&- 1>&logfile 2>&logfile &
   
+disown
+
+echo_to_err "Started a tunnel to ${tunnel_host_name} at ${tunnel_url}"
+
+sleep 3
+echo_to_err "Processes after 3 seconds:"
+echo_to_err "$(ps -Al)"
+echo_to_err ""
 echo_to_err "Log of spawned process:"
 echo_to_err "$(cat "${logfile}")"
-
-exit 1
 
 # External Program Protocol
 # https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
