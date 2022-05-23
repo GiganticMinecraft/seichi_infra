@@ -267,13 +267,14 @@ CPノードへSSHでログインするには、作業者のローカル端末で
 
 CPノードへのログインに利用できる鍵ペアは、クラスタを作成するタイミングで固定されています。
 
+<details>
+<summary>詳細</summary>
+
 より具体的には、[`deploy-vm.sh`](./deploy-vm.sh)で作成される cloud-config (特に、user-config) で、GitHubに登録してある、CPノードへのアクセス権を与えたいユーザーの公開鍵を `/home/cloudinit/.ssh/authorized_keys` に書き込むように[設定](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L98-L100)しています。
 
----
+</details>
 
-クラスタの再作成を伴わずにログイン可能な公開鍵を追加したい場合は、**全CPノード**の `/home/cloudinit/.ssh/authorized_keys` に追記してください。
-
-合わせて、次回のクラスタ作成時に反映されるよう、[`deploy-vm.sh`](./deploy-vm.sh)で作成される user-config の `runcmd:` 内への追記も行ってください。
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加したい場合は、**全CPノード**の `/home/cloudinit/.ssh/authorized_keys` に追記してください。合わせて、次回のクラスタ作成時に反映されるよう、[`deploy-vm.sh`](./deploy-vm.sh)で作成される user-config の `runcmd:` 内への追記も行ってください。
 
 ### インターネットを介してクラスタを操作する
 
