@@ -97,29 +97,18 @@ provider "github" {
 
 #region on-premise k8s access configuration
 
+# トンネルが貼れるポートを取得する
+data "external" "port_for_cloudflare_tunnel_to_onp_k8s_api" {
+  program = [
+    "bash",
+    "${path.module}/sh/pick_free_port.sh"
+  ]
+}
+
 variable "onp_k8s_kubeconfig" {
   description   = "On-premise cluster's kubeconfig.yaml content"
   type          = string
   sensitive     = true
-}
-
-# トンネルをcloudflaredで張る external data
-data "external" "cloudflare_tunnel_to_onp_k8s_api" {
-  # これは正確には depends_on cloudflare_record.local_tunnels だが、これを指定すると
-  # 何故か onp_kubenetes_cluster_host の展開よりも前に実行されず、
-  # providerの初期化でエラーが出る(おそらく https://github.com/hashicorp/terraform/issues/2430 に関連)。
-  #
-  # depends_on = [cloudflare_record.local_tunnels]
-  # 
-  # 初回applyには失敗するが、二度applyすれば動く
-  # (一度目のapplyでDNSレコードが生成されるがkubernetesプロバイダが通信に失敗し、
-  #  二度目のapplyではkubernetesプロバイダからの通信がlocalhostに向く)はず。
-
-  # オンプレk8sクラスタへのトンネルをバックグラウンドで生やす。
-  program = [
-    "bash",
-    "${path.module}/tunnel-to-onp-k8s.sh"
-  ]
 }
 
 # オンプレクラスタの kubeconfig.yaml は、cluster CA certificate、client certificate、client keyをそれぞれ
@@ -129,29 +118,37 @@ data "external" "cloudflare_tunnel_to_onp_k8s_api" {
 # base64で保持している。
 
 locals {
-  onp_kubenetes_cluster_host           = data.external.cloudflare_tunnel_to_onp_k8s_api.result.host
-  onp_kubenetes_cluster_ca_certificate = base64decode(yamldecode(var.onp_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
-  onp_kubenetes_client_certificate     = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-certificate-data)
-  onp_kubenetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
+  # APIエンドポイントが最終的に露出されるべきドメイン。
+  # このドメインは cloudflare_dns_records.tf の設定により、127.0.0.1 (localhost) に向いている。
+  onp_kubernetes_tunnel_entry_host = "k8s-api.onp-k8s.admin.local-tunnels.seichi.click"
+  onp_kubernetes_tunnel_entry_port = data.external.port_for_cloudflare_tunnel_to_onp_k8s_api.result.port
+
+  # トンネルの接続先のドメイン
+  onp_kubernetes_tunnel_host       = "k8s-api.onp-k8s.admin.seichi.click"
+
+  onp_kubernetes_cluster_host           = "https://${local.onp_kubernetes_tunnel_entry_host}:${local.onp_kubernetes_tunnel_entry_port}"
+  onp_kubernetes_cluster_ca_certificate = base64decode(yamldecode(var.onp_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
+  onp_kubernetes_client_certificate     = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-certificate-data)
+  onp_kubernetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
 }
 
 provider "kubernetes" {
   alias = "onp_cluster"
 
-  host                   = local.onp_kubenetes_cluster_host
-  cluster_ca_certificate = local.onp_kubenetes_cluster_ca_certificate
-  client_certificate     = local.onp_kubenetes_client_certificate
-  client_key             = local.onp_kubenetes_client_key
+  host                   = local.onp_kubernetes_cluster_host
+  cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
+  client_certificate     = local.onp_kubernetes_client_certificate
+  client_key             = local.onp_kubernetes_client_key
 }
 
 provider "helm" {
   alias = "onp_cluster"
 
   kubernetes {
-    host                   = local.onp_kubenetes_cluster_host
-    cluster_ca_certificate = local.onp_kubenetes_cluster_ca_certificate
-    client_certificate     = local.onp_kubenetes_client_certificate
-    client_key             = local.onp_kubenetes_client_key
+    host                   = local.onp_kubernetes_cluster_host
+    cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
+    client_certificate     = local.onp_kubernetes_client_certificate
+    client_key             = local.onp_kubernetes_client_key
   }
 }
 
@@ -173,26 +170,26 @@ variable "lke_k8s_kubeconfig" {
 # LKE以外のmanaged k8s環境へ乗り換える際には、クラスタから得られるkubeconfigが含む情報が異なる可能性があるので注意。
 
 locals {
-  lke_kubenetes_cluster_host           = yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.server
-  lke_kubenetes_cluster_token          = yamldecode(var.lke_k8s_kubeconfig).users[0].user.token
-  lke_kubenetes_cluster_ca_certificate = base64decode(yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
+  lke_kubernetes_cluster_host           = yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.server
+  lke_kubernetes_cluster_token          = yamldecode(var.lke_k8s_kubeconfig).users[0].user.token
+  lke_kubernetes_cluster_ca_certificate = base64decode(yamldecode(var.lke_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
 }
 
 provider "kubernetes" {
   alias = "lke_cluster"
 
-  host                   = local.lke_kubenetes_cluster_host
-  token                  = local.lke_kubenetes_cluster_token
-  cluster_ca_certificate = local.lke_kubenetes_cluster_ca_certificate
+  host                   = local.lke_kubernetes_cluster_host
+  token                  = local.lke_kubernetes_cluster_token
+  cluster_ca_certificate = local.lke_kubernetes_cluster_ca_certificate
 }
 
 provider "helm" {
   alias = "lke_cluster"
 
   kubernetes {
-    host                   = local.lke_kubenetes_cluster_host
-    token                  = local.lke_kubenetes_cluster_token
-    cluster_ca_certificate = local.lke_kubenetes_cluster_ca_certificate
+    host                   = local.lke_kubernetes_cluster_host
+    token                  = local.lke_kubernetes_cluster_token
+    cluster_ca_certificate = local.lke_kubernetes_cluster_ca_certificate
   }
 }
 
