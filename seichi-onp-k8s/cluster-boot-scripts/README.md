@@ -7,21 +7,21 @@
 
 ### VM 環境
 
-VM環境は `Proxmox Virtual Environment 7.1-11` を利用している。
+VM環境は `Proxmox Virtual Environment 7.1-11` を利用しています。
  - 3ノードクラスタ構成
- - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可である。
+ - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可
 
-KubernetesノードのVMは cloudinit イメージで作成されている。
-この cloudinit イメージのベースには `Ubuntu 20.04 LTS` を利用している。
+KubernetesノードのVMは cloudinit イメージで作成されています。
+この cloudinit イメージのベースには `Ubuntu 20.04 LTS` を利用しています。
 
 ### ストレージ
 
-以下のストレージを共有ストレージとして使用している。
+以下のストレージを共有ストレージとして使用しています。
  - Synology NAS(DS1621+)
 
 ### ネットワーク
 
-以下のセグメントを切っている。
+以下のネットワークセグメントを切っています。
  - Service Network (192.168.0.0/20)
  - Storage Network (192.168.16.0/22)
  - Kubernetes
@@ -49,17 +49,21 @@ Container Network Interface には Cilium を利用しています。
 
 ### 概要
 
-以下に列挙した、[オンプレ環境の前提](#オンプレ環境の前提)を満たすために必要な作業の詳細は当ディレクトリでは管理しない。
+以下に列挙した、[オンプレ環境の前提](#オンプレ環境の前提)を満たすために必要な作業の詳細は、当ディレクトリでは管理しないこととします。
  - ベアメタルなProxmox環境の構築
  - Snippetが配置可能な共有ストレージの構築
  - VM Diskが配置可能な共有ストレージの構築
  - Network周りの構築
 
-proxmoxをホストしている物理マシンのターミナルで以下のように `deploy-vm.sh` を実行すると、k8sクラスタの構築に利用するVMテンプレートが作成されたのち、k8sクラスタのノードとなるVMが沸きます。 
+後述する手順で `deploy-vm.sh` を実行すると、k8sクラスタの構築に利用するVMテンプレートが作成されたのち、k8sクラスタのノードとなるVMが沸きます。
+
+その後、クラスタに各ノードを参加させるために、ローカル端末から
 
 ### 手順
 
- 1. `TARGET_BRANCH` は、デプロイ対象のコード(`deploy-vm.sh` 及び `scripts/` 内のスクリプト)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
+ 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトにより `deploy-vm.sh` を実行します。
+ 
+    `TARGET_BRANCH` は、デプロイ対象のコード(`deploy-vm.sh` 及び `scripts/` 内のスクリプト)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
 
     ```sh
     export TARGET_BRANCH=main
@@ -168,7 +172,7 @@ proxmoxをホストしている物理マシンのターミナルで以下のよ�
     ssh seichi-onp-k8s-wk-3 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
     ```
 
- 1. 軽い動作チェック
+ 1. ローカル端末上で軽い動作チェック
 
     ```sh
     ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
