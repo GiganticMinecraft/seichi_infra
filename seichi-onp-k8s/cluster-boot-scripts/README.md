@@ -178,7 +178,7 @@ proxmoxをホストしている物理マシンのターミナルで以下のよ�
 
 ## クラスタ操作
 
-### コントロールプレーンのノード上から直接操作する
+### コントロールプレーンのノードを経由してクラスタを操作する
 
 作成フローが完了した時点で、Proxmox上に `seichi-onp-k8s-cp-[1-3]` で識別される VM が作成されているはずです。以下、これらの VM の事を「CPノード」と呼びます。CPノードである VM は、k8s クラスタのコントロールプレーンノードとして機能しています。
 
@@ -278,9 +278,19 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
 ### インターネットを介してクラスタを操作する
 
-踏み台より先(内部NW)でクラスタを操作する場合、各環境のHAProxyに持たせたVIP(API Endpoint)に接続することができますが、構成の都合上外部からも接続可能なエンドポイントが存在します。
+オンプレ環境の内部ネットワーク内からクラスタを操作する場合、各環境のHAProxyに持たせた k8s API Endpoint の VIP に接続することができます。
 
-FQDNについては公開しない前提ですが、クラスタへのアクセス権限がある場合は`seichi-systems` Namespace内の`external-k8s-endpoint`というSecretリソースを参照することでFQDNを取得可能です。
+一方、API Endpointにインターネットから直接接続するための経路は、DoS攻撃等の懸念から設けていません。しかしながら、Terraform Cloud からリソースを注入する等の目的で、インターネットからクラスタAPIへの到達経路が必要となることがあります。
+
+そこで、次のようなセットアップを行っています。
+
+ - まず、クラスタのセットアップスクリプトにより、`k8s-api.onp-k8s.admin.local-tunnels.seichi.click` がクラスタAPIのSSL証明書のSAN(Subject Alternative Name)に追記されており、かつ、このドメイン(`k8s-api.onp-k8s.admin.local-tunnels.seichi.click`) は `127.0.0.1` を向くように[設定されて](../../terraform/cloudflare_dns_records.tf)います。
+
+ - 次に、k8s クラスタ内に、 k8s API Endpoint を `k8s-api.onp-k8s.admin.seichi.click` に張った TCP Argo Tunnel でアクセスできるようにするための `cloudflared` インスタンスを常駐させています。
+
+よって、`k8s-api.onp-k8s.admin.seichi.click` 上のトンネルへのアクセス権限がある任意の個人及びサービスは、 `127.0.0.1` の適当なポートに `k8s-api.onp-k8s.admin.seichi.click` へのトンネルを生やすことで、ローカル環境の `kubectl` 等が直接 API に問い合わせることができるようになります。
+
+`k8s-api.onp-k8s.admin.seichi.click` 上のトンネルのアクセス制御の詳細は [`cloudflare_network_admin_services`](../../terraform/cloudflare_network_admin_services.tf)を参照してください。
 
 ## クラスタの削除
 
