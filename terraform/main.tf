@@ -105,8 +105,17 @@ variable "onp_k8s_kubeconfig" {
 
 # トンネルをcloudflaredで張る external data
 data "external" "cloudflare_tunnel_to_onp_k8s_api" {
-  depends_on = [cloudflare_record.local_tunnels]
+  # これは正確には depends_on cloudflare_record.local_tunnels だが、これを指定すると
+  # 何故か onp_kubenetes_cluster_host の展開よりも前に実行されず、
+  # providerの初期化でエラーが出る(おそらく https://github.com/hashicorp/terraform/issues/2430 に関連)。
+  #
+  # depends_on = [cloudflare_record.local_tunnels]
+  # 
+  # 初回applyには失敗するが、二度applyすれば動く
+  # (一度目のapplyでDNSレコードが生成されるがkubernetesプロバイダが通信に失敗し、
+  #  二度目のapplyではkubernetesプロバイダからの通信がlocalhostに向く)はず。
 
+  # オンプレk8sクラスタへのトンネルをバックグラウンドで生やす。
   program = [
     "bash",
     "${path.module}/tunnel-to-onp-k8s.sh"
