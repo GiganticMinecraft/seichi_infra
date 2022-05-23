@@ -6,7 +6,7 @@ resource "null_resource" "proxy_to_onp_k8s_api" {
   }
 
   provisioner "local-exec" {
-    command = "${path.module}/sh/begin_tunnel_to_onp_k8s.sh \"${local.onp_kubernetes_tunnel_host}\" \"${local.onp_kubernetes_tunnel_entry_host}:${local.onp_kubernetes_tunnel_entry_port}\""
+    command = "${path.module}/sh/begin_tunnel_to_onp_k8s.sh \"${local.onp_kubernetes_tunnel_host}\" \"127.0.0.1:${local.onp_kubernetes_tunnel_entry_port}\""
     interpreter = ["bash", "-c"]
   }
 }
