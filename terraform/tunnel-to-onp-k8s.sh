@@ -51,7 +51,7 @@ chmod 700 "${tmp_workdir}/cloudflared"
 
 free_port=$(pick_free_port)
 
-echo_to_err "$(cloudflared --version)"
+echo_to_err "$(${tmp_workdir}/cloudflared --version)"
 echo_to_err "Using port: ${free_port}"
 
 reroute_tunnel_domain_to_localhost
