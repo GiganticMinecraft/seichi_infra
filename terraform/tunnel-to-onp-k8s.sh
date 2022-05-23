@@ -59,8 +59,6 @@ nohup "${tmp_workdir}/cloudflared" access tcp \
 
 echo_to_err "Started a tunnel to ${tunnel_host_name} at localhost:${free_port}"
 
-exit 1
-
 # External Program Protocol
 # https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
 result=$(cat <<EOF
