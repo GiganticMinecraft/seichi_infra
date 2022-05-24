@@ -72,83 +72,83 @@ CNI には Cilium を利用しています。
 
  1. ローカル端末から全ノードに接続できるようにします。
 
-   1. ターミナルで次のスクリプトを実行し、必要なパラメータをセットする。
+     1. ターミナルで次のスクリプトを実行し、必要なパラメータをセットする。
 
-      ```bash
-      IDENTITY_FILE_PATH=<接続に利用する秘密鍵へのパス>
-      BASTION_HOST_NAME=<踏み台サーバーのホスト名>
-      ```
+        ```bash
+        IDENTITY_FILE_PATH=<接続に利用する秘密鍵へのパス>
+        BASTION_HOST_NAME=<踏み台サーバーのホスト名>
+        ```
 
-   1. 次のスクリプトを実行し、踏み台サーバーを介した接続に必要な設定を生成する。
+     1. 次のスクリプトを実行し、踏み台サーバーを介した接続に必要な設定を生成する。
 
-      ```bash
-      ssh_additional_config=$(cat <<EOF
-      Host seichi-onp-k8s-cp-1
-        HostName 192.168.18.11
-        User cloudinit
-        IdentityFile ${IDENTITY_FILE_PATH}
-        ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        ```bash
+        ssh_additional_config=$(cat <<EOF
+        Host seichi-onp-k8s-cp-1
+          HostName 192.168.18.11
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
-      Host seichi-onp-k8s-cp-2
-        HostName 192.168.18.12
-        User cloudinit
-        IdentityFile ${IDENTITY_FILE_PATH}
-        ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        Host seichi-onp-k8s-cp-2
+          HostName 192.168.18.12
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
-      Host seichi-onp-k8s-cp-3
-        HostName 192.168.18.13
-        User cloudinit
-        IdentityFile ${IDENTITY_FILE_PATH}
-        ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        Host seichi-onp-k8s-cp-3
+          HostName 192.168.18.13
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
-      Host seichi-onp-k8s-wk-1
-        HostName 192.168.18.21
-        User cloudinit
-        IdentityFile ${IDENTITY_FILE_PATH}
-        ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        Host seichi-onp-k8s-wk-1
+          HostName 192.168.18.21
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
-      Host seichi-onp-k8s-wk-2
-        HostName 192.168.18.22
-        User cloudinit
-        IdentityFile ${IDENTITY_FILE_PATH}
-        ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        Host seichi-onp-k8s-wk-2
+          HostName 192.168.18.22
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
 
-      Host seichi-onp-k8s-wk-3
-        HostName 192.168.18.23
-        User cloudinit
-        IdentityFile ${IDENTITY_FILE_PATH}
-        ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
-      EOF
-      )
-      ```
+        Host seichi-onp-k8s-wk-3
+          HostName 192.168.18.23
+          User cloudinit
+          IdentityFile ${IDENTITY_FILE_PATH}
+          ProxyCommand ssh -W %h:%p ${BASTION_HOST_NAME}
+        EOF
+        )
+        ```
 
-   1. 次のスクリプトを実行して、`~/.ssh/config` に設定を追記してください。
+     1. 次のスクリプトを実行して、`~/.ssh/config` に設定を追記してください。
 
-      ```bash
-      echo "${ssh_additional_config}" >> ~/.ssh/config
-      ```
+        ```bash
+        echo "${ssh_additional_config}" >> ~/.ssh/config
+        ```
 
-      もし生成された設定を確認したい場合は、 `echo "${ssh_additional_config}"` のみを実行してください。
+        もし生成された設定を確認したい場合は、 `echo "${ssh_additional_config}"` のみを実行してください。
 
-   1. 以下のコマンドをローカル端末で実行してください。
+     1. 以下のコマンドをローカル端末で実行してください。
 
-      ```bash
-      # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わるため)
-      ssh-keygen -R 192.168.18.11
-      ssh-keygen -R 192.168.18.12
-      ssh-keygen -R 192.168.18.13
-      ssh-keygen -R 192.168.18.21
-      ssh-keygen -R 192.168.18.22
-      ssh-keygen -R 192.168.18.23
+        ```bash
+        # known_hosts登録削除(VM作り直す度にホスト公開鍵が変わるため)
+        ssh-keygen -R 192.168.18.11
+        ssh-keygen -R 192.168.18.12
+        ssh-keygen -R 192.168.18.13
+        ssh-keygen -R 192.168.18.21
+        ssh-keygen -R 192.168.18.22
+        ssh-keygen -R 192.168.18.23
 
-      # 接続チェック(ホスト公開鍵の登録も兼ねる)
-      ssh seichi-onp-k8s-cp-1 "hostname"
-      ssh seichi-onp-k8s-cp-2 "hostname"
-      ssh seichi-onp-k8s-cp-3 "hostname"
-      ssh seichi-onp-k8s-wk-1 "hostname"
-      ssh seichi-onp-k8s-wk-2 "hostname"
-      ssh seichi-onp-k8s-wk-3 "hostname"
-      ```
+        # 接続チェック(ホスト公開鍵の登録も兼ねる)
+        ssh seichi-onp-k8s-cp-1 "hostname"
+        ssh seichi-onp-k8s-cp-2 "hostname"
+        ssh seichi-onp-k8s-cp-3 "hostname"
+        ssh seichi-onp-k8s-wk-1 "hostname"
+        ssh seichi-onp-k8s-wk-2 "hostname"
+        ssh seichi-onp-k8s-wk-3 "hostname"
+        ```
 
  1. クラスタの基点となる cp-1 の初期化が終わっていることをチェックします。
 
