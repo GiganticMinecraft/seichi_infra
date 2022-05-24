@@ -22,6 +22,9 @@ unchama宅のルーター配下のLAN (subnet 192.168.0.0/20)。マイクラサ�
  - [`proxy-kubernetes`](./proxy-kubernetes/)
    - Linode Kubernetes Engine(LKE) 上の k8s クラスタの定義を管理するディレクトリ。詳細は [README](./proxy-kubernetes/README.md) を参照してください。
  
+ - [`proxy-kubernetes`](./seichi-onp-k8s/)
+   - オンプレ環境の k8s クラスタの定義を管理するディレクトリ。詳細は [README](./seichi-onp-k8s/README.md) を参照してください。
+
  - [`terraform`](./terraform/)
    - [Terraform Cloud](https://app.terraform.io/app/GiganticMinecraft/workspaces/seichi_infra) に管理させているインフラ全般の設定です。
    - 2022/03/18現在、 Terraform Cloud 管理下にある設定および定義は以下の通りです
