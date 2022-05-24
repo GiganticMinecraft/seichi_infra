@@ -29,10 +29,11 @@ EOF
 )"
 # endregion
 
-ssh seichi-onp-k8s-cp-1 "
+prerequisite_resources_apply_cmd="
 cat <<EOF | kubectl apply -f -
 ${prerequisite_resources}
 EOF
 "
 
+ssh seichi-onp-k8s-cp-1 "${prerequisite_resources_apply_cmd}"
 ssh seichi-onp-k8s-cp-1 "kubectl apply -f \"${cloudflared_k8s_endpoint_manifest}\""
