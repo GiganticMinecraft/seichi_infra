@@ -16,6 +16,15 @@ cloudflared_binary="https://github.com/cloudflare/cloudflared/releases/download/
 workdir=$(mktemp -d)
 
 function preempt_cert_pem_and () {
+  # "${HOME}/.cloudflared/cert.pem" に
+  # 既に cert.pem が存在している場合は
+  # これを一時的に別の場所に移したうえで、
+  # 第一引数に与えられたコマンドを追加の引数無しで実行する。
+  #
+  # cloudflared に cert.pem のダウンロード先を指定できず、
+  # しかもすでにファイルが存在していたらエラーとなるため、
+  # このような手法を取っている。
+
   local -r command="$1"
 
   if [ -f "${cert_pem_downloaded_location}" ]; then
