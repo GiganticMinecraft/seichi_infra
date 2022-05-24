@@ -32,7 +32,7 @@ function preempt_cert_pem_and () {
   if (( "${command_result}" == 0 )); then
     return 0
   else
-    echo "Command failed: ${command}" 1>2
+    echo "Command failed: ${command}" 1>&2
     exit 1
   fi
 }
@@ -46,11 +46,11 @@ function download_and_print_cert_pem () {
     exit 1
   fi
 
-  "${workdir}/cloudflared" login 1>2
+  "${workdir}/cloudflared" login 1>&2
   local -r command_result="$?"
 
   if (( "${command_result}" != 0 )); then
-    echo "cert.pem download failed!" 1>2
+    echo "cert.pem download failed!" 1>&2
     exit 1
   else
     cat "${cert_pem_downloaded_location}"
@@ -60,8 +60,8 @@ function download_and_print_cert_pem () {
 }
 
 # cloudflared をダウンロードする
-wget "${cloudflared_binary}" -O "${workdir}/cloudflared" 1>2
-chmod +x "${workdir}/cloudflared" 1>2
+wget "${cloudflared_binary}" -O "${workdir}/cloudflared" 1>&2
+chmod +x "${workdir}/cloudflared" 1>&2
 
 # cert.pem をダウンロードし、標準出力に内容を出力する。
 preempt_cert_pem_and download_and_print_cert_pem
