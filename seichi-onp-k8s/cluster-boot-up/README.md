@@ -305,7 +305,7 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 <details>
 <summary>詳細</summary>
 
-より具体的には、[`scripts/proxmox-host-terminal/deploy-vm.sh`](./scripts/proxmox-host-terminal/deploy-vm.sh)で作成される cloud-config (特に、user-config) で、GitHubに登録してある、CPノードへのアクセス権を与えたいユーザーの公開鍵を `/home/cloudinit/.ssh/authorized_keys` に書き込むように[設定](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L98-L100)しています。
+より具体的には、[`scripts/proxmox-host-terminal/deploy-vm.sh`](./scripts/proxmox-host-terminal/deploy-vm.sh)で作成される cloud-config (特に、user-config) で、GitHubに登録してある、CPノードへのアクセス権を与えたいユーザーの公開鍵を `/home/cloudinit/.ssh/authorized_keys` に書き込むように[設定](https://github.com/GiganticMinecraft/seichi_infra/blob/10347c55fc09f08464fbc3d976a763262036557b/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh#L98-L100)しています。
 
 </details>
 
