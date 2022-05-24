@@ -61,7 +61,7 @@ CNI には Cilium を利用しています。
 
 ### 手順
 
- 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトで `deploy-vm.sh` を実行します。
+  1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトで `deploy-vm.sh` を実行します。
  
     `TARGET_BRANCH` は、デプロイ対象のコード(`deploy-vm.sh` 及び `scripts/` 内のスクリプト)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
 
@@ -70,7 +70,7 @@ CNI には Cilium を利用しています。
     /bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh) ${TARGET_BRANCH}
     ```
 
- 1. ローカル端末から全ノードに接続できるようにします。
+  1. ローカル端末から全ノードに接続できるようにします。
 
     1. ターミナルで次のスクリプトを実行し、必要なパラメータをセットする。
 
