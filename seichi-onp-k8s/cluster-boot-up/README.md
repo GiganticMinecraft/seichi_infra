@@ -1,6 +1,6 @@
-# seichi-onp-k8s / cluster-boot-scripts
+# seichi-onp-k8s / cluster-boot-up
 
-オンプレミス上に整地鯖用のKubernetesクラスタをデプロイするためのスクリプト群です。
+オンプレミス上に整地鯖用のKubernetesクラスタをデプロイするためのスクリプト及び設定群です。
 構築の前提としているオンプレ環境については、[オンプレ環境の前提](#オンプレ環境の前提)を参照してください。
 
 ## オンプレ環境の前提
@@ -55,19 +55,19 @@ CNI には Cilium を利用しています。
  - VM Diskが配置可能な共有ストレージの構築
  - Network周りの構築
 
-後述する手順で `scripts/nodes/deploy-vm.sh` を実行すると、k8sクラスタの構築に利用するVMテンプレートが作成されたのち、k8sクラスタのノードとなるVMが沸きます。
+後述する手順で `scripts/proxmox-host-terminal/deploy-vm.sh` を実行すると、k8sクラスタの構築に利用するVMテンプレートが作成されたのち、k8sクラスタのノードとなるVMが沸きます。
 
 その後、`cp-1` を最初のマスターノードとして、作成した全ノードをクラスタ内に引き込みます。
 
 ### 手順
 
- 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトで `scripts/nodes/deploy-vm.sh` を実行します。
+ 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトで `scripts/proxmox-host-terminal/deploy-vm.sh` を実行します。
  
     `TARGET_BRANCH` は、デプロイ対象のスクリプト(`scripts/`)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
 
     ```sh
     export TARGET_BRANCH=main
-    /bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-scripts/scripts/nodes/deploy-vm.sh) ${TARGET_BRANCH}
+    /bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh) ${TARGET_BRANCH}
     ```
 
  1. ローカル端末から全ノードに接続できるようにします。
@@ -305,11 +305,11 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 <details>
 <summary>詳細</summary>
 
-より具体的には、[`scripts/nodes/deploy-vm.sh`](./scripts/nodes/deploy-vm.sh)で作成される cloud-config (特に、user-config) で、GitHubに登録してある、CPノードへのアクセス権を与えたいユーザーの公開鍵を `/home/cloudinit/.ssh/authorized_keys` に書き込むように[設定](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L98-L100)しています。
+より具体的には、[`scripts/proxmox-host-terminal/deploy-vm.sh`](./scripts/proxmox-host-terminal/deploy-vm.sh)で作成される cloud-config (特に、user-config) で、GitHubに登録してある、CPノードへのアクセス権を与えたいユーザーの公開鍵を `/home/cloudinit/.ssh/authorized_keys` に書き込むように[設定](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L98-L100)しています。
 
 </details>
 
-クラスタの再作成を伴わずにログイン可能な公開鍵を追加したい場合は、**全CPノード**の `/home/cloudinit/.ssh/authorized_keys` に追記してください。合わせて、次回のクラスタ作成時に反映されるよう、[`scripts/nodes/deploy-vm.sh`](./scripts/nodes/deploy-vm.sh)で作成される user-config の `runcmd:` 内への追記も行ってください。
+クラスタの再作成を伴わずにログイン可能な公開鍵を追加したい場合は、**全CPノード**の `/home/cloudinit/.ssh/authorized_keys` に追記してください。合わせて、次回のクラスタ作成時に反映されるよう、[`scripts/proxmox-host-terminal/deploy-vm.sh`](./scripts/proxmox-host-terminal/deploy-vm.sh)で作成される user-config の `runcmd:` 内への追記も行ってください。
 
 ### インターネットを介してクラスタを操作する
 
