@@ -323,6 +323,8 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
  - 次に、k8s クラスタ内に、 k8s API Endpoint を `k8s-api.onp-k8s.admin.seichi.click` に張った TCP Argo Tunnel でアクセスできるようにするための `cloudflared` インスタンスを常駐させています。
 
+![クラスタAPIを外部公開する仕組みの構成図](./docs/diagrams/cluster-api-exposure.drawio.svg)
+
 よって、`k8s-api.onp-k8s.admin.seichi.click` 上のトンネルへのアクセス権限がある任意の個人及びサービスは、 `127.0.0.1` の適当なポートに `k8s-api.onp-k8s.admin.seichi.click` へのトンネルを生やすことで、ローカル環境の `kubectl` 等が直接 API に問い合わせることができるようになります。
 
 `k8s-api.onp-k8s.admin.seichi.click` 上のトンネルのアクセス制御の詳細は [`cloudflare_network_admin_services`](../../terraform/cloudflare_network_admin_services.tf)を参照してください。
