@@ -315,18 +315,6 @@ helm install cilium cilium/cilium \
     --set k8sServiceHost=${KUBE_API_SERVER_VIP} \
     --set k8sServicePort=8443
 
-# Install ArgoCD Helm chart
-helm repo add argo https://argoproj.github.io/argo-helm
-helm install argocd argo/argo-cd \
-    --create-namespace \
-    --namespace argocd
-
-# Install kube-prometheus-stack Helm chart
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install prometheus prometheus-community/kube-prometheus-stack \
-    --create-namespace \
-    --namespace monitoring
-
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
 
