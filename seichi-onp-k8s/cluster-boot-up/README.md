@@ -61,25 +61,43 @@ CNI には Cilium を利用しています。
 
 ### 手順
 
- 1. **proxmoxをホストしている物理マシンのターミナル上で**、以下のスクリプトで `scripts/proxmox-host-terminal/deploy-vm.sh` を実行します。
+ 1. **proxmoxをホストしている物理マシンのターミナル上で**、VMを定義/作成するための以下の手順を実行します。
  
-    `TARGET_BRANCH` は、デプロイ対象のスクリプト(`scripts/`)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
-
-    ```sh
-    export TARGET_BRANCH=main
-    /bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh) ${TARGET_BRANCH}
-    ```
-
- 1. ローカル端末から全ノードに接続できるようにします。
-
-     1. ターミナルで次のスクリプトを実行し、必要なパラメータをセットする。
+     1. 必要なパラメータを設定します。
 
         ```bash
+        TARGET_BRANCH=main
+        ```
+
+        `TARGET_BRANCH` は、デプロイ対象のスクリプト(`scripts/`)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
+
+     1. `scripts/proxmox-host-terminal/deploy-vm.sh` を実行します。
+
+        ```sh
+        /bin/bash <(curl -s https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh) ${TARGET_BRANCH}
+        ```
+
+ 1. **ローカルマシンのターミナルから**で、作業を続行するための準備をします。以下、すべての作業はローカルマシンのターミナルより行われます。
+
+    ```bash
+    TARGET_BRANCH=main
+    ```
+
+    `TARGET_BRANCH` は、デプロイ対象のスクリプト(`scripts/`)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
+
+ 1. 生成した全ノードにローカルマシンから接続できるようにします。
+
+     1. 次のスクリプトを実行し、必要なパラメータをセットします。
+
+        `TARGET_BRANCH` は、デプロイ対象のスクリプト(`scripts/`)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
+
+        ```bash
+        TARGET_BRANCH=main
         IDENTITY_FILE_PATH=<接続に利用する秘密鍵へのパス>
         BASTION_HOST_NAME=<踏み台サーバーのホスト名>
         ```
 
-     1. 次のスクリプトを実行し、踏み台サーバーを介した接続に必要な設定を生成する。
+     1. 次のスクリプトを実行し、踏み台サーバーを介した接続に必要な設定を生成します。
 
         ```bash
         ssh_additional_config=$(cat <<EOF
@@ -166,6 +184,14 @@ CNI には Cilium を利用しています。
     ssh seichi-onp-k8s-wk-1 "sudo cat /var/log/cloud-init-output.log"
     ssh seichi-onp-k8s-wk-2 "sudo cat /var/log/cloud-init-output.log"
     ssh seichi-onp-k8s-wk-3 "sudo cat /var/log/cloud-init-output.log"
+    ```
+
+ 1. k8s API endpoint へのインターネットからの経路を確立するために、 `cloudflared` の Deployment リソースと、その実行に必要な Cloudflare の API Token を Secret として注入します。
+
+    以下のスクリプトを実行します。スクリプトの内容は、 [実行される当該スクリプト](./scripts/local-terminal/deploy-k8s-api-cloudflared-resources-to-cp-1.sh) を参照してください。
+
+    ```bash
+    /bin/bash <(curl -s "https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-up/scripts/local-terminal/deploy-k8s-api-cloudflared-resources-to-cp-1.sh") "${TARGET_BRANCH}"
     ```
 
  1. 作成した全ノードをクラスタ内に引き込みます。
