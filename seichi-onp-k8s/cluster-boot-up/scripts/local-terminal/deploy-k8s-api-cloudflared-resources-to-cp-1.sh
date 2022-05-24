@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # region manifest URLを生成する
+
 target_branch="$1"
 k8s_definition_base_url="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${target_branch}/seichi-onp-k8s"
-cloudflared_k8s_endpoint_manifest="${k8s_definition_base_url}/manifests/seichi-kubernetes/apps/cluster-wide-app-resources/cloudflared-k8s-endpoint.yaml"
+cloudflared_k8s_endpoint_manifest_url="${k8s_definition_base_url}/manifests/seichi-kubernetes/apps/cluster-wide-app-resources/cloudflared-k8s-endpoint.yaml"
+
 # endregion
 
 # region secret リソースの中身を生成する
@@ -29,12 +31,12 @@ EOF
 )"
 # endregion
 
-prerequisite_resources_apply_cmd="
+# shellcheck disable=SC2029 # ssh command expanded on client side is the expected behaviour
+ssh seichi-onp-k8s-cp-1 "
 cat <<EOF | kubectl apply -f -
 ${prerequisite_resources}
 EOF
 "
-manifest_apply_cmd="kubectl apply -f \"${cloudflared_k8s_endpoint_manifest}\""
 
-ssh seichi-onp-k8s-cp-1 "${prerequisite_resources_apply_cmd}"
-ssh seichi-onp-k8s-cp-1 "${manifest_apply_cmd}"
+# shellcheck disable=SC2029 # ssh command expanded on client side is the expected behaviour
+ssh seichi-onp-k8s-cp-1 "kubectl apply -f \"${cloudflared_k8s_endpoint_manifest_url}\""
