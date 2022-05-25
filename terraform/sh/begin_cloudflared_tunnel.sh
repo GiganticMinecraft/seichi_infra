@@ -3,6 +3,10 @@ set -e
 
 # Script to spawn a child process to keep cloudflare tunnel alive.
 
+# FIXME: 厳密には、このスクリプトは
+#        *.local-tunnels.seichi.click から 127.0.0.1 への A レコードが可視になるまで
+#        ずっと待ち続けるべき。
+
 #region query
 
 # Domain at which the tunnel connection can be established
