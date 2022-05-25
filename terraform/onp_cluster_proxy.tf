@@ -29,7 +29,7 @@ data "external" "proxy_to_onp_k8s_api" {
 }
 
 resource "null_resource" "proxy_to_onp_k8s_api" {
-  depends_on = [ resources.cloudflare_record.local_tunnels, data.external.proxy_to_onp_k8s_api ]
+  depends_on = [ cloudflare_record.local_tunnels, data.external.proxy_to_onp_k8s_api ]
 
   // Apply時に常にprovisionerを実行するため。
   // ref. https://github.com/hashicorp/terraform/issues/8266#issuecomment-454377049
