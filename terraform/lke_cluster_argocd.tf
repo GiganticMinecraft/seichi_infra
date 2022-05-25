@@ -8,7 +8,7 @@ resource "helm_release" "lke_cluster_argocd" {
   chart      = "argo-cd"
   name       = "argocd"
   namespace  = "argocd"
-  version    = "4.6.5"
+  version    = "4.7.0"
 
   reset_values    = true
   recreate_pods   = true
