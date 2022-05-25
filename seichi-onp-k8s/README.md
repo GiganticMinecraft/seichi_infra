@@ -2,7 +2,7 @@
 
 オンプレミスでデプロイされている整地鯖用のKubernetesクラスタを一元的に管理するディレクトリです。
 
-クラスタ自体の構成情報、作成や削除に関する情報は [`cluster-boot-scripts`](./cluster-boot-scripts) を参照してください。
+クラスタ自体の構成情報、作成や削除に関する情報は [`cluster-boot-up`](./cluster-boot-up) を参照してください。
 
 クラスタ内に置かれるリソースの設定は、 [`manifests/seichi-kubernetes`](./manifests/seichi-kubernetes) を参照してください。
 
