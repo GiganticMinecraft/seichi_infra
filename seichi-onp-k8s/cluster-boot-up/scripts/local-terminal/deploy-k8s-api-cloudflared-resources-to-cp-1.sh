@@ -15,9 +15,7 @@ prerequisite_resources="$(cat <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: test
-  labels:
-    name: cluster-wide-apps
+  name: cluster-wide-apps
 ---
 apiVersion: v1
 kind: Secret
