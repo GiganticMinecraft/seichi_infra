@@ -422,21 +422,21 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
        ```sh
        for host in 192.168.16.150 192.168.16.151 192.168.16.153 ; do
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--cloudinit
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--cloudinit
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--cloudinit
 
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1101--cloudinit
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1102--cloudinit
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1103--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1101--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1102--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1103--cloudinit
 
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--disk--0
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--disk--0
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--disk--0
 
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1101--disk--0
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1102--disk--0
-       ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1103--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1101--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1102--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1103--disk--0
        done
        ```
 
