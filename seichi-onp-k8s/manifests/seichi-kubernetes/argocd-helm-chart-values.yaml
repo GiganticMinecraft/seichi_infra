@@ -126,20 +126,20 @@ redis:
   resources:
     limits:
       cpu: 200m
-      memory: 64Mi
+      memory: 256Mi
     requests:
       cpu: 100m
-      memory: 16Mi
+      memory: 128Mi
 
 repoServer:
   replicaCount: 1
   resources:
     limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 256Mi
     requests:
       cpu: 50m
-      memory: 48Mi
+      memory: 128Mi
 
 applicationSet:
   replicaCount: 1
