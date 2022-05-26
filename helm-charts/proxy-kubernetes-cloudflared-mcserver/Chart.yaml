@@ -1,5 +1,0 @@
-apiVersion: v2
-name: proxy-kubernetes-cloudflared-mcserver
-version: "1.0.4"
-maintainers:
-  - name: GiganticMinecraft
