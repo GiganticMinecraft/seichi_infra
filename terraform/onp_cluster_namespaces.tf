@@ -27,3 +27,13 @@ resource "kubernetes_namespace" "onp_argocd" {
     name = "argocd"
   }
 }
+
+resource "kubernetes_namespace" "onp_monitoring" {
+  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
+
+  provider = kubernetes.onp_cluster
+
+  metadata {
+    name = "monitoring"
+  }
+}

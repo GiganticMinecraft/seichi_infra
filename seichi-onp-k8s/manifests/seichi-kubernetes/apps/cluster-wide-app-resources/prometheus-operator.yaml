@@ -61,6 +61,7 @@ spec:
                 token_url: https://github.com/login/oauth/access_token
                 api_url: https://api.github.com/user
                 allowed_organizations: GiganticMinecraft
+          envFromSecret: "grafana-github-oauth-app-secret"
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
