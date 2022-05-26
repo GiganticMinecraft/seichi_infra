@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: origin-cloudflared-admin-services
+data:
+  tunnel-config.yml: |
+    ingress:
+      - hostname: argocd.onp-k8s.admin.seichi.click
+        service: https://argocd-server.argocd:443
+        originRequest:
+          noTLSVerify: true
+
+      - service: http_status:404
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: origin-cloudflared-admin-services
+  namespace: cluster-wide-apps
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: origin-cloudflared-admin-services
+    appgroup: origin-cloudflared-admin-services
+    env: cluster-wide
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: origin-cloudflared-admin-services
+      appgroup: origin-cloudflared-admin-services
+      env: cluster-wide
+  template:
+    metadata:
+      labels:
+        app: origin-cloudflared-admin-services
+        appgroup: origin-cloudflared-admin-services
+        env: cluster-wide
+    spec:
+      containers:
+        - name: origin-cloudflared-admin-services
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-6455b98"
+          env:
+            - name: TUNNEL_NAME
+              value: "onp-kubernetes-admin-services-tunnel"
+            # cloudflared tunnel が実行された時、 cloudflared は Tunnel credential を
+            # $TUNNEL_CRED_FILE に書き込む。
+            # また、tunnel origin certificate は k8s の Secret によって提供されるため、
+            # どこかにread-onlyでマウントする必要がある。
+            # そのため、 TUNNEL_ORIGIN_FILE を TUNNEL_ORIGIN_CERT のマウントパス外に
+            # 設定する必要がある
+            - name: TUNNEL_ORIGIN_CERT
+              value: "/root/.cloudflared-origin-cert/cert.pem"
+            - name: TUNNEL_CRED_FILE
+              value: "/root/.cloudflared/tunnel-cred.json"
+          volumeMounts:
+            - mountPath: "/root/.cloudflared-origin-cert"
+              name: cloudflared-authorization-certificate
+            - mountPath: "/etc/cloudflared"
+              name: cloudflared-config
+          resources:
+            requests:
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: cloudflared-authorization-certificate
+          secret:
+            # このシークレットはクラスタセットアップ作業手順により注入されているべき。
+            secretName: cloudflared-tunnel-credential
+            items:
+              - key: TUNNEL_CREDENTIAL
+                path: cert.pem
+        - name: cloudflared-config
+          configMap:
+            name: origin-cloudflared-admin-services
