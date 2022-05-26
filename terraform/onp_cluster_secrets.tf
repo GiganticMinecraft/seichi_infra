@@ -35,8 +35,7 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   }
 
   data = {
-    # TODO: use new variable
-    ARGOCD_GITHUB_OAUTH_APP_SECRET = var.lke_k8s_argocd_github_oauth_app_secret
+    ARGOCD_GITHUB_OAUTH_APP_SECRET = var.onp_k8s_argocd_github_oauth_app_secret
   }
 
   type = "Opaque"

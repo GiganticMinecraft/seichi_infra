@@ -74,7 +74,7 @@ server:
           id: github
           name: GitHub
           config:
-            clientID: 6d77699f96a51159ce39
+            clientID: e7e08e1b813a638bdd99
             clientSecret: $argocd-github-oauth-app-secret:ARGOCD_GITHUB_OAUTH_APP_SECRET
             orgs:
             - name: GiganticMinecraft
