@@ -22,7 +22,17 @@
 ### VM 環境
 
 VM環境は `Proxmox Virtual Environment 7.1-11` を利用しています。
- - 3ノードクラスタ構成
+
+ - ベアメタル3ノード
+
+ - クラスタ構成済みであること
+
+   - クラスタ構成にすると、proxmoxホスト間でrootユーザーによるSSH接続が可能となります。
+
+     これはクラスタの各種機能を維持するために使用されています。また、手順やスクリプトの一部はこのSSH接続を前提としています。
+     
+     参考: [Role of SSH in Proxmox VE Clusters - proxmox wiki](https://pve.proxmox.com/wiki/Cluster_Manager#_role_of_ssh_in_proxmox_ve_clusters)
+
  - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可
 
 KubernetesノードのVMは cloudinit イメージで作成されています。
