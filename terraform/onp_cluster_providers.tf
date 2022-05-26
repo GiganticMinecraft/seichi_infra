@@ -74,7 +74,7 @@ locals {
 
   # HACK: この変数は null_resource.proxy_to_onp_k8s_api に依存するが、
   #       onp_kubernetes_cluster_hostと完全に同一。
-  onp_kubernetes_cluster_host_depends_on_proxy = "${substr(null_resource.proxy_to_onp_k8s_api, 0, 0)}${local.onp_kubernetes_cluster_host}"
+  onp_kubernetes_cluster_host_depends_on_proxy = "${substr(null_resource.proxy_to_onp_k8s_api.id, 0, 0)}${local.onp_kubernetes_cluster_host}"
 }
 
 provider "kubernetes" {
