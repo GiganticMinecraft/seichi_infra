@@ -22,7 +22,17 @@
 ### VM 環境
 
 VM環境は `Proxmox Virtual Environment 7.1-11` を利用しています。
- - 3ノードクラスタ構成
+
+ - ベアメタル3ノード
+
+ - クラスタ構成済みであること
+
+   - クラスタ構成にすると、proxmoxホスト間でrootユーザーによるSSH接続が可能となります。
+
+     これはクラスタの各種機能を維持するために使用されています。また、手順やスクリプトの一部はこのSSH接続を前提としています。
+     
+     参考: [Role of SSH in Proxmox VE Clusters - proxmox wiki](https://pve.proxmox.com/wiki/Cluster_Manager#_role_of_ssh_in_proxmox_ve_clusters)
+
  - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可
 
 KubernetesノードのVMは cloudinit イメージで作成されています。
@@ -371,33 +381,77 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
 ## クラスタの削除
 
+### 概要
+
 クラスタを再作成する場合は、事前に以下の手順でクラスタの削除を行って下さい。
 
-- proxmoxのホストコンソール上で以下コマンド実行。ノードローカルにいるVMしか操作できないため、全てのノードで打って回る。
+### 手順
 
-```sh
-# stop vm
-## on unchama-sv-prox01
-ssh 192.168.16.150 qm stop 1001
-ssh 192.168.16.150 qm stop 1101
-## on unchama-sv-prox02
-ssh 192.168.16.151 qm stop 1002
-ssh 192.168.16.151 qm stop 1102
-## on unchama-sv-prox04
-ssh 192.168.16.153 qm stop 1003
-ssh 192.168.16.153 qm stop 1103
+ 1. **proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、クラスタを構成するVMを停止します。
 
-# delete vm
-## on unchama-sv-prox01
-ssh 192.168.16.150 qm destroy 9050 --destroy-unreferenced-disks true --purge true
-ssh 192.168.16.150 qm destroy 1001 --destroy-unreferenced-disks true --purge true
-ssh 192.168.16.150 qm destroy 1101 --destroy-unreferenced-disks true --purge true
-## on unchama-sv-prox02
-ssh 192.168.16.151 qm destroy 1102 --destroy-unreferenced-disks true --purge true
-ssh 192.168.16.151 qm destroy 1002 --destroy-unreferenced-disks true --purge true
-## on unchama-sv-prox04
-ssh 192.168.16.153 qm destroy 1003 --destroy-unreferenced-disks true --purge true
-ssh 192.168.16.153 qm destroy 1103 --destroy-unreferenced-disks true --purge true
-```
+    ```sh
+    # unchama-sv-prox01上に存在するクラスタを構成するVMを停止する
+    ssh 192.168.16.150 qm stop 1001
+    ssh 192.168.16.150 qm stop 1101
+    # unchama-sv-prox02上に存在するクラスタを構成するVMを停止する
+    ssh 192.168.16.151 qm stop 1002
+    ssh 192.168.16.151 qm stop 1102
+    # unchama-sv-prox04上に存在するクラスタを構成するVMを停止する
+    ssh 192.168.16.153 qm stop 1003
+    ssh 192.168.16.153 qm stop 1103
+    ```
 
-- cleanup後、同じVMIDでVMを再作成できなくなることがあるが、proxmoxホストの再起動で解決する。(複数ノードで平行してqm destroyコマンド実行すると 不整合が起こる模様)
+ 1. **proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、クラスタを構成するVMを削除します。
+
+    ```sh
+    # unchama-sv-prox01上に存在するクラスタを構成するVMを削除する
+    ssh 192.168.16.150 qm destroy 9050 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.150 qm destroy 1001 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.150 qm destroy 1101 --destroy-unreferenced-disks true --purge true
+    # unchama-sv-prox02上に存在するクラスタを構成するVMを削除する
+    ssh 192.168.16.151 qm destroy 1102 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.151 qm destroy 1002 --destroy-unreferenced-disks true --purge true
+    # unchama-sv-prox04上に存在するクラスタを構成するVMを削除する
+    ssh 192.168.16.153 qm destroy 1003 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.153 qm destroy 1103 --destroy-unreferenced-disks true --purge true
+    ```
+
+### クラスタの削除後、クラスタの再作成に失敗する場合
+
+クラスタの削除後、同じVMIDでVMを再作成できず、クラスタの作成に失敗することがあります。
+
+これは、クラスタの削除時に複数ノードでコマンド`qm destroy`が実行された際に、Device Mapperで生成された仮想ディスクデバイスの一部が消えずに残留することがあるためです。
+
+上記事象に遭遇した場合は、以下**いずれか**の方法で解決を試みてください。
+
+ - 残った仮想ディスクデバイスを手動で削除する
+
+    1. クラスタを構成するVMが一部でも存在する場合は、事前にクラスタの削除を実施してください。
+
+    1. その後、**proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、残ったデバイスを削除します。
+
+       ```sh
+       for host in 192.168.16.150 192.168.16.151 192.168.16.153 ; do
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--cloudinit
+
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1101--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1102--cloudinit
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1103--cloudinit
+
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--disk--0
+
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1101--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1102--disk--0
+         ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1103--disk--0
+       done
+       ```
+
+   参考: [cannot migrate - device-mapper:create ioctl on cluster failed - proxmox forum](https://forum.proxmox.com/threads/cannot-migrate-device-mapper-create-ioctl-on-cluster-failed.12221/)
+
+ - 全proxmoxホストを再起動する
+
+   proxmoxホスト上の全てのVMの停止を伴うため、サービス提供中の本番環境では推奨されません。
