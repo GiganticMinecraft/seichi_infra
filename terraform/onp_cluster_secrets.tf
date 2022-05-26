@@ -1,21 +1,3 @@
-resource "kubernetes_secret" "onp_cloudflared_tunnel_credential" {
-  provider = kubernetes.onp_cluster
-
-  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
-
-  metadata {
-    name      = "cloudflared-tunnel-credential"
-    namespace = "cluster-wide-apps"
-  }
-
-  data = {
-    # TODO: use new variable
-    TUNNEL_CREDENTIAL = var.lke_k8s_cloudflare_argo_tunnel_credential
-  }
-
-  type = "Opaque"
-}
-
 resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
   provider = kubernetes.onp_cluster
 
