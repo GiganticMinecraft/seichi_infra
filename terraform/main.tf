@@ -162,4 +162,10 @@ variable "onp_k8s_argocd_github_oauth_app_secret" {
   sensitive     = true
 }
 
+variable "onp_k8s_grafana_github_oauth_app_secret" {
+  description   = "The OAuth app secret for Grafana-GitHub integration on On-Premise Kubernetes cluster"
+  type          = string
+  sensitive     = true
+}
+
 #endregion
