@@ -42,9 +42,3 @@ data:
         - 'seichi.click network for debug 3TBUkfU6'
       dynamic:
         - 'seichi.click network for debug 3TBUkfU6'
-
-  TCPShield-config.yml: |
-    only-allow-proxy-connections: true
-    timestamp-validation: 'htpdate'
-    debug-mode: false
-    enable-geyser-support: false
