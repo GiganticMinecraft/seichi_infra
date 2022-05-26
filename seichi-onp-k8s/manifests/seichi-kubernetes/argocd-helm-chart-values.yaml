@@ -11,12 +11,12 @@ server:
     # -- Average memory utilization percentage (to the requested resource) for the Argo CD server [HPA]
     targetMemoryUtilizationPercentage: 175
   resources:
-   requests:
-     cpu: 100m
-     memory: 48Mi
-   limits:
-     cpu: 200m
-     memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 48Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -26,13 +26,13 @@ server:
       namespace: argocd
       description: The top-level project
       sourceRepos:
-        - '*'
+        - "*"
       destinations:
-        - namespace: '*'
+        - namespace: "*"
           server: https://kubernetes.default.svc
       clusterResourceWhitelist:
-        - group: '*'
-          kind: '*'
+        - group: "*"
+          kind: "*"
 
   additionalApplications:
     - name: argocd-root-app-of-apps
@@ -98,12 +98,12 @@ server:
 controller:
   enableStatefulSet: true
   resources:
-   limits:
-     cpu: 500m
-     memory: 512Mi
-   requests:
-     cpu: 250m
-     memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 128Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -111,12 +111,12 @@ controller:
 
 dex:
   resources:
-   limits:
-     cpu: 100m
-     memory: 128Mi
-   requests:
-     cpu: 50m
-     memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -124,22 +124,22 @@ dex:
 
 redis:
   resources:
-   limits:
-     cpu: 200m
-     memory: 64Mi
-   requests:
-     cpu: 100m
-     memory: 16Mi
+    limits:
+      cpu: 200m
+      memory: 64Mi
+    requests:
+      cpu: 100m
+      memory: 16Mi
 
 repoServer:
   replicaCount: 1
   resources:
-   limits:
-     cpu: 200m
-     memory: 128Mi
-   requests:
-     cpu: 50m
-     memory: 48Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 48Mi
 
 applicationSet:
   replicaCount: 1
