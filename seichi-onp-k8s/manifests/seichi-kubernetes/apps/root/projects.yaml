@@ -13,10 +13,12 @@ spec:
     # ./cluster-wide-app-resources でインストールされる
     #  - cert-manager
     #  - metrics-server
-    #  - sealed-secrets
+    #  - metallb
     #
-    # の二つはkube-systemにもリソースインストールを行うため、許可する必要がある
+    # の3つのリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: 'kube-system'
+      server: https://kubernetes.default.svc
+    - namespace: 'metallb-system'
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
