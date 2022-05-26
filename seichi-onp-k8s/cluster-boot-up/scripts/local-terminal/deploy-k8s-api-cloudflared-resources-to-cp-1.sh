@@ -25,6 +25,34 @@ metadata:
 type: Opaque
 data:
   TUNNEL_CREDENTIAL: "$(echo "${cloudflare_cert_pem}" | base64 -w 0 -)"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: seichi-minecraft
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflared-tunnel-credential
+  namespace: seichi-minecraft
+type: Opaque
+data:
+  TUNNEL_CREDENTIAL: "$(echo "${cloudflare_cert_pem}" | base64 -w 0 -)"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: seichi-debug-minecraft
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflared-tunnel-credential
+  namespace: seichi-debug-minecraft
+type: Opaque
+data:
+  TUNNEL_CREDENTIAL: "$(echo "${cloudflare_cert_pem}" | base64 -w 0 -)"
 EOF
 )"
 # endregion

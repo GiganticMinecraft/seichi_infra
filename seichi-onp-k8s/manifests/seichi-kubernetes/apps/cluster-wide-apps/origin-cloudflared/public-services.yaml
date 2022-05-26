@@ -1,32 +1,53 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: origin-cloudflared-admin-services
-  namespace: cluster-wide-apps
+  name: origin-cloudflared-public-services
+  namespace: seichi-minecraft
 data:
   tunnel-config.yml: |
     ingress:
-      - hostname: argocd.onp-k8s.admin.seichi.click
-        service: https://argocd-server.argocd:443
-        originRequest:
-          noTLSVerify: true
-      - hostname: grafana.onp-k8s.admin.seichi.click
-        service: https://prometheus-grafana.monitoring:80
-        originRequest:
-          noTLSVerify: true
+      # dynmap-webserver
+      # cloudflare-service-tokenによるアクセス制御はしない
+      - hostname: s1-map-gigantic.seichi.click
+        service: "http://192.168.2.1:80"
+      - hostname: s2-map-gigantic.seichi.click
+        service: "http://192.168.2.2:80"
+      - hostname: s3-map-gigantic.seichi.click
+        service: "http://192.168.2.3:80"
+      - hostname: s5-map-gigantic.seichi.click
+        service: "http://192.168.2.5:80"
+      - hostname: s7-map-gigantic.seichi.click
+        service: "http://192.168.2.7:80"
+      - hostname: cre-map-gigantic.seichi.click
+        service: "http://192.168.1.187:80"
+      - hostname: h1-map-spring.seichi.click
+        service: "http://192.168.1.187:82"
 
+      # redmine-webserver
+      # cloudflare-service-tokenによるアクセス制御はしない
+      - hostname: redmine.seichi.click
+        service: "https://192.168.1.187:3443"
+        originRequest:
+          noTLSVerify: true
+      
+      # seichiranking-webserver
+      # cloudflare-service-tokenによるアクセス制御はしない
+      - hostname: ranking-gigantic.seichi.click
+        service: "http://192.168.3.1:80"
+      
       - service: http_status:404
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: origin-cloudflared-admin-services
-  namespace: cluster-wide-apps
+  name: origin-cloudflared-public-services
+  namespace: seichi-minecraft
   annotations:
     reloader.stakater.com/auto: "true"
   labels:
-    app: origin-cloudflared-admin-services
-    appgroup: origin-cloudflared-admin-services
+    app: origin-cloudflared-public-services
+    appgroup: origin-cloudflared-public-services
     env: cluster-wide
 spec:
   strategy:
@@ -34,18 +55,18 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: origin-cloudflared-admin-services
-      appgroup: origin-cloudflared-admin-services
+      app: origin-cloudflared-public-services
+      appgroup: origin-cloudflared-public-services
       env: cluster-wide
   template:
     metadata:
       labels:
-        app: origin-cloudflared-admin-services
-        appgroup: origin-cloudflared-admin-services
+        app: origin-cloudflared-public-services
+        appgroup: origin-cloudflared-public-services
         env: cluster-wide
     spec:
       containers:
-        - name: origin-cloudflared-admin-services
+        - name: origin-cloudflared-public-services
           image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-6455b98"
           env:
             - name: TUNNEL_NAME
@@ -80,4 +101,4 @@ spec:
                 path: cert.pem
         - name: cloudflared-config
           configMap:
-            name: origin-cloudflared-admin-services
+            name: origin-cloudflared-public-services
