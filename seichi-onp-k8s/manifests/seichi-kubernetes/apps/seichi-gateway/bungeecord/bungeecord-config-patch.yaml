@@ -14,7 +14,7 @@ data:
         restricted: false
         motd: ''
       s2:
-        address:192.168.2.2:25565
+        address: 192.168.2.2:25565
         restricted: false
         motd: ''
       s3:
