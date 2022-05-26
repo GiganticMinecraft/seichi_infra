@@ -1,24 +1,3 @@
-resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
-  provider = kubernetes.onp_cluster
-
-  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
-
-  # name と data の指定は LOGDNA_INGESTION_KEY の参照指定による
-  # https://github.com/logdna/logdna-agent-v2/blob/442810f18f4ea44c71bedff01c12795223b0e41e/k8s/agent-resources.yaml#L114-L118
-
-  metadata {
-    namespace = "cluster-wide-apps"
-    name      = "logdna-agent-key"
-  }
-
-  data = {
-    # TODO: use new variable
-    "logdna-agent-key" = var.lke_k8s_logdna_agent_ingestion_key
-  }
-
-  type = "Opaque"
-}
-
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   provider = kubernetes.onp_cluster
 
