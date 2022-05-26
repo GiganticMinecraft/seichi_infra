@@ -290,6 +290,16 @@ apiServer:
   #   https://k8s-api.onp-k8s.admin.local-tunnels.seichi.click:PORT
   # where PORT is the port at which the local tunnel is running.
   - k8s-api.onp-k8s.admin.local-tunnels.seichi.click
+
+# expose these components so that we can get metrics
+# https://prometheus-operator.dev/docs/kube-prometheus-on-kubeadm/#kubeadm-pre-requisites
+controllerManager:
+  extraArgs:
+    bind-address: "0.0.0.0"
+scheduler:
+  extraArgs:
+    bind-address: "0.0.0.0"
+
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
