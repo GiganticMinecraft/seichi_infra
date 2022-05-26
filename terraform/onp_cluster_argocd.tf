@@ -1,7 +1,7 @@
 resource "helm_release" "onp_cluster_argocd" {
   provider = helm.onp_cluster
 
-  depends_on = [ kubernetes_namespace.onp_argocd ]
+  depends_on = [ null_resource.proxy_to_onp_k8s_api, kubernetes_namespace.onp_argocd ]
 
   # https://github.com/argoproj/argo-helm/releases/tag/argo-cd-4.2.2
   repository = "https://argoproj.github.io/argo-helm"
