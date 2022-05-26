@@ -154,6 +154,16 @@ provider "helm" {
 
 #endregion
 
+#region on-premise ArgoCD to GitHub integration
+
+variable "onp_k8s_argocd_github_oauth_app_secret" {
+  description   = "The OAuth app secret for ArgoCD-GitHub integration on On-Premise Kubernetes cluster"
+  type          = string
+  sensitive     = true
+}
+
+#endregion
+
 #region proxy-layer's k8s access configuration
 
 variable "lke_k8s_kubeconfig" {
