@@ -47,7 +47,6 @@ locals {
 #
 #   null_resource.proxy_to_onp_k8s_api は external.proxy_to_onp_k8s_api に依存しているため、
 #   provider が null_resource.proxy_to_onp_k8s_api に依存するというのを Terraform に伝えればよい。
-#   この実現方法は onp_kubernetes_cluster_host_depends_on_proxy を参照されたい。
 
 data "external" "proxy_to_onp_k8s_api" {
   depends_on = [ cloudflare_record.local_tunnels ]
@@ -71,26 +70,26 @@ resource "null_resource" "proxy_to_onp_k8s_api" {
 
 locals {
   onp_kubernetes_cluster_host = "https://${local.onp_kubernetes_tunnel_entry_host}:${local.onp_kubernetes_tunnel_entry_port}"
-
-  # HACK: この変数は null_resource.proxy_to_onp_k8s_api に依存するが、
-  #       onp_kubernetes_cluster_hostと完全に同一。
-  onp_kubernetes_cluster_host_depends_on_proxy = "${substr(null_resource.proxy_to_onp_k8s_api.id, 0, 0)}${local.onp_kubernetes_cluster_host}"
 }
 
 provider "kubernetes" {
+  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
+
   alias = "onp_cluster"
 
-  host                   = local.onp_kubernetes_cluster_host_depends_on_proxy
+  host                   = local.onp_kubernetes_cluster_host
   cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
   client_certificate     = local.onp_kubernetes_client_certificate
   client_key             = local.onp_kubernetes_client_key
 }
 
 provider "helm" {
+  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
+
   alias = "onp_cluster"
 
   kubernetes {
-    host                   = local.onp_kubernetes_cluster_host_depends_on_proxy
+    host                   = local.onp_kubernetes_cluster_host
     cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
     client_certificate     = local.onp_kubernetes_client_certificate
     client_key             = local.onp_kubernetes_client_key
