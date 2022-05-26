@@ -97,14 +97,6 @@ provider "github" {
 
 #region on-premise k8s access configuration
 
-# トンネルが貼れるポートを取得する
-data "external" "port_for_cloudflare_tunnel_to_onp_k8s_api" {
-  program = [
-    "bash",
-    "${path.module}/sh/pick_free_port.sh"
-  ]
-}
-
 variable "onp_k8s_kubeconfig" {
   description   = "On-premise cluster's kubeconfig.yaml content"
   type          = string
@@ -118,39 +110,13 @@ variable "onp_k8s_kubeconfig" {
 # base64で保持している。
 
 locals {
-  # APIエンドポイントが最終的に露出されるべきドメイン。
-  # このドメインは cloudflare_dns_records.tf の設定により、127.0.0.1 (localhost) に向いている。
-  onp_kubernetes_tunnel_entry_host = "k8s-api.onp-k8s.admin.local-tunnels.seichi.click"
-  onp_kubernetes_tunnel_entry_port = data.external.port_for_cloudflare_tunnel_to_onp_k8s_api.result.port
-
-  # トンネルの接続先のドメイン
-  onp_kubernetes_tunnel_host       = "k8s-api.onp-k8s.admin.seichi.click"
-
-  onp_kubernetes_cluster_host           = "https://${local.onp_kubernetes_tunnel_entry_host}:${local.onp_kubernetes_tunnel_entry_port}"
   onp_kubernetes_cluster_ca_certificate = base64decode(yamldecode(var.onp_k8s_kubeconfig).clusters[0].cluster.certificate-authority-data)
   onp_kubernetes_client_certificate     = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-certificate-data)
   onp_kubernetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
 }
 
-provider "kubernetes" {
-  alias = "onp_cluster"
-
-  host                   = local.onp_kubernetes_cluster_host
-  cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
-  client_certificate     = local.onp_kubernetes_client_certificate
-  client_key             = local.onp_kubernetes_client_key
-}
-
-provider "helm" {
-  alias = "onp_cluster"
-
-  kubernetes {
-    host                   = local.onp_kubernetes_cluster_host
-    cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
-    client_certificate     = local.onp_kubernetes_client_certificate
-    client_key             = local.onp_kubernetes_client_key
-  }
-}
+# Terraform / Helm provider は、接続するためにトンネルを張る必要性があり複雑度が高いので、
+# onp_cluster_providers.tf に記述している。
 
 #endregion
 
