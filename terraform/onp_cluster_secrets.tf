@@ -22,7 +22,7 @@ resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   provider = kubernetes.onp_cluster
 
-  depends_on = [ null_resource.proxy_to_onp_k8s_api, kubernetes_namespace.argocd ]
+  depends_on = [ null_resource.proxy_to_onp_k8s_api, kubernetes_namespace.onp_argocd ]
 
   metadata {
     name      = "argocd-github-oauth-app-secret"
