@@ -56,9 +56,3 @@ data:
         - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地にする？整地にする？それとも…セ・イ・チ？'
         - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f用法用量を守って正しく整地しましょう'
         - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fYou have a pickaxe. You have a time. Oh! Seichi Love.'
-
-  TCPShield-config.yml: |
-    only-allow-proxy-connections: true
-    timestamp-validation: 'htpdate'
-    debug-mode: false
-    enable-geyser-support: false
