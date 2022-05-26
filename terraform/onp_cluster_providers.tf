@@ -70,12 +70,14 @@ resource "null_resource" "proxy_to_onp_k8s_api" {
 
 locals {
   onp_kubernetes_cluster_host = "https://${local.onp_kubernetes_tunnel_entry_host}:${local.onp_kubernetes_tunnel_entry_port}"
+
+  empty_string_depending_on_proxy_null_resource = substr(null_resource.proxy_to_onp_k8s_api.id, 0, 0)
 }
 
 provider "kubernetes" {
-  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
-
   alias = "onp_cluster"
+
+  password = local.empty_string_depending_on_proxy_null_resource
 
   host                   = local.onp_kubernetes_cluster_host
   cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
@@ -84,11 +86,11 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
-
   alias = "onp_cluster"
 
   kubernetes {
+    password = local.empty_string_depending_on_proxy_null_resource
+
     host                   = local.onp_kubernetes_cluster_host
     cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
     client_certificate     = local.onp_kubernetes_client_certificate
