@@ -145,3 +145,13 @@ variable "onp_k8s_grafana_github_oauth_app_secret" {
 }
 
 #endregion
+
+#region on-premise Synology CSI Driver Secret
+
+variable "onp_k8s_synology_csi_config" {
+  description   = "Synology CSI Driver Token for On-Premise Kubernetes Cluster"
+  type          = string
+  sensitive     = true
+}
+
+#endregion
