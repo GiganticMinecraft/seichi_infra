@@ -78,6 +78,11 @@ spec:
                   resources:
                     requests:
                       storage: 50Gi
+            securityContext:
+              runAsGroup: 0
+              runAsNonRoot: true
+              runAsUser: 0
+              fsGroup: 2000
         alertmanager:
           alertmanagerSpec:
             storage:
@@ -86,6 +91,11 @@ spec:
                   resources:
                     requests:
                       storage: 20Gi
+            securityContext:
+              runAsGroup: 0
+              runAsNonRoot: true
+              runAsUser: 0
+              fsGroup: 2000
         kubeProxy:
           enabled: false
         kubeEtcd:
