@@ -66,6 +66,10 @@ resource "null_resource" "proxy_to_onp_k8s_api" {
     command     = local.tunnel_cmd
     interpreter = ["bash", "-c"]
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 locals {
