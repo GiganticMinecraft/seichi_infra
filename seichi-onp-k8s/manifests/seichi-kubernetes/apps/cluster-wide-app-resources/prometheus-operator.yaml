@@ -35,7 +35,33 @@ spec:
     helm:
       releaseName: prometheus
       skipCrds: true
-      # values: |
+      values: |
+        grafana:
+          defaultDashboardsTimezone: Asia/Tokyo
+          grafana.ini:
+            log:
+              level: warn
+            server:
+              enforce_domain: true
+              domain: grafana.onp-k8s.admin.seichi.click
+              root_url: %(protocol)s://%(domain)s:%(http_port)s/
+            date_formats:
+              default_timezone: Asia/Tokyo
+            # 初期設定が終わったら有効化する
+            # auth:
+            #   disable_login_form: true
+            #   oauth_auto_login: true
+            auth.github:
+                enabled: true
+                allow_sign_up: true
+                client_id: client_id
+                client_secret: client_secret
+                scopes: user:email,read:org
+                auth_url: https://github.com/login/oauth/authorize
+                token_url: https://github.com/login/oauth/access_token
+                api_url: https://api.github.com/user
+                allowed_organizations: GiganticMinecraft
+          envFromSecret: "grafana-github-oauth-app-secret"
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

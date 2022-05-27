@@ -2,11 +2,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: origin-cloudflared-admin-services
+  namespace: cluster-wide-apps
 data:
   tunnel-config.yml: |
     ingress:
       - hostname: argocd.onp-k8s.admin.seichi.click
         service: https://argocd-server.argocd:443
+        originRequest:
+          noTLSVerify: true
+      - hostname: grafana.onp-k8s.admin.seichi.click
+        service: https://prometheus-grafana.monitoring:80
         originRequest:
           noTLSVerify: true
 
