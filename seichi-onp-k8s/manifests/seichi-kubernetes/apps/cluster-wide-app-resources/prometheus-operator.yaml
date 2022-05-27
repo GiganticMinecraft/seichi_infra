@@ -80,7 +80,7 @@ spec:
                       storage: 50Gi
             securityContext:
               runAsGroup: 0
-              runAsNonRoot: true
+              runAsNonRoot: false
               runAsUser: 0
               fsGroup: 2000
         alertmanager:
@@ -93,7 +93,7 @@ spec:
                       storage: 20Gi
             securityContext:
               runAsGroup: 0
-              runAsNonRoot: true
+              runAsNonRoot: false
               runAsUser: 0
               fsGroup: 2000
         kubeProxy:
