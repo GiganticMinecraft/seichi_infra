@@ -96,6 +96,7 @@ server:
     policy.default: role:readonly
 
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -115,6 +116,7 @@ controller:
     minAvailable: 1
     maxUnavailable: 0
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -133,6 +135,7 @@ dex:
     minAvailable: 1
     maxUnavailable: 0
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -147,6 +150,7 @@ redis:
       cpu: 100m
       memory: 128Mi
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -162,6 +166,7 @@ repoServer:
       cpu: 500m
       memory: 128Mi
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -177,6 +182,7 @@ applicationSet:
       cpu: 100m
       memory: 64Mi
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -191,6 +197,7 @@ notifications:
       cpu: 100m
       memory: 64Mi
   metrics:
+    enabled: true
     serviceMonitor:
       enabled: true
       additionalLabels:
