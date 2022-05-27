@@ -30,15 +30,21 @@ spec:
             - port-distribution
             serviceMonitor:
               enabled: true
+              labels:
+                release: prometheus
         operator:
           prometheus:
             enabled: true
             serviceMonitor:
               enabled: true
+              labels:
+                release: prometheus
         prometheus:
           enabled: true
           serviceMonitor:
             enabled: true
+            labels:
+              release: prometheus
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
