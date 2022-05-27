@@ -16,8 +16,9 @@ spec:
     #  - metallb
     #  - monitoring
     #  - sentry
+    #  - synology-csi
     #
-    # の3つのリソースインストールを行うため、namespaceを明示的に許可する必要がある
+    # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: 'kube-system'
       server: https://kubernetes.default.svc
     - namespace: 'metallb-system'
@@ -25,6 +26,8 @@ spec:
     - namespace: 'monitoring'
       server: https://kubernetes.default.svc
     - namespace: 'sentry'
+      server: https://kubernetes.default.svc
+    - namespace: 'synology-csi'
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
