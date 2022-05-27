@@ -52,25 +52,25 @@ spec:
             #   disable_login_form: true
             #   oauth_auto_login: true
             auth.github:
-                enabled: true
-                allow_sign_up: true
-                client_id: client_id
-                client_secret: client_secret
-                scopes: user:email,read:org
-                auth_url: https://github.com/login/oauth/authorize
-                token_url: https://github.com/login/oauth/access_token
-                api_url: https://api.github.com/user
-                allowed_organizations: GiganticMinecraft
+              enabled: true
+              allow_sign_up: true
+              client_id: client_id
+              client_secret: client_secret
+              scopes: user:email,read:org
+              auth_url: https://github.com/login/oauth/authorize
+              token_url: https://github.com/login/oauth/access_token
+              api_url: https://api.github.com/user
+              allowed_organizations: GiganticMinecraft
           envFromSecret: "grafana-github-oauth-app-secret"
         # Prometheus Operatorはデフォルトで監視できるnamespaceが自身のものだけなので
         # 全namespaceのリソースで/metrics(prometheus metrics endpoint)をgetできるように指定したい
         # ref. https://github.com/prometheus-operator/prometheus-operator/issues/2155#issuecomment-441002864
         prometheus:
-            additionalRulesForClusterRole:
-              - nonResourceURLs
-                  - /metrics
-                verbs:
-                  - get
+          additionalRulesForClusterRole:
+            - nonResourceURLs:
+                - /metrics
+              verbs:
+                - get
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
