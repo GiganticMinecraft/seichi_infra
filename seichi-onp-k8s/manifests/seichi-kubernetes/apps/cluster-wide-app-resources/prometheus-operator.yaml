@@ -44,7 +44,7 @@ spec:
             server:
               enforce_domain: true
               domain: grafana.onp-k8s.admin.seichi.click
-              root_url: %(protocol)s://%(domain)s:%(http_port)s/
+              root_url: "%(protocol)s://%(domain)s:%(http_port)s/"
             date_formats:
               default_timezone: Asia/Tokyo
             # 初期設定が終わったら有効化する
