@@ -15,6 +15,7 @@ spec:
     #  - metrics-server
     #  - metallb
     #  - monitoring
+    #  - sentry
     #
     # の3つのリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: 'kube-system'
@@ -22,6 +23,8 @@ spec:
     - namespace: 'metallb-system'
       server: https://kubernetes.default.svc
     - namespace: 'monitoring'
+      server: https://kubernetes.default.svc
+    - namespace: 'sentry'
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'

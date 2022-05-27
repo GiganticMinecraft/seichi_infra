@@ -12,6 +12,8 @@ data:
           noTLSVerify: true
       - hostname: grafana.onp-k8s.admin.seichi.click
         service: http://prometheus-grafana.monitoring:80
+      - hostname: sentry.onp-k8s.admin.seichi.click
+        service: http://sentry-nginx.sentry:80
 
       - service: http_status:404
 ---
