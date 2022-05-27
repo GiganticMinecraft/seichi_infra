@@ -37,3 +37,13 @@ resource "kubernetes_namespace" "onp_monitoring" {
     name = "monitoring"
   }
 }
+
+resource "kubernetes_namespace" "onp_synology_csi" {
+  depends_on = [ null_resource.proxy_to_onp_k8s_api ]
+
+  provider = kubernetes.onp_cluster
+
+  metadata {
+    name = "synology-csi"
+  }
+}
