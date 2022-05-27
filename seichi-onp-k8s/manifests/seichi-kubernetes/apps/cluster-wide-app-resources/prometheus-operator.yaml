@@ -71,7 +71,7 @@ spec:
               - argocd
               - kube-system
               - metallb-system
-            podMonitorNamespaceSelector
+            podMonitorNamespaceSelector:
               - argocd
               - kube-system
               - metallb-system
