@@ -11,9 +11,7 @@ data:
         originRequest:
           noTLSVerify: true
       - hostname: grafana.onp-k8s.admin.seichi.click
-        service: https://prometheus-grafana.monitoring:80
-        originRequest:
-          noTLSVerify: true
+        service: http://prometheus-grafana.monitoring:80
 
       - service: http_status:404
 ---
