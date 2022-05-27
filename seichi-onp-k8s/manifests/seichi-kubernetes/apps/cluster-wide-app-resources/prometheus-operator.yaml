@@ -36,6 +36,11 @@ spec:
       releaseName: prometheus
       skipCrds: true
       values: |
+        defaultRules:
+          create: true
+          rules:
+            etcd: false
+            kubeProxy: false
         grafana:
           defaultDashboardsTimezone: Asia/Tokyo
           grafana.ini:
@@ -62,6 +67,29 @@ spec:
               api_url: https://api.github.com/user
               allowed_organizations: GiganticMinecraft
           envFromSecret: "grafana-github-oauth-app-secret"
+          persistence:
+            enabled: true
+            size: 10Gi
+        prometheus:
+          prometheusSpec:
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 50Gi
+        alertmanager:
+          alertmanagerSpec:
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 20Gi
+        kubeProxy:
+          enabled: false
+        kubeEtcd:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
