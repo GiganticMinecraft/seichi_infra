@@ -62,19 +62,6 @@ spec:
               api_url: https://api.github.com/user
               allowed_organizations: GiganticMinecraft
           envFromSecret: "grafana-github-oauth-app-secret"
-        # Prometheus Operatorはデフォルトで監視できるnamespaceが自身のものだけなので
-        # 全namespaceのリソースで/metrics(prometheus metrics endpoint)をgetできるように指定したい
-        # ref. https://github.com/prometheus-operator/prometheus-operator/issues/2155#issuecomment-441002864
-        prometheus:
-          prometheusSpec:
-            serviceMonitorNamespaceSelector:
-              - argocd
-              - kube-system
-              - metallb-system
-            podMonitorNamespaceSelector:
-              - argocd
-              - kube-system
-              - metallb-system
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

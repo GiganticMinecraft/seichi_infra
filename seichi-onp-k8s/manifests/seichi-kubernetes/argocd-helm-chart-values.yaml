@@ -95,6 +95,12 @@ server:
     # but will see no apps, projects, etc...
     policy.default: role:readonly
 
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
+
 controller:
   enableStatefulSet: true
   resources:
@@ -108,6 +114,11 @@ controller:
     enabled: true
     minAvailable: 1
     maxUnavailable: 0
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
 
 dex:
   resources:
@@ -121,6 +132,11 @@ dex:
     enabled: true
     minAvailable: 1
     maxUnavailable: 0
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
 
 redis:
   resources:
@@ -130,6 +146,11 @@ redis:
     requests:
       cpu: 100m
       memory: 128Mi
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
 
 repoServer:
   replicaCount: 1
@@ -140,6 +161,11 @@ repoServer:
     requests:
       cpu: 500m
       memory: 128Mi
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
 
 applicationSet:
   replicaCount: 1
@@ -150,6 +176,11 @@ applicationSet:
     requests:
       cpu: 100m
       memory: 64Mi
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
 
 notifications:
   resources:
@@ -159,3 +190,8 @@ notifications:
     requests:
       cpu: 100m
       memory: 64Mi
+  metrics:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
