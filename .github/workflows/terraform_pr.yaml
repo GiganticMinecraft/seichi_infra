@@ -42,7 +42,7 @@ jobs:
         working-directory: "./terraform"
 
       - name: Plan Terraform infrastructure changes
-        run: terraform plan -no-color
+        run: terraform plan -input=false -no-color
         id: tfplan
         working-directory: "./terraform"
 

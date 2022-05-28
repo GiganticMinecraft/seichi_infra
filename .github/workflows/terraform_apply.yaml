@@ -16,5 +16,8 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
 
       - name: Terraform apply
-        run: terraform apply
+        run: terraform apply -input=false -no-color
         working-directory: "./terraform"
+        env:
+          TF_VAR_cloudflare_api_key: ${{ secrets.TF_VAR_CLOUDFLARE_API_KEY }}
+          TF_VAR_cloudflare_email: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
