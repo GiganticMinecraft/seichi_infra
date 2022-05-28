@@ -7,7 +7,7 @@ function strip_prefix () {
   local -r str="$2"
 
   # 参考: https://stackoverflow.com/a/16623897
-  echo "${str#$prefix}"
+  echo "${str#$"prefix"}"
 }
 
 # 第二引数が第一引数で始まるかどうかを判定する
@@ -35,12 +35,12 @@ function pick_delimiter_for () {
     delimiter_to_try="${delimiter_prefix}${suffix}"
 
     # delimiter_to_try がいずれかの行の先頭に現れたら suffix をインクリメントしてやり直す
-    while read line; do
+    while read -r line; do
       if starts_with "${delimiter_to_try}" "${line}"; then
         suffix=$((suffix + 1))
         continue 2;
       fi
-    done <<< "$(echo "${str}")"
+    done <<< "${str}"
 
     echo "${delimiter_to_try}"
     return 0
