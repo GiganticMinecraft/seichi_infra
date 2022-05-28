@@ -58,7 +58,7 @@ nohup "${tmp_workdir}/cloudflared" access tcp \
   --url "${tunnel_url}" \
   0<&- 1>"${logfile}" 2>&1 & disown
 
-echo_to_err "Started a tunnel to ${tunnel_host_name} at ${tunnel_url}"
+echo_to_err "Started a tunnel to ${tunnel_host} at ${tunnel_url}"
 
 sleep 3
 echo_to_err "Processes after 3 seconds:"
