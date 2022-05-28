@@ -11,6 +11,7 @@ resource "helm_release" "onp_cluster_argocd" {
   cleanup_on_fail = true
 
   values = [
-    file("../../../seichi-onp-k8s/manifests/seichi-kubernetes/argocd-helm-chart-values.yaml")
+    # terraform working directory からの相対パス
+    file("../seichi-onp-k8s/manifests/seichi-kubernetes/argocd-helm-chart-values.yaml")
   ]
 }
