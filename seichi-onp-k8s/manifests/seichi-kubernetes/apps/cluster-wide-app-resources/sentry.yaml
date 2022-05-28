@@ -64,6 +64,24 @@ spec:
                 accessModes:
                   - "ReadWriteOnce"
                 storage: "40Gi"
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
+              fsGroup: 1001
+
+        zookeeper:
+          enabled: true
+          podSecurityContext:
+            enabled: true
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            fsGroup: 1001
+          containerSecurityContext:
+            enabled: true
+            runAsUser: 1001
+            runAsNonRoot: true
 
         # Settings for Kafka.
         # See https://github.com/bitnami/charts/tree/master/bitnami/kafka
@@ -74,6 +92,16 @@ spec:
           maxMessageBytes: "50000000"
           # 50 MB
           socketRequestMaxBytes: "50000000"
+          podSecurityContext:
+            enabled: true
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            fsGroup: 1001
+          containerSecurityContext:
+            enabled: true
+            runAsUser: 1001
+            runAsNonRoot: true
 
         redis:
           enabled: true
@@ -84,6 +112,28 @@ spec:
         postgresql:
           replication:
             enabled: true
+          podSecurityContext:
+            enabled: true
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            fsGroup: 1001
+          containerSecurityContext:
+            enabled: true
+            runAsUser: 1001
+            runAsNonRoot: true
+
+        rabbitmq:
+          podSecurityContext:
+            enabled: true
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
+            fsGroup: 1001
+          containerSecurityContext:
+            enabled: true
+            runAsUser: 1001
+            runAsNonRoot: true
 
         ## Prometheus Exporter / Metrics
         ##
