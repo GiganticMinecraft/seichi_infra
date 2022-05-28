@@ -1,6 +1,4 @@
 resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
-  provider = kubernetes.onp_cluster
-
   # name と data の指定は LOGDNA_INGESTION_KEY の参照指定による
   # https://github.com/logdna/logdna-agent-v2/blob/442810f18f4ea44c71bedff01c12795223b0e41e/k8s/agent-resources.yaml#L114-L118
 
@@ -17,10 +15,6 @@ resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
 }
 
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
-  provider = kubernetes.onp_cluster
-
-  depends_on = [ null_resource.proxy_to_onp_k8s_api, kubernetes_namespace.onp_argocd ]
-
   metadata {
     name      = "argocd-github-oauth-app-secret"
     namespace = "argocd"
@@ -32,42 +26,34 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   }
 
   data = {
-    ARGOCD_GITHUB_OAUTH_APP_SECRET = var.onp_k8s_argocd_github_oauth_app_secret
+    ARGOCD_GITHUB_OAUTH_APP_SECRET = var.argocd_github_oauth_app_secret
   }
 
   type = "Opaque"
 }
 
 resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
-  provider = kubernetes.onp_cluster
-
-  depends_on = [ null_resource.proxy_to_onp_k8s_api, kubernetes_namespace.onp_monitoring ]
-
   metadata {
     name      = "grafana-github-oauth-app-secret"
     namespace = "monitoring"
   }
 
   data = {
-    GF_AUTH_GITHUB_CLIENT_ID = var.onp_k8s_grafana_github_oauth_app_id
-    GF_AUTH_GITHUB_CLIENT_SECRET = var.onp_k8s_grafana_github_oauth_app_secret
+    GF_AUTH_GITHUB_CLIENT_ID = var.grafana_github_oauth_app_id
+    GF_AUTH_GITHUB_CLIENT_SECRET = var.grafana_github_oauth_app_secret
   }
 
   type = "Opaque"
 }
 
 resource "kubernetes_secret" "onp_synology_csi" {
-  provider = kubernetes.onp_cluster
-
-  depends_on = [ null_resource.proxy_to_onp_k8s_api, kubernetes_namespace.onp_synology_csi ]
-
   metadata {
     name      = "client-info-secret"
     namespace = "synology-csi"
   }
 
   data = {
-    "client-info.yml" = var.onp_k8s_synology_csi_config
+    "client-info.yml" = var.synology_csi_config
   }
 
   type = "Opaque"

@@ -47,14 +47,15 @@ locals {
 #
 #   null_resource.proxy_to_onp_k8s_api は external.proxy_to_onp_k8s_api に依存しているため、
 #   provider が null_resource.proxy_to_onp_k8s_api に依存するというのを Terraform に伝えればよい。
+#   これを実現するために、直接 provider とリソースを書くのではなく、モジュールの中に provider を書き、モジュールが
+#   null_resource.proxy_to_onp_k8s_api に依存するようにしている。
 
 data "external" "proxy_to_onp_k8s_api" {
-  depends_on = [ cloudflare_record.local_tunnels ]
   program = [ "bash", "-c", local.tunnel_cmd ]
 }
 
 resource "null_resource" "proxy_to_onp_k8s_api" {
-  depends_on = [ cloudflare_record.local_tunnels, data.external.proxy_to_onp_k8s_api ]
+  depends_on = [ data.external.proxy_to_onp_k8s_api ]
 
   // Apply時に常にprovisionerを実行するため。
   // ref. https://github.com/hashicorp/terraform/issues/8266#issuecomment-454377049
@@ -69,35 +70,5 @@ resource "null_resource" "proxy_to_onp_k8s_api" {
 
   lifecycle {
     create_before_destroy = true
-  }
-}
-
-locals {
-  onp_kubernetes_cluster_host = "https://${local.onp_kubernetes_tunnel_entry_host}:${local.onp_kubernetes_tunnel_entry_port}"
-
-  empty_string_depending_on_proxy_null_resource = substr(null_resource.proxy_to_onp_k8s_api.id, 0, 0)
-}
-
-provider "kubernetes" {
-  alias = "onp_cluster"
-
-  password = local.empty_string_depending_on_proxy_null_resource
-
-  host                   = local.onp_kubernetes_cluster_host
-  cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
-  client_certificate     = local.onp_kubernetes_client_certificate
-  client_key             = local.onp_kubernetes_client_key
-}
-
-provider "helm" {
-  alias = "onp_cluster"
-
-  kubernetes {
-    password = local.empty_string_depending_on_proxy_null_resource
-
-    host                   = local.onp_kubernetes_cluster_host
-    cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
-    client_certificate     = local.onp_kubernetes_client_certificate
-    client_key             = local.onp_kubernetes_client_key
   }
 }
