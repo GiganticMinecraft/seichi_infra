@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-script_dir=$(dirname -- "$(rreadlink "$0")")
+script_dir=$(dirname -- "$0")
 
 onp_k8s_server_url="$(bash "${script_dir}/open-tunnel-to-onp-k8s.sh")"
 
