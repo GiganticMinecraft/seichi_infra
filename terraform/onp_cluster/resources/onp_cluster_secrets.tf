@@ -15,6 +15,8 @@ resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
 }
 
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
+  depends_on = [ kubernetes_namespace.onp_argocd ]
+
   metadata {
     name      = "argocd-github-oauth-app-secret"
     namespace = "argocd"
@@ -33,6 +35,8 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
 }
 
 resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
+  depends_on = [ kubernetes_namespace.onp_monitoring ]
+
   metadata {
     name      = "grafana-github-oauth-app-secret"
     namespace = "monitoring"
@@ -47,6 +51,8 @@ resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
 }
 
 resource "kubernetes_secret" "onp_synology_csi" {
+  depends_on = [ kubernetes_namespace.onp_synology_csi ]
+
   metadata {
     name      = "client-info-secret"
     namespace = "synology-csi"
