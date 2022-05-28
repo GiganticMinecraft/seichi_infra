@@ -150,3 +150,29 @@ variable "onp_k8s_argocd_github_oauth_app_secret" {
 }
 
 #endregion
+
+#region on-premise Grafana to GitHub integration
+
+variable "onp_k8s_grafana_github_oauth_app_id" {
+  description   = "The OAuth app id for Grafana-GitHub integration on On-Premise Kubernetes cluster"
+  type          = string
+  sensitive     = true
+}
+
+variable "onp_k8s_grafana_github_oauth_app_secret" {
+  description   = "The OAuth app secret for Grafana-GitHub integration on On-Premise Kubernetes cluster"
+  type          = string
+  sensitive     = true
+}
+
+#endregion
+
+#region on-premise Synology CSI Driver Secret
+
+variable "onp_k8s_synology_csi_config" {
+  description   = "Synology CSI Driver Token for On-Premise Kubernetes Cluster"
+  type          = string
+  sensitive     = true
+}
+
+# endregion
