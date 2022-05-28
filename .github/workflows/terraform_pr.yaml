@@ -46,6 +46,11 @@ jobs:
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        with:
+          limit-access-to-actor: true
+
       - name: Plan Terraform infrastructure changes
         run: terraform plan -input=false -no-color
         id: tfplan
