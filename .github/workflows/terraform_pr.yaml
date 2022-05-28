@@ -41,6 +41,13 @@ jobs:
         run: terraform validate -no-color
         working-directory: "./terraform"
 
+      # 参考: https://github.community/t/exporting-all-secrets-in-a-workflow-action/122365/7
+      - name: Expose all GitHub secrets to environment variables
+        run: |
+          jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' <<< "$SECRETS_CONTEXT" >> $GITHUB_ENV
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+
       - name: Plan Terraform infrastructure changes
         run: terraform plan -input=false -no-color
         id: tfplan

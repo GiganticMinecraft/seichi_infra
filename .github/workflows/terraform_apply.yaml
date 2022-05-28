@@ -15,6 +15,13 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
 
+      # 参考: https://github.community/t/exporting-all-secrets-in-a-workflow-action/122365/7
+      - name: Expose all GitHub secrets to environment variables
+        run: |
+          jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' <<< "$SECRETS_CONTEXT" >> $GITHUB_ENV
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+
       - name: Terraform apply
         run: terraform apply -input=false -no-color
         working-directory: "./terraform"
