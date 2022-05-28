@@ -1,3 +1,5 @@
+# TODO: このリソースを削除する
+#       Terraform Cloud から GHA への移行をするために一時的に置きっぱなしにしているだけなので、移行が終わったら消す
 resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
   # name と data の指定は LOGDNA_INGESTION_KEY の参照指定による
   # https://github.com/logdna/logdna-agent-v2/blob/442810f18f4ea44c71bedff01c12795223b0e41e/k8s/agent-resources.yaml#L114-L118
