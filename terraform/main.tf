@@ -116,7 +116,7 @@ locals {
 }
 
 # Terraform / Helm provider は、接続するためにトンネルを張る必要性があり複雑度が高いので、
-# onp_cluster_providers.tf に記述している。
+# onp_cluster モジュールに設定を隔離している。
 
 #endregion
 
