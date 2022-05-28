@@ -115,8 +115,29 @@ locals {
   onp_kubernetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
 }
 
-# Terraform / Helm provider は、接続するためにトンネルを張る必要性があり複雑度が高いので、
-# onp_cluster モジュールに設定を隔離している。
+module "proxy" {
+  source = "./onp_cluster/proxy"
+}
+
+provider "kubernetes" {
+  alias = "onp_cluster"
+
+  host                   = module.proxy.cluster_host
+  cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
+  client_certificate     = local.onp_kubernetes_client_certificate
+  client_key             = local.onp_kubernetes_client_key
+}
+
+provider "helm" {
+  alias = "onp_cluster"
+
+  kubernetes {
+    host                   = module.proxy.cluster_host
+    cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
+    client_certificate     = local.onp_kubernetes_client_certificate
+    client_key             = local.onp_kubernetes_client_key
+  }
+}
 
 #endregion
 
@@ -124,32 +145,6 @@ locals {
 
 variable "onp_k8s_argocd_github_oauth_app_secret" {
   description   = "The OAuth app secret for ArgoCD-GitHub integration on On-Premise Kubernetes cluster"
-  type          = string
-  sensitive     = true
-}
-
-#endregion
-
-#region on-premise Grafana to GitHub integration
-
-variable "onp_k8s_grafana_github_oauth_app_id" {
-  description   = "The OAuth app id for Grafana-GitHub integration on On-Premise Kubernetes cluster"
-  type          = string
-  sensitive     = true
-}
-
-variable "onp_k8s_grafana_github_oauth_app_secret" {
-  description   = "The OAuth app secret for Grafana-GitHub integration on On-Premise Kubernetes cluster"
-  type          = string
-  sensitive     = true
-}
-
-#endregion
-
-#region on-premise Synology CSI Driver Secret
-
-variable "onp_k8s_synology_csi_config" {
-  description   = "Synology CSI Driver Token for On-Premise Kubernetes Cluster"
   type          = string
   sensitive     = true
 }
