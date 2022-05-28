@@ -85,13 +85,10 @@ spec:
           maxMessageBytes: "50000000"
           # 50 MB
           socketRequestMaxBytes: "50000000"
-          podSecurityContext:
+          containerSecurityContext:
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-          containerSecurityContext:
-            runAsUser: 1001
-            runAsNonRoot: true
 
         redis:
           enabled: true
