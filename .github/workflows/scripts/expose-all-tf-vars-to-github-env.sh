@@ -7,7 +7,7 @@ function strip_prefix () {
   local -r str="$2"
 
   # 参考: https://stackoverflow.com/a/16623897
-  echo "${str#$"prefix"}"
+  echo "${str#"$prefix"}"
 }
 
 # 第二引数が第一引数で始まるかどうかを判定する
