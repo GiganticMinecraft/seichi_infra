@@ -27,6 +27,6 @@ for key_value_pair_json_in_base64 in $kv_pairs; do
     tf_variable_name="$(echo "$tf_variable_secret_name" | tr '[:upper:]' '[:lower:]')"
 
     # 参考: https://stackoverflow.com/a/68008861
-    echo "TF_VAR_${tf_variable_name}=\"${value}\"" >> $GITHUB_ENV
+    echo "TF_VAR_${tf_variable_name}=\"${value}\"" >> "$GITHUB_ENV"
   fi
 done
