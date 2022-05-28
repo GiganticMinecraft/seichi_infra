@@ -68,18 +68,15 @@ spec:
               runAsUser: 0
               runAsGroup: 0
               runAsNonRoot: false
-              fsGroup: 1001
 
         zookeeper:
           enabled: true
           podSecurityContext:
-            enabled: true
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
             fsGroup: 1001
           containerSecurityContext:
-            enabled: true
             runAsUser: 1001
             runAsNonRoot: true
 
@@ -93,13 +90,10 @@ spec:
           # 50 MB
           socketRequestMaxBytes: "50000000"
           podSecurityContext:
-            enabled: true
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-            fsGroup: 1001
           containerSecurityContext:
-            enabled: true
             runAsUser: 1001
             runAsNonRoot: true
 
@@ -112,28 +106,16 @@ spec:
         postgresql:
           replication:
             enabled: true
-          podSecurityContext:
-            enabled: true
+          containerSecurityContext:
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-            fsGroup: 1001
-          containerSecurityContext:
-            enabled: true
-            runAsUser: 1001
-            runAsNonRoot: true
 
         rabbitmq:
-          podSecurityContext:
-            enabled: true
+          containerSecurityContext:
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-            fsGroup: 1001
-          containerSecurityContext:
-            enabled: true
-            runAsUser: 1001
-            runAsNonRoot: true
 
         ## Prometheus Exporter / Metrics
         ##
