@@ -66,7 +66,6 @@ spec:
                 storage: "40Gi"
             securityContext:
               runAsUser: 0
-              runAsGroup: 0
               runAsNonRoot: false
 
         zookeeper:
@@ -97,12 +96,10 @@ spec:
               enabled: true
             containerSecurityContext:
               runAsUser: 0
-              runAsGroup: 0
               runAsNonRoot: false
           replica:
             containerSecurityContext:
               runAsUser: 0
-              runAsGroup: 0
               runAsNonRoot: false
 
         postgresql:
@@ -110,7 +107,6 @@ spec:
             enabled: true
           containerSecurityContext:
             runAsUser: 0
-            runAsGroup: 0
             runAsNonRoot: false
 
         rabbitmq:
