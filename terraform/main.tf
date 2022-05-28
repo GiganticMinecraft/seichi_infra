@@ -115,14 +115,14 @@ locals {
   onp_kubernetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
 }
 
-module "proxy" {
+module "onp_cluster_proxy" {
   source = "./onp_cluster/proxy"
 }
 
 provider "kubernetes" {
   alias = "onp_cluster"
 
-  host                   = module.proxy.cluster_host
+  host                   = module.onp_cluster_proxy.cluster_host
   cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
   client_certificate     = local.onp_kubernetes_client_certificate
   client_key             = local.onp_kubernetes_client_key
@@ -132,7 +132,7 @@ provider "helm" {
   alias = "onp_cluster"
 
   kubernetes {
-    host                   = module.proxy.cluster_host
+    host                   = module.onp_cluster_proxy.cluster_host
     cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
     client_certificate     = local.onp_kubernetes_client_certificate
     client_key             = local.onp_kubernetes_client_key

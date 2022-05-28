@@ -1,4 +1,4 @@
-module "onp_cluster" {
+module "onp_cluster_resources" {
   source = "./onp_cluster/resources"
 
   argocd_github_oauth_app_secret  = var.onp_k8s_argocd_github_oauth_app_secret
