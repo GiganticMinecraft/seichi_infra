@@ -7,23 +7,23 @@ resource "cloudflare_certificate_pack" "advanced_cert_for_tcp_debug_network" {
   validation_method     = "txt"
   validity_days         = 365
   certificate_authority = "digicert"
-  cloudflare_branding   = false  
+  cloudflare_branding   = false
 }
 
 resource "cloudflare_access_application" "debug_vps_to_op_network" {
-  zone_id                   = local.cloudflare_zone_id
-  name                      = "Debug Network"
-  domain                    = "*.tcp-debug-network.${local.root_domain}"
-  type                      = "self_hosted"
+  zone_id = local.cloudflare_zone_id
+  name    = "Debug Network"
+  domain  = "*.tcp-debug-network.${local.root_domain}"
+  type    = "self_hosted"
   # オンプレ側が1日に1回再起動するのでセッション長は高々24時間になる
-  session_duration          = "30h"
+  session_duration = "30h"
 
   http_only_cookie_attribute = true
 }
 
 resource "cloudflare_access_service_token" "debug_linode_to_onp" {
-  zone_id    = local.cloudflare_zone_id
-  name       = "Linode (for Debug Network)"
+  zone_id = local.cloudflare_zone_id
+  name    = "Linode (for Debug Network)"
 
   # サービストークンの有効期限は、最後に生成/renewされてから365日となっている。
   # そこで、トークンの有効期限が切れる30日前以降は terraform apply されたときにrenewするように設定しておく。
@@ -46,7 +46,7 @@ resource "cloudflare_access_policy" "debug_linode_to_onp" {
   # allow/deny での制御にすると、クライアントとなるcloudflaredが起動するときにブラウザ経由の認証を求められる。
   # Service account token による制御ではそんなことは無いが、 decision を non_identity とする必要がある。
   # 詳細は https://developers.cloudflare.com/cloudflare-one/policies/zero-trust#actions を参照のこと
-  decision       = "non_identity"
+  decision = "non_identity"
 
   include {
     service_token = [
