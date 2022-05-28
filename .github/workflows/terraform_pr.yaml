@@ -1,0 +1,57 @@
+name: Terraform (PR)
+on:
+  pull_request:
+    # paths:
+    #   - "**.tf"
+
+jobs:
+  tflint:
+    name: runner / tflint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: tflint
+        uses: reviewdog/action-tflint@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          fail_on_error: "true"
+          filter_mode: "nofilter" # Check all files, not just the diff
+
+  tf_plan:
+    name: tf plan
+    runs-on: ubuntu-latest
+    needs: [tflint]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
+
+      - name: Terraform fmt
+        run: terraform fmt -check
+        working-directory: "./terraform"
+
+      - run: terraform init
+        working-directory: "./terraform"
+
+      - name: Validate .tf files
+        run: terraform validate -no-color
+        working-directory: "./terraform"
+
+      - name: Plan Terraform infrastructure changes
+        run: terraform plan -no-color
+        id: tfplan
+        working-directory: "./terraform"
+
+      - name: Comment result to Pull Request
+        uses: robburger/terraform-pr-commenter@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commenter_type: plan
+          # Terraform rarely writes to stdout and stderr in the same action, so we concatenate
+          commenter_input: ${{ format('{0}{1}', steps.tfplan.outputs.stdout, steps.tfplan.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.tfplan.outputs.exitcode }}

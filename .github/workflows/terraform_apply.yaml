@@ -1,0 +1,20 @@
+name: Terraform apply
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  tf_apply:
+    name: tf apply
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
+
+      - name: Terraform apply
+        run: terraform apply
+        working-directory: "./terraform"
