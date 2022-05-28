@@ -76,7 +76,7 @@ for key_value_pair_json_in_base64 in $kv_pairs; do
 
     delimiter="$(pick_delimiter_for "${value}")"
 
-    echo "TF_VAR_${tf_variable_name}=${delimiter}" >> "$GITHUB_ENV"
+    echo "TF_VAR_${tf_variable_name}<<${delimiter}" >> "$GITHUB_ENV"
     echo "${value}" >> "${GITHUB_ENV}"
     echo "${delimiter}" >> "${GITHUB_ENV}"
   fi
