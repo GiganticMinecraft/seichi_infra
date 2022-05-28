@@ -69,25 +69,10 @@ spec:
               runAsNonRoot: false
 
         zookeeper:
-          enabled: true
-          containerSecurityContext:
-            runAsUser: 0
-            runAsNonRoot: false
-          volumePermissions:
-            enabled: true
+          enabled: false
 
-        # Settings for Kafka.
-        # See https://github.com/bitnami/charts/tree/master/bitnami/kafka
         kafka:
-          enabled: true
-          replicaCount: 3
-          # 50 MB
-          maxMessageBytes: "50000000"
-          # 50 MB
-          socketRequestMaxBytes: "50000000"
-          podSecurityContext:
-            runAsUser: 0
-            runAsNonRoot: false
+          enabled: false
 
         redis:
           enabled: true
