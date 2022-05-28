@@ -1,8 +1,8 @@
 name: Terraform (PR)
 on:
   pull_request:
-    # paths:
-    #   - "**.tf"
+    paths:
+      - "terraform/**.tf"
 
 jobs:
   tflint:
