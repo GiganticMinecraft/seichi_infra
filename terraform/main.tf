@@ -124,8 +124,6 @@ locals {
 }
 
 provider "kubernetes" {
-  alias = "onp_cluster"
-
   password = local.empty_string_dependent_on_proxy
 
   host                   = module.onp_cluster_proxy.cluster_host
@@ -135,8 +133,6 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  alias = "onp_cluster"
-
   kubernetes {
     password = local.empty_string_dependent_on_proxy
 
