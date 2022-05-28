@@ -73,8 +73,9 @@ spec:
           enabled: true
           containerSecurityContext:
             runAsUser: 0
-            runAsGroup: 0
             runAsNonRoot: false
+          volumePermissions:
+            enabled: true
 
         # Settings for Kafka.
         # See https://github.com/bitnami/charts/tree/master/bitnami/kafka
@@ -85,9 +86,8 @@ spec:
           maxMessageBytes: "50000000"
           # 50 MB
           socketRequestMaxBytes: "50000000"
-          containerSecurityContext:
+          podSecurityContext:
             runAsUser: 0
-            runAsGroup: 0
             runAsNonRoot: false
 
         redis:
@@ -95,6 +95,15 @@ spec:
           master:
             persistence:
               enabled: true
+            containerSecurityContext:
+              runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
+          replica:
+            containerSecurityContext:
+              runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
 
         postgresql:
           replication:
@@ -105,10 +114,8 @@ spec:
             runAsNonRoot: false
 
         rabbitmq:
-          containerSecurityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            runAsNonRoot: false
+          ## If disabled, Redis will be used instead as the broker.
+          enabled: false
 
         ## Prometheus Exporter / Metrics
         ##
