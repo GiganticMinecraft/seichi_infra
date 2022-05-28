@@ -54,21 +54,11 @@ data "external" "proxy_to_onp_k8s_api" {
   program = [ "bash", "-c", local.tunnel_cmd ]
 }
 
-resource "null_resource" "proxy_to_onp_k8s_api" {
-  depends_on = [ data.external.proxy_to_onp_k8s_api ]
+resource "null_resource" "empty_resource" {
+}
 
-  // Apply時に常にprovisionerを実行するため。
-  // ref. https://github.com/hashicorp/terraform/issues/8266#issuecomment-454377049
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+data "external" "dynamic_proxy_to_onp_k8s_api" {
+  depends_on = [ null_resource.empty_resource ]
 
-  provisioner "local-exec" {
-    command     = local.tunnel_cmd
-    interpreter = ["bash", "-c"]
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  program = [ "bash", "-c", local.tunnel_cmd ]
 }

@@ -3,6 +3,6 @@ output "cluster_host" {
   depends_on= [ data.external.proxy_to_onp_k8s_api ]
 }
 
-output "id" {
-  value = null_resource.proxy_to_onp_k8s_api.id
+output "dynamic_empty_str" {
+  value = data.external.dynamic_proxy_to_onp_k8s_api.result.empty_str
 }

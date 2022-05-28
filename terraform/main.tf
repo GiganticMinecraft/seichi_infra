@@ -119,12 +119,8 @@ module "onp_cluster_proxy" {
   source = "./onp_cluster/proxy"
 }
 
-locals {
-  empty_string_dependent_on_proxy = module.onp_cluster_proxy.id
-}
-
 provider "kubernetes" {
-  password = local.empty_string_dependent_on_proxy
+  password = module.onp_cluster_proxy.dynamic_empty_str
 
   host                   = module.onp_cluster_proxy.cluster_host
   cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
@@ -134,7 +130,7 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes {
-    password = local.empty_string_dependent_on_proxy
+    password = module.onp_cluster_proxy.dynamic_empty_str
 
     host                   = module.onp_cluster_proxy.cluster_host
     cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate

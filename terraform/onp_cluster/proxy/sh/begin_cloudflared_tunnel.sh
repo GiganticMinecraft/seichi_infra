@@ -60,7 +60,9 @@ echo_to_err "$(cat "${logfile}")"
 # External Program Protocol
 # https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source#external-program-protocol
 result=$(cat <<EOF
-  {}
+  {
+    "empty_str": ""
+  }
 EOF
 )
 
