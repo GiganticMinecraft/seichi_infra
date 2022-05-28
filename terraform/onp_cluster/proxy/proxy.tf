@@ -55,6 +55,13 @@ data "external" "proxy_to_onp_k8s_api" {
 }
 
 resource "null_resource" "empty_resource" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 data "external" "dynamic_proxy_to_onp_k8s_api" {
