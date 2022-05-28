@@ -58,7 +58,5 @@ resource "null_resource" "empty_resource" {
 }
 
 data "external" "dynamic_proxy_to_onp_k8s_api" {
-  depends_on = [ null_resource.empty_resource ]
-
-  program = [ "bash", "-c", local.tunnel_cmd ]
+  program = [ "bash", "-c", "${local.tunnel_cmd} \"${null_resource.empty_resource.id}\"" ]
 }
