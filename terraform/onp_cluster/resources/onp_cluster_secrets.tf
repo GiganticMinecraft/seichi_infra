@@ -26,7 +26,7 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   }
 
   data = {
-    ARGOCD_GITHUB_OAUTH_APP_SECRET = var.onp_k8s_argocd_github_oauth_app_secret
+    ARGOCD_GITHUB_OAUTH_APP_SECRET = var.argocd_github_oauth_app_secret
   }
 
   type = "Opaque"
@@ -39,8 +39,8 @@ resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
   }
 
   data = {
-    GF_AUTH_GITHUB_CLIENT_ID = var.onp_k8s_grafana_github_oauth_app_id
-    GF_AUTH_GITHUB_CLIENT_SECRET = var.onp_k8s_grafana_github_oauth_app_secret
+    GF_AUTH_GITHUB_CLIENT_ID = var.grafana_github_oauth_app_id
+    GF_AUTH_GITHUB_CLIENT_SECRET = var.grafana_github_oauth_app_secret
   }
 
   type = "Opaque"
@@ -53,7 +53,7 @@ resource "kubernetes_secret" "onp_synology_csi" {
   }
 
   data = {
-    "client-info.yml" = var.onp_k8s_synology_csi_config
+    "client-info.yml" = var.synology_csi_config
   }
 
   type = "Opaque"
