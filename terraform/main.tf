@@ -97,6 +97,12 @@ provider "github" {
 
 #region on-premise k8s access configuration
 
+variable "onp_k8s_server_url" {
+  description = "URL at which k8s server is exposed"
+  type        = string
+  sensitive   = true
+}
+
 variable "onp_k8s_kubeconfig" {
   description = "On-premise cluster's kubeconfig.yaml content"
   type        = string
@@ -115,14 +121,8 @@ locals {
   onp_kubernetes_client_key             = base64decode(yamldecode(var.onp_k8s_kubeconfig).users[0].user.client-key-data)
 }
 
-module "onp_cluster_proxy" {
-  source = "./onp_cluster/proxy"
-}
-
 provider "kubernetes" {
-  password = module.onp_cluster_proxy.dynamic_empty_str
-
-  host                   = module.onp_cluster_proxy.cluster_host
+  host                   = var.onp_k8s_server_url
   cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
   client_certificate     = local.onp_kubernetes_client_certificate
   client_key             = local.onp_kubernetes_client_key
@@ -130,9 +130,7 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes {
-    password = module.onp_cluster_proxy.dynamic_empty_str
-
-    host                   = module.onp_cluster_proxy.cluster_host
+    host                   = var.onp_k8s_server_url
     cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
     client_certificate     = local.onp_kubernetes_client_certificate
     client_key             = local.onp_kubernetes_client_key
