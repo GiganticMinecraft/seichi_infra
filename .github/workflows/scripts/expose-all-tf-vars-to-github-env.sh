@@ -8,7 +8,7 @@ kv_pairs="$(echo "${SECRETS_CONTEXT}" | jq -r 'to_entries | .[] | @base64')"
 
 for key_value_pair_json_in_base64 in $kv_pairs; do
   # kv_pairs の各要素は base64 エンコードされた
-  # { "key": **, "value": ** } の形式の json なので、decode
+  # { "key": **, "value": ** } の形式の json なので、 base64 -d でデコードする
   key_value_pair_json="$(echo "${key_value_pair_json_in_base64}" | base64 -d)"
 
   # key / value の組を読む
@@ -16,7 +16,7 @@ for key_value_pair_json_in_base64 in $kv_pairs; do
   value="$(echo "${key_value_pair_json}" | jq -r '.value')"
 
   # TF_VAR_${tf_v_name} で始まる secret variable のみ、tf_v_name の部分を小文字にして環境変数に export する。
-  # Terraform 側では variable は小文字で宣言されており、secrets オブジェクトは全部大文字で入れてくるため、
+  # Terraform 側では variable は小文字で宣言されており、secrets オブジェクトはキーが全部大文字になっているため、
   # このような変換をする必要がある。
   # 参考: https://stackoverflow.com/a/2172367
   if [[ $key == TF_VAR_* ]]; then
