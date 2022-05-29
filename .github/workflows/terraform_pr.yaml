@@ -2,6 +2,7 @@ name: Terraform (PR)
 on:
   pull_request:
     paths:
+      - '.github/workflows/terraform_pr.yaml'
       - "terraform/**.tf"
 
 jobs:
