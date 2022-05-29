@@ -25,6 +25,9 @@ jobs:
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
 
+      - run: terraform init
+        working-directory: "./terraform"
+
       - name: Terraform apply
         run: terraform apply -input=false -no-color
         working-directory: "./terraform"
