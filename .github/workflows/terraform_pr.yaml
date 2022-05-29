@@ -1,9 +1,9 @@
 name: Terraform (PR)
 on:
+  # terraform が file(...) でファイルを参照することがあり、
+  # 参照されたファイルが変更された場合 re-apply する必要があるので、
+  # 常に plan していい
   pull_request:
-    paths:
-      - "terraform/**.tf"
-      - ".github/workflows/terraform_pr.yaml"
 
 jobs:
   tf_plan:

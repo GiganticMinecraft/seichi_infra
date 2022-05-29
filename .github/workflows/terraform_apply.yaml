@@ -1,11 +1,11 @@
 name: Terraform apply
 on:
   push:
+    # terraform が file(...) でファイルを参照することがあり、
+    # 参照されたファイルが変更された場合 re-apply する必要があるので、
+    # main へのコミット時は常に apply していい
     branches:
       - "main"
-    paths:
-      - "terraform/**.tf"
-      - ".github/workflows/terraform_apply.yaml"
 
 jobs:
   tf_apply:
