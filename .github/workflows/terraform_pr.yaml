@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - "terraform/**.tf"
+      - ".github/workflows/terraform_pr.yaml"
 
 jobs:
   tflint:

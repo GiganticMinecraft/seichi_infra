@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - "**.tf"
+      - ".github/workflows/tflint.yaml"
+
 jobs:
   tflint:
     name: runner / tflint
