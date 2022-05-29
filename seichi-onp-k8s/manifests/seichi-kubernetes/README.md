@@ -7,7 +7,7 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 概要図は `*/diagrams` 以下で、 draw.io によってパース可能なsvgファイルとして管理されています。これらを編集する場合は [Draw.io VS Code Integration](https://github.com/hediet/vscode-drawio) の利用を推奨します。
 
 # 全体俯瞰図
-![概要図](./diagrams/seichi-network-lke-infrastructure.drawio.svg)
+![概要図](./diagrams/seichi-network-infrastructure.drawio.svg)
 | フルネーム  | 役割                                                                           | 
 | ----------- | ------------------------------------------------------------------------------ | 
 |  BungeeCord | Minecraftプロトコル用プロキシ                                                  | 
