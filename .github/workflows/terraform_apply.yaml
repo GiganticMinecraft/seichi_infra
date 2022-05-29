@@ -31,7 +31,7 @@ jobs:
         working-directory: "./terraform"
 
       - name: Terraform apply
-        run: terraform apply -input=false -no-color
+        run: terraform apply -input=false -no-color -auto-approve
         working-directory: "./terraform"
         env:
           TF_VAR_cloudflare_api_key: ${{ secrets.TF_VAR_CLOUDFLARE_API_KEY }}

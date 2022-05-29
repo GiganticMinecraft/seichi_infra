@@ -6,25 +6,9 @@ on:
       - ".github/workflows/terraform_pr.yaml"
 
 jobs:
-  tflint:
-    name: runner / tflint
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@master
-      - name: tflint
-        uses: reviewdog/action-tflint@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          fail_on_error: "true"
-          filter_mode: "nofilter" # Check all files, not just the diff
-
   tf_plan:
     name: tf plan
     runs-on: ubuntu-latest
-    needs: [tflint]
-
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
