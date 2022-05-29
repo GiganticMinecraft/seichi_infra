@@ -9,9 +9,36 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 ## 全体俯瞰図
 
 ![概要図](./diagrams/seichi-network-infrastructure.drawio.svg)
+
 | フルネーム  | 役割                                                                           | 
 | ----------- | ------------------------------------------------------------------------------ | 
 |  BungeeCord | Minecraftプロトコル用プロキシ                                                  | 
+
+## 外部からトラフィックが直接流入する `Service` の VIP について
+
+エンドユーザーからの HTTP 通信を受け取るサービスは、パケットをすべて Cloudflare Tunnel (`cloudflared` による) で終端しているため、インターネットからそれらサービスへの ingress の経路は用意してません。
+
+しかし、以下に記す例外では、 (TCP) パケットの送信元から対応するサービスへと
+TCP パケットをそのまま送り届ける必要があります。
+
+ - 投票サイトからの投票パケットは、投票受付 Minecraft サーバーへ
+ - TCPShield からの Minecraft ゲームパケットは、 BungeeCord をまとめる `Service` へ
+
+よって、これらサービスに限っては、
+
+ - 対応する `Service` リソース達に `loadbalancerIP` を振り
+ - オンプレのルーターからこれら VIP へのポートフォワードを (unchamaが) 設定し
+ - パケット送信元のサービスに global IP とフォワードされている外向きのポートを登録しておく
+ 
+という構成になっています。割り当てられている `loadbalancerIP` は以下の通りです。
+
+| サービス                     | `Service` の VIP                                            | 
+| ---------------------------- | ----------------------------------------------------------- | 
+|  BungeeCord (本番環境用)     | [`192.168.8.130`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
+|  BungeeCord (デバッグ環境用) | [`192.168.8.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
+|  投票受付サーバー            | (まだ k8s 上に乗っていないので、 `Service` の VIP ではない) |
+
+`loadbalancerIP` が取りうる範囲に関しては、 [オンプレ環境のネットワーク構成に関する説明](https://github.com/GiganticMinecraft/seichi_infra/tree/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/cluster-boot-up#%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF) を参照してください。
 
 ## Kubernetes クラスタのブートストラップについて
 
