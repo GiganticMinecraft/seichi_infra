@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     cloudflare = {
-      source = "cloudflare/cloudflare"
+      source  = "cloudflare/cloudflare"
       version = "~> 3.0"
     }
     github = {
@@ -21,8 +21,8 @@ terraform {
 
 locals {
   cloudflare_zone_id = "77c10fdfa7c65de4d14903ed8879ebcb"
-  root_domain = "seichi.click"
-  github_org_name = "GiganticMinecraft"
+  root_domain        = "seichi.click"
+  github_org_name    = "GiganticMinecraft"
 }
 
 #region cloudflare provider
@@ -98,9 +98,9 @@ provider "github" {
 #region on-premise k8s access configuration
 
 variable "onp_k8s_kubeconfig" {
-  description   = "On-premise cluster's kubeconfig.yaml content"
-  type          = string
-  sensitive     = true
+  description = "On-premise cluster's kubeconfig.yaml content"
+  type        = string
+  sensitive   = true
 }
 
 # オンプレクラスタの kubeconfig.yaml は、cluster CA certificate、client certificate、client keyをそれぞれ
@@ -144,9 +144,9 @@ provider "helm" {
 #region on-premise ArgoCD to GitHub integration
 
 variable "onp_k8s_argocd_github_oauth_app_secret" {
-  description   = "The OAuth app secret for ArgoCD-GitHub integration on On-Premise Kubernetes cluster"
-  type          = string
-  sensitive     = true
+  description = "The OAuth app secret for ArgoCD-GitHub integration on On-Premise Kubernetes cluster"
+  type        = string
+  sensitive   = true
 }
 
 #endregion
@@ -154,15 +154,15 @@ variable "onp_k8s_argocd_github_oauth_app_secret" {
 #region on-premise Grafana to GitHub integration
 
 variable "onp_k8s_grafana_github_oauth_app_id" {
-  description   = "The OAuth app id for Grafana-GitHub integration on On-Premise Kubernetes cluster"
-  type          = string
-  sensitive     = true
+  description = "The OAuth app id for Grafana-GitHub integration on On-Premise Kubernetes cluster"
+  type        = string
+  sensitive   = true
 }
 
 variable "onp_k8s_grafana_github_oauth_app_secret" {
-  description   = "The OAuth app secret for Grafana-GitHub integration on On-Premise Kubernetes cluster"
-  type          = string
-  sensitive     = true
+  description = "The OAuth app secret for Grafana-GitHub integration on On-Premise Kubernetes cluster"
+  type        = string
+  sensitive   = true
 }
 
 #endregion
@@ -170,9 +170,9 @@ variable "onp_k8s_grafana_github_oauth_app_secret" {
 #region on-premise Synology CSI Driver Secret
 
 variable "onp_k8s_synology_csi_config" {
-  description   = "Synology CSI Driver Token for On-Premise Kubernetes Cluster"
-  type          = string
-  sensitive     = true
+  description = "Synology CSI Driver Token for On-Premise Kubernetes Cluster"
+  type        = string
+  sensitive   = true
 }
 
 # endregion
