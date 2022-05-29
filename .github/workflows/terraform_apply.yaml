@@ -5,6 +5,7 @@ on:
       - "main"
     paths:
       - "terraform/**.tf"
+      - ".github/workflows/terraform_apply.yaml"
 
 jobs:
   tf_apply:
