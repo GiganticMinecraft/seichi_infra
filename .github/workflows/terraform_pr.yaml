@@ -41,6 +41,9 @@ jobs:
         run: terraform validate -no-color
         working-directory: "./terraform"
 
+      - name: Open tunnel to OnP k8s cluster
+        run: bash "./.github/workflows/scripts/open-tunnel-to-onp-k8s-and-export-tf-var-to-github-env.sh"
+
       - name: Expose all Terraform variables to environment variables from secrets
         run: bash "./.github/workflows/scripts/expose-all-tf-vars-to-github-env.sh"
         env:
