@@ -10,6 +10,11 @@ spec:
   destinations:
     - namespace: 'cluster-wide-apps'
       server: https://kubernetes.default.svc
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    - namespace: 'argocd'
+      server: https://kubernetes.default.svc
     # ./cluster-wide-app-resources でインストールされる
     #  - cert-manager
     #  - metrics-server
