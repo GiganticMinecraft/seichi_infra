@@ -4,7 +4,7 @@
 
 target_branch="$1"
 k8s_definition_base_url="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${target_branch}/seichi-onp-k8s"
-cloudflared_k8s_endpoint_manifest_url="${k8s_definition_base_url}/manifests/seichi-kubernetes/apps/cluster-wide-app-resources/cloudflared-k8s-endpoint.yaml"
+cloudflared_k8s_endpoint_manifest_url="${k8s_definition_base_url}/manifests/seichi-kubernetes/apps/cluster-wide-apps/cloudflared-k8s-endpoint/cloudflared-k8s-endpoint.yaml"
 
 # endregion
 
