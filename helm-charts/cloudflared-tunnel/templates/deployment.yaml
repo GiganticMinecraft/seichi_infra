@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-tunnel-{{ required "installationName is required" .Values.installationName }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: cloudflared-tunnel-{{ .Values.installationName }}
+    appgroup: cloudflared-tunnel
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared-tunnel-{{ .Values.installationName }}
+      appgroup: cloudflared-tunnel
+  template:
+    metadata:
+      labels:
+        app: cloudflared-tunnel-{{ .Values.installationName }}
+        appgroup: cloudflared-tunnel
+    spec:
+      containers:
+        - name: cloudflared-tunnel-{{ .Values.installationName }}
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:sha-6455b98"
+          env:
+            - name: TUNNEL_NAME
+              value: '{{ required "tunnelNamePrefix is required" .Values.tunnelNamePrefix }}-{{ .Values.installationName }}'
+            # cloudflared tunnel が実行された時、 cloudflared は Tunnel credential を
+            # $TUNNEL_CRED_FILE に書き込む。
+            # また、tunnel origin certificate は Secret リソースによって提供されるため、
+            # どこかにread-onlyでマウントする必要がある。
+            # そのため、 TUNNEL_ORIGIN_FILE を TUNNEL_ORIGIN_CERT のマウントパス外に
+            # 設定する必要がある
+            - name: TUNNEL_ORIGIN_CERT
+              value: "/root/.cloudflared-origin-cert/cert.pem"
+            - name: TUNNEL_CRED_FILE
+              value: "/root/.cloudflared/tunnel-cred.json"
+          volumeMounts:
+            - mountPath: "/root/.cloudflared-origin-cert"
+              name: cloudflared-tunnel-{{ .Values.installationName }}-authorization-certificate
+            - mountPath: "/etc/cloudflared"
+              name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-config
+          resources:
+            requests:
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: cloudflared-tunnel-{{ .Values.installationName }}-authorization-certificate
+          secret:
+            # このシークレットはクラスタセットアップ作業手順により注入されているべき。
+            secretName: '{{ required "tunnelCredentialSecretName is required" .Values.tunnelCredentialSecretName }}'
+            items:
+              - key: TUNNEL_CREDENTIAL
+                path: cert.pem
+        - name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-config
+          configMap:
+            name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-configmap
