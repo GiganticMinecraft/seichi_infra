@@ -79,7 +79,7 @@ spec:
             tunnelConfigContent: |
               ingress:
                 - hostname: {{external-hostname}}
-                  service: "http://{{internal-authority}}/"
+                  service: "http://{{internal-authority}}"
                 # Catch-all service
                 - service: http_status:404
 
