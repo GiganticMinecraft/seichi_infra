@@ -1,0 +1,76 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cloudflared-tunnel-https-exits
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        # 出口を生成するリスト。
+        # オンプレネットワーク内で HTTPS で公開されているサービスを外部に露出したい時は、
+        # このリストに
+        #   - トンネル名の suffix として使われる文字列 (name)
+        #   - 露出されるサービスが外部から見えるようになるドメイン (external-hostname)
+        #   - Pod から見た、サービスが公開されている authority ({{domain-name}}:{{port}} の形式の文字列) (internal-authority)
+        # の三つのプロパティを持つ要素を追加すればよい。
+        elements:
+          # ArgoCD
+          - name: argocd
+            external-hostname: argocd.onp-k8s.admin.seichi.click
+            internal-authority: argocd-server.argocd:443
+
+          # 管理者からの直アクセスを想定するため、GitHub TeamsによるSSOを設定している
+          # (terraform/cloudflare_network_admin_services.yaml 参照)
+          #
+          # 現時点(2022/04/25)ではproxmoxはHTTPS**しか**サポートしないらしく、
+          # (https://forum.proxmox.com/threads/disabling-ssl-on-latest-proxmox-ve.42889/post-205902)
+          # 自己署名証明書で保護されているため、 noTLSVerify で無視する。
+          - name: proxmox
+            external-hostname: proxmox.onp.admin.seichi.click
+            internal-authority: 192.168.1.150:8006
+
+          # Redmine
+          - name: redmine
+            external-hostname: redmine.seichi.click
+            internal-authority: 192.168.1.187:3443
+
+  template:
+    metadata:
+      name: "cloudflared-tunnel-https-exit--{{name}}"
+      namespace: argocd
+    spec:
+      project: seichi-gateway
+      source:
+        repoURL: https://giganticminecraft.github.io/seichi_infra
+        chart: cloudflared-tunnel
+        targetRevision: "1.0.0"
+        helm:
+          # サービス一つに対してトンネルを一つずつ生やす
+          releaseName: cloudflared-tunnel-https-exit--{{name}}
+          values: |
+            installationName: {{name}}
+            tunnelNamePrefix: "seichi-onp-k8s--https--"
+            tunnelCredentialSecretName: "cloudflared-tunnel-credential"
+            tunnelConfigContent: |
+              ingress:
+                - hostname: {{external-hostname}}
+                  service: "https://{{internal-authority}}/"
+                  originRequest:
+                    noTLSVerify: true
+                # Catch-all service
+                - service: http_status:404
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cloudflared-tunnel-exits
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
