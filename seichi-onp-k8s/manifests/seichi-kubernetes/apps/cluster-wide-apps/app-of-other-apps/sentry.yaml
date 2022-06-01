@@ -64,35 +64,26 @@ spec:
                 accessModes:
                   - "ReadWriteOnce"
                 storage: "40Gi"
-            securityContext:
-              runAsUser: 0
-              runAsNonRoot: false
 
-        zookeeper:
-          enabled: false
-
+        # Settings for Kafka.
+        # See https://github.com/bitnami/charts/tree/master/bitnami/kafka
         kafka:
-          enabled: false
+          enabled: true
+          replicaCount: 3
+          # 50 MB
+          maxMessageBytes: "50000000"
+          # 50 MB
+          socketRequestMaxBytes: "50000000"
 
         redis:
           enabled: true
           master:
             persistence:
               enabled: true
-            containerSecurityContext:
-              runAsUser: 0
-              runAsNonRoot: false
-          replica:
-            containerSecurityContext:
-              runAsUser: 0
-              runAsNonRoot: false
 
         postgresql:
           replication:
             enabled: true
-          containerSecurityContext:
-            runAsUser: 0
-            runAsNonRoot: false
 
         rabbitmq:
           ## If disabled, Redis will be used instead as the broker.

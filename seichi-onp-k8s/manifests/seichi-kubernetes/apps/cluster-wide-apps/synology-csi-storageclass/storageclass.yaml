@@ -8,6 +8,6 @@ provisioner: csi.san.synology.com
 parameters:
   dsm: '192.168.16.240'
   location: '/volume1'
-  fsType: 'ext4'
+  csi.storage.k8s.io/fstype: ext4
 reclaimPolicy: Retain
 allowVolumeExpansion: true
