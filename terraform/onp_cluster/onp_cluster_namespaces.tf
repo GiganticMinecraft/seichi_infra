@@ -27,3 +27,9 @@ resource "kubernetes_namespace" "onp_synology_csi" {
     name = "synology-csi"
   }
 }
+
+resource "kubernetes_namespace" "cloudflared_tunnel_exits" {
+  metadata {
+    name = "cloudflared-tunnel-exits"
+  }
+}

@@ -17,3 +17,8 @@ variable "synology_csi_config" {
   type          = string
   sensitive     = true
 }
+
+variable "cloudflared_tunnel_credential" {
+  type          = string
+  sensitive     = true
+}
