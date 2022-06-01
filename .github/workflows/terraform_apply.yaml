@@ -12,6 +12,8 @@ jobs:
     name: tf apply
     runs-on: ubuntu-latest
 
+    concurrency: tf_apply_on_main
+
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
