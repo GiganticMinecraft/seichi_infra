@@ -110,7 +110,7 @@ controller:
       memory: 1024Mi
     requests:
       cpu: 250m
-      memory: 128Mi
+      memory: 768Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -160,8 +160,8 @@ repoServer:
   replicaCount: 1
   resources:
     limits:
-      cpu: 1500m
-      memory: 512Mi
+      cpu: 500m
+      memory: 128Mi
     requests:
       cpu: 500m
       memory: 128Mi
@@ -176,8 +176,8 @@ applicationSet:
   replicaCount: 1
   resources:
     limits:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 250m
+      memory: 128Mi
     requests:
       cpu: 250m
       memory: 128Mi
