@@ -6,14 +6,14 @@ metadata:
 spec:
   description: The project of applications used by the entire cluster
   sourceRepos:
-    - '*'
+    - "*"
   destinations:
-    - namespace: 'cluster-wide-apps'
+    - namespace: "cluster-wide-apps"
       server: https://kubernetes.default.svc
     # Application 及び ApplicationSet リソースは
     # argocd namespace に置かないとArgoCDに認識されないため、
     # argocd namespace へのデプロイも許可する。
-    - namespace: 'argocd'
+    - namespace: "argocd"
       server: https://kubernetes.default.svc
     # ./cluster-wide-app-resources でインストールされる
     #  - cert-manager
@@ -24,19 +24,19 @@ spec:
     #  - synology-csi
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
-    - namespace: 'kube-system'
+    - namespace: "kube-system"
       server: https://kubernetes.default.svc
-    - namespace: 'metallb-system'
+    - namespace: "metallb-system"
       server: https://kubernetes.default.svc
-    - namespace: 'monitoring'
+    - namespace: "monitoring"
       server: https://kubernetes.default.svc
     # - namespace: 'sentry'
     #   server: https://kubernetes.default.svc
-    - namespace: 'synology-csi'
+    - namespace: "synology-csi"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: "*"
+      kind: "*"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -46,7 +46,7 @@ metadata:
 spec:
   description: The project of gateway system for the seichi-network (debug)
   sourceRepos:
-    - '*'
+    - "*"
   destinations:
     - namespace: seichi-debug-gateway
       server: https://kubernetes.default.svc
@@ -56,8 +56,8 @@ spec:
     - namespace: argocd
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: "*"
+      kind: "*"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -67,7 +67,7 @@ metadata:
 spec:
   description: The project of gateway system for the seichi-network
   sourceRepos:
-    - '*'
+    - "*"
   destinations:
     - namespace: seichi-gateway
       server: https://kubernetes.default.svc
@@ -77,5 +77,29 @@ spec:
     - namespace: argocd
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: "*"
+      kind: "*"
+---
+# Cloudflare Tunnel のすべての出口を管理するプロジェクト。
+# ただし、k8s APIの ingress を受ける cloudflared のみ
+# cluster-wide-apps/cloudflared-k8s-endpoint で管理されている。
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cloudflared-tunnel-exits
+  namespace: argocd
+spec:
+  description: The project that manages all Cloudflare Tunnel exits points (except the cluster API's tunnel)
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: cloudflared-tunnel-exits
+      server: https://kubernetes.default.svc
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

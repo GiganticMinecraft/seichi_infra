@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cloudflared-tunnel-http-exits
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        # 出口を生成するリスト。
+        # オンプレネットワーク内で HTTP で公開されているサービスを外部に露出したい時は、
+        # このリストに
+        #   - トンネル名の suffix として使われる文字列 (name)
+        #   - 露出されるサービスが外部から見えるようになるドメイン (external-hostname)
+        #   - Pod から見た、サービスが公開されている authority ({{domain-name}}:{{port}} の形式の文字列) (internal-authority)
+        # の三つのプロパティを持つ要素を追加すればよい。
+        elements:
+          # k8s 上の Grafana。
+          # grafana側でGitHub-SSO認証が掛かっているため、Cloudflare のレイヤではアクセス制御はしていない。
+          - name: grafana-k8s
+            external-hostname: grafana.onp-k8s.admin.seichi.click
+            internal-authority: "prometheus-grafana.monitoring:80"
+
+          # オンプレにもともとあった Grafana。
+          # grafana側でGitHub-SSO認証が掛かっているため、Cloudflare のレイヤではアクセス制御はしていない。
+          - name: grafana-onp
+            external-hostname: grafana.onp.admin.seichi.click
+            internal-authority: "192.168.3.20:3000"
+
+          # k8s 上の Sentry。
+          # 2022/06/01 時点では、きちんと稼働していないのでルーティング自体を止めている
+          # - name: sentry
+          #  external-hostname: sentry.onp-k8s.admin.seichi.click
+          #  internal-authority: sentry-nginx.sentry:80
+
+          # 各サーバーの Dynmap ウェブサーバー。
+          - name: dynmap-s1
+            external-hostname: s1-map-gigantic.seichi.click
+            internal-authority: "192.168.2.1:80"
+          - name: dynmap-s2
+            external-hostname: s2-map-gigantic.seichi.click
+            internal-authority: "192.168.2.2:80"
+          - name: dynmap-s3
+            external-hostname: s3-map-gigantic.seichi.click
+            internal-authority: "192.168.2.3:80"
+          - name: dynmap-s5
+            external-hostname: s5-map-gigantic.seichi.click
+            internal-authority: "192.168.2.5:80"
+          - name: dynmap-s7
+            external-hostname: s7-map-gigantic.seichi.click
+            internal-authority: "192.168.2.7:80"
+          - name: dynmap-cre
+            external-hostname: cre-map-gigantic.seichi.click
+            internal-authority: "192.168.1.187:80"
+          - name: dynmap-h1
+            external-hostname: h1-map-spring.seichi.click
+            internal-authority: "192.168.1.187:82"
+
+          # SeichiRanking の web サーバー。
+          - name: seichi-ranking
+            external-hostname: ranking-gigantic.seichi.click
+            internal-authority: "192.168.3.1:80"
+  template:
+    metadata:
+      name: "cloudflared-tunnel-http-exit--{{name}}"
+      namespace: argocd
+    spec:
+      project: seichi-gateway
+      source:
+        repoURL: https://giganticminecraft.github.io/seichi_infra
+        chart: cloudflared-tunnel
+        targetRevision: "1.0.0"
+        helm:
+          # サービス一つに対してトンネルを一つずつ生やす
+          releaseName: cloudflared-tunnel-http-exit--{{name}}
+          values: |
+            installationName: {{name}}
+            tunnelNamePrefix: "seichi-onp-k8s--http--"
+            tunnelCredentialSecretName: "cloudflared-tunnel-credential"
+            tunnelConfigContent: |
+              ingress:
+                - hostname: {{external-hostname}}
+                  service: "http://{{internal-authority}}/"
+                # Catch-all service
+                - service: http_status:404
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cloudflared-tunnel-exits
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
