@@ -128,7 +128,7 @@ spec:
   source:
     repoURL: https://github.com/GiganticMinecraft/seichi_infra
     targetRevision: main
-    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/clusdflared-tunnel-exits
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cloudflared-tunnel-exits
   destination:
     server: https://kubernetes.default.svc
     namespace: "cloudflared-tunnel-exits"
