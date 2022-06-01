@@ -121,7 +121,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cloudflared-tunnel-exits
+  name: app-of-cloudflared-tunnel-exits
   namespace: argocd
 spec:
   project: cloudflared-tunnel-exits
