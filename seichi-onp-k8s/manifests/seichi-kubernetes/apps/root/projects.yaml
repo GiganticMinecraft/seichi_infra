@@ -30,8 +30,8 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: 'monitoring'
       server: https://kubernetes.default.svc
-    - namespace: 'sentry'
-      server: https://kubernetes.default.svc
+    # - namespace: 'sentry'
+    #   server: https://kubernetes.default.svc
     - namespace: 'synology-csi'
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
