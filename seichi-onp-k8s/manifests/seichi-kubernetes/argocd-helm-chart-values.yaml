@@ -176,7 +176,7 @@ applicationSet:
   replicaCount: 1
   resources:
     limits:
-      cpu: 250m
+      cpu: 500m
       memory: 128Mi
     requests:
       cpu: 250m
