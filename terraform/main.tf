@@ -173,4 +173,19 @@ variable "onp_k8s_synology_csi_config" {
   sensitive   = true
 }
 
-# endregion
+#endregion
+
+#region on-premise Cloudflared tunnel secret
+
+# オンプレ k8s で走る cloudflared の認証情報。
+# cloudflared login で得られる .pem ファイルの中身を設定してください。 
+#
+# 2022/06/01 現在、適切な権限を持った Cloduflare ユーザーが
+# https://dash.cloudflare.com/argotunnel にアクセスして seichi-network を対象に認証することでも .pem が得られます。
+variable "onp_k8s_cloudflared_tunnel_credential" {
+  description = "Cloudflared tunnel credential for On-Premise Kubernetes Cluster"
+  type        = string
+  sensitive   = true
+}
+
+#endregion

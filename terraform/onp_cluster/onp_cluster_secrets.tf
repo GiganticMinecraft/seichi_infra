@@ -66,3 +66,21 @@ resource "kubernetes_secret" "onp_synology_csi" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "cloudflared_tunnel_credential" {
+  depends_on = [ kubernetes_namespace.cloudflared_tunnel_exits ]
+
+  metadata {
+    name      = "cloudflared-tunnel-credential"
+    namespace = "cloudflared-tunnel-exits"
+  }
+
+  # cloudflared-tunnel Helm chart がこの形式の Secret を想定している。
+  # どのようにこの Secret を Pod が利用しているかについては、
+  # helm-charts/cloudflared-tunnel/deployment.yaml を参照のこと。
+  data = {
+    "TUNNEL_CREDENTIAL" = var.cloudflared_tunnel_credential
+  }
+
+  type = "Opaque"
+}
