@@ -54,7 +54,7 @@ spec:
             tunnelConfigContent: |
               ingress:
                 - hostname: {{external-hostname}}
-                  service: "https://{{internal-authority}}/"
+                  service: "https://{{internal-authority}}"
                   originRequest:
                     noTLSVerify: true
                 # Catch-all service
