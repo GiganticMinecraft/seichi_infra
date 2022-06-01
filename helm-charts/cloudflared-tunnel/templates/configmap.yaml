@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-configmap
+  labels:
+    app: cloudflared-tunnel-{{ .Values.installationName }}
+    appgroup: cloudflared-tunnel
+    release-namespace: "{{ .Release.Namespace }}"
+data:
+  tunnel-config.yml: |
+    {{- required "tunnelConfigContent is required" .Values.tunnelConfigContent | nindent 4 }}

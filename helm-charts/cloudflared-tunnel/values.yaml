@@ -1,0 +1,34 @@
+# この Chart の Release を一意に識別する文字列。
+installationName: null
+
+# 生成されるトンネル名の prefix。
+# トンネル名は "{{ .Values.TunnelNamePrefix }}-{{ .Values.InstallationName }}" のような形式となる。
+tunnelNamePrefix: null
+
+# cloudflared login して得られる cert.pem の中身を
+#
+# data:
+#   TUNNEL_CREDENTIAL: ${data}
+#
+# のような形式で格納している、 Release と同 Namespace に置かれた Secret の名前。
+tunnelCredentialSecretName: null
+
+# tunnel-config.yaml の中身。
+#
+# ingressセクションにてトンネルへルーティングされるURLとバックエンドのサービスへのマッピングを定義することができる。
+# ingressセクションの書式は
+#  https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/local-management/ingress/
+# 等を参考にせよ。
+tunnelConfigContent: |
+  ingress:
+    # ここに例えば次のようなエントリを追加することで、
+    #  k8s-api.onp-k8s.admin.seichi.click
+    # から(Podから見た)
+    #  tcp://kubernetes.default:443
+    # へのトンネルが疎通することになる:
+    #
+    # - hostname: k8s-api.onp-k8s.admin.seichi.click
+    #   service: tcp://kubernetes.default:443
+
+    # Catch-all service
+    - service: http_status:404

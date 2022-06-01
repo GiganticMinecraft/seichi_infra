@@ -1,0 +1,5 @@
+apiVersion: v2
+name: "cloudflared-tunnel"
+version: "1.0.0"
+maintainers:
+  - name: GiganticMinecraft
