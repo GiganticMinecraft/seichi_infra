@@ -65,6 +65,10 @@ spec:
               token_url: https://github.com/login/oauth/access_token
               api_url: https://api.github.com/user
               allowed_organizations: GiganticMinecraft
+            security:
+              disable_initial_admin_creation: true
+              admin_user: inductor
+              cookie_secure: true
           deploymentStrategy:
             type: Recreate
           envFromSecret: "grafana-github-oauth-app-secret"
