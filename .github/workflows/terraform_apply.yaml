@@ -6,6 +6,7 @@ on:
     # main へのコミット時は常に apply していい
     branches:
       - "main"
+  workflow_dispatch:
 
 jobs:
   tf_apply:
