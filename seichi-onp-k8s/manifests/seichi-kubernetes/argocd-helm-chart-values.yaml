@@ -160,7 +160,7 @@ repoServer:
   replicaCount: 1
   resources:
     limits:
-      cpu: 500m
+      cpu: 750m
       memory: 128Mi
     requests:
       cpu: 500m
@@ -176,10 +176,10 @@ applicationSet:
   replicaCount: 1
   resources:
     limits:
-      cpu: 500m
+      cpu: 750m
       memory: 128Mi
     requests:
-      cpu: 250m
+      cpu: 500m
       memory: 128Mi
   metrics:
     enabled: true
