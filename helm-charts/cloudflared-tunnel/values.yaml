@@ -21,4 +21,14 @@ tunnelCredentialSecretName: null
 # 等を参考にせよ。
 tunnelConfigContent: |
   ingress:
+    # ここに例えば次のようなエントリを追加することで、
+    #  k8s-api.onp-k8s.admin.seichi.click
+    # から(Podから見た)
+    #  tcp://kubernetes.default:443
+    # へのトンネルが疎通することになる:
+    #
+    # - hostname: k8s-api.onp-k8s.admin.seichi.click
+    #   service: tcp://kubernetes.default:443
+
+    # Catch-all service
     - service: http_status:404
