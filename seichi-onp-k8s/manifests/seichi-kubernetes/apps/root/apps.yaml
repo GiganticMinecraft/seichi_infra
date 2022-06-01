@@ -117,3 +117,29 @@ spec:
             duration: 5s
             factor: 2
             maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudflared-tunnel-exits
+  namespace: argocd
+spec:
+  project: cloudflared-tunnel-exits
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/clusdflared-tunnel-exits
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "cloudflared-tunnel-exits"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
