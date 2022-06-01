@@ -39,7 +39,7 @@ spec:
       name: "cloudflared-tunnel-https-exit--{{name}}"
       namespace: argocd
     spec:
-      project: seichi-gateway
+      project: cloudflared-tunnel-exits
       source:
         repoURL: https://giganticminecraft.github.io/seichi_infra
         chart: cloudflared-tunnel
