@@ -159,9 +159,6 @@ redis:
 repoServer:
   replicaCount: 1
   resources:
-    limits:
-      cpu: 750m
-      memory: 128Mi
     requests:
       cpu: 500m
       memory: 128Mi
@@ -175,9 +172,6 @@ repoServer:
 applicationSet:
   replicaCount: 1
   resources:
-    limits:
-      cpu: 750m
-      memory: 128Mi
     requests:
       cpu: 500m
       memory: 128Mi

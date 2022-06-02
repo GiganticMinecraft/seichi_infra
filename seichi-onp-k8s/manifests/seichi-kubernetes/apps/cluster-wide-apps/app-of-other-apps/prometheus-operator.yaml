@@ -26,6 +26,8 @@ kind: Application
 metadata:
   name: prometheus
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
 spec:
   project: cluster-wide-apps
   source:
