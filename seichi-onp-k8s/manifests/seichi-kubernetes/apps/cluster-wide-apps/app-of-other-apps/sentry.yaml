@@ -56,6 +56,7 @@ spec:
 
         clickhouse:
           enabled: true
+          timezone: "Asia/Tokyo"
           clickhouse:
             persistentVolumeClaim:
               enabled: true
@@ -120,5 +121,3 @@ spec:
   syncPolicy:
     automated:
       prune: true
-    syncOptions:
-    - CreateNamespace=true
