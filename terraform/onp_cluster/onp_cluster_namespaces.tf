@@ -34,7 +34,7 @@ resource "kubernetes_namespace" "cloudflared_tunnel_exits" {
   }
 }
 
-resource "kubernetes_namespace" "cloudflared_tunnel_exits" {
+resource "kubernetes_namespace" "onp_sentry" {
   metadata {
     name = "sentry"
   }
