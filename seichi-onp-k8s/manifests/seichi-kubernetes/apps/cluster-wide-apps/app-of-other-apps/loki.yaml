@@ -32,7 +32,7 @@ spec:
               retention_enabled: true
 
           serviceMonitor:
-            enabled: false
+            enabled: true
             interval: ""
             additionalLabels:
               release: prometheus
