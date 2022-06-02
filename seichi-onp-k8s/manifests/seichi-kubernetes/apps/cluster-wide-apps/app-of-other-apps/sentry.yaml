@@ -70,7 +70,10 @@ spec:
               runAsNonRoot: false
 
         zookeeper:
-          enabled: false
+          containerSecurityContext:
+            enabled: true
+            runAsUser: 0
+            runAsNonRoot: false
 
         kafka:
           enabled: false
