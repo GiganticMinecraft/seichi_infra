@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sentry-kafka
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: kafka
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 17.1.0
+    helm:
+      releaseName: sentry-kafka
+      values: |
+        replicaCount: 3
+        allowPlaintextListener: true
+        defaultReplicationFactor: 3
+        offsetsTopicReplicationFactor: 3
+        transactionStateLogReplicationFactor: 3
+        transactionStateLogMinIsr: 3
+        maxMessageBytes: "50000000"
+        socketRequestMaxBytes: "50000000"
+        service:
+          type: ClusterIP
+          ## @param service.ports.client Kafka svc port for client connections
+          ## @param service.ports.internal Kafka svc port for inter-broker connections
+          ## @param service.ports.external Kafka svc port for external connections
+          ##
+          ports:
+            client: 9092
+            internal: 9093
+            external: 9094
+
+
+        containerSecurityContext:
+          enabled: true
+          runAsUser: 0
+          runAsNonRoot: false
+
+        metrics:
+          kafka:
+            enabled: true
+          jmx:
+            enabled: true
+          serviceMonitor:
+            enabled: true
+            labels:
+              release: prometheus
+
+        zookeeper:
+          containerSecurityContext:
+            enabled: true
+            runAsUser: 0
+            runAsNonRoot: false
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              additionalLabels:
+                release: prometheus
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sentry
+  syncPolicy:
+    automated:
+      prune: true

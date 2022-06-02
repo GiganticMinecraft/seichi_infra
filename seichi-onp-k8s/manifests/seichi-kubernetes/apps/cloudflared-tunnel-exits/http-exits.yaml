@@ -27,10 +27,10 @@ spec:
             internal-authority: "192.168.3.20:3000"
 
           # k8s 上の Sentry。
-          # 2022/06/01 時点では、きちんと稼働していないのでルーティング自体を止めている
-          # - name: sentry
-          #  external-hostname: sentry.onp-k8s.admin.seichi.click
-          #  internal-authority: sentry-nginx.sentry:80
+          # SSOをかけられるのでそのまま通す。
+          - name: sentry
+           external-hostname: sentry.onp-k8s.admin.seichi.click
+           internal-authority: sentry-nginx.sentry:80
 
           # 各サーバーの Dynmap ウェブサーバー。
           - name: dynmap-s1
