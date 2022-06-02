@@ -19,6 +19,8 @@ spec:
           algorithm: maglev
         hubble:
           enabled: true
+          relay:
+            enabled: true
           metrics:
             enabled:
             - dns:query;ignoreAAAA

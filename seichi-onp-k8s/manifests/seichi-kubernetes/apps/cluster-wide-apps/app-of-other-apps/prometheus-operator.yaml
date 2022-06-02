@@ -41,10 +41,11 @@ spec:
         defaultRules:
           create: true
           rules:
-            etcd: false
             kubeProxy: false
         grafana:
           defaultDashboardsTimezone: Asia/Tokyo
+          plugins:
+            - grafana-piechart-panel
           grafana.ini:
             log:
               level: warn
@@ -71,8 +72,6 @@ spec:
               cookie_secure: true
               strict_transport_security: true
               content_security_policy: true
-            plugins:
-              - grafana-piechart-panel
           securityContext:
             runAsUser: 0
             runAsGroup: 0
@@ -124,7 +123,14 @@ spec:
         kubeProxy:
           enabled: false
         kubeEtcd:
-          enabled: false
+          endpoints:
+            - 192.168.18.11
+            - 192.168.18.12
+            - 192.168.18.13
+          service:
+            enabled: true
+            port: 2381
+            targetPort: 2381
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
