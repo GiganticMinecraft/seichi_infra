@@ -30,6 +30,7 @@ spec:
           config:
             compactor:
               retention_enabled: true
+
           serviceMonitor:
             enabled: false
             interval: ""
