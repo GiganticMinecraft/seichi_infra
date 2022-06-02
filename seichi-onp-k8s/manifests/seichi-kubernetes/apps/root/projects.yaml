@@ -16,7 +16,6 @@ spec:
     - namespace: "argocd"
       server: https://kubernetes.default.svc
     # ./cluster-wide-app-resources でインストールされる
-    #  - cert-manager
     #  - metrics-server
     #  - metallb
     #  - monitoring
@@ -30,8 +29,8 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: "monitoring"
       server: https://kubernetes.default.svc
-    # - namespace: 'sentry'
-    #   server: https://kubernetes.default.svc
+    - namespace: "sentry"
+      server: https://kubernetes.default.svc
     - namespace: "synology-csi"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
