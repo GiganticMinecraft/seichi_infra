@@ -32,7 +32,7 @@ spec:
               retention_enabled: true
 
           serviceMonitor:
-            enabled: false
+            enabled: true
             interval: ""
             additionalLabels:
               release: prometheus
@@ -70,6 +70,12 @@ spec:
                 annotations:
                   summary: Loki request latency (instance {{ $labels.instance }})
                   description: "The {{ $labels.job }} {{ $labels.route }} is experiencing {{ printf \"%.2f\" $value }}s 99th percentile latency\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        promtail:
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
+
   syncPolicy:
     automated:
       prune: true

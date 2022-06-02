@@ -69,6 +69,10 @@ spec:
               allowed_organizations: GiganticMinecraft
             security:
               cookie_secure: true
+              strict_transport_security: true
+              content_security_policy: true
+            plugins:
+              - grafana-piechart-panel
           securityContext:
             runAsUser: 0
             runAsGroup: 0
@@ -80,6 +84,17 @@ spec:
           persistence:
             enabled: true
             size: 10Gi
+          datasources:
+            datasources.yaml:
+              apiVersion: 1
+              datasources:
+                - name: Prometheus
+                  type: prometheus
+                  url: http://prometheus-kube-prometheus-prometheus:9090
+                  isDefault: true
+                - name: Loki
+                  type: loki
+                  url: http://loki:3100
         prometheus:
           prometheusSpec:
             storageSpec:
