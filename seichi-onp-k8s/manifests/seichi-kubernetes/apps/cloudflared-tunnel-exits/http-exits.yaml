@@ -29,8 +29,8 @@ spec:
           # k8s 上の Sentry。
           # SSOをかけられるのでそのまま通す。
           - name: sentry
-           external-hostname: sentry.onp-k8s.admin.seichi.click
-           internal-authority: sentry-nginx.sentry:80
+            external-hostname: sentry.onp-k8s.admin.seichi.click
+            internal-authority: sentry-nginx.sentry:80
 
           # 各サーバーの Dynmap ウェブサーバー。
           - name: dynmap-s1
