@@ -19,7 +19,7 @@ spec:
         loki:
           persistence:
             enabled: true
-            size: 500Gi
+            size: 50Gi
 
           securityContext:
             fsGroup: 10001
