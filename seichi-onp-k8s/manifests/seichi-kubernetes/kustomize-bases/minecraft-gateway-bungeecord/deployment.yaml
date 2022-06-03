@@ -71,7 +71,7 @@ spec:
                 https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
                 https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-4c5449d8aecf6bf5a6b810fb85a1bfa75c0fd03f/bungeehubcommand-1.jar,
                 https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar,
-                https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+                https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
                 https://github.com/weihao/bungeecord-prometheus-exporter/releases/download/3.0.2/bungeecord-prometheus-exporter-3.0.2.jar
 
             # BungeeYAML (depended by SwiftMOTD):
