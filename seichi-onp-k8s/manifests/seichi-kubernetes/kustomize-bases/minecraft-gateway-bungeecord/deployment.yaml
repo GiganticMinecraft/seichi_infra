@@ -30,9 +30,9 @@ spec:
             - name: server-icon-download-volume
               mountPath: /root/server-icon-download
           command:
-            - 'sh'
-            - '-c'
-            - "wget -O /root/server-icon-download/server-icon.png \"${SERVER_ICON_URL}\""
+            - "sh"
+            - "-c"
+            - 'wget -O /root/server-icon-download/server-icon.png "${SERVER_ICON_URL}"'
         - name: jmx-exporter-downloader
           image: busybox:1.35.0
           env:
@@ -42,9 +42,9 @@ spec:
             - name: jmx-exporter-download-volume
               mountPath: /root/jmx-exporter-download
           command:
-            - 'sh'
-            - '-c'
-            - "wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar \"${JMX_EXPORTER_URL}\""
+            - "sh"
+            - "-c"
+            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
 
       containers:
         - resources:
@@ -65,11 +65,14 @@ spec:
               #   https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar
               # RedisBungee:
               #   https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+              # bungeecord-prometheus-exporter:
+              #   https://github.com/weihao/bungeecord-prometheus-exporter/releases/download/3.0.2/bungeecord-prometheus-exporter-3.0.2.jar
               value: >-
                 https://github.com/GiganticMinecraft/BungeeKick/releases/download/release-at-bdbef2f162815b6805aaf7379c213136a077cf04/bungeekick-1.3.jar,
                 https://github.com/GiganticMinecraft/BungeeHubCommand/releases/download/release-at-4c5449d8aecf6bf5a6b810fb85a1bfa75c0fd03f/bungeehubcommand-1.jar,
                 https://github.com/GiganticMinecraft/BungeeSemaphore/releases/download/release-at-bcd5886827c813c75eb31d6f6fa926e0e8e0fd4f/BungeeSemaphore.jar,
                 https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar
+                https://github.com/weihao/bungeecord-prometheus-exporter/releases/download/3.0.2/bungeecord-prometheus-exporter-3.0.2.jar
 
             # BungeeYAML (depended by SwiftMOTD):
             #   https://www.spigotmc.org/resources/bungeeyaml-original.13068/
@@ -89,6 +92,8 @@ spec:
               name: bungeecord
             - containerPort: 18321
               name: jmx-metrics
+            - containerPort: 9225
+              name: metrics
           startupProbe:
             tcpSocket:
               port: 25577
@@ -128,6 +133,9 @@ spec:
             - name: bungeecord-plugin-configs
               mountPath: /config/plugins/SwiftMOTD/config.yml
               subPath: SwiftMOTD-config.yml
+            - name: bungeecord-plugin-configs
+              mountPath: /config/plugins/BungeeCordPrometheusExporter/config.json
+              subPath: BungeeCordPrometheusExporter-config.json
 
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
