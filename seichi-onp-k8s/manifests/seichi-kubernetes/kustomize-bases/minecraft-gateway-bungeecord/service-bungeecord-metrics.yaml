@@ -3,6 +3,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: bungeecord
+    release: prometheus
   name: bungeecord-metrics
 spec:
   endpoints:
@@ -14,7 +15,6 @@ spec:
     matchLabels:
       app: bungeecord
       role: metrics
-
 ---
 apiVersion: v1
 kind: Service
