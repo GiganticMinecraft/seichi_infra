@@ -4,7 +4,7 @@ resources:
   - "./deployment.yaml"
   # - "./networkpolicies.yaml"
   - "./service-bungeecord-loadbalancer.yaml"
-  - "./service-bungeecord-jmx-cluster-ip.yaml"
+  - "./service-bungeecord-metrics.yaml"
   - "./configs/bungeecord-config.yaml"
   - "./configs/plugin-configs.yaml"
   - "./configs/jmx-exporter-config.yaml"
