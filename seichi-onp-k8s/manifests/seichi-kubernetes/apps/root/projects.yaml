@@ -16,6 +16,7 @@ spec:
     - namespace: "argocd"
       server: https://kubernetes.default.svc
     # ./cluster-wide-app-resources でインストールされる
+    #  - keda(event driven autoscaler, 時間によってPodを0にスケールダウンさせるために使用)
     #  - metrics-server
     #  - metallb
     #  - monitoring
@@ -24,6 +25,8 @@ spec:
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: "kube-system"
+      server: https://kubernetes.default.svc
+    - namespace: "keda"
       server: https://kubernetes.default.svc
     - namespace: "metallb-system"
       server: https://kubernetes.default.svc

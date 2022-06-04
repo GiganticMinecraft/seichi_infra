@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keda
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: keda
+    repoURL: https://kedacore.github.io/charts
+    targetRevision: 2.7.2
+    helm:
+      releaseName: keda
+      values: |
+        prometheus:
+          metricServer:
+            enabled: true
+            podMonitor:
+              enabled: true
+              additionalLabels:
+                release: prometheus
+          operator:
+            enabled: true
+            port: 8080
+            path: /metrics
+            podMonitor:
+              enabled: true
+              additionalLabels:
+                release: prometheus
+            prometheusRules:
+              enabled: true
+              additionalLabels:
+                release: prometheus
+              alerts:
+                - alert: KedaScalerErrors
+                  annotations:
+                    description: Keda scaledObject {{ $labels.scaledObject }} is experiencing errors with {{ $labels.scaler }} scaler
+                    summary: Keda Scaler {{ $labels.scaler }} Errors
+                  expr: sum by ( scaledObject , scaler) (rate(keda_metrics_adapter_scaler_errors[2m]))  > 0
+                  for: 2m
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: keda
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
