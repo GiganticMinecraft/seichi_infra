@@ -2,6 +2,15 @@ apiVersion: v1
 entries:
   cloudflared-tunnel:
   - apiVersion: v2
+    created: "2022-06-04T09:15:02.266560956Z"
+    digest: 0a4fe0cddc4b3837b7147b8378ded8d51a7de6520fc7a3b7399d6054e503d3b6
+    maintainers:
+    - name: GiganticMinecraft
+    name: cloudflared-tunnel
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/cloudflared-tunnel-1.0.1/cloudflared-tunnel-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
     created: "2022-06-01T21:05:30.641123134Z"
     digest: 0b3a24a9f276239418855586223cdd4dc113f4672b158ab5b263f75735edf302
     maintainers:
@@ -233,4 +242,4 @@ entries:
     urls:
     - https://github.com/GiganticMinecraft/seichi_infra/releases/download/proxy-kubernetes-cloudflared-redis-1.0.0/proxy-kubernetes-cloudflared-redis-1.0.0.tgz
     version: 1.0.0
-generated: "2022-06-01T21:05:30.641173937Z"
+generated: "2022-06-04T09:15:02.266606857Z"
