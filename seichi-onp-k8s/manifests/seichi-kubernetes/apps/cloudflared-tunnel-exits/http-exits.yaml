@@ -34,25 +34,25 @@ spec:
 
           # 各サーバーの Dynmap ウェブサーバー。
           - name: dynmap-s1
-            external-hostname: s1-map-gigantic.seichi.click
+            external-hostname: s1.map.gigantic.seichi.click
             internal-authority: "192.168.2.1:80"
           - name: dynmap-s2
-            external-hostname: s2-map-gigantic.seichi.click
+            external-hostname: s2.map.gigantic.seichi.click
             internal-authority: "192.168.2.2:80"
           - name: dynmap-s3
-            external-hostname: s3-map-gigantic.seichi.click
+            external-hostname: s3.map.gigantic.seichi.click
             internal-authority: "192.168.2.3:80"
           - name: dynmap-s5
-            external-hostname: s5-map-gigantic.seichi.click
+            external-hostname: s5.map.gigantic.seichi.click
             internal-authority: "192.168.2.5:80"
           - name: dynmap-s7
-            external-hostname: s7-map-gigantic.seichi.click
+            external-hostname: s7.map.gigantic.seichi.click
             internal-authority: "192.168.2.7:80"
           - name: dynmap-cre
-            external-hostname: cre-map-gigantic.seichi.click
+            external-hostname: cre.map.gigantic.seichi.click
             internal-authority: "192.168.1.187:80"
           - name: dynmap-h1
-            external-hostname: h1-map-spring.seichi.click
+            external-hostname: h1.map.spring.seichi.click
             internal-authority: "192.168.1.187:82"
 
           # SeichiRanking の web サーバー。
