@@ -14,24 +14,6 @@ resource "cloudflare_certificate_pack" "advanced_cert_for_admin_network" {
   cloudflare_branding   = false
 }
 
-# オンプレk8sのAPIエンドポイントのFQDNへの通信を保護する証明書パック。
-#
-# 注: APIエンドポイントのFQDNは(DoS等を防ぐために)
-# クラスタセットアップ時にランダムに生成しており、公開はしていない。
-
-resource "cloudflare_certificate_pack" "advanced_cert_for_k8s_endpoint_fqdn" {
-  zone_id = local.cloudflare_zone_id
-  type    = "advanced"
-  hosts = [
-    local.root_domain,
-    "*.k8s-api.onp-k8s.admin.${local.root_domain}",
-  ]
-  validation_method     = "txt"
-  validity_days         = 365
-  certificate_authority = "digicert"
-  cloudflare_branding   = false
-}
-
 resource "cloudflare_access_application" "debug_admin_jmx" {
   zone_id          = local.cloudflare_zone_id
   name             = "Debug server administration"
