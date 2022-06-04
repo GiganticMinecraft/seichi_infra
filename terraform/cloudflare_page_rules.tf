@@ -10,7 +10,7 @@ resource "cloudflare_page_rule" "seichi_maps_old" {
 
 resource "cloudflare_page_rule" "spring_maps_old" {
   zone_id  = local.cloudflare_zone_id
-  priority = cloudflare_page_rule.seichi_maps_old.priority
+  priority = cloudflare_page_rule.seichi_maps_old.priority + 1
   target   = "*-map-spring.${local.root_domain}/*"
 
   actions {
@@ -20,7 +20,7 @@ resource "cloudflare_page_rule" "spring_maps_old" {
 
 resource "cloudflare_page_rule" "seichi_ranking" {
   zone_id  = local.cloudflare_zone_id
-  priority = cloudflare_page_rule.spring_maps_old.priority
+  priority = cloudflare_page_rule.spring_maps_old.priority + 1
   target   = "ranking-gigantic.${local.root_domain}/*"
 
   actions {
@@ -30,7 +30,7 @@ resource "cloudflare_page_rule" "seichi_ranking" {
 
 resource "cloudflare_page_rule" "seichi_maps" {
   zone_id  = local.cloudflare_zone_id
-  priority = cloudflare_page_rule.seichi_ranking.priority
+  priority = cloudflare_page_rule.seichi_ranking.priority + 1
   target   = "*.map.gigantic.${local.root_domain}/*"
 
   actions {
@@ -40,7 +40,7 @@ resource "cloudflare_page_rule" "seichi_maps" {
 
 resource "cloudflare_page_rule" "spring_maps" {
   zone_id  = local.cloudflare_zone_id
-  priority = cloudflare_page_rule.seichi_maps.priority
+  priority = cloudflare_page_rule.seichi_maps.priority + 1
   target   = "*.map.spring.${local.root_domain}/*"
 
   actions {
