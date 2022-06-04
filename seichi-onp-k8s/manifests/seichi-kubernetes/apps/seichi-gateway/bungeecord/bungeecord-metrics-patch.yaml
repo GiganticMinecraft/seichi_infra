@@ -6,3 +6,10 @@ spec:
   selector:
     matchLabels:
       env: prod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bungeecord-metrics
+  labels:
+    env: prod
