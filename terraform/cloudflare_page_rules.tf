@@ -39,8 +39,6 @@ resource "cloudflare_page_rule" "seichi_maps" {
 }
 
 resource "cloudflare_page_rule" "spring_maps" {
-  depends_on = [cloudflare_page_rule.seichi_maps]
-
   zone_id  = local.cloudflare_zone_id
   priority = cloudflare_page_rule.seichi_maps.priority
   target   = "*.map.spring.${local.root_domain}/*"
