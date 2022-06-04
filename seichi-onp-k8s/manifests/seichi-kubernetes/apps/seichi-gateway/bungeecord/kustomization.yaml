@@ -4,9 +4,6 @@ namespace: seichi-gateway
 resources:
   - "../../../kustomize-bases/minecraft-gateway-bungeecord"
 
-commonLabels:
-  env: prod
-
 patchesStrategicMerge:
   - "bungeecord-config-patch.yaml"
   - "bungeecord-metrics-patch.yaml"
