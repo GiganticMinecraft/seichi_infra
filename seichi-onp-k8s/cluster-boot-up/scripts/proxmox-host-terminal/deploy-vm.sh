@@ -141,6 +141,17 @@ qm migrate 1101 unchama-sv-prox01
 qm migrate 1102 unchama-sv-prox02
 qm migrate 1103 unchama-sv-prox04
 
+# move vm-disk to local
+## on unchama-sv-prox01
+ssh 192.168.16.150 qm move-disk 1001 scsi0 local-lvm --delete true
+ssh 192.168.16.150 qm move-disk 1101 scsi0 local-lvm --delete true
+## on unchama-sv-prox02
+ssh 192.168.16.151 qm move-disk 1002 scsi0 local-lvm --delete true
+ssh 192.168.16.151 qm move-disk 1102 scsi0 local-lvm --delete true
+## on unchama-sv-prox04
+ssh 192.168.16.153 qm move-disk 1003 scsi0 local-lvm --delete true
+ssh 192.168.16.153 qm move-disk 1103 scsi0 local-lvm --delete true
+
 # start vm
 ## on unchama-sv-prox01
 ssh 192.168.16.150 qm start 1001
