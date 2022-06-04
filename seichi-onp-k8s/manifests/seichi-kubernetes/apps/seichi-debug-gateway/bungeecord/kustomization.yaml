@@ -4,8 +4,12 @@ namespace: seichi-debug-gateway
 resources:
   - "../../../kustomize-bases/minecraft-gateway-bungeecord"
 
+commonLabels:
+  env: debug
+
 patchesStrategicMerge:
   - "bungeecord-config-patch.yaml"
+  - "bungeecord-metrics-patch.yaml"
   - "bungeecord-plugin-configs-patch.yaml"
   - "service-bungeecord-loadbalancer.yaml"
 
