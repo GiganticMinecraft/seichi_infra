@@ -1,5 +1,16 @@
 {
   "extends": [
     "config:base"
-  ]
+  ],
+  "argocd": {
+    "fileMatch": [
+      "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"
+    ]
+  },
+  "kubernetes": {
+    "fileMatch": [
+      "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
+      "^seichi-onp-k8s/manifests/seichi-kubernetes/kustomize-bases/.+\\.yaml$"
+    ]
+  }
 }
