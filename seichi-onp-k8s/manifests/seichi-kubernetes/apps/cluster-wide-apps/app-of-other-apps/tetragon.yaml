@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tetragon
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: tetragon
+    repoURL: https://helm.cilium.io/
+    targetRevision: 0.8.0
+    helm:
+      releaseName: tetragon
+      values: |
+        tetragon:
+          enableCiliumAPI: true
+          prometheus:
+            serviceMonitor:
+              enabled: true
+              labelsOverride:
+                release: prometheus
+          exportAllowList: |-
+            {
+              "namespace": ["default", "cluster-wide-apps", "seichi-gateway", "seichi-minecraft"],
+              "event_set": ["PROCESS_EXEC", "PROCESS_KPROBE"]
+            }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
