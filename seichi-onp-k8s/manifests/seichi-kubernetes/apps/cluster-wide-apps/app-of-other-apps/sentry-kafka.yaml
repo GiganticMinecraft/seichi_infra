@@ -10,7 +10,7 @@ spec:
   source:
     chart: kafka
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 17.1.0
+    targetRevision: 17.2.3
     helm:
       releaseName: sentry-kafka
       values: |
