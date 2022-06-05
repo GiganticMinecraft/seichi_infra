@@ -20,7 +20,10 @@ spec:
               labelsOverride:
                 release: prometheus
           exportAllowList: |-
-            {"namespace":["default", "cluster-wide-apps", "seichi-gateway", "seichi-minecraft"], "event_set":["PROCESS_EXEC", "PROCESS_KPROBE"]}
+            {
+              "namespace": ["default", "cluster-wide-apps", "seichi-gateway", "seichi-minecraft"],
+              "event_set": ["PROCESS_EXEC", "PROCESS_KPROBE"]
+            }
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
