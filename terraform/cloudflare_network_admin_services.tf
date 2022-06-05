@@ -69,7 +69,7 @@ resource "cloudflare_access_policy" "onp_admin_proxmox" {
 resource "cloudflare_access_application" "onp_admin_minio" {
   zone_id          = local.cloudflare_zone_id
   name             = "minio-console administration"
-  domain           = "minio-console.onp.admin.${local.root_domain}"
+  domain           = "minio-console.onp-k8s.admin.${local.root_domain}"
   type             = "self_hosted"
   session_duration = "24h"
 
