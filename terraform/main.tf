@@ -189,3 +189,13 @@ variable "onp_k8s_cloudflared_tunnel_credential" {
 }
 
 #endregion
+
+#region on-premise MinIO root user password
+
+variable "minio_root_password" {
+  description = "MinIO root password"
+  type        = string
+  sensitive   = true
+}
+
+#endregion

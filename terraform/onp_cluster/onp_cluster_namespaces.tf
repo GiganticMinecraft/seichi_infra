@@ -39,3 +39,9 @@ resource "kubernetes_namespace" "onp_sentry" {
     name = "sentry"
   }
 }
+
+resource "kubernetes_namespace" "minio" {
+  metadata {
+    name = "minio"
+  }
+}

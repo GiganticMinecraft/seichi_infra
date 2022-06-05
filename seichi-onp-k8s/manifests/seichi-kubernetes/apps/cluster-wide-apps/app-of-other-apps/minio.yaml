@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: minio
+    repoURL: https://charts.min.io/
+    targetRevision: 4.0.2
+    helm:
+      releaseName: seichi-private-plugin-blackhole
+      values: |
+        mode: standalone
+        replicas: 1
+        gateway:
+          replicas: 1
+        persistence:
+          size: 5Gi
+        securityContext:
+          enabled: true
+          runAsUser: 0
+          runAsGroup: 0
+          runAsNonRoot: false
+        resources:
+          requests:
+            memory: 2Gi
+        existingSecret: "minio-root-user"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
