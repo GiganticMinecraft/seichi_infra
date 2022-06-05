@@ -33,30 +33,6 @@ spec:
             internal-authority: sentry-nginx.sentry:80
 
           # 各サーバーの Dynmap ウェブサーバー
-          # (旧URL。これらを参照している物がすべて新URLを指すようになったら-oldなホストは全部消す)
-          - name: dynmap-s1-old
-            external-hostname: s1-map-gigantic.seichi.click
-            internal-authority: "192.168.2.1:80"
-          - name: dynmap-s2-old
-            external-hostname: s2-map-gigantic.seichi.click
-            internal-authority: "192.168.2.2:80"
-          - name: dynmap-s3-old
-            external-hostname: s3-map-gigantic.seichi.click
-            internal-authority: "192.168.2.3:80"
-          - name: dynmap-s5-old
-            external-hostname: s5-map-gigantic.seichi.click
-            internal-authority: "192.168.2.5:80"
-          - name: dynmap-s7-old
-            external-hostname: s7-map-gigantic.seichi.click
-            internal-authority: "192.168.2.7:80"
-          - name: dynmap-cre-old
-            external-hostname: cre-map-gigantic.seichi.click
-            internal-authority: "192.168.1.187:80"
-          - name: dynmap-h1-old
-            external-hostname: h1-map-spring.seichi.click
-            internal-authority: "192.168.1.187:82"
-
-          # 各サーバーの Dynmap ウェブサーバー(新URL)
           - name: dynmap-s1
             external-hostname: s1.map.gigantic.seichi.click
             internal-authority: "192.168.2.1:80"
