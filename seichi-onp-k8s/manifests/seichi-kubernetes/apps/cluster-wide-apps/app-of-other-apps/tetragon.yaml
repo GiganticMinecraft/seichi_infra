@@ -21,9 +21,6 @@ spec:
                 release: prometheus
           exportAllowList: |-
             {"namespace":["default", "cluster-wide-apps", "seichi-gateway", "seichi-minecraft"], "event_set":["PROCESS_EXEC", "PROCESS_KPROBE"]}
-          exportDenyList: |-
-            {"health_check":true}
-            {"namespace":["sentry", "cilium", "kube-system", "monitoring"]}
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
