@@ -32,6 +32,11 @@ spec:
             external-hostname: sentry.onp-k8s.admin.seichi.click
             internal-authority: sentry-nginx.sentry:80
 
+          # プライベートなminecraft pluginをアップロードするためのMinIO
+          - name: grafana-k8s
+            external-hostname: grafana.onp-k8s.admin.seichi.click
+            internal-authority: "prometheus-grafana.monitoring:80"
+
           # 各サーバーの Dynmap ウェブサーバー
           # (旧URL。これらを参照している物がすべて新URLを指すようになったら-oldなホストは全部消す)
           - name: dynmap-s1-old
