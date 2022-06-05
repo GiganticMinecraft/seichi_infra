@@ -32,10 +32,11 @@ spec:
             external-hostname: sentry.onp-k8s.admin.seichi.click
             internal-authority: sentry-nginx.sentry:80
 
-          # プライベートなminecraft pluginをアップロードするためのMinIO
-          - name: grafana-k8s
-            external-hostname: grafana.onp-k8s.admin.seichi.click
-            internal-authority: "prometheus-grafana.monitoring:80"
+          # プライベートなminecraft pluginをアップロードするためのMinIO。
+          # 肝心のオブジェクトストレージは seichi-private-plugin-blackhole-minio.minio:9000 にClusterIPでアクセスすればよい。
+          - name: minio-console
+            external-hostname: minio-console.onp-k8s.admin.seichi.click
+            internal-authority: "seichi-private-plugin-blackhole-minio-console.minio:9001"
 
           # 各サーバーの Dynmap ウェブサーバー
           # (旧URL。これらを参照している物がすべて新URLを指すようになったら-oldなホストは全部消す)
