@@ -14,8 +14,6 @@ spec:
       values: |
         mode: standalone
         replicas: 1
-        gateway:
-          replicas: 1
         persistence:
           size: 5Gi
         securityContext:
@@ -27,6 +25,11 @@ spec:
           requests:
             memory: 2Gi
         existingSecret: "minio-root-user"
+        buckets:
+          - name: private-plugins-blackhole
+            policy: public
+            purge: false
+            versioning: false
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
