@@ -30,7 +30,7 @@ spec:
         buckets:
           - name: private-plugins-blackhole
             policy: public
-            purge: false
+            purge: true
             versioning: false
   destination:
     server: https://kubernetes.default.svc
