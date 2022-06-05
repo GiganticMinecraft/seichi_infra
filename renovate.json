@@ -13,13 +13,5 @@
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
       "^seichi-onp-k8s/manifests/seichi-kubernetes/kustomize-bases/.+\\.yaml$"
     ]
-  },
-  "packageRules": [
-    {
-      "matchPackageNames": [
-        "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route"
-      ],
-      "allowedVersions": "/^sha-[0-9a-f]+$/"
-    }
-  ]
+  }
 }
