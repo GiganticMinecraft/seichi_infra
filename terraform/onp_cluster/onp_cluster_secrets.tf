@@ -94,7 +94,7 @@ resource "kubernetes_secret" "minio_root_user" {
   }
 
   data = {
-    "rootUser"     = var.minio_root_user
+    "rootUser"     = "root"
     "rootPassword" = var.minio_root_password
   }
 
