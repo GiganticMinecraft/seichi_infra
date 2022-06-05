@@ -13,10 +13,10 @@ server:
   resources:
     requests:
       cpu: 100m
-      memory: 48Mi
+      memory: 128Mi
     limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 192Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -122,10 +122,10 @@ dex:
   resources:
     limits:
       cpu: 100m
-      memory: 128Mi
+      memory: 192Mi
     requests:
       cpu: 50m
-      memory: 64Mi
+      memory: 128Mi
   metrics:
     enabled: true
     serviceMonitor:
