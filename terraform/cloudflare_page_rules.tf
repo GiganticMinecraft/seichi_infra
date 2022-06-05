@@ -1,26 +1,6 @@
-resource "cloudflare_page_rule" "seichi_maps_old" {
-  zone_id  = local.cloudflare_zone_id
-  priority = 1
-  target   = "*-map-gigantic.${local.root_domain}/*"
-
-  actions {
-    security_level = "under_attack"
-  }
-}
-
-resource "cloudflare_page_rule" "spring_maps_old" {
-  zone_id  = local.cloudflare_zone_id
-  priority = cloudflare_page_rule.seichi_maps_old.priority + 1
-  target   = "*-map-spring.${local.root_domain}/*"
-
-  actions {
-    security_level = "under_attack"
-  }
-}
-
 resource "cloudflare_page_rule" "seichi_ranking" {
   zone_id  = local.cloudflare_zone_id
-  priority = cloudflare_page_rule.spring_maps_old.priority + 1
+  priority = 1
   target   = "ranking-gigantic.${local.root_domain}/*"
 
   actions {
