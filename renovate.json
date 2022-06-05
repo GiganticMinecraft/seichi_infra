@@ -9,7 +9,7 @@
   },
   "kubernetes": {
     "fileMatch": [
-      "^helm-charts/[^/]/templates/.+\\.yaml$",
+      "^helm-charts/[^/]+/templates/.+\\.yaml$",
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
       "^seichi-onp-k8s/manifests/seichi-kubernetes/kustomize-bases/.+\\.yaml$"
     ]
