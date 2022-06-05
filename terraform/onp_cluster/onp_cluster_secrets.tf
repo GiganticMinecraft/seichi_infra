@@ -84,3 +84,19 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "minio_root_user" {
+  depends_on = [ kubernetes_namespace.minio ]
+
+  metadata {
+    name      = "minio-root-user"
+    namespace = "minio"
+  }
+
+  data = {
+    "rootUser" = var.minio_root_user
+    "rootPassword" = var.minio_root_password
+  }
+
+  type = "Opaque"
+}

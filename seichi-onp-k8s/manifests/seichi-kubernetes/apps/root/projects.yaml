@@ -19,6 +19,7 @@ spec:
     #  - keda(event driven autoscaler, 時間によってPodを0にスケールダウンさせるために使用)
     #  - metrics-server
     #  - metallb
+    #  - minio
     #  - monitoring
     #  - sentry
     #  - synology-csi
@@ -29,6 +30,8 @@ spec:
     - namespace: "keda"
       server: https://kubernetes.default.svc
     - namespace: "metallb-system"
+      server: https://kubernetes.default.svc
+    - namespace: "minio"
       server: https://kubernetes.default.svc
     - namespace: "monitoring"
       server: https://kubernetes.default.svc
