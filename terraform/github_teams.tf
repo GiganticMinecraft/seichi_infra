@@ -35,6 +35,12 @@ resource "github_team" "onp_admin_proxmox" {
   privacy     = "closed"
 }
 
+resource "github_team" "onp_admin_minio" {
+  name        = "onp-admin-minio"
+  description = "オンプレミス環境のminioに接続できるTeam"
+  privacy     = "closed"
+}
+
 resource "github_team" "springer" {
   name        = "Springer"
   description = "整地鯖(春)のデベロッパー"
