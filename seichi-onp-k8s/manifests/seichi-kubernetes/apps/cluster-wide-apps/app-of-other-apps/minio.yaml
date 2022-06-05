@@ -16,6 +16,8 @@ spec:
         replicas: 1
         persistence:
           size: 5Gi
+        DeploymentUpdate:
+          type: Recreate
         securityContext:
           enabled: true
           runAsUser: 0
