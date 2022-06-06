@@ -14,9 +14,9 @@ VM_LIST=(
     "1001 seichi-onp-k8s-cp-1 4    8192 "
     "1002 seichi-onp-k8s-cp-2 4    8192 "
     "1003 seichi-onp-k8s-cp-3 4    8192 "
-    "1101 seichi-onp-k8s-wk-1 6    12288"
-    "1102 seichi-onp-k8s-wk-2 6    12288"
-    "1103 seichi-onp-k8s-wk-3 6    12288"
+    "1101 seichi-onp-k8s-wk-1 6    24576"
+    "1102 seichi-onp-k8s-wk-2 6    18432"
+    "1103 seichi-onp-k8s-wk-3 6    24576"
 )
 
 #endregion
