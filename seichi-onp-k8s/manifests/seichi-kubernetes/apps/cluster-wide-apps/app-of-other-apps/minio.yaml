@@ -25,7 +25,7 @@ spec:
           runAsNonRoot: false
         resources:
           requests:
-            memory: 2Gi
+            memory: 1Gi
         existingSecret: "minio-root-user"
   destination:
     server: https://kubernetes.default.svc
