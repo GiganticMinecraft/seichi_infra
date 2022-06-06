@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bungeesemaphore-redis
+  namespace: argocd
+spec:
+  project: seichi-minecraft
+  source:
+    chart: redis
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 16.11.2
+    helm:
+      releaseName: bungeesemaphore-redis
+      values: |
+        architecture: standalone 
+        commonConfiguration: |-
+          notify-keyspace-events "Eg$x"
+        master:
+          containerSecurityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+          service:
+            type: LoadBalancer	
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
+          prometheusRule:
+            enabled: true
+            additionalLabels:
+              release: prometheus
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: seichi-minecraft
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
