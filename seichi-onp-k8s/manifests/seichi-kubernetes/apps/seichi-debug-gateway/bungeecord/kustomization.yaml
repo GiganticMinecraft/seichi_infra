@@ -18,8 +18,5 @@ patchesJson6902:
       name: bungeecord
     patch: |-
       - op: replace
-        path: /spec/template/spec/containers/0/resources/requests/memory
-        value: 768Mi
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: 768m
+        path: /spec/template/spec/containers/0/env/1/value
+        value: BUNGEECORD
