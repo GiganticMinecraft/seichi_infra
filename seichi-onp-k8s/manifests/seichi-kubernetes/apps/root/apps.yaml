@@ -143,3 +143,55 @@ spec:
         duration: 5s
         factor: 2
         maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-of-seichi-minecraft
+  namespace: argocd
+spec:
+  project: seichi-minecraft
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "seichi-minecraft"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-of-seichi-debug-minecraft
+  namespace: argocd
+spec:
+  project: seichi-debug-minecraft
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: "seichi-debug-minecraft"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
