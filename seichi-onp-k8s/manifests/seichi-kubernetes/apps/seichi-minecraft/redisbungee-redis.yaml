@@ -30,7 +30,7 @@ spec:
           prometheusRule:
             enabled: true
             additionalLabels:
-              release: 
+              release: prometheus
             rules:
               - alert: RedisDown
                 expr: redis_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
