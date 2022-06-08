@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: bungeesemaphore-debug-redis
+  name: seichi-debug-bungeesemaphore-redis
   namespace: argocd
 spec:
   project: seichi-debug-minecraft
@@ -10,7 +10,7 @@ spec:
     repoURL: https://charts.bitnami.com/bitnami
     targetRevision: 16.11.2
     helm:
-      releaseName: bungeesemaphore-redis
+      releaseName: seichi-debug-bungeesemaphore-redis
       values: |
         architecture: standalone 
         commonConfiguration: |-
