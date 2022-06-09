@@ -21,6 +21,11 @@ spec:
             runAsNonRoot: false
           service:
             type: LoadBalancer	
+          resources:
+            requests:
+              cpu: "250m"
+              # https://github.com/GiganticMinecraft/seichi_infra/issues/468
+              memory: "1Gi"
         metrics:
           enabled: true
           serviceMonitor:
