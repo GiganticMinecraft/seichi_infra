@@ -13,6 +13,8 @@ spec:
       releaseName: seichi-debug-redisbungee-redis
       values: |
         architecture: standalone 
+        auth:
+          enabled: false
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
         master:

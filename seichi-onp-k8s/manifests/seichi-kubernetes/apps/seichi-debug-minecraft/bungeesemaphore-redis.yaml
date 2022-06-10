@@ -12,7 +12,9 @@ spec:
     helm:
       releaseName: seichi-debug-bungeesemaphore-redis
       values: |
-        architecture: standalone 
+        architecture: standalone
+        auth:
+          enabled: false
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
         master:
