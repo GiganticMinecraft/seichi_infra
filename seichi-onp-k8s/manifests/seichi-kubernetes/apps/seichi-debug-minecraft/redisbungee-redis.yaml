@@ -25,9 +25,9 @@ spec:
           resources:
             requests:
               cpu: "250m"
-              # https://github.com/GiganticMinecraft/seichi_infra/issues/468
               memory: "1Gi"
           extraFlags:
+            # https://github.com/GiganticMinecraft/seichi_infra/issues/468
             - "--maxmemory 2048mb"
         metrics:
           enabled: true
