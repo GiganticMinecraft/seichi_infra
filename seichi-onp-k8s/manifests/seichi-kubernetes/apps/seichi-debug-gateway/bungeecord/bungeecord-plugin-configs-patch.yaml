@@ -15,8 +15,8 @@ data:
   BungeeSemaphore-config.yml: |
     synchronized-server-regex: "^(deb-s\\d+)$"
     redis:
-      host: 192.168.1.188
-      port: 11788
+      host: seichi-debug-bungeesemaphore-redis-master.seichi-debug-minecraft
+      port: 6379
 
     locale:
       error:
@@ -28,8 +28,8 @@ data:
   RedisBungee-config.yml: |
     server-id: ""
     use-random-id-string: true
-    redis-server: 192.168.1.188
-    redis-port: 11787
+    redis-server: seichi-debug-redisbungee-redis-master.seichi-debug-minecraft
+    redis-port: 6379
     redis-password: ""
     max-redis-connections: 8
     useSSL: false
