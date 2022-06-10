@@ -14,7 +14,11 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 | ----------- | ------------------------------------------------------------------------------ | 
 |  BungeeCord | Minecraftプロトコル用プロキシ                                                  | 
 
-## 外部からトラフィックが直接流入する `Service` の VIP について
+## `Service` の VIP 割り当て
+
+`loadbalancerIP` が取りうる範囲に関しては、 [オンプレ環境のネットワーク構成に関する説明](https://github.com/GiganticMinecraft/seichi_infra/tree/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/cluster-boot-up#%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF) を参照してください。
+
+### 外部からトラフィックが直接流入する `Service`
 
 エンドユーザーからの HTTP 通信を受け取るサービスは、パケットをすべて Cloudflare Tunnel (`cloudflared` による) で終端しているため、インターネットからそれらサービスへの ingress の経路は用意してません。
 
@@ -30,7 +34,9 @@ TCP パケットをそのまま送り届ける必要があります。
  - オンプレのルーターからこれら VIP へのポートフォワードを (unchamaが) 設定し
  - パケット送信元のサービスに global IP とフォワードされている外向きのポートを登録しておく
  
-という構成になっています。割り当てられている `loadbalancerIP` は以下の通りです。
+という構成になっています。
+
+この条件に該当する `Service` に割り当てられた `loadbalancerIP` は以下の通りです。
 
 | サービス                     | `Service` の VIP                                            | 
 | ---------------------------- | ----------------------------------------------------------- | 
@@ -38,7 +44,19 @@ TCP パケットをそのまま送り届ける必要があります。
 |  BungeeCord (デバッグ環境用) | [`192.168.8.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
 |  投票受付サーバー            | (まだ k8s 上に乗っていないので、 `Service` の VIP ではない) |
 
-`loadbalancerIP` が取りうる範囲に関しては、 [オンプレ環境のネットワーク構成に関する説明](https://github.com/GiganticMinecraft/seichi_infra/tree/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/cluster-boot-up#%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF) を参照してください。
+### オンプレネットワーク内からのトラフィックを受ける `Service`
+
+レガシーな、オンプレネットワーク内のVMからトラフィックを受け取るサービスにも `loadbalancerIP` を割り当てています。
+
+この条件に該当する `Service` に割り当てられた `loadbalancerIP` は以下の通りです。
+
+| サービス                       | `Service` の VIP                                            | 
+| ------------------------------ | ----------------------------------------------------------- | 
+| 本番 RedisBungee 用 Redis      | [`192.168.8.132`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/redisbungee-redis.yaml#L24) |
+| 本番 BungeeSemaphore 用 Redis  | [`192.168.8.133`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/bungeesemaphore-redis.yaml#L24) |
+| Debug RedisBungee 用 Redis     | [`192.168.8.134`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/redisbungee-redis.yaml#L24) |
+| Debug BungeeSemaphore 用 Redis | [`192.168.8.135`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/bungeesemaphore-redis.yaml#L24) |
+
 
 ## Kubernetes クラスタのブートストラップについて
 
