@@ -145,53 +145,77 @@ spec:
         maxDuration: 2m
 ---
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
-  name: app-of-seichi-minecraft
+  name: seichi-minecraft-apps
   namespace: argocd
 spec:
-  project: seichi-minecraft
-  source:
-    repoURL: https://github.com/GiganticMinecraft/seichi_infra
-    targetRevision: main
-    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: "seichi-minecraft"
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-      allowEmpty: true
-    retry:
-      limit: -1
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 2m
+  generators:
+    - git:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        revision: main
+        directories:
+          - path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/*
+  template:
+    metadata:
+      # 各Application が argocd namespace に配置されるため prefix した方が安全
+      name: "seichi-minecraft-{{path.basenameNormalized}}"
+      namespace: argocd
+    spec:
+      project: seichi-minecraft
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "seichi-minecraft"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
 ---
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
-  name: app-of-seichi-debug-minecraft
+  name: seichi-debug-minecraft-apps
   namespace: argocd
 spec:
-  project: seichi-debug-minecraft
-  source:
-    repoURL: https://github.com/GiganticMinecraft/seichi_infra
-    targetRevision: main
-    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: "seichi-debug-minecraft"
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-      allowEmpty: true
-    retry:
-      limit: -1
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 2m
+  generators:
+    - git:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        revision: main
+        directories:
+          - path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/*
+  template:
+    metadata:
+      # 各Application が argocd namespace に配置されるため prefix した方が安全
+      name: "seichi-debug-minecraft-{{path.basenameNormalized}}"
+      namespace: argocd
+    spec:
+      project: seichi-debug-minecraft
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "seichi-debug-minecraft"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
