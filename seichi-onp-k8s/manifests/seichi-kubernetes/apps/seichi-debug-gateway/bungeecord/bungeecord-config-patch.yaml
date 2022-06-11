@@ -14,6 +14,11 @@ data:
         restricted: false
         motd: ''
 
+      test-one-day-to-reset:
+        address: mcserver--one-day-to-reset:25565
+        restricted: false
+        motd: ''
+
     listeners:
       - priorities:
           - deb-s1
