@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-mcserver-plugin-configs
+data:
+  # TODO
+  jmx-exporter-config.yaml: |

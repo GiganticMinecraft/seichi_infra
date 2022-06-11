@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: mcserver
+    release: prometheus
+    mcserver: one-day-to-reset
+  name: mcserver-metrics--one-day-to-reset
+spec:
+  endpoints:
+    - interval: 30s
+      port: jmx-metrics
+  selector:
+    matchLabels:
+      app: mcserver
+      role: metrics
+      mcserver: one-day-to-reset
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcserver-metrics--one-day-to-reset
+  labels:
+    app: mcserver
+    role: metrics
+    mcserver: one-day-to-reset
+spec:
+  type: ClusterIP
+  ports:
+    - name: jmx-metrics
+      port: 18321
+      protocol: TCP
+      targetPort: jmx-metrics
+  selector:
+    mcserver: one-day-to-reset
