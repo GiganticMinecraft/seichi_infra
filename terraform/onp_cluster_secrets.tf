@@ -17,12 +17,12 @@ resource "kubernetes_secret" "onp_logdna_agent_ingestion_key" {
 }
 
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
-  depends_on = [ kubernetes_namespace.onp_argocd ]
+  depends_on = [kubernetes_namespace.onp_argocd]
 
   metadata {
     name      = "argocd-github-oauth-app-secret"
     namespace = "argocd"
-    labels    = {
+    labels = {
       # これが必要っぽい
       # https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#alternative
       "app.kubernetes.io/part-of" = "argocd"
@@ -37,7 +37,7 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
 }
 
 resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
-  depends_on = [ kubernetes_namespace.onp_monitoring ]
+  depends_on = [kubernetes_namespace.onp_monitoring]
 
   metadata {
     name      = "grafana-github-oauth-app-secret"
@@ -45,7 +45,7 @@ resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
   }
 
   data = {
-    GF_AUTH_GITHUB_CLIENT_ID = var.onp_k8s_grafana_github_oauth_app_id
+    GF_AUTH_GITHUB_CLIENT_ID     = var.onp_k8s_grafana_github_oauth_app_id
     GF_AUTH_GITHUB_CLIENT_SECRET = var.onp_k8s_grafana_github_oauth_app_secret
   }
 
@@ -53,7 +53,7 @@ resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
 }
 
 resource "kubernetes_secret" "onp_synology_csi" {
-  depends_on = [ kubernetes_namespace.onp_synology_csi ]
+  depends_on = [kubernetes_namespace.onp_synology_csi]
 
   metadata {
     name      = "client-info-secret"
@@ -68,7 +68,7 @@ resource "kubernetes_secret" "onp_synology_csi" {
 }
 
 resource "kubernetes_secret" "cloudflared_tunnel_credential" {
-  depends_on = [ kubernetes_namespace.cloudflared_tunnel_exits ]
+  depends_on = [kubernetes_namespace.cloudflared_tunnel_exits]
 
   metadata {
     name      = "cloudflared-tunnel-credential"
@@ -86,7 +86,7 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
 }
 
 resource "kubernetes_secret" "minio_root_user" {
-  depends_on = [ kubernetes_namespace.minio ]
+  depends_on = [kubernetes_namespace.minio]
 
   metadata {
     name      = "minio-root-user"
