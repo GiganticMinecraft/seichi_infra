@@ -16,7 +16,7 @@ resource "kubernetes_secret" "onp_minecraft_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_secrets" {
+resource "kubernetes_secret" "onp_minecraft_one_day_to_reset_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft, kubernetes_namespace.onp_seichi_debug_minecraft]
 
   for_each = toset(["seichi-debug-minecraft", "seichi-minecraft"])
