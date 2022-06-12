@@ -9,8 +9,7 @@ resource "kubernetes_secret" "onp_minecraft_secrets" {
   }
 
   data = {
-    # TODO: put real data from variable
-    DISCORDSRV_TOKEN = "INVALID_TOKEN"
+    DISCORDSRV_TOKEN = var.minecraft__discordsrv_bot_token
   }
 
   type = "Opaque"
@@ -27,8 +26,7 @@ resource "kubernetes_secret" "onp_minecraft_one_day_to_reset_secrets" {
   }
 
   data = {
-    # TODO: put real data from variable
-    MORNING_GLORY_SEEDS_WEBHOOK_URL = "https://discord.com/api/webhooks/886923395407679498/INVALID_ENDPOINT"
+    MORNING_GLORY_SEEDS_WEBHOOK_URL = var.minecraft__one_day_to_reset__morning_glory_seed_webhook_url
   }
 
   type = "Opaque"
