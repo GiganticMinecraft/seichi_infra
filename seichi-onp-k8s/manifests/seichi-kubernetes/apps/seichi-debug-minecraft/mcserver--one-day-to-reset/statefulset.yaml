@@ -79,14 +79,14 @@ spec:
             - name: CFG_DISCORDSRV_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: mcserver-config-secrets
+                  name: mcserver--common--config-secrets
                   key: DISCORDSRV_TOKEN
 
-            - name: CFG_ONE_DAY_TO_RESET__MORNING_GLORY_SEEDS_WEBHOOK
+            - name: CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL
               valueFrom:
                 secretKeyRef:
                   name: mcserver--one-day-to-reset--config-secrets
-                  key: MORNING_GLORY_SEEDS_WEBHOOK
+                  key: MORNING_GLORY_SEEDS_WEBHOOK_URL
 
           image: itzg/minecraft-server:2022.8.0-java17-jdk
           name: minecraft

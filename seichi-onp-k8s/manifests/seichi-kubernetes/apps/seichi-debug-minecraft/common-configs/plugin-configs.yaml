@@ -299,4 +299,4 @@ data:
     ServerWatchdogMessageCount: 3
 
   MorningGlorySeeds-config.yml: |
-    webhook: "${CFG_ONE_DAY_TO_RESET__MORNING_GLORY_SEEDS_WEBHOOK}"
+    webhook: "${CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL}"
