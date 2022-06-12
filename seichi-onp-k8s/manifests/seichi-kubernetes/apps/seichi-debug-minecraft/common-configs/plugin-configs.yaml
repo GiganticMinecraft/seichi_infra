@@ -32,10 +32,10 @@ data:
     #
     # チャンネルペアの最初の部分はDiscordチャンネル名ではありません！
     # このオプションを変更した後、サーバーを再起動する必要があります
-    Channels: {"global": "689106486944989232"}
+    Channels: {"global": "${CFG_DISCORDSRV_GLOBAL_CHANNEL_ID}"}
 
     # コンソールチャンネルの数値のID(チャンネル名ではありません)。コンソールチャンネルを全て無効にするなら、空のままにしてください。
-    DiscordConsoleChannelId: "689106759851180044"
+    DiscordConsoleChannelId: "${CFG_DISCORDSRV_CONSOLE_CHANNEL_ID}"
 
     # /discordの使用時にプレーヤーに表示される招待リンク、およびリンクが強制されるときにリンクされていないプレーヤーに表示されるメッセージに表示される招待リンク
     DiscordInviteLink: "discord.gg/changethisintheconfig.yml"

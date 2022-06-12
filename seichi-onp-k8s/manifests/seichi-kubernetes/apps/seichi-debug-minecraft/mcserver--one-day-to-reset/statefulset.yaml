@@ -88,6 +88,12 @@ spec:
                   name: mcserver--one-day-to-reset--config-secrets
                   key: MORNING_GLORY_SEEDS_WEBHOOK_URL
 
+            - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
+              value: "689106486944989232"
+
+            - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
+              value: "689106759851180044"
+
           image: itzg/minecraft-server:2022.8.0-java17-jdk
           name: minecraft
           ports:
