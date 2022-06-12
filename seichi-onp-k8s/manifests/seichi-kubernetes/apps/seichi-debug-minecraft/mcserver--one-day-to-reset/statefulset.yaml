@@ -66,6 +66,28 @@ spec:
               value: >-
                 -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
 
+            - name: COPY_CONFIG_DEST
+              # /config をサーバーディレクトリにコピーするようにする
+              # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
+              value: /data
+
+            # 設定ファイル内の ${CFG_*} の形をした部分を置き換える
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+            - name: REPLACE_ENV_VARIABLE_PREFIX
+              value: CFG_
+
+            - name: CFG_DISCORDSRV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver-config-secrets
+                  key: DISCORDSRV_TOKEN
+
+            - name: CFG_ONE_DAY_TO_RESET__MORNING_GLORY_SEEDS_WEBHOOK
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--one-day-to-reset--config-secrets
+                  key: MORNING_GLORY_SEEDS_WEBHOOK
+
           image: itzg/minecraft-server:2022.8.0-java17-jdk
           name: minecraft
           ports:
@@ -86,11 +108,6 @@ spec:
             # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
             # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
 
-            # TODO
-            - name: common-mcserver-configs
-              mountPath: /config/config.yml
-              subPath: config.yml
-
             # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
             # 提供するために symlink による一時ディレクトリがマウントされることになるが、
             # itzg/minecraft-server が利用するファイル同期の仕組み (itzg/mc-image-helper) は
@@ -100,25 +117,29 @@ spec:
             # 参考: https://stackoverflow.com/a/63114800
             # 参考: https://stackoverflow.com/a/50687707
 
-            # TODO
-            - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/BungeeHubCommand/config.yml
-              subPath: BungeeHubCommand-config.yml
-            - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/BungeeKick/config.yml
-              subPath: BungeeKick-config.yml
-            - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/BungeeSemaphore/config.yml
-              subPath: BungeeSemaphore-config.yml
-            - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/RedisBungee/config.yml
-              subPath: RedisBungee-config.yml
-            - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/SwiftMOTD/config.yml
-              subPath: SwiftMOTD-config.yml
-            - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/BungeeCordPrometheusExporter/config.json
-              subPath: BungeeCordPrometheusExporter-config.json
+            # サーバーの設定ファイル
+            - name: common-mcserver-configs
+              mountPath: /config/bukkit.yml
+              subPath: bukkit.yml
+            - name: common-mcserver-configs
+              mountPath: /config/paper.yml
+              subPath: paper.yml
+            - name: common-mcserver-configs
+              mountPath: /config/server.properties
+              subPath: server.properties
+            - name: common-mcserver-configs
+              mountPath: /config/spigot.yml
+              subPath: spigot.yml
+
+            # DiscordSRV プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DiscordSRV/config.yml
+              subPath: DiscordSRV-config.yml
+
+            # MorningGlorySeeds プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/MorningGlorySeeds/config.yml
+              subPath: MorningGlorySeeds-config.yml
 
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
