@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  annotations:
+    reloader.stakater.com/auto: "true"
   labels:
     app: mcserver
     mcserver: one-day-to-reset
@@ -145,6 +147,9 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/DiscordSRV/config.yml
               subPath: DiscordSRV-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DiscordSRV/messages.yml
+              subPath: DiscordSRV-messages.yml
 
             # MorningGlorySeeds プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
