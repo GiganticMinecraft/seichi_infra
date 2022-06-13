@@ -6,13 +6,14 @@ spec:
   scaleTargetRef:
     name: mcserver--one-day-to-reset
     kind: StatefulSet
-  # 4:00 にレプリカ数を 0 に落とすことで再起動を促す。
+  # 04:05 から翌日の 04:00 までレプリカ数を 1 にすることで、
+  # 04:00 に再起動がされるようにする
   triggers:
     - type: cron
       metadata:
         timezone: Asia/Tokyo
-        # "At 04:00." https://crontab.guru/#0_4_*_*_*
-        start: 0 4 * * *
         # "At 04:05." https://crontab.guru/#5_4_*_*_*
-        end: 5 4 * * *
-        desiredReplicas: "0"
+        start: 5 4 * * *
+        # "At 04:00." https://crontab.guru/#0_4_*_*_*
+        end: 0 4 * * *
+        desiredReplicas: "1"

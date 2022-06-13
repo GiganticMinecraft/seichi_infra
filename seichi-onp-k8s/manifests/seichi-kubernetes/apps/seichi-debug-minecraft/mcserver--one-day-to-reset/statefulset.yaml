@@ -8,7 +8,7 @@ metadata:
     mcserver: one-day-to-reset
   name: mcserver--one-day-to-reset
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 0
   serviceName: "mcserver--one-day-to-reset"
   selector:
