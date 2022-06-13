@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cron-scaledobject--one-day-to-reset
+spec:
+  scaleTargetRef:
+    name: mcserver--one-day-to-reset
+    kind: StatefulSet
+  # 常時レプリカ数 1 で稼働させ、
+  # 4:00 にレプリカ数を 0 に落とすことで再起動を促す。
+  idleReplicaCount: 1
+  triggers:
+    - type: cron
+      metadata:
+        timezone: Asia/Tokyo
+        # "At 04:00." https://crontab.guru/#0_4_*_*_*
+        start: 0 4 * * *
+        # "At 04:05." https://crontab.guru/#5_4_*_*_*
+        end: 5 4 * * *
+        desiredReplicas: 0

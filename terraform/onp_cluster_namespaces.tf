@@ -4,9 +4,21 @@ resource "kubernetes_namespace" "onp_seichi_debug_gateway" {
   }
 }
 
+resource "kubernetes_namespace" "onp_seichi_debug_minecraft" {
+  metadata {
+    name = "seichi-debug-minecraft"
+  }
+}
+
 resource "kubernetes_namespace" "onp_seichi_gateway" {
   metadata {
     name = "seichi-gateway"
+  }
+}
+
+resource "kubernetes_namespace" "onp_seichi_minecraft" {
+  metadata {
+    name = "seichi-minecraft"
   }
 }
 

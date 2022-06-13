@@ -199,3 +199,19 @@ variable "minio_root_password" {
 }
 
 #endregion
+
+#region on-premise minecraft config secrets
+
+variable "minecraft__discordsrv_bot_token" {
+  description = "DiscordSRV bot token"
+  type        = string
+  sensitive   = true
+}
+
+variable "minecraft__one_day_to_reset__morning_glory_seed_webhook_url" {
+  description = "Webhook URL for MorningGlorySeeds on one-day-to-reset server"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
