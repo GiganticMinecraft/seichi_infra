@@ -8,7 +8,9 @@ metadata:
     mcserver: one-day-to-reset
   name: mcserver--one-day-to-reset
 spec:
-  replicas: 0
+  # レプリカ数の制御を ScaledObject に任せるため、 replicas は指定しない
+  # 参考: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#replicas
+
   revisionHistoryLimit: 0
   serviceName: "mcserver--one-day-to-reset"
   selector:
