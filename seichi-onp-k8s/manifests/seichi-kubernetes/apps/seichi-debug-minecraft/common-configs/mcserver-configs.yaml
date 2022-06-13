@@ -422,7 +422,7 @@ data:
     server-ip=
     resource-pack-prompt=
     allow-nether=true
-    server-port=25591
+    server-port=25565
     enable-rcon=false
     sync-chunk-writes=true
     op-permission-level=4
