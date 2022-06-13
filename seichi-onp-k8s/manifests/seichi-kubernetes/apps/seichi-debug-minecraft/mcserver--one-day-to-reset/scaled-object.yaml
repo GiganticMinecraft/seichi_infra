@@ -8,7 +8,7 @@ spec:
     kind: StatefulSet
   # 常時レプリカ数 1 で稼働させ、
   # 4:00 にレプリカ数を 0 に落とすことで再起動を促す。
-  idleReplicaCount: 1
+  idleReplicaCount: "1"
   triggers:
     - type: cron
       metadata:
@@ -17,4 +17,4 @@ spec:
         start: 0 4 * * *
         # "At 04:05." https://crontab.guru/#5_4_*_*_*
         end: 5 4 * * *
-        desiredReplicas: 0
+        desiredReplicas: "0"
