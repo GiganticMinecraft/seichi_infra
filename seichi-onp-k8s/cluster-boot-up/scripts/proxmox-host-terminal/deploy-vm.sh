@@ -10,13 +10,13 @@ SNIPPET_TARGET_VOLUME=seichi-prox-backup04
 SNIPPET_TARGET_PATH=/mnt/pve/${SNIPPET_TARGET_VOLUME}/snippets
 REPOSITORY_RAW_SOURCE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}"
 VM_LIST=(
-    #vmid #vmname             #cpu #mem
-    "1001 seichi-onp-k8s-cp-1 4    8192 "
-    "1002 seichi-onp-k8s-cp-2 4    8192 "
-    "1003 seichi-onp-k8s-cp-3 4    8192 "
-    "1101 seichi-onp-k8s-wk-1 6    24576"
-    "1102 seichi-onp-k8s-wk-2 6    18432"
-    "1103 seichi-onp-k8s-wk-3 6    24576"
+    #vmid #vmname             #cpu #mem  #targetip      #targethost
+    "1001 seichi-onp-k8s-cp-1 4    8192  192.168.16.150 unchama-sv-prox01"
+    "1002 seichi-onp-k8s-cp-2 4    8192  192.168.16.151 unchama-sv-prox02"
+    "1003 seichi-onp-k8s-cp-3 4    8192  192.168.16.153 unchama-sv-prox04"
+    "1101 seichi-onp-k8s-wk-1 6    24576 192.168.16.150 unchama-sv-prox01"
+    "1102 seichi-onp-k8s-wk-2 6    18432 192.168.16.151 unchama-sv-prox02"
+    "1103 seichi-onp-k8s-wk-3 6    24576 192.168.16.153 unchama-sv-prox04"
 )
 
 #endregion
@@ -62,14 +62,20 @@ rm focal-server-cloudimg-amd64.img
 
 for array in "${VM_LIST[@]}"
 do
-    echo "${array}" | while read -r vmid vmname cpu mem
+    echo "${array}" | while read -r vmid vmname cpu mem targetip targethost
     do
         # clone from template
-        qm clone "${TEMPLATE_VMID}" "${vmid}" --name "${vmname}" --full true 
-        qm set "${vmid}" --cores "${cpu}" --memory "${mem}"
+        # in clone phase, can't create vm-disk to local volume
+        qm clone "${TEMPLATE_VMID}" "${vmid}" --name "${vmname}" --full true --target "${targethost}"
+        
+        # set compute resources
+        ssh "${targetip}" qm set "${vmid}" --cores "${cpu}" --memory "${mem}"
+
+        # move vm-disk to local
+        ssh "${targetip}" qm move-disk "${vmid}" scsi0 "${BOOT_IMAGE_TARGET_VOLUME}" --delete true
 
         # resize disk (Resize after cloning, because it takes time to clone a large disk)
-        qm resize "${vmid}" scsi0 30G
+        ssh "${targetip}" qm resize "${vmid}" scsi0 30G
 
         # create snippet for cloud-init(user-config)
         # START irregular indent because heredoc
@@ -128,39 +134,12 @@ EOF
         curl -s "${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-up/snippets/${vmname}-network.yaml" > "${SNIPPET_TARGET_PATH}"/"${vmname}"-network.yaml
 
         # set snippet to vm
-        qm set "${vmid}" --cicustom "user=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-user.yaml,network=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-network.yaml"
+        ssh "${targetip}" qm set "${vmid}" --cicustom "user=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-user.yaml,network=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-network.yaml"
+
+        # start vm
+        ssh "${targetnode}" qm start "${vmid}"
 
     done
 done
-
-# migrate vm
-qm migrate 1001 unchama-sv-prox01
-qm migrate 1002 unchama-sv-prox02
-qm migrate 1003 unchama-sv-prox04
-qm migrate 1101 unchama-sv-prox01
-qm migrate 1102 unchama-sv-prox02
-qm migrate 1103 unchama-sv-prox04
-
-# move vm-disk to local
-## on unchama-sv-prox01
-ssh 192.168.16.150 qm move-disk 1001 scsi0 local-lvm --delete true
-ssh 192.168.16.150 qm move-disk 1101 scsi0 local-lvm --delete true
-## on unchama-sv-prox02
-ssh 192.168.16.151 qm move-disk 1002 scsi0 local-lvm --delete true
-ssh 192.168.16.151 qm move-disk 1102 scsi0 local-lvm --delete true
-## on unchama-sv-prox04
-ssh 192.168.16.153 qm move-disk 1003 scsi0 local-lvm --delete true
-ssh 192.168.16.153 qm move-disk 1103 scsi0 local-lvm --delete true
-
-# start vm
-## on unchama-sv-prox01
-ssh 192.168.16.150 qm start 1001
-ssh 192.168.16.150 qm start 1101
-## on unchama-sv-prox02
-ssh 192.168.16.151 qm start 1002
-ssh 192.168.16.151 qm start 1102
-## on unchama-sv-prox04
-ssh 192.168.16.153 qm start 1003
-ssh 192.168.16.153 qm start 1103
 
 # endregion
