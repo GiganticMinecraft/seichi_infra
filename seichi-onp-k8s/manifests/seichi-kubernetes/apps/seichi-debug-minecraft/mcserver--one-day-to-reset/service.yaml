@@ -27,6 +27,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
+    - name: minecraft
+      port: 25565
+      protocol: TCP
+      targetPort: minecraft
     - name: jmx-metrics
       port: 18321
       protocol: TCP
