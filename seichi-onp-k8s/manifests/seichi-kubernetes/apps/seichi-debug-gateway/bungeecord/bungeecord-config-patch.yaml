@@ -15,7 +15,7 @@ data:
         motd: ''
 
       test-one-day-to-reset:
-        address: mcserver--one-day-to-reset:25565
+        address: mcserver--one-day-to-reset.seichi-debug-minecraft:25565
         restricted: false
         motd: ''
 
