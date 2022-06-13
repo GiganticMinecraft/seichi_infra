@@ -8,6 +8,7 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 0
+  serviceName: "mcserver--one-day-to-reset"
   selector:
     matchLabels:
       app: mcserver--one-day-to-reset
