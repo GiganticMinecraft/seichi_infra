@@ -46,6 +46,8 @@ spec:
               value: 2048m
             - name: TYPE
               value: PAPER
+            - name: VERSION
+              value: "1.18.1"
             - name: EULA
               value: "TRUE"
 
