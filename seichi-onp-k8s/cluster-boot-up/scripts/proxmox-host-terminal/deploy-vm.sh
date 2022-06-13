@@ -69,13 +69,13 @@ do
         qm clone "${TEMPLATE_VMID}" "${vmid}" --name "${vmname}" --full true --target "${targethost}"
         
         # set compute resources
-        ssh "${targetip}" qm set "${vmid}" --cores "${cpu}" --memory "${mem}"
+        ssh -n "${targetip}" qm set "${vmid}" --cores "${cpu}" --memory "${mem}"
 
         # move vm-disk to local
-        ssh "${targetip}" qm move-disk "${vmid}" scsi0 "${BOOT_IMAGE_TARGET_VOLUME}" --delete true
+        ssh -n "${targetip}" qm move-disk "${vmid}" scsi0 "${BOOT_IMAGE_TARGET_VOLUME}" --delete true
 
         # resize disk (Resize after cloning, because it takes time to clone a large disk)
-        ssh "${targetip}" qm resize "${vmid}" scsi0 30G
+        ssh -n "${targetip}" qm resize "${vmid}" scsi0 30G
 
         # create snippet for cloud-init(user-config)
         # START irregular indent because heredoc
@@ -134,10 +134,10 @@ EOF
         curl -s "${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-up/snippets/${vmname}-network.yaml" > "${SNIPPET_TARGET_PATH}"/"${vmname}"-network.yaml
 
         # set snippet to vm
-        ssh "${targetip}" qm set "${vmid}" --cicustom "user=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-user.yaml,network=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-network.yaml"
+        ssh -n "${targetip}" qm set "${vmid}" --cicustom "user=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-user.yaml,network=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-network.yaml"
 
         # start vm
-        ssh "${targetip}" qm start "${vmid}"
+        ssh -n "${targetip}" qm start "${vmid}"
 
     done
 done
