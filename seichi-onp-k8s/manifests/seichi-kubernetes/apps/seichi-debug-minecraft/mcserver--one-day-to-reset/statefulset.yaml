@@ -93,10 +93,10 @@ spec:
                   key: MORNING_GLORY_SEEDS_WEBHOOK_URL
 
             - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
-              value: "689106486944989232"
+              value: "985725592227938325"
 
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
-              value: "689106759851180044"
+              value: "985691299501985812"
 
           image: itzg/minecraft-server:2022.8.0-java17-jdk
           name: minecraft
