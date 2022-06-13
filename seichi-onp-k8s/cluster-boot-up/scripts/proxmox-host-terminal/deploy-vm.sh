@@ -5,7 +5,8 @@
 TARGET_BRANCH=$1
 TEMPLATE_VMID=9050
 CLOUDINIT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
-BOOT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
+TEMPLATE_BOOT_IMAGE_TARGET_VOLUME=prd-network-01-lun01
+BOOT_IMAGE_TARGET_VOLUME=local-lvm
 SNIPPET_TARGET_VOLUME=seichi-prox-backup04
 SNIPPET_TARGET_PATH=/mnt/pve/${SNIPPET_TARGET_VOLUME}/snippets
 REPOSITORY_RAW_SOURCE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}"
@@ -33,11 +34,11 @@ wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.i
 # vmbr1=Storage Network Segment (192.168.16.0/22)
 qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --name seichi-onp-k8s-template
 
-# import the downloaded disk to $BOOT_IMAGE_TARGET_VOLUME storage
-qm importdisk $TEMPLATE_VMID focal-server-cloudimg-amd64.img $BOOT_IMAGE_TARGET_VOLUME
+# import the downloaded disk to $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME storage
+qm importdisk $TEMPLATE_VMID focal-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
 
 # finally attach the new disk to the VM as scsi drive
-qm set $TEMPLATE_VMID --scsihw virtio-scsi-pci --scsi0 $BOOT_IMAGE_TARGET_VOLUME:vm-$TEMPLATE_VMID-disk-0
+qm set $TEMPLATE_VMID --scsihw virtio-scsi-pci --scsi0 $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME:vm-$TEMPLATE_VMID-disk-0
 
 # add Cloud-Init CD-ROM drive
 qm set $TEMPLATE_VMID --ide2 $CLOUDINIT_IMAGE_TARGET_VOLUME:cloudinit
