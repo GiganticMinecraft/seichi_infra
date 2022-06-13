@@ -152,7 +152,7 @@ spec:
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
               subPath: jmx-exporter-javaagent.jar
-            - name: jmx-exporter-config
+            - name: common-jmx-exporter-config
               mountPath: /jmx-exporter/jmx-exporter-config.yaml
               subPath: jmx-exporter-config.yaml
 
@@ -167,6 +167,6 @@ spec:
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
           emptyDir: {}
-        - name: jmx-exporter-config
+        - name: common-jmx-exporter-config
           configMap:
-            name: jmx-exporter-config
+            name: common-jmx-exporter-config
