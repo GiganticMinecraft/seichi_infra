@@ -45,7 +45,10 @@ spec:
             - name: EULA
               value: "TRUE"
 
-            - name: PLUGINS
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
+            - name: MODS
               # DiscordSRV:
               #   https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar
               # LunaChat:
