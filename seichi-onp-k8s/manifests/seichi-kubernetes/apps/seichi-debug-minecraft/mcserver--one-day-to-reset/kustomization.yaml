@@ -4,5 +4,6 @@ namespace: seichi-debug-minecraft
 
 resources:
   - "./scaled-object.yaml"
+  - "./service-monitor.yaml"
   - "./service.yaml"
-  - "./statefulset.yaml"
+  - "./stateful-set.yaml"
