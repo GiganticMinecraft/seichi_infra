@@ -36,7 +36,7 @@ jobs:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
 
       - name: Plan Terraform infrastructure changes
-        run: terraform plan -input=false -no-color
+        run: terraform plan -input=false -no-color -lock-timeout=10m
         id: tfplan
         working-directory: "./terraform"
 
