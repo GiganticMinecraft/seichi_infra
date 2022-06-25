@@ -44,6 +44,16 @@ spec:
               scrapeTimeout: 30s
               relabelings: []
               additionalMetricsRelabels: {}
+            - name: unchama-sv-nas3
+              target: 192.168.16.230
+              module:
+                - synology
+              labels:
+                release: prometheus
+              interval: 30s
+              scrapeTimeout: 30s
+              relabelings: []
+              additionalMetricsRelabels: {}
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
