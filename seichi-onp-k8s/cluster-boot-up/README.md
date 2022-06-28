@@ -36,7 +36,7 @@ VM環境は `Proxmox Virtual Environment 7.1-11` を利用しています。
  - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可
 
 KubernetesノードのVMは cloudinit イメージで作成されています。
-この cloudinit イメージのベースには `Ubuntu 20.04 LTS` を利用しています。
+この cloudinit イメージのベースには `Ubuntu 22.04 LTS` を利用しています。
 
 ### ストレージ
 

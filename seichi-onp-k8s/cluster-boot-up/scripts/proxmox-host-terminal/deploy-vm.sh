@@ -26,8 +26,8 @@ VM_LIST=(
 
 #region create-template
 
-# download the image(ubuntu 20.04 LTS)
-wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+# download the image(ubuntu 22.04 LTS)
+wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 
 # create a new VM and attach Network Adaptor
 # vmbr0=Service Network Segment (192.168.0.0/20)
@@ -35,7 +35,7 @@ wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.i
 qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --name seichi-onp-k8s-template
 
 # import the downloaded disk to $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME storage
-qm importdisk $TEMPLATE_VMID focal-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
+qm importdisk $TEMPLATE_VMID jammy-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
 
 # finally attach the new disk to the VM as scsi drive
 qm set $TEMPLATE_VMID --scsihw virtio-scsi-pci --scsi0 $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME:vm-$TEMPLATE_VMID-disk-0
@@ -53,7 +53,7 @@ qm set $TEMPLATE_VMID --serial0 socket --vga serial0
 qm template $TEMPLATE_VMID
 
 # cleanup
-rm focal-server-cloudimg-amd64.img
+rm jammy-server-cloudimg-amd64.img
 
 #endregion
 
