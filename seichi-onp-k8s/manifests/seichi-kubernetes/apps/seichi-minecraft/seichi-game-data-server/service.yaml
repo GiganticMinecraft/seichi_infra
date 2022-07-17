@@ -4,7 +4,7 @@ metadata:
   namespace: seichi-minecraft
   name: seichi-game-data-server
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: seichi-game-data-server-web
       port: 80
