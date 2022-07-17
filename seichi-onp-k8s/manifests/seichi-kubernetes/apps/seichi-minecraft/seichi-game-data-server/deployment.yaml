@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-game-data-server
+  name: seichi-game-data-server
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: seichi-game-data-server
+  template:
+    metadata:
+      labels:
+        app: seichi-game-data-server
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: 128Mi
+          env:
+            - name: HTTP_HOST
+              value: "0.0.0.0"
+            - name: HTTP_PORT
+              value: "80"
+            - name: DB_HOST
+              value: "192.168.2.186"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_DATABASE_NAME
+              value: "seichiassist"
+            - name: DB_USER
+              value: "mcserver"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: GAME_DB_PASSWORD
+
+          image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-6e26443
+          name: seichi-game-data-server
+          ports:
+            - containerPort: 80
+          startupProbe:
+            tcpSocket:
+              port: 80
+            # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5

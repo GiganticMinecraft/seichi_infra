@@ -214,4 +214,10 @@ variable "minecraft__one_day_to_reset__morning_glory_seed_webhook_url" {
   sensitive   = true
 }
 
+variable "minecraft__production_game_db__password" {
+  description = "Password set to the production game database"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
