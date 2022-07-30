@@ -26,12 +26,6 @@ spec:
             external-hostname: grafana.onp.admin.seichi.click
             internal-authority: "192.168.3.20:3000"
 
-          # k8s 上の Sentry。
-          # SSOをかけられるのでそのまま通す。
-          - name: sentry
-            external-hostname: sentry.onp-k8s.admin.seichi.click
-            internal-authority: sentry-nginx.sentry:80
-
           # プライベートなminecraft pluginをアップロードするためのMinIO。
           # 肝心のオブジェクトストレージは seichi-private-plugin-blackhole-minio.minio:9000 にClusterIPでアクセスすればよい。
           - name: minio-console
