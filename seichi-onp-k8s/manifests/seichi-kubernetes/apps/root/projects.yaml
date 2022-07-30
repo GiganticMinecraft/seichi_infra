@@ -21,6 +21,7 @@ spec:
     #  - metallb
     #  - minio
     #  - monitoring
+    #  - sentry
     #  - synology-csi
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
@@ -33,6 +34,8 @@ spec:
     - namespace: "minio"
       server: https://kubernetes.default.svc
     - namespace: "monitoring"
+      server: https://kubernetes.default.svc
+    - namespace: "sentry"
       server: https://kubernetes.default.svc
     - namespace: "synology-csi"
       server: https://kubernetes.default.svc
