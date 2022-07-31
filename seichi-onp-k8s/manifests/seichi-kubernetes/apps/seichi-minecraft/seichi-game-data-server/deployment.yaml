@@ -41,7 +41,7 @@ spec:
                   name: mcserver--common--config-secrets
                   key: GAME_DB_PASSWORD
 
-          image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-6e26443
+          image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-a0224a5
           name: seichi-game-data-server
           ports:
             - containerPort: 80
