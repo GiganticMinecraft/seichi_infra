@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: seichi-timed-stats-translator-config
 data:
-  GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server-web.seichi-minecraft.svc.cluster.local:80"
+  GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server.seichi-minecraft.svc.cluster.local:80"
