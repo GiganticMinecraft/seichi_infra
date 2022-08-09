@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seichi-game-data-server-config
+data:
+  RUST_LOG: "info"
+  HTTP_HOST: "0.0.0.0"
+  HTTP_PORT: "80"
+
+  DB_HOST: "192.168.2.186"
+  DB_PORT: "3306"
+  DB_DATABASE_NAME: "seichiassist"
+  DB_USER: "mcserver"
+
+  # Db password will be read from mcserver--common--config-secrets secret
