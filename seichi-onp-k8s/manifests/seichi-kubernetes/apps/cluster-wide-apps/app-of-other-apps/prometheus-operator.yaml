@@ -95,7 +95,7 @@ spec:
                   type: loki
                   url: http://loki:3100
           dashboards:
-            General:
+            default:
               cilium-agent:
                 gnetId: 16611
                 revision: 1
