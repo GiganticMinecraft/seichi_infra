@@ -94,6 +94,31 @@ spec:
                 - name: Loki
                   type: loki
                   url: http://loki:3100
+          dashboards:
+            General:
+              cilium-agent:
+                gnetId: 16611
+                revision: 1
+                datasource: Prometheus
+              cilium-operator:
+                gnetId: 16612
+                revision: 1
+                datasource: Prometheus
+              cilium-hubble:
+                gnetId: 16613
+                revision: 1
+                datasource: Prometheus
+              argocd:
+                gnetId: 14584
+                revision: 1
+              synology-details:
+                gnetId: 14284
+                revision: 9
+                datasource: Prometheus
+              synology-overview:
+                gnetId: 14364
+                revision: 8
+                datasource: Prometheus
         prometheus:
           prometheusSpec:
             storageSpec:
