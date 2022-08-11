@@ -221,3 +221,19 @@ variable "minecraft__production_game_db__password" {
 }
 
 #endregion
+
+#region influxdb admin password and token
+
+variable "influxdb_auth_password" {
+  description = "influxdb auth passsword"
+  type        = string
+  sensitive   = true
+}
+
+variable "influxdb_auth_token" {
+  description = "influxdb auth token"
+  type        = string
+  sensitive   = true
+}
+
+#endregion

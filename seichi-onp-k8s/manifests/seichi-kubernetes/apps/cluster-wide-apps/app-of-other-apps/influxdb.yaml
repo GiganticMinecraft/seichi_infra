@@ -1,0 +1,98 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: influxdb
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: influxdb2
+    repoURL: https://helm.influxdata.com/
+    targetRevision: 2.1.0
+    helm:
+      releaseName: seichi-timed-stats-influxdb
+      values: |
+        image:
+          tag: 2.2.0-alpine
+
+        ## Configure resource requests and limits
+        ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+        ##
+        resources:
+          limits:
+          cpu: 100m
+          memory: 128Mi
+          requests:
+          cpu: 100m
+          memory: 128Mi
+
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          runAsNonRoot: false
+
+        ## Customize liveness, readiness and startup probes
+        ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+        ##
+        livenessProbe:
+          path: "/health"
+          scheme: "HTTP"
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+
+        readinessProbe:
+          path: "/health"
+          scheme: "HTTP"
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 3
+
+        startupProbe:
+          enabled: true
+          path: "/health"
+          scheme: "HTTP"
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 6
+
+        ## Create default user through docker entrypoint
+        ## Defaults indicated below
+        ##
+        adminUser:
+          organization: "influxdata"
+          bucket: "seichi-timed-stats"
+          user: "admin"
+          retention_policy: "0s"
+
+          ## The password and token are obtained from an existing secret. The expected
+          ## keys are `admin-password` and `admin-token`.
+          ## If set, the password and token values above are ignored.
+          existingSecret: influxdb-auth
+
+        ## Persist data to a persistent volume
+        ##
+        persistence:
+          enabled: true
+          accessMode: ReadWriteOnce
+          size: 50Gi
+          mountPath: /var/lib/influxdb2
+          subPath: ""
+
+        ## Pod disruption budget configuration
+        ##
+        pdb:
+          create: true
+          minAvailable: 1
+          # maxUnavailable: 1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: seichi-minecraft
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
