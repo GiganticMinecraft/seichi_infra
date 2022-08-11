@@ -67,7 +67,7 @@ spec:
           organization: "influxdata"
           bucket: "seichi-timed-stats"
           user: "admin"
-          retention_policy: "0s"
+          retention_policy: ""
 
           ## The password and token are obtained from an existing secret. The expected
           ## keys are `admin-password` and `admin-token`.
