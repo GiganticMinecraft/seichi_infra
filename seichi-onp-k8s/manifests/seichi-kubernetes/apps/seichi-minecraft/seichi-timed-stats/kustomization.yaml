@@ -4,6 +4,7 @@ namespace: seichi-minecraft
 resources:
   # https://github.com/GiganticMinecraft/seichi-timed-stats-server/tree/b9825a64669c90cf12a16c5a1bda7edbdaaeacf3/kubernetes
   - github.com/GiganticMinecraft/seichi-timed-stats-server/kubernetes?ref=b9825a64669c90cf12a16c5a1bda7edbdaaeacf3
+  - influxdb.yaml
 
 patchesStrategicMerge:
   - ./patch-translator.yaml
