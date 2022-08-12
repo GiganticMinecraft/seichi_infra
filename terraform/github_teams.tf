@@ -41,6 +41,12 @@ resource "github_team" "onp_admin_minio" {
   privacy     = "closed"
 }
 
+resource "github_team" "onp_hubble_ui" {
+  name        = "onp-hubble-ui"
+  description = "Cilium Hubble UIに接続できるTeam"
+  privacy     = "closed"
+}
+
 resource "github_team" "springer" {
   name        = "Springer"
   description = "整地鯖(春)のデベロッパー"
