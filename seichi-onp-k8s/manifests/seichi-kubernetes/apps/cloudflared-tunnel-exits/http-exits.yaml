@@ -34,7 +34,7 @@ spec:
 
           # Cilium HubbleのUI
           # 肝心のオブジェクトストレージは seichi-private-plugin-blackhole-minio.minio:9000 にClusterIPでアクセスすればよい。
-          - name: minio-console
+          - name: hubble-ui
             external-hostname: hubble-ui.onp-k8s.admin.seichi.click
             internal-authority: "hubble-ui.kube-system:80"
 
