@@ -6,3 +6,4 @@ data:
   # we are expecting influxdb to be in the same namespace
   CONFIG_INFLUXDB_URL: "http://seichi-timed-stats-influxdb-influxdb2:80"
   CONFIG_INFLUXDB_DATABASE_NAME: "seichi-timed-stats"
+  CONFIG_INFLUXDB_USERNAME: "admin"
