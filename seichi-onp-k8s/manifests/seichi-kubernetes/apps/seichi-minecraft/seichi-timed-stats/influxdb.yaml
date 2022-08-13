@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: influxdb
+  name: seichi-timed-stats-influxdb
   namespace: argocd
 spec:
   project: cluster-wide-apps
