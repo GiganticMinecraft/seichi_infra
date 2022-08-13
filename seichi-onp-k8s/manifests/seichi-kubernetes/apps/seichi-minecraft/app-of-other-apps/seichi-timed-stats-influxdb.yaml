@@ -20,10 +20,10 @@ spec:
         ##
         resources:
           limits:
-            cpu: 100m
+            cpu: 1000m
             memory: 4096Mi
           requests:
-            cpu: 100m
+            cpu: 300m
             memory: 256Mi
 
         securityContext:
