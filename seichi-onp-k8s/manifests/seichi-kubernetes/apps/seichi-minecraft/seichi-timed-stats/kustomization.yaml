@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: seichi-minecraft
 resources:
-  # https://github.com/GiganticMinecraft/seichi-timed-stats-server/tree/afb0718daf3b8881c16d17e3e8e371de51146be9/kubernetes
-  - github.com/GiganticMinecraft/seichi-timed-stats-server/kubernetes?ref=afb0718daf3b8881c16d17e3e8e371de51146be9
+  # https://github.com/GiganticMinecraft/seichi-timed-stats-server/tree/d88ef946b8db0bafe6d58ab631ac2482314abfc0/kubernetes
+  - github.com/GiganticMinecraft/seichi-timed-stats-server/kubernetes?ref=d88ef946b8db0bafe6d58ab631ac2482314abfc0
 
 patchesStrategicMerge:
   - ./patch-translator.yaml
@@ -14,7 +14,7 @@ patchesJson6902:
       version: v1
       kind: ConfigMap
       name: seichi-timed-stats-telegraf-influxdb-config
-    # we are specifying CONFIG_INFLUXDB_PASSWORD in the deployment
+    # we are specifying CONFIG_INFLUXDB_TOKEN in the deployment
     patch: |-
       - op: remove
-        path: /data/CONFIG_INFLUXDB_PASSWORD
+        path: /data/CONFIG_INFLUXDB_TOKEN
