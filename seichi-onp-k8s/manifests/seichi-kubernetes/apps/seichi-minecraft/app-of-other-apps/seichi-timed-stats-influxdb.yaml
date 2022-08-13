@@ -4,7 +4,7 @@ metadata:
   name: seichi-timed-stats-influxdb
   namespace: argocd
 spec:
-  project: cluster-wide-apps
+  project: seichi-minecraft
   source:
     chart: influxdb2
     repoURL: https://helm.influxdata.com/
