@@ -92,8 +92,8 @@ resource "kubernetes_secret" "influxdb_auth" {
   }
 
   data = {
-    "admin-password" = var.influxdb_auth_password
-    "admin-token"    = var.influxdb_auth_token
+    "admin-password" = module.onp_cluster_internal_credentials.influxdb_admin_password
+    "admin-token"    = module.onp_cluster_internal_credentials.influxdb_admin_token
   }
 
   type = "Opaque"
