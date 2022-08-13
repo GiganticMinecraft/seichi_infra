@@ -8,3 +8,13 @@ resources:
 patchesStrategicMerge:
   - ./patch-translator.yaml
   - ./patch-telegraf.yaml
+
+patchesJson6902:
+  - target:
+      version: v1
+      kind: ConfigMap
+      name: seichi-timed-stats-telegraf-influxdb-config
+    # we are specifying CONFIG_INFLUXDB_PASSWORD in the deployment
+    patch: |-
+      - op: remove
+        path: /data/CONFIG_INFLUXDB_PASSWORD

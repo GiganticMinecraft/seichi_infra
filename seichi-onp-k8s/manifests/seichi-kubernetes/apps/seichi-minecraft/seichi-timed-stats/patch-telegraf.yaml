@@ -1,3 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seichi-timed-stats-telegraf
+spec:
+  template:
+    spec:
+      containers:
+        - name: seichi-timed-stats-telegraf
+          env:
+            - name: CONFIG_INFLUXDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb-auth
+                  key: admin-password
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
