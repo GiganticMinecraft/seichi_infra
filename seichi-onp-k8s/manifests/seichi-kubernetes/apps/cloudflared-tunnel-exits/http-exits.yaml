@@ -41,7 +41,7 @@ spec:
           # 特に制限は掛けていないため、 /api/v2 で API を叩くこともできる
           - name: timed-stats-influxdb
             external-hostname: seichi-timed-stats-influxdb-ui.onp-k8s.admin.seichi.click
-            internal-authority: "seichi-timed-stats-influxdb-influxdb2.seichi-minecraft:8086"
+            internal-authority: "seichi-timed-stats-influxdb-influxdb2.seichi-minecraft:80"
 
           # 各サーバーの Dynmap ウェブサーバー
           - name: dynmap-s1
