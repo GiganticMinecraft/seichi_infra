@@ -39,22 +39,22 @@ spec:
               value: "/root/.cloudflared/tunnel-cred.json"
           volumeMounts:
             - mountPath: "/root/.cloudflared-origin-cert"
-              name: cloudflared-tunnel-{{ .Values.installationName }}-authorization-certificate
+              name: cloudflared-tunnel-authorization-certificate
             - mountPath: "/etc/cloudflared"
-              name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-config
+              name: cloudflared-tunnel-endpoint-config
           resources:
             requests:
               memory: 32Mi
             limits:
               memory: 64Mi
       volumes:
-        - name: cloudflared-tunnel-{{ .Values.installationName }}-authorization-certificate
+        - name: cloudflared-tunnel-authorization-certificate
           secret:
             # このシークレットはクラスタセットアップ作業手順により注入されているべき。
             secretName: '{{ required "tunnelCredentialSecretName is required" .Values.tunnelCredentialSecretName }}'
             items:
               - key: TUNNEL_CREDENTIAL
                 path: cert.pem
-        - name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-config
+        - name: cloudflared-tunnel-endpoint-config
           configMap:
             name: cloudflared-tunnel-{{ .Values.installationName }}-endpoint-configmap
