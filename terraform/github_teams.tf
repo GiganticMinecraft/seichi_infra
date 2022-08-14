@@ -47,6 +47,12 @@ resource "github_team" "onp_hubble_ui" {
   privacy     = "closed"
 }
 
+resource "github_team" "onp_seichi_timed_stats_influxdb_ui" {
+  name        = "onp-seichi-timed-stats-influxdb-ui"
+  description = "seichi-timed-stats の InfluxDB UI に接続できるTeam"
+  privacy     = "closed"
+}
+
 resource "github_team" "springer" {
   name        = "Springer"
   description = "整地鯖(春)のデベロッパー"
