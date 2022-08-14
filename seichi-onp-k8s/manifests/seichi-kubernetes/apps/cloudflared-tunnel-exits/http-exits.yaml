@@ -38,7 +38,8 @@ spec:
             internal-authority: "hubble-ui.kube-system:80"
 
           # seichi-timed-stats 用 InfluxDB のUI (管理用)
-          - name: seichi-timed-stats-influxdb-ui
+          # 特に制限は掛けていないため、 /api/v2 で API を叩くこともできる
+          - name: timed-stats-influxdb
             external-hostname: seichi-timed-stats-influxdb-ui.onp-k8s.admin.seichi.click
             internal-authority: "seichi-timed-stats-influxdb-influxdb2.seichi-minecraft:8086"
 
