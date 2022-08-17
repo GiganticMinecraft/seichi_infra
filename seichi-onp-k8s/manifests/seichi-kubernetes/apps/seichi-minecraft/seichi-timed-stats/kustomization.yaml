@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: seichi-minecraft
 resources:
-  # https://github.com/GiganticMinecraft/seichi-timed-stats-server/tree/2e22fccd007d80cfd20066f1b1e8a397adc1c40c/kubernetes
-  - github.com/GiganticMinecraft/seichi-timed-stats-server/kubernetes?ref=2e22fccd007d80cfd20066f1b1e8a397adc1c40c
+  # https://github.com/GiganticMinecraft/seichi-timed-stats-server/tree/71022bcbafe2f7490c4ba398cb09102f2cd79512/kubernetes
+  - github.com/GiganticMinecraft/seichi-timed-stats-server/kubernetes?ref=71022bcbafe2f7490c4ba398cb09102f2cd79512
 
 patchesStrategicMerge:
   - ./patch-translator.yaml
