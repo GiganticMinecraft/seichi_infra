@@ -66,6 +66,7 @@ spec:
             external-hostname: h1.map.spring.seichi.click
             internal-authority: "192.168.1.187:82"
 
+          # プレーヤー統計量を公開するエンドポイント。
           - name: seichi-game-data
             external-hostname: seichi-game-data.public-gigantic-api.seichi.click
             internal-authority: "seichi-game-data-publisher-cache-proxy.seichi-minecraft:80"
