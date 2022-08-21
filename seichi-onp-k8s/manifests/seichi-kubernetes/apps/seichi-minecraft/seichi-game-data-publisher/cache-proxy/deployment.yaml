@@ -33,7 +33,7 @@ spec:
             failureThreshold: 6
             periodSeconds: 5
           volumeMounts:
-            - mountPath: /etc/nginx/
+            - mountPath: /etc/nginx/nginx.conf
               name: nginx-conf
               subPath: nginx.conf
 
