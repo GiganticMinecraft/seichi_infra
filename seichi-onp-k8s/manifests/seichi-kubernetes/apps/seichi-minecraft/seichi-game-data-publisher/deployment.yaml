@@ -27,7 +27,7 @@ spec:
             - configMapRef:
                 name: seichi-game-data-publisher-config
 
-          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:sha-fc9b5e5
+          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:sha-60ce057
           name: seichi-game-data-publisher
           ports:
             - containerPort: 80
