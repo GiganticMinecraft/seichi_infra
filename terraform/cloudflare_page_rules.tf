@@ -27,3 +27,14 @@ resource "cloudflare_page_rule" "spring_maps" {
     security_level = "under_attack"
   }
 }
+
+resource "cloudflare_page_rule" "foobar" {
+  zone_id  = local.cloudflare_zone_id
+  priority = cloudflare_page_rule.spring_maps.priority + 1
+  target   = "seichi-game-data.public-gigantic-api.${local.root_domain}/"
+
+  actions {
+    cache_level = "cache_everything"
+  }
+}
+
