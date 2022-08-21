@@ -6,4 +6,4 @@ data:
   # Expect game-data-server service to be in the same namespace
   GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server:80"
   RUST_LOG: "debug,h2::codec::framed_read=info"
-  RUST_BACKTRACE: 1
+  RUST_BACKTRACE: "1"
