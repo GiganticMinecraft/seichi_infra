@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: seichi-minecraft
 resources:
   - "publisher-server"
-
+  - "cache-proxy"

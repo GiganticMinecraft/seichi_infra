@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: seichi-game-data-publisher-cache-proxy
+  name: seichi-game-data-publisher-cache-proxy
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: seichi-game-data-publisher-cache-proxy
+  template:
+    metadata:
+      labels:
+        app: seichi-game-data-publisher-cache-proxy
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: 128Mi
+
+          image: nginx:1.23.1
+          name: seichi-game-data-publisher-cache-proxy
+          ports:
+            - containerPort: 80
+          startupProbe:
+            tcpSocket:
+              port: 80
+            # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /etc/nginx/
+              name: nginx-conf
+              subPath: nginx.conf
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: seichi-game-data-publisher-cache-proxy-nginx-conf
