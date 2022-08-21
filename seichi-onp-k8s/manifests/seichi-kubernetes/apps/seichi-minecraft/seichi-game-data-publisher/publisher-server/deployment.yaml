@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   namespace: seichi-minecraft
   labels:
-    app: seichi-game-data-publisher
-  name: seichi-game-data-publisher
+    app: seichi-game-data-publisher-server
+  name: seichi-game-data-publisher-server
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
@@ -12,11 +12,11 @@ spec:
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: seichi-game-data-publisher
+      app: seichi-game-data-publisher-server
   template:
     metadata:
       labels:
-        app: seichi-game-data-publisher
+        app: seichi-game-data-publisher-server
     spec:
       containers:
         - resources:
@@ -25,10 +25,10 @@ spec:
 
           envFrom:
             - configMapRef:
-                name: seichi-game-data-publisher-config
+                name: seichi-game-data-publisher-server
 
           image: ghcr.io/giganticminecraft/seichi-game-data-publisher:sha-60ce057
-          name: seichi-game-data-publisher
+          name: seichi-game-data-publisher-server
           ports:
             - containerPort: 80
           startupProbe:
