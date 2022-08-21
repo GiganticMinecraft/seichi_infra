@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: seichi-minecraft
   labels:
     app: seichi-game-data-publisher-server
   name: seichi-game-data-publisher-server
