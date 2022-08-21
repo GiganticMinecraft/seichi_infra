@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-game-data-publisher
+  name: seichi-game-data-publisher
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: seichi-game-data-publisher
+  template:
+    metadata:
+      labels:
+        app: seichi-game-data-publisher
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: 128Mi
+
+          envFrom:
+            - configMapRef:
+                name: seichi-game-data-publisher-config
+
+          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:sha-fc9b5e5
+          name: seichi-game-data-publisher
+          ports:
+            - containerPort: 80
+          startupProbe:
+            tcpSocket:
+              port: 80
+            # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5

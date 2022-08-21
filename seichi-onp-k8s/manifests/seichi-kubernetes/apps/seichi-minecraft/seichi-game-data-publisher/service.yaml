@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: seichi-game-data-publisher
+spec:
+  type: ClusterIP
+  ports:
+    - name: seichi-game-data-publisher-web
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: seichi-game-data-publisher
