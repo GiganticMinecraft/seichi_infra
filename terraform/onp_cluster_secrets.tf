@@ -82,19 +82,3 @@ resource "kubernetes_secret" "minio_root_user" {
 
   type = "Opaque"
 }
-
-resource "kubernetes_secret" "influxdb_auth" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
-
-  metadata {
-    name      = "influxdb-auth"
-    namespace = "seichi-minecraft"
-  }
-
-  data = {
-    "admin-password" = module.onp_cluster_internal_credentials.influxdb_admin_password
-    "admin-token"    = module.onp_cluster_internal_credentials.influxdb_admin_token
-  }
-
-  type = "Opaque"
-}
