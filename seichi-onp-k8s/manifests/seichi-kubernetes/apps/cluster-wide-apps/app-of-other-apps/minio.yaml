@@ -18,11 +18,6 @@ spec:
           size: 5Gi
         DeploymentUpdate:
           type: Recreate
-        securityContext:
-          enabled: true
-          runAsUser: 0
-          runAsGroup: 0
-          runAsNonRoot: false
         resources:
           requests:
             memory: 1Gi
