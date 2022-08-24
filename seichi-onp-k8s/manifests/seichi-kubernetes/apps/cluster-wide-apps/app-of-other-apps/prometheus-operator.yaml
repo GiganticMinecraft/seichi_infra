@@ -72,11 +72,6 @@ spec:
               cookie_secure: true
               strict_transport_security: true
               content_security_policy: true
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            runAsNonRoot: false
-            fsGroup: 472
           deploymentStrategy:
             type: Recreate
           envFromSecret: "grafana-github-oauth-app-secret"
@@ -130,11 +125,6 @@ spec:
             resources:
               requests:
                 memory: 2Gi
-            securityContext:
-              runAsGroup: 0
-              runAsNonRoot: false
-              runAsUser: 0
-              fsGroup: 2000
         alertmanager:
           alertmanagerSpec:
             storage:
@@ -143,11 +133,6 @@ spec:
                   resources:
                     requests:
                       storage: 20Gi
-            securityContext:
-              runAsGroup: 0
-              runAsNonRoot: false
-              runAsUser: 0
-              fsGroup: 2000
         kubeProxy:
           enabled: false
         kubeEtcd:

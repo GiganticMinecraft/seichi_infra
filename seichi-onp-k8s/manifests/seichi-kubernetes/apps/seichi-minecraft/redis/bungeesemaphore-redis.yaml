@@ -18,9 +18,6 @@ spec:
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
         master:
-          containerSecurityContext:
-            runAsUser: 0
-            runAsNonRoot: false
           service:
             type: LoadBalancer
             loadBalancerIP: 192.168.8.133

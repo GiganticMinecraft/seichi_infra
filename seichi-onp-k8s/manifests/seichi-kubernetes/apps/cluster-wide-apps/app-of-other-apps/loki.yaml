@@ -21,12 +21,6 @@ spec:
             enabled: true
             size: 50Gi
 
-          securityContext:
-            fsGroup: 10001
-            runAsGroup: 0
-            runAsNonRoot: false
-            runAsUser: 0
-
           config:
             compactor:
               retention_enabled: true
