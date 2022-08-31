@@ -22,6 +22,11 @@ spec:
           requests:
             memory: 1Gi
         existingSecret: "minio-root-user"
+        metrics:
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
