@@ -46,7 +46,7 @@ data:
         restricted: false
         motd: ''
       reset:
-        address: 192.168.1.187:25591
+        address: mcserver--one-day-to-reset.seichi-minecraft:25565
         restricted: false
         motd: ''
       kagawa:
