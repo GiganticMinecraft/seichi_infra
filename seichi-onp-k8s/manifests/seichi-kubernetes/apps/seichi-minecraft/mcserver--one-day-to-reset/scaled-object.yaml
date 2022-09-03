@@ -17,3 +17,4 @@ spec:
         # "At 04:00." https://crontab.guru/#0_4_*_*_*
         end: 0 4 * * *
         desiredReplicas: "1"
+  minReplicaCount: 0 # 何も条件がない場合はスケール数が0になる(cronが発火している間イベント駆動で1にスケール)
