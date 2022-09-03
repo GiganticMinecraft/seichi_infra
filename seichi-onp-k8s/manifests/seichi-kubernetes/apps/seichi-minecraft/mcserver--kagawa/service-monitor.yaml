@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: mcserver
+    release: prometheus
+    mcserver: kagawa
+  name: mcserver-metrics--kagawa
+spec:
+  endpoints:
+    - interval: 30s
+      port: jmx-metrics
+  selector:
+    matchLabels:
+      app: mcserver
+      role: metrics
+      mcserver: kagawa

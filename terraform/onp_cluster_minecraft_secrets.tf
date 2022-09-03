@@ -43,3 +43,18 @@ resource "kubernetes_secret" "onp_minecraft_prod_one_day_to_reset_secrets" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "onp_minecraft_prod_kagawa_secrets" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "mcserver--kagawa--config-secrets"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    MORNING_GLORY_SEEDS_WEBHOOK_URL = var.minecraft__prod_kagawa__morning_glory_seed_webhook_url
+  }
+
+  type = "Opaque"
+}
