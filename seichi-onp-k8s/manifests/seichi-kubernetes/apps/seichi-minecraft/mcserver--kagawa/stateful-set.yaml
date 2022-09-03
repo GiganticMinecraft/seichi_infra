@@ -47,7 +47,7 @@ spec:
             - name: TYPE
               value: PAPER
             - name: VERSION
-              value: "1.19.2"
+              value: "1.16.5"
             - name: EULA
               value: "TRUE"
 
@@ -99,10 +99,10 @@ spec:
                   key: MORNING_GLORY_SEEDS_WEBHOOK_URL
 
             - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
-              value: "689106486944989232"
+              value: "959300037844799560"
 
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
-              value: "689106759851180044"
+              value: "689841701333893163"
 
           image: itzg/minecraft-server:2022.11.0-java17-jdk
           name: minecraft
