@@ -214,6 +214,12 @@ variable "minecraft__prod_one_day_to_reset__morning_glory_seed_webhook_url" {
   sensitive   = true
 }
 
+variable "minecraft__prod_kagawa__morning_glory_seed_webhook_url" {
+  description = "Webhook URL for MorningGlorySeeds on kagawa server in production env"
+  type        = string
+  sensitive   = true
+}
+
 variable "minecraft__prod_game_db__password" {
   description = "Password set to the production game database"
   type        = string
