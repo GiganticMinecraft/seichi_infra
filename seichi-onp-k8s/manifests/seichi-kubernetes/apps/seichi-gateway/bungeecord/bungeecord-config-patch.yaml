@@ -50,7 +50,7 @@ data:
         restricted: false
         motd: ''
       kagawa:
-        address: 192.168.1.187:25593
+        address: mcserver--kagawa.seichi-minecraft:25565
         restricted: false
         motd: ''
       petra:
