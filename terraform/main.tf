@@ -208,13 +208,13 @@ variable "minecraft__discordsrv_bot_token" {
   sensitive   = true
 }
 
-variable "minecraft__one_day_to_reset__morning_glory_seed_webhook_url" {
-  description = "Webhook URL for MorningGlorySeeds on one-day-to-reset server"
+variable "minecraft__prod_one_day_to_reset__morning_glory_seed_webhook_url" {
+  description = "Webhook URL for MorningGlorySeeds on one-day-to-reset server in production env"
   type        = string
   sensitive   = true
 }
 
-variable "minecraft__production_game_db__password" {
+variable "minecraft__prod_game_db__password" {
   description = "Password set to the production game database"
   type        = string
   sensitive   = true
