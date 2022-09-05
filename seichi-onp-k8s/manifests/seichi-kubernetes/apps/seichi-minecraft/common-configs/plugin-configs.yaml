@@ -745,3 +745,242 @@ data:
 
   MorningGlorySeeds-config.yml: |
     webhook: "${CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL}"
+
+  LunaChat-config.yml: |
+    # ${project.name} v${project.version}
+    # @author     ucchy
+    # @license    LGPLv3
+    # @copyright  Copyright ucchy 2020
+
+
+    # -------------------- 全般設定 --------------------
+
+    # 言語設定
+    lang: ja
+
+    # チャンネルチャット機能を利用可能にするかどうか
+    # Japanize機能のみを利用したい場合は、falseにしてください。
+    enableChannelChat: true
+
+    # イベント処理の優先度を設定できます。
+    # 他のプラグインとの組み合わせでうまく動かないときに使用してください。
+    # LOWEST, LOW, NORMAL, HIGH, HIGHEST のどれかを指定できます。
+    playerChatEventListenerPriority: 'HIGHEST'
+
+
+    # -------------------- チャンネルチャット設定 --------------------
+
+    # チャンネルチャットに入っていない人の発言を、グローバルとして扱うかどうか
+    noJoinAsGlobal: true
+
+    # チャンネルチャットの発言内容を、ログに残すかどうか
+    loggingChat: true
+
+    # チャンネルチャットの発言内容を、サーバーコンソールに表示するかどうか
+    displayChatOnConsole: true
+
+    # グローバルマーカー。
+    # これが発言の頭に入っている場合は、一時的にグローバル発言になる。
+    globalMarker: '!'
+
+    # 全てのメンバーが退出したときに、チャンネルを削除するかどうか
+    zeroMemberRemove: false
+
+    # ログイン時に、参加中チャンネルを表示するかどうか
+    showListOnJoin: false
+
+    # /ch join コマンドで存在しないチャンネルを指定したときに、
+    # チャンネルを新規作成して入室するかどうか
+    createChannelOnJoinCommand: false
+
+    # 通常のチャットの代わりに、既定として使用するグローバルチャンネル。
+    # グローバルチャンネルを作らず通常のチャットを使用する場合は、
+    # から文字列 「''」 を指定すること。
+    globalChannel: ''
+
+    # サーバーに参加したユーザーに必ず参加させるチャンネル。
+    # グローバルチャンネルとは別で指定できる。
+    # 複数のチャンネルを設定可能。例）forceJoinChannels: ['L', 'M', 'N']
+    forceJoinChannels: []
+
+    # formatコマンド実行時に、必ず含まれる必要があるキーワード。
+    formatConstraint: ['%username', '%msg']
+
+    # チャンネルを作成したときに、デフォルトで設定されるフォーマット設定。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %ch       : チャンネル名
+    # %color    : チャンネルカラー
+    # %displayname : 発言者表示名
+    # %player   : 発言者ID
+    # %server   : 発言者の接続サーバー名（BungeeCord側に導入したときに有効です。）
+    # %world    : 発言したワールド名
+    # %prefix   : プレフィックス（Vaultとパーミッション管理プラグインが導入されている場合に置き換えられます）
+    # %suffix   : サフィックス（Vaultとパーミッション管理プラグインが導入されている場合に置き換えられます）
+    # %date     : 日付
+    # %time     : 時刻
+    # %msg      : 発言内容（Japanize変換された場合は、Japanize結果を含みます。）
+    defaultFormat: '&f[%color%ch&f]%prefix%displayname%suffix&a:&f %msg'
+
+    # OPの画面に、全チャンネルの発言内容を表示する設定。
+    opListenAllChannel: false
+
+    # チャンネルを新規作成するときに、チャンネル名が満たさなければならない、最低文字列長。
+    # 指定されたチャンネル名がこの文字数を下回る場合は、エラーになってチャンネルを作成できません。
+    minChannelNameLength: 4
+
+    # チャンネルを新規作成するときに、チャンネル名が満たさなければならない、最大文字列長。
+    # 指定されたチャンネル名がこの文字数を上回る場合は、エラーになってチャンネルを作成できません。
+    maxChannelNameLength: 20
+
+    # クイックチャンネルチャット機能を有効化するかどうか。
+    # クイックチャンネルチャットは、「(チャンネル名 or エイリアス) + (専用の記号) + (発言内容) 」を発言すると使用できます。
+    # 例えば、mainチャンネルにエイリアスmを設定しておくと、mainチャンネルを発言先にしなくても、
+    # m:こんにちは！
+    # と発言することで、mainチャンネルに発言を行うことができます。
+    enableQuickChannelChat: true
+
+    # クイックチャンネルチャット機能に使用する記号。
+    quickChannelChatSeparator: ':'
+
+
+    # -------------------- プライベートメッセージ設定 --------------------
+
+    # /tell や /msg や /r コマンドでプライベートメッセージを送信するときに、
+    # 適用されるフォーマット設定。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %ch       : チャンネル名（「%player>%to」と同一です。）
+    # %displayname : 発言者表示名
+    # %player   : 発言者ID
+    # %server   : 発言者の接続サーバー名（BungeeCord側に導入したときに有効です。）
+    # %to       : 発言の相手（受信者）のID
+    # %recieverserver : 受信者の接続サーバー名（BungeeCord側に導入したときに有効です。）
+    # %world    : 発言したワールド名（spigot側に導入したときに有効です。MultiVerseが導入されている場合は、ワールドの表示名を取得して使用します。）
+    # %prefix   : プレフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %suffix   : サフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %date     : 日付
+    # %time     : 時刻
+    # %msg      : 発言内容（Japanize変換された場合は、Japanize結果を含みます。）
+    defaultFormatForPrivateMessage: '&7[%player -> %to]&f %msg'
+    #defaultFormatForPrivateMessage: '&7[%player@%server > %to@%recieverserver] %msg'
+
+
+    # -------------------- dynmap連携設定 --------------------
+
+    # ブロードキャストチャンネルの発言内容を、dynmapに送信するかどうか。
+    # dynmapがロードされていない場合は、この設定は無視される（false扱い）。
+    sendBroadcastChannelChatToDynmap: true
+
+    # dynmapへ送信するときに、チャンネルのフォーマットを反映して送信するかどうか。
+    # trueにするとチャンネルフォーマットを反映したメッセージをdynmapに表示します。
+    # falseにするとメッセージのみをdynmapに表示します。
+    # 参考：https://github.com/ucchyocean/LunaChat/issues/68
+    sendFormattedMessageToDynmap: false
+
+    # dynmapのWebUIから発言された発言内容を表示するチャンネル。
+    # dynmapChannelが無指定で、globalChannelが指定されているなら、グローバルチャンネルに、
+    # dynmapChannelが無指定で、globalChannelも無指定なら、通常チャットに発言される。
+    dynmapChannel: ''
+
+
+
+    # -------------------- NGワード設定 --------------------
+
+    # NGワード設定。正規表現が指定可能です。
+    # ここに設定されたワードを発言したプレイヤーは、NGワード部分がマスクされます。
+    ngword:
+    - 'ちん(こ|ぽ|ちん)'
+
+    # NGワード発言時の動作設定。mask、mute、kick、ban の4つのいずれかが設定可能。
+    # mask : NGワードをマスクする
+    # mute : NGワードをマスクしたのち、発言したプレイヤーをチャンネルからMuteする
+    # kick : NGワードをマスクしたのち、発言したプレイヤーをチャンネルからキックする
+    # ban  : NGワードをマスクしたのち、発言したプレイヤーをチャンネルからBANする
+    # ※ 通常チャット（非チャンネルチャット）の場合は、
+    #    kickやbanを設定しても、マスクのみが実行されます。
+    ngwordAction: mask
+
+
+
+    # -------------------- 通常チャット設定 --------------------
+
+    # 通常チャット（非チャンネルチャット）の装飾を、LunaChatから行うかどうか。
+    enableNormalChatMessageFormat: true
+
+    # チャット装飾のフォーマット設定。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %displayname : 発言者表示名
+    # %player   : 発言者ID
+    # %world    : 発言したワールド名（spigot側に導入したときに有効です。MultiVerseが導入されている場合は、ワールドの表示名を取得して使用します。）
+    # %server   : 発言者の接続サーバー名（BungeeCord側に導入したときに有効です。）
+    # %prefix   : プレフィックス（VaultとPrefix/Suffixプラグインが導入されている場合に置き換えられます）
+    # %suffix   : サフィックス（VaultとPrefix/Suffixプラグインが導入されている場合に置き換えられます）
+    # %date     : 日付
+    # %time     : 時刻
+    # %msg      : 発言内容（Japanize変換された場合は、Japanize結果を含みます。）
+    normalChatMessageFormat: '&f%prefix%displayname%suffix&a:&f %msg'
+    #normalChatMessageFormat: '&f%displayname@%server&a:&f %msg'
+
+    # 通常チャット（非チャンネルチャット）で、カラーコード（&aや&bなど）を
+    # 使用可能にするかどうか。falseに設定すると、カラーコードは変換されません。
+    enableNormalChatColorCode: true
+
+    # 通常チャット（非チャンネルチャット）をクリック可能にするかどうか。
+    # クリック可能にすると、プレイヤー名をクリックしてプライベートメッセージを送ることができるようになりますが、
+    # 通常チャットをキャンセルしてクリック可能な別のメッセージを流すので、他のチャット関連プラグインとの連携が
+    # うまくいかなくなる可能性があります。
+    # なお、この設定に関係なく、チャンネルチャットは常にクリック可能です。
+    enableNormalChatClickable: false
+
+    # 通常チャット（非チャンネルチャット）をコンソールにログ出力するかどうか。
+    # 本項目をfalseにしても、コンソールに記録される場合があります。
+    displayNormalChatOnConsole: true
+
+
+    # -------------------- Japanize変換設定 --------------------
+
+    # ローマ字をかな文字や漢字に変換する設定。
+    # none/kana/GoogleIME の3つのいずれかが設定可能。
+    # none      : 変換なし。
+    # kana      : かな変換のみ。
+    # GoogleIME : かな変換したのち、GoogleIMEを使って漢字変換する。
+    japanizeType: GoogleIME
+
+    # かな変換や漢字変換時に、
+    # 変換結果を元の発言内容と合わせて1行で表示するか、
+    # 変換結果のみを2行目に表示するかを、設定する。
+    # 1行表示の例：
+    #     <ucchy> aiueo (あいうえお)
+    # 2行表示の例：
+    #     <ucchy> aiueo
+    #     [JP] あいうえお
+    japanizeDisplayLine: 1
+
+    # japanizeDisplayLine が 1 のときの、表示フォーマットを設定する。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %msg      : 元の発言内容
+    # %japanize : Japanize変換された発言内容
+    japanizeLine1Format: '%msg &6(%japanize)'
+
+    # japanizeDisplayLine が 2 のときの、2行目の表示フォーマットを設定する。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %msg      : 元の発言内容
+    # %japanize : Japanize変換された発言内容
+    japanizeLine2Format: '&6[JP] %japanize'
+
+    # 発言に含まれているプレイヤー名を、Japanize変換から除外するかどうかを設定する。
+    japanizeIgnorePlayerName: true
+
+    # ノンジャパナイズマーカー。
+    # これが発言の頭に入っている場合は、一時的にJapanize変換を実行しない。
+    noneJapanizeMarker: '#'
+
+    # プレイヤーのJapanize変換を、デフォルトでオンにするかオフにするかを設定する。
+    japanizePlayerDefault: true
+
+
+    # -------------------- BungeeCord設定 --------------------
+
+    # BungeeCord構成のときに、チャットイベントを配下のspigotサーバーに流し、
+    # 返送してもらってから処理を行うモードです。
+    # 配下のすべてのspigotサーバーにも、LunaChatの導入が必要です。
+    bungeePassThroughMode: false
