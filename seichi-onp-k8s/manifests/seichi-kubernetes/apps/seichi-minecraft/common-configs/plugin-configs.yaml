@@ -747,7 +747,7 @@ data:
     webhook: "${CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL}"
 
   LunaChat-config.yml: |
-    # ${project.name} v${project.version}
+    # LunaChat v3.0.16
     # @author     ucchy
     # @license    LGPLv3
     # @copyright  Copyright ucchy 2020
