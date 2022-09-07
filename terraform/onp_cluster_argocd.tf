@@ -16,7 +16,7 @@ resource "helm_release" "onp_cluster_argocd" {
   ]
 }
 
-resource "helm_release" "onp_cluster_argocd" {
+resource "helm_release" "onp_cluster_argo_apps" {
   # https://github.com/argoproj/argo-helm/releases/tag/argo-apps-0.0.1
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argocd-apps"
