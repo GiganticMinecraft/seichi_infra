@@ -24,6 +24,8 @@ server:
   additionalProjects:
     - name: argocd-root
       namespace: argocd
+      additionalAnnotations:
+        "helm.sh/resource-policy": keep
       description: The top-level project
       sourceRepos:
         - "*"
@@ -37,6 +39,8 @@ server:
   additionalApplications:
     - name: argocd-root-app-of-apps
       namespace: argocd
+      additionalAnnotations:
+        "helm.sh/resource-policy": keep
       project: argocd-root
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
