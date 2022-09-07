@@ -1,0 +1,46 @@
+# Config values for the ArgoCD Helm Chart.
+# For default values, see
+# https://raw.githubusercontent.com/argoproj/argo-helm/798c8107c3d0015b8cb93d565cf714c16848b3e8/charts/argocd-apps/values.yaml
+applications:
+  - name: argocd-root-app-of-apps
+    namespace: argocd
+    project: argocd-root
+    source:
+      repoURL: https://github.com/GiganticMinecraft/seichi_infra
+      targetRevision: main
+      path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/root
+      directory:
+        recurse: true
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: argocd
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+        allowEmpty: true
+      syncOptions:
+        - CreateNamespace=true
+      retry:
+        limit: -1
+        backoff:
+          duration: 5s
+          factor: 2
+          maxDuration: 2m
+
+projects:
+  - name: argocd-root
+    namespace: argocd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    description: The top-level project
+    sourceRepos:
+      - "*"
+    destinations:
+      - namespace: "*"
+        server: https://kubernetes.default.svc
+    clusterResourceWhitelist:
+      - group: "*"
+        kind: "*"
