@@ -1,6 +1,12 @@
 # Config values for the ArgoCD Helm Chart.
 # For default values, see
 # https://github.com/argoproj/argo-helm/blob/3a2858aa98f607b495d34db0da2a7a3ecad3eaa0/charts/argo-cd/values.yaml
+crds:
+  install: true
+  keep: true
+  annotations:
+    meta.helm.sh/release-namespace: argocd
+
 server:
   autoscaling:
     enabled: true
@@ -21,47 +27,6 @@ server:
     enabled: true
     minAvailable: 1
     maxUnavailable: 0
-  additionalProjects:
-    - name: argocd-root
-      namespace: argocd
-      additionalAnnotations:
-        "helm.sh/resource-policy": keep
-      description: The top-level project
-      sourceRepos:
-        - "*"
-      destinations:
-        - namespace: "*"
-          server: https://kubernetes.default.svc
-      clusterResourceWhitelist:
-        - group: "*"
-          kind: "*"
-
-  additionalApplications:
-    - name: argocd-root-app-of-apps
-      namespace: argocd
-      additionalAnnotations:
-        "helm.sh/resource-policy": keep
-      project: argocd-root
-      source:
-        repoURL: https://github.com/GiganticMinecraft/seichi_infra
-        targetRevision: main
-        path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/root
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: argocd
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-          allowEmpty: true
-        syncOptions:
-          - CreateNamespace=true
-        retry:
-          limit: -1
-          backoff:
-            duration: 5s
-            factor: 2
-            maxDuration: 2m
 
   configEnabled: true
   # -- [General Argo CD configuration]
@@ -107,7 +72,6 @@ server:
         release: prometheus
 
 controller:
-  enableStatefulSet: true
   resources:
     limits:
       cpu: 500m
