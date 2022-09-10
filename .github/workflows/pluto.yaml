@@ -1,0 +1,26 @@
+name: K8s resource API version check with Pluto
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/pluto.yaml"
+      - "helm-charts/cloudflared-tunnel"
+      - "seichi-onp-k8s/manifests/seichi-kubernetes"
+
+jobs:
+  api-c :
+    name: K8s resource API version check with Pluto
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Pluto
+        uses: FairwindsOps/pluto/github-action@master
+
+      - name: Use pluto
+        run: |
+          pluto detect-files -d helm-charts/cloudflared-tunnel --target-versions k8s=v1.24.0
+
+      - name: Use pluto
+        run: |
+          pluto detect-files -d seichi-onp-k8s/manifests/seichi-kubernetes/apps --target-versions k8s=v1.24.0
