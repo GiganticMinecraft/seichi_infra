@@ -39,8 +39,13 @@ spec:
           ports:
             - containerPort: 80
           startupProbe:
-            tcpSocket:
+            grpc:
               port: 80
             # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5
+          livenessProbe:
+            grpc:
+              port: 80
             failureThreshold: 6
             periodSeconds: 5

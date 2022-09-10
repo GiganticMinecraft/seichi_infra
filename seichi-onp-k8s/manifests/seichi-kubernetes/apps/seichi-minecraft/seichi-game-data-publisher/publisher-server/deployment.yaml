@@ -31,8 +31,15 @@ spec:
           ports:
             - containerPort: 80
           startupProbe:
-            tcpSocket:
+            httpGet:
+              path: /metrics
               port: 80
             # 最大30秒待つ
             failureThreshold: 6
             periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
