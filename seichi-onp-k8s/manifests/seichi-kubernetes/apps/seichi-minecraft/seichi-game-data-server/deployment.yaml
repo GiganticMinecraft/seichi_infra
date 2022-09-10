@@ -44,7 +44,7 @@ spec:
             # 最大30秒待つ
             failureThreshold: 6
             periodSeconds: 5
-          livenessProbe:
+          readinessProbe:
             grpc:
               port: 80
             failureThreshold: 6

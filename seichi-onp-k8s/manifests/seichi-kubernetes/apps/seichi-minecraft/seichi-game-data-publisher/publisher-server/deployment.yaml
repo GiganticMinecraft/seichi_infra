@@ -37,7 +37,7 @@ spec:
             # 最大30秒待つ
             failureThreshold: 6
             periodSeconds: 5
-          livenessProbe:
+          readinessProbe:
             httpGet:
               path: /metrics
               port: 80
