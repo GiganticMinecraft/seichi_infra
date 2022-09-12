@@ -6,6 +6,7 @@ spec:
   scaleTargetRef:
     name: mcserver--kagawa
     kind: StatefulSet
+  # 香川の時間に極力添えるようにチェックは毎回行うようにさせる
   pollingInterval:  30
   cooldownPeriod:   30
   # 平日と休日で別々のトリガーを設定する。
