@@ -6,6 +6,8 @@ spec:
   scaleTargetRef:
     name: mcserver--one-day-to-reset
     kind: StatefulSet
+  pollingInterval:  30
+  cooldownPeriod:   30
   # 04:05 から翌日の 04:00 までレプリカ数を 1 にすることで、
   # 04:00 に再起動がされるようにする
   triggers:
