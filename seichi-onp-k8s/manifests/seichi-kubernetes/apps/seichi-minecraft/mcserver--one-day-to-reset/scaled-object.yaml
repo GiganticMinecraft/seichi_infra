@@ -6,9 +6,8 @@ spec:
   scaleTargetRef:
     name: mcserver--one-day-to-reset
     kind: StatefulSet
-  # one-day-to-reset は香川ほど厳密に管理しなくても良い(要出典)と思うのでちょっとだけ感覚を長くしておく
   pollingInterval:  30
-  cooldownPeriod:   60
+  cooldownPeriod:   30
   # 04:05 から翌日の 04:00 までレプリカ数を 1 にすることで、
   # 04:00 に再起動がされるようにする
   triggers:
