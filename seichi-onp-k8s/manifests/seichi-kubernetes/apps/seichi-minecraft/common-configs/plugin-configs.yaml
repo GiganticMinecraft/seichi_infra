@@ -989,6 +989,17 @@ data:
         - game-mode: Spectator
           time: '0:00'
         - game-mode: Survival
+          time: '19:30'
+          days-of-week:
+            - 'SATURDAY'
+            - 'SUNDAY'
+        - game-mode: Survival
           time: '20:00'
+          days-of-week:
+            - 'MONDAY'
+            - 'TUESDAY'
+            - 'WEDNESDAY'
+            - 'THURSDAY'
+            - 'FRIDAY'
         - game-mode: Spectator
           time: '21:00'
