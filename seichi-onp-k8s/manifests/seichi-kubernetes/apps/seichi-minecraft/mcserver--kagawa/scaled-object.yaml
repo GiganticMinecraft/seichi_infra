@@ -22,9 +22,9 @@ spec:
     - type: cron
       metadata:
         timezone: Asia/Tokyo
-        # "土日: 19:30 (https://crontab.guru/#30_19_*_*_0,6) 
+        # "土日: 19:30 (https://crontab.guru/#30_19_*_*_0,6)
         start: 30 19 * * 0,6
-        # "土日: 21:00 (https://crontab.guru/#0_21_*_*_0,6) 
+        # "土日: 21:00 (https://crontab.guru/#0_21_*_*_0,6)
         end: 0 21 * * 0,6
         desiredReplicas: "1"
   minReplicaCount: 0 # 何も条件がない場合はスケール数が0になる(cronが発火している間イベント駆動で1にスケール)
