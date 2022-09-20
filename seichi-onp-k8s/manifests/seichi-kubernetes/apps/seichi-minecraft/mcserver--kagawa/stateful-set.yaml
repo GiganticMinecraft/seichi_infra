@@ -66,14 +66,14 @@ spec:
               # ViaVersion:
               #   https://github.com/ViaVersion/ViaVersion/releases/download/4.4.2/ViaVersion-4.4.2.jar
               # TimeToGo:
-              #   https://github.com/GiganticMinecraft/TimeToGo/releases/download/v0.3.0/TimeToGo-0.3.0.jar
+              #   https://github.com/GiganticMinecraft/TimeToGo/releases/download/v1.0.0/TimeToGo-1.0.0.jar
               value: >-
                 https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar,
                 https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar,
                 https://github.com/SigureRuri/MorningGlorySeeds/releases/download/3.0/MorningGlorySeeds.jar,
                 https://github.com/ViaVersion/ViaBackwards/releases/download/4.4.2/ViaBackwards-4.4.2.jar,
                 https://github.com/ViaVersion/ViaVersion/releases/download/4.4.2/ViaVersion-4.4.2.jar,
-                https://github.com/GiganticMinecraft/TimeToGo/releases/download/v0.3.0/TimeToGo-0.3.0.jar,
+                https://github.com/GiganticMinecraft/TimeToGo/releases/download/v1.0.0/TimeToGo-1.0.0.jar,
 
             - name: JVM_OPTS
               value: >-
