@@ -8,7 +8,7 @@ spec:
   source:
     chart: tetragon
     repoURL: https://helm.cilium.io/
-    targetRevision: 0.8.1
+    targetRevision: 0.8.2
     helm:
       releaseName: tetragon
       values: |
