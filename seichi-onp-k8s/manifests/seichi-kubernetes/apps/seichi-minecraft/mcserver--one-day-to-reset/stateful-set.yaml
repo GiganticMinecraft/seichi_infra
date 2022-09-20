@@ -48,6 +48,8 @@ spec:
               value: PAPER
             - name: VERSION
               value: "1.19.2"
+            - name: DIFFICULTY
+              value: "normal"
             - name: EULA
               value: "TRUE"
 
