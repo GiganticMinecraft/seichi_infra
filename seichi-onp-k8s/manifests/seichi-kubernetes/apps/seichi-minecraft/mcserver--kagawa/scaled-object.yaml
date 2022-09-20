@@ -9,22 +9,15 @@ spec:
   # 香川の時間に極力添えるようにチェックは毎回行うようにさせる
   pollingInterval:  30
   cooldownPeriod:   30
-  # 平日と休日で別々のトリガーを設定する。
+  # 04:05 から翌日の 04:00 までレプリカ数を 1 にすることで、
+  # 04:00 に再起動がされるようにする
   triggers:
     - type: cron
       metadata:
         timezone: Asia/Tokyo
-        # "月-金: 20:00 (https://crontab.guru/#0_20_*_*_1-5)
-        start: 0 20 * * 1-5
-        # "月-金: 21:00 (https://crontab.guru/#0_21_*_*_1-5)
-        end: 0 21 * * 1-5
-        desiredReplicas: "1"
-    - type: cron
-      metadata:
-        timezone: Asia/Tokyo
-        # "土日: 19:30 (https://crontab.guru/#30_19_*_*_0,6)
-        start: 30 19 * * 0,6
-        # "土日: 21:00 (https://crontab.guru/#0_21_*_*_0,6)
-        end: 0 21 * * 0,6
+        # "At 04:05." https://crontab.guru/#5_4_*_*_*
+        start: 5 4 * * *
+        # "At 04:00." https://crontab.guru/#0_4_*_*_*
+        end: 0 4 * * *
         desiredReplicas: "1"
   minReplicaCount: 0 # 何も条件がない場合はスケール数が0になる(cronが発火している間イベント駆動で1にスケール)
