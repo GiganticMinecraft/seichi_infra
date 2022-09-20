@@ -168,6 +168,11 @@ spec:
               mountPath: /plugins/LunaChat/config.yml
               subPath: LunaChat-config.yml
 
+            # TimeToGo プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/TimeToGo/config.yml
+              subPath: TimeToGo-config.yml
+
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
