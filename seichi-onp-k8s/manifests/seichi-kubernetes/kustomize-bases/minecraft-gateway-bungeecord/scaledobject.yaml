@@ -1,0 +1,24 @@
+# bungeecordの長期起動によるスローダウンを防止するための定期再起動を担うScaledObject
+# scaledobjectの仕様上厳密には停止して起動する
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cron-scaledobject--bungeecord
+spec:
+  scaleTargetRef:
+    name: bungeecord
+    kind: Deployment
+  # 再起動の時間に極力添えるようにチェックは毎回行うようにさせる
+  pollingInterval:  30
+  cooldownPeriod:   30
+  # 平日初日の日次再起動のタイミングに合わせて再起動することによって鯖民に対して健全な社会生活を促す
+  triggers:
+    - type: cron
+      metadata:
+        timezone: Asia/Tokyo
+        # "月: 04:06 (https://crontab.guru/#6_4_*_*_1)
+        start: 6 4 * * 1
+        # "月: 04:05 (https://crontab.guru/#5_4_*_*_1)
+        end: 5 4 * * 1
+        desiredReplicas: "2"
+  minReplicaCount: 0 # 何も条件がない場合はスケール数が minReplicaCount になる(cronが発火している間イベント駆動で desiredReplicas にスケール)

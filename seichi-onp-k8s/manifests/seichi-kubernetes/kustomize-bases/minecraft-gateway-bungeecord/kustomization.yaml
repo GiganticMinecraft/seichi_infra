@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - "./deployment.yaml"
   # - "./networkpolicies.yaml"
+  - "./scaledobject.yaml"
   - "./service-bungeecord-loadbalancer.yaml"
   - "./service-bungeecord-metrics.yaml"
   - "./configs/bungeecord-config.yaml"

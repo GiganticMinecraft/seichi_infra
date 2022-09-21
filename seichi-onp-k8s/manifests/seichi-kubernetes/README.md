@@ -2,8 +2,6 @@
 
 seichi.click network 向けの Kubernetes のクラスタ定義を管理するディレクトリです。
 
-Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本リポジトリのGithub Actionsによって再起動されています。
-
 概要図は `*/diagrams` 以下で、 draw.io によってパース可能なsvgファイルとして管理されています。これらを編集する場合は [Draw.io VS Code Integration](https://github.com/hediet/vscode-drawio) の利用を推奨します。
 
 ## 全体俯瞰図
@@ -13,6 +11,10 @@ Production環境のBungeeCordは毎月10日20日30日の毎朝4時30分に、本
 | フルネーム  | 役割                                                                           | 
 | ----------- | ------------------------------------------------------------------------------ | 
 |  BungeeCord | Minecraftプロトコル用プロキシ                                                  | 
+
+## BungeeCordの定期的な再起動
+
+BungeeCordは長期起動するとスローダウンを起こすため、kedaのCRDsである[`ScaledObjects`](./kustomize-bases/minecraft-gateway-bungeecord/scaledobject.yaml)によって定期的な再起動を行なっています。
 
 ## `Service` の VIP 割り当て
 
