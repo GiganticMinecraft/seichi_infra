@@ -9,5 +9,5 @@ resource "cloudflare_firewall_rule" "bypass_waf_on_minio_api_requests" {
   description = "Let MinIO API requests bypass WAF rules"
   filter_id   = cloudflare_filter.minio_api_requests.id
   action      = "bypass"
-  products    = set("waf")
+  products    = toset(["waf"])
 }
