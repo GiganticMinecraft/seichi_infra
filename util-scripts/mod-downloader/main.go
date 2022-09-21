@@ -23,6 +23,7 @@ func main() {
 	})
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
 
 	bucketName := os.Getenv("BUCKET_NAME")
