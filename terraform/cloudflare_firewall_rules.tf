@@ -1,7 +1,7 @@
 resource "cloudflare_filter" "minio_api_requests" {
   zone_id     = local.cloudflare_zone_id
   description = "MinIO API requests"
-  expression  = "http.host eq \"minio-console.onp-k8s.admin.seichi.click\" and http.request.uri.path ~ \"/api/.*\""
+  expression  = "http.host eq \"minio-console.onp-k8s.admin.seichi.click\""
 }
 
 resource "cloudflare_firewall_rule" "bypass_waf_on_minio_api_requests" {
