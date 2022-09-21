@@ -16,15 +16,15 @@ spec:
         timezone: Asia/Tokyo
         # "月-金: 20:00 (https://crontab.guru/#0_20_*_*_1-5)
         start: 0 20 * * 1-5
-        # "月-金: 21:00 (https://crontab.guru/#0_21_*_*_1-5)
-        end: 0 21 * * 1-5
+        # "火-土: 19:00 (https://crontab.guru/#00_19_*_*_2-6)
+        end: 00 19 * * 2-6
         desiredReplicas: "1"
     - type: cron
       metadata:
         timezone: Asia/Tokyo
-        # "土日: 19:30 (https://crontab.guru/#30_19_*_*_0,6) 
+        # "土日: 19:30 (https://crontab.guru/#30_19_*_*_0,6)
         start: 30 19 * * 0,6
-        # "土日: 21:00 (https://crontab.guru/#0_21_*_*_0,6) 
-        end: 0 21 * * 0,6
+        # "日月: 19:00 (https://crontab.guru/#0_19_*_*_0,1)
+        end: 0 19 * * 0,1
         desiredReplicas: "1"
   minReplicaCount: 0 # 何も条件がない場合はスケール数が0になる(cronが発火している間イベント駆動で1にスケール)
