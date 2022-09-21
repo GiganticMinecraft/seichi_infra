@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/minio/minio-go/v7"
@@ -45,31 +43,10 @@ func main() {
 		}
 		// fmt.Println(object)
 		fmt.Println(object.Key)
-		fileUrl := "http://" + endpoint + "/" + bucketName + "/" + prefixName + "/" + object.Key
-
-		if err := DownloadFile(object.Key, fileUrl); err != nil {
-			panic(err)
+		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, object.Key, minio.GetObjectOptions{})
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
 	}
-}
-
-func DownloadFile(filepath string, url string) error {
-
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode >= 400 {
-		return fmt.Errorf("bad response status code %d", resp.StatusCode)
-	}
-	defer resp.Body.Close()
-
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	return err
 }
