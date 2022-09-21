@@ -8,7 +8,7 @@ on:
       - "seichi-onp-k8s/manifests/seichi-kubernetes/**"
 
 jobs:
-  api-c :
+  api-check:
     name: K8s resource API version check with Pluto
     runs-on: ubuntu-latest
     steps:
