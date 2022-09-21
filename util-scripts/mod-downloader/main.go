@@ -42,7 +42,6 @@ func main() {
 			fmt.Println(object.Err)
 			return
 		}
-		// fmt.Println(object)
 		fmt.Println(object.Key)
 		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, object.Key, minio.GetObjectOptions{})
 		if err != nil {
