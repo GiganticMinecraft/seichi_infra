@@ -3,7 +3,7 @@ name: "Run goreleaser"
 on:
   pull_request:
     paths:
-      - "util-scripts/mod-downloader"
+      - "util-scripts/mod-downloader/**"
 
 jobs:
   goreleaser:

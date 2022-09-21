@@ -4,8 +4,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/pluto.yaml"
-      - "helm-charts/cloudflared-tunnel"
-      - "seichi-onp-k8s/manifests/seichi-kubernetes"
+      - "helm-charts/cloudflared-tunnel/**"
+      - "seichi-onp-k8s/manifests/seichi-kubernetes/**"
 
 jobs:
   api-c :
