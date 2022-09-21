@@ -16,8 +16,8 @@ spec:
         timezone: Asia/Tokyo
         # "月-金: 20:00 (https://crontab.guru/#0_20_*_*_1-5)
         start: 0 20 * * 1-5
-        # "火-土: 19:30 (https://crontab.guru/#30_19_*_*_2-6)
-        end: 30 19 * * 2-6
+        # "火-土: 19:00 (https://crontab.guru/#00_19_*_*_2-6)
+        end: 00 19 * * 2-6
         desiredReplicas: "1"
     - type: cron
       metadata:
