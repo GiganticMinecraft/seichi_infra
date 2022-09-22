@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: discord-spam-reporter-config
 data:
+  # TODO: add config.yml
   CONFIG: /config.yml
   REPORT_CHANNEL: 1022347809145499668
   GUILD: 237758724121427969
