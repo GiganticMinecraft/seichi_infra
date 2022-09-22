@@ -50,6 +50,8 @@ spec:
               value: "1.16.5"
             - name: EULA
               value: "TRUE"
+            - name: TZ
+              value: Asia/Tokyo
 
             - name: REMOVE_OLD_MODS
               value: "TRUE"
