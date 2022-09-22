@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: discord-bot
+  labels:
+    app: discord-spam-reporter
+  name: discord-spam-reporter
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: discord-spam-reporter
+  template:
+    metadata:
+      labels:
+        app: discord-spam-reporter
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: 128Mi
+
+          envFrom:
+            - configMapRef:
+                name: discord-spam-reporter-config
+
+          # TODO: Set
+          # env:
+          #   - name: TOKEN
+          #     valueFrom:
+          #       secretKeyRef:
+          #         name:
+          #         key:
+
+          image: ghcr.io/giganticminecraft/discord-spam-reporter:sha-8657541
+          name: discord-spam-reporter
+          startupProbe:
+            tcpSocket:
+              port: 80
+            # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5

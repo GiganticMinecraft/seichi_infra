@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: discord-spam-reporter-config
+data:
+  CONFIG: /config.yml
+  REPORT_CHANNEL: 1022347809145499668
+  GUILD: 237758724121427969
+  ROLE: 1022347936119664751
+
+  #TODO: Bot token will be read from secret
