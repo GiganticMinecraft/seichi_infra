@@ -27,13 +27,12 @@ spec:
             - configMapRef:
                 name: discord-spam-reporter-config
 
-          # TODO: Set
-          # env:
-          #   - name: TOKEN
-          #     valueFrom:
-          #       secretKeyRef:
-          #         name:
-          #         key:
+          env:
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: discord-bot--discord-spam-reporter--config-secrets
+                  key: TOKEN
 
           image: ghcr.io/giganticminecraft/discord-spam-reporter:sha-8657541
           name: discord-spam-reporter

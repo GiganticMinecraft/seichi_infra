@@ -227,3 +227,13 @@ variable "minecraft__prod_game_db__password" {
 }
 
 #endregion
+
+#region on-premise discord bot config secrets
+
+variable "discord_bot__discord_spam_reporter__token" {
+  description = "discord-spam-reporter bot token"
+  type        = string
+  sensitive   = true
+}
+
+#endregion

@@ -8,4 +8,4 @@ data:
   GUILD: 237758724121427969
   ROLE: 1022347936119664751
 
-  #TODO: Bot token will be read from secret
+  # Bot token will be read from secret
