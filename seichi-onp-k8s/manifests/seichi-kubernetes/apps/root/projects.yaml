@@ -151,3 +151,24 @@ spec:
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: discord-bot
+  namespace: argocd
+spec:
+  description: The project of Discord bots for the GiganticSeichiServer official Discord server
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: discord-bot
+      server: https://kubernetes.default.svc
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
