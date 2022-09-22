@@ -22,6 +22,12 @@ resource "kubernetes_namespace" "onp_seichi_minecraft" {
   }
 }
 
+resource "kubernetes_namespace" "onp_discord_bot" {
+  metadata {
+    name = "discord-bot"
+  }
+}
+
 resource "kubernetes_namespace" "onp_argocd" {
   metadata {
     name = "argocd"
