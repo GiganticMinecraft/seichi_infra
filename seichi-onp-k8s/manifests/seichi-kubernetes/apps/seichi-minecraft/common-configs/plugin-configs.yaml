@@ -985,7 +985,7 @@ data:
     # 配下のすべてのspigotサーバーにも、LunaChatの導入が必要です。
     bungeePassThroughMode: false
   TimeToGo-config.yml: |
-    mode-time:
+    mode-triggers:
         - game-mode: Spectator
           time: '0:00'
         - game-mode: Survival
