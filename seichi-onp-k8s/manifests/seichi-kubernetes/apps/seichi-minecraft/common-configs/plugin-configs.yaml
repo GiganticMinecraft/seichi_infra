@@ -987,7 +987,7 @@ data:
   TimeToGo-config.yml: |
     mode-triggers:
         - game-mode: Spectator
-          time: '0:00'
+          time: '00:00'
         - game-mode: Survival
           time: '19:30'
           days-of-week:
