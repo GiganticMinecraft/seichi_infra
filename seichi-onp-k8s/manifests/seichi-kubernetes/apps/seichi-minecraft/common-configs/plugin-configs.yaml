@@ -991,15 +991,15 @@ data:
         - game-mode: Survival
           time: '19:30'
           days-of-week:
-            - 'SATURDAY'
-            - 'SUNDAY'
+            - Saturday
+            - Sunday
         - game-mode: Survival
           time: '20:00'
           days-of-week:
-            - 'MONDAY'
-            - 'TUESDAY'
-            - 'WEDNESDAY'
-            - 'THURSDAY'
-            - 'FRIDAY'
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
         - game-mode: Spectator
           time: '21:00'
