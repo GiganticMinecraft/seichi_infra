@@ -12,9 +12,6 @@ jobs:
   lint-and-test:
     name: Lint and test application
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: util-scripts/mod-downloader
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,6 +23,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
+          working-directory: util-scripts/mod-downloader
 
   build-image:
     name: Build docker image (and publish on master)
