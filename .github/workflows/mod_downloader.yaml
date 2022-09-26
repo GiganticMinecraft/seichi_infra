@@ -56,8 +56,8 @@ jobs:
       - name: Build (and push if on main)
         id: docker_build
         uses: docker/build-push-action@v3
+        working-directory: util-scripts/mod-downloader
         with:
-          context: ./util-scripts/mod-downloader/
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.ref == 'refs/heads/main' }}
