@@ -61,7 +61,6 @@ jobs:
       - name: Build (and push if on main)
         id: docker_build
         uses: docker/build-push-action@v3
-        working-directory: util-scripts/mod-downloader
         with:
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
