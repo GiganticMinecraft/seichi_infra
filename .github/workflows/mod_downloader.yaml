@@ -2,6 +2,7 @@ name: CI
 on: 
   push:
     paths:
+      - ".github/workflows/mod_downloader.yaml"
       - "util-scripts/mod-downloader/**"
 
 env:
