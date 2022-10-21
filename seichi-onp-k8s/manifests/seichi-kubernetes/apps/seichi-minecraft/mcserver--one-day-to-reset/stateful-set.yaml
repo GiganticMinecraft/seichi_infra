@@ -106,7 +106,7 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "689106759851180044"
 
-          image: itzg/minecraft-server:2022.11.0-java17-jdk
+          image: itzg/minecraft-server:2022.12.0-java17-jdk
           name: minecraft
           ports:
             - containerPort: 25565
