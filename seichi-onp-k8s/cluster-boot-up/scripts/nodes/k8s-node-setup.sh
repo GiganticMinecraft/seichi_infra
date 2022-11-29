@@ -280,10 +280,11 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
+imageRepository: "k8s.gcr.io"
 networking:
   serviceSubnet: "10.96.0.0/16"
   podSubnet: "10.128.0.0/16"
-kubernetesVersion: "v1.24.1"
+kubernetesVersion: "v1.24.7"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
@@ -351,6 +352,7 @@ nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
   kubeletExtraArgs:
     feature-gates: "DelegateFSGroupToCSIDriver=false"
+    pod-infra-container-image: "k8s.gcr.io/pause:3.5"
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
@@ -373,6 +375,7 @@ nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
   kubeletExtraArgs:
     feature-gates: "DelegateFSGroupToCSIDriver=false"
+    pod-infra-container-image: "k8s.gcr.io/pause:3.5"
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
