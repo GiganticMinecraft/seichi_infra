@@ -32,6 +32,10 @@ spec:
                 secretKeyRef:
                   name: mcserver--common--config-secrets
                   key: GAME_DB_PASSWORD
+            - name: UPLOAD_LIMIT
+              value: 1024M
+            - name: TZ
+              value: Asia/Tokyo
 
           image: phpmyadmin:5.2
           name: phpmyadmin
