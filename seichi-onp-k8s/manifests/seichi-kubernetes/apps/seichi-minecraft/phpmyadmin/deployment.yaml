@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: seichi-minecraft
+  labels:
+    app: phpmyadmin
+  name: phpmyadmin
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+
+          env:
+            - name: PMA_ABSOLUTE_URI
+              value: phpmyadmin.onp-k8s.admin.seichi.click
+            - name: PMA_HOST
+              value: 192.168.2.186
+            - name: PMA_USER
+              value: mcserver
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: GAME_DB_PASSWORD
+
+          image: phpmyadmin:5.2
+          name: phpmyadmin
+          ports:
+            - containerPort: 80
