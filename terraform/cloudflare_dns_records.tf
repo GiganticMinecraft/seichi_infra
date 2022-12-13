@@ -16,6 +16,14 @@ resource "cloudflare_record" "play_debug" {
   ttl     = 1 # automatic
 }
 
+resource "cloudflare_record" "portal" {
+  zone_id = local.cloudflare_zone_id
+  name    = "portal"
+  value   = "giganticminecraft.github.io"
+  type    = "CNAME"
+  ttl     = 1 # automatic
+}
+
 # ローカルにトンネルを生やしてアクセスすることを想定したドメイン。
 #
 # 例えば、オンプレのk8sクラスタのAPIエンドポイントへは、
