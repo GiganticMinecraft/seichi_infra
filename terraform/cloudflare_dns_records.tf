@@ -16,6 +16,14 @@ resource "cloudflare_record" "play_debug" {
   ttl     = 1 # automatic
 }
 
+resource "cloudflare_record" "github_pages" {
+  zone_id = local.cloudflare_zone_id
+  name    = "_github-pages-challenge-GiganticMinecraft"
+  value   = var.cloudflare__txt_record_value__github_pages
+  type    = "TXT"
+  ttl     = 1 # automatic
+}
+
 resource "cloudflare_record" "portal" {
   zone_id = local.cloudflare_zone_id
   name    = "portal"
