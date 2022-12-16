@@ -227,3 +227,13 @@ variable "minecraft__prod_game_db__password" {
 }
 
 #endregion
+
+#region Cloudflare DNS Record secrets
+
+variable "cloudflare__txt_record_value__github_pages" {
+  description = "TXT Record value to verify domain for GitHub Pages"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
