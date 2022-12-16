@@ -19,7 +19,7 @@ spec:
         app: phpmyadmin
     spec:
       containers:
-          env:
+        - env:
             - name: PMA_ABSOLUTE_URI
               value: phpmyadmin.onp-k8s.admin.seichi.click
             - name: PMA_HOST
