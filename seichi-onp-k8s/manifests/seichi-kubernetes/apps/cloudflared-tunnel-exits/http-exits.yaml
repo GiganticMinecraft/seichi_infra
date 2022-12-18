@@ -69,6 +69,11 @@ spec:
           - name: seichi-ranking
             external-hostname: ranking-gigantic.seichi.click
             internal-authority: "192.168.3.1:80"
+
+          # phpMyAdmin
+          - name: phpmyadmin
+            external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
+            internal-authority: "phpmyadmin.seichi-minecraft:80"
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
@@ -78,7 +83,7 @@ spec:
       source:
         repoURL: https://giganticminecraft.github.io/seichi_infra
         chart: cloudflared-tunnel
-        targetRevision: "1.0.5"
+        targetRevision: "1.0.6"
         helm:
           # サービス一つに対してトンネルを一つずつ生やす
           releaseName: cloudflared-tunnel-http-exit--{{name}}

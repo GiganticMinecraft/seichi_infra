@@ -984,3 +984,22 @@ data:
     # 返送してもらってから処理を行うモードです。
     # 配下のすべてのspigotサーバーにも、LunaChatの導入が必要です。
     bungeePassThroughMode: false
+  TimeToGo-config.yml: |
+    mode-triggers:
+        - game-mode: Spectator
+          time: '00:00'
+        - game-mode: Survival
+          time: '19:30'
+          days-of-week:
+            - Saturday
+            - Sunday
+        - game-mode: Survival
+          time: '20:00'
+          days-of-week:
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+        - game-mode: Spectator
+          time: '21:00'
