@@ -1,0 +1,186 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: mcserver
+    mcserver: debug-s1
+  name: mcserver--debug-s1
+spec:
+  replicas: 1
+  serviceName: "mcserver--debug-s1"
+  selector:
+    matchLabels:
+      app: mcserver--debug-s1
+      mcserver: debug-s1
+  template:
+    metadata:
+      labels:
+        app: mcserver--debug-s1
+        mcserver: debug-s1
+    spec:
+      initContainers:
+        - name: jmx-exporter-downloader
+          image: busybox:1.35.0
+          env:
+            - name: JMX_EXPORTER_URL
+              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar"
+          volumeMounts:
+            - name: jmx-exporter-download-volume
+              mountPath: /root/jmx-exporter-download
+          command:
+            - "sh"
+            - "-c"
+            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
+
+      containers:
+        - resources:
+            requests:
+              memory: 2100Mi
+          env:
+            - name: MEMORY
+              value: 2048m
+            - name: TYPE
+              value: PAPER
+            - name: VERSION
+              value: "1.12.2"
+            - name: EULA
+              value: "TRUE"
+
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
+            - name: MODS
+              # DiscordSRV:
+              #   https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar
+              # LunaChat:
+              #   https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar
+              # MorningGlorySeeds:
+              #   https://github.com/SigureRuri/MorningGlorySeeds/releases/download/3.0/MorningGlorySeeds.jar
+              # ViaBackwards:
+              #   https://github.com/ViaVersion/ViaBackwards/releases/download/4.4.2/ViaBackwards-4.4.2.jar
+              # ViaVersion:
+              #   https://github.com/ViaVersion/ViaVersion/releases/download/4.4.2/ViaVersion-4.4.2.jar
+              value: >-
+                https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar,
+                https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar,
+                https://github.com/SigureRuri/MorningGlorySeeds/releases/download/3.0/MorningGlorySeeds.jar,
+                https://github.com/ViaVersion/ViaBackwards/releases/download/4.4.2/ViaBackwards-4.4.2.jar,
+                https://github.com/ViaVersion/ViaVersion/releases/download/4.4.2/ViaVersion-4.4.2.jar,
+
+            - name: JVM_OPTS
+              value: >-
+                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+
+            - name: COPY_CONFIG_DEST
+              # /config をサーバーディレクトリにコピーするようにする
+              # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
+              value: /data
+
+            # 設定ファイル内の ${CFG_*} の形をした部分を置き換える
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+            - name: REPLACE_ENV_VARIABLE_PREFIX
+              value: CFG_
+
+            - name: CFG_DISCORDSRV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: DISCORDSRV_TOKEN
+
+            - name: CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--debug-s1--config-secrets
+                  key: MORNING_GLORY_SEEDS_WEBHOOK_URL
+
+            - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
+              value: "959300037844799560"
+
+            - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
+              value: "689841701333893163"
+
+          image: itzg/minecraft-server:2022.11.0-java8-jdk
+          name: minecraft
+          ports:
+            - containerPort: 25565
+              name: minecraft
+            - containerPort: 18321
+              name: jmx-metrics
+
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            # 最大120秒待つ
+            failureThreshold: 6
+            periodSeconds: 20
+
+          volumeMounts:
+            # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/minecraft-server が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+
+            # サーバーの設定ファイル
+            - name: common-mcserver-configs
+              mountPath: /config/bukkit.yml
+              subPath: bukkit.yml
+            - name: common-mcserver-configs
+              mountPath: /config/paper.yml
+              subPath: paper.yml
+            - name: common-mcserver-configs
+              mountPath: /config/server.properties
+              subPath: server.properties
+            - name: common-mcserver-configs
+              mountPath: /config/spigot.yml
+              subPath: spigot.yml
+
+            # DiscordSRV プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DiscordSRV/config.yml
+              subPath: DiscordSRV-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DiscordSRV/messages.yml
+              subPath: DiscordSRV-messages.yml
+
+            # MorningGlorySeeds プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/MorningGlorySeeds/config.yml
+              subPath: MorningGlorySeeds-config.yml
+
+            # LunaChat プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LunaChat/config.yml
+              subPath: LunaChat-config.yml
+
+            # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
+            - name: jmx-exporter-download-volume
+              mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
+              subPath: jmx-exporter-javaagent.jar
+            - name: common-jmx-exporter-config
+              mountPath: /jmx-exporter/jmx-exporter-config.yaml
+              subPath: jmx-exporter-config.yaml
+
+      volumes:
+        - name: common-mcserver-configs
+          configMap:
+            name: common-mcserver-configs
+        - name: common-mcserver-plugin-configs
+          configMap:
+            name: common-mcserver-plugin-configs
+
+        # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
+        - name: jmx-exporter-download-volume
+          emptyDir: {}
+        - name: common-jmx-exporter-config
+          configMap:
+            name: common-jmx-exporter-config

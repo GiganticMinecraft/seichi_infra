@@ -1,0 +1,17 @@
+FROM golang:1.18-bullseye as builder
+WORKDIR /go/src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN go build -o /mod-downloader
+
+FROM gcr.io/distroless/static:nonroot
+
+COPY --from=builder --chown=nonroot:nonroot /mod-downloader /bin/
+ENV MINIO_ENDPOINT=""
+ENV MINIO_ACCESS_KEY=""
+ENV MINIO_ACCESS_SECRET=""
+ENV BUCKET_NAME=""
+ENV BUCKET_PREFIX_NAME=""
+ENV DOWNLOAD_TARGET_DIR_PATH=""
+CMD ["/bin/mod-downloader"]
