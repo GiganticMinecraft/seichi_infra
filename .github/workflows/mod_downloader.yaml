@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - ".github/workflows/mod_downloader.yaml"
-      - "util-scripts/mod-downloader/**"
+      - "docker-images/mod-downloader/**"
 
 env:
   IMAGE: ghcr.io/giganticminecraft/mod-downloader
@@ -23,7 +23,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-          working-directory: util-scripts/mod-downloader
+          working-directory: docker-images/mod-downloader
 
   build-image:
     name: Build docker image (and publish on master)
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-20.04
     defaults:
       run:
-        working-directory: util-scripts/mod-downloader
+        working-directory: docker-images/mod-downloader
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -60,7 +60,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v3
         with:
-          context: ./util-scripts/mod-downloader/
+          context: ./docker-images/mod-downloader/
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
