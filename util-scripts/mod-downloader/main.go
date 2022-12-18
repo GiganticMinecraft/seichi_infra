@@ -42,11 +42,13 @@ func main() {
 			fmt.Println(object.Err)
 			return
 		}
-		fmt.Println(object.Key)
+		fmt.Println("Downloading object:", object.Key)
 		err = minioClient.FGetObject(context.Background(), bucketName, prefixName+object.Key, object.Key, minio.GetObjectOptions{})
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 	}
+
+	fmt.Println("Downloaded all visible objects.")
 }
