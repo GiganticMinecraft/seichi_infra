@@ -11,6 +11,14 @@ import (
 )
 
 func main() {
+	downloadTargetDirPath := os.Getenv("DOWNLOAD_TARGET_DIR_PATH")
+	err := os.MkdirAll(downloadTargetDirPath, 0600)
+
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
 	endpoint := os.Getenv("MINIO_ENDPOINT")
 	accessKeyID := os.Getenv("MINIO_ACCESS_KEY")
 	secretAccessKey := os.Getenv("MINIO_ACCESS_SECRET")
@@ -43,7 +51,7 @@ func main() {
 			return
 		}
 		fmt.Println("Downloading object:", object.Key)
-		err = minioClient.FGetObject(context.Background(), bucketName, prefixName+object.Key, object.Key, minio.GetObjectOptions{})
+		err = minioClient.FGetObject(context.Background(), bucketName, prefixName+object.Key, downloadTargetDirPath+object.Key, minio.GetObjectOptions{})
 		if err != nil {
 			fmt.Println(err)
 			return
