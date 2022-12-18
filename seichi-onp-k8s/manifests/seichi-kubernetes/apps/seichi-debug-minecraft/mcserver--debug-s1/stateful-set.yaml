@@ -89,12 +89,6 @@ spec:
                   name: mcserver--common--config-secrets
                   key: DISCORDSRV_TOKEN
 
-            - name: CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL
-              valueFrom:
-                secretKeyRef:
-                  name: mcserver--debug-s1--config-secrets
-                  key: MORNING_GLORY_SEEDS_WEBHOOK_URL
-
             - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
               value: "1054159992447570032"
 
