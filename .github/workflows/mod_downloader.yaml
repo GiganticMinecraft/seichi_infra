@@ -58,7 +58,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./util-scripts/mod-downloader/
-          file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
