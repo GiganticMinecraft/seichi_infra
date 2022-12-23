@@ -16,21 +16,33 @@ jobs:
             build_context: ./docker-images/mcservers/base-server-image
 
     steps:
-      - name: checkout
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            build_script_or_image_definition:
+              - .github/workflows/build_mcserver_images.yaml
+              - ${{ matrix.build_context }}/**
+
+      - if: steps.changes.outputs.build_script_or_image_definition == 'true'
+        name: checkout
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
+      - if: steps.changes.outputs.build_script_or_image_definition == 'true'
+        name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Login to GitHub Container Registry
+      - if: steps.changes.outputs.build_script_or_image_definition == 'true'
+        name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta
+      - if: steps.changes.outputs.build_script_or_image_definition == 'true'
+        name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -39,7 +51,8 @@ jobs:
             type=sha,prefix=sha-,suffix=,format=short
             type=schedule,pattern={{date 'YYYYMMDD'}}
 
-      - name: Build (and push if on main)
+      - if: steps.changes.outputs.build_script_or_image_definition == 'true'
+        name: Build (and push if on main)
         id: docker_build
         uses: docker/build-push-action@v3
         with:
