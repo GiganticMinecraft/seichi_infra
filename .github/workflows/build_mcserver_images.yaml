@@ -14,6 +14,8 @@ jobs:
         include:
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_base
             build_context: ./docker-images/mcservers/base-server-image
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa
+            build_context: ./docker-images/mcservers/production/kagawa
 
     steps:
       - name: checkout
