@@ -5,7 +5,6 @@
   "packageRules": [
     {
       "matchPackagePatterns": "ghcr.io/giganticminecraft/seichi_minecraft_server_base",
-      "extractVersion": "(?<version>[^-]+)$",
       "allowedVersions": "/^.*$/"
     }
   ],
