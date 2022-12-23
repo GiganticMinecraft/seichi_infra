@@ -2,6 +2,13 @@
   "extends": [
     "config:base"
   ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": "ghcr.io/giganticminecraft/seichi_minecraft_server_base",
+      "extractVersion": "(?<version>[^-]+)$",
+      "allowedVersions": "/^.*$/"
+    }
+  ],
   "argocd": {
     "fileMatch": [
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"
