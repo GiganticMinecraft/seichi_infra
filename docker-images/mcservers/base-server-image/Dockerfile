@@ -1,16 +1,10 @@
 ##---
 # JVM exporter をダウンロードする stage
-FROM ubuntu:22.10 as jmx-prometheus-exporter-downloader
-
-RUN apt-get update \
- && apt-get install -y wget ca-certificates \
- && apt-get clean
-
+FROM busybox:1.35.0 as jmx-prometheus-exporter-downloader
 RUN wget \
   -O /root/jmx_prometheus_javaagent.jar \
   https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar
 
-# ---
 ##---
 # base image
 FROM itzg/minecraft-server:2022.15.0-java8-jdk
@@ -19,7 +13,7 @@ FROM itzg/minecraft-server:2022.15.0-java8-jdk
 COPY --from=jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
 COPY ./jmx-exporter-config.yaml /jmx-exporter/jmx-exporter-config.yaml
 
-##---
+# ---
 # サーバー群に共通する環境変数
 #   必要であれば各サーバーの image が (ENV を各々定義することによって) オーバーライドすべき
 
