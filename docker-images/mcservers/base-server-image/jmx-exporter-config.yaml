@@ -1,0 +1,8 @@
+# https://github.com/prometheus/jmx_exporter/tree/ca972bfe693cca03d3a0fac802968e33828a1dd9#configuration
+
+startDelaySeconds: 0
+lowercaseOutputName: false
+lowercaseOutputLabelNames: false
+whitelistObjectNames: []
+blacklistObjectNames: []
+rules: []
