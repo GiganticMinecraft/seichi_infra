@@ -16,6 +16,11 @@ jobs:
             build_context: ./docker-images/mcservers/base-server-image
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -23,10 +28,6 @@ jobs:
             build_script_or_image_definition:
               - .github/workflows/build_mcserver_images.yaml
               - ${{ matrix.build_context }}/**
-
-      - if: steps.changes.outputs.build_script_or_image_definition == 'true'
-        name: checkout
-        uses: actions/checkout@v3
 
       - if: steps.changes.outputs.build_script_or_image_definition == 'true'
         name: Set up Docker Buildx
