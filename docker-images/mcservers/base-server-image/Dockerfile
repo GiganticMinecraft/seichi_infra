@@ -50,3 +50,6 @@ ENV TZ="Asia/Tokyo"
 
 # サーバー自体の設定ファイル
 COPY ./minecraft-server-configs /config
+
+# プラグインの設定ファイル
+COPY ./common-plugin-configs /plugins
