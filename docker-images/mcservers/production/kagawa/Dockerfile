@@ -1,4 +1,4 @@
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:sha-672ea19
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:sha-b369ed2
 
 ENV VERSION="1.16.5"
 
