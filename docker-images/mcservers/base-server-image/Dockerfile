@@ -7,8 +7,8 @@ RUN apt-get update \
  && apt-get clean
 
 RUN wget \
-  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar \
-  /root/jmx_prometheus_javaagent.jar
+  -O /root/jmx_prometheus_javaagent.jar \
+  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar
 
 # ---
 ##---
