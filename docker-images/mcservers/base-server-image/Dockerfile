@@ -6,8 +6,12 @@ RUN wget \
   https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar
 
 ##---
-# base image
-FROM itzg/minecraft-server:2022.15.0-java8-jdk
+# 最終 stage
+#
+# MCSERVER_BASE_IMAGE は、 build args を通して
+#   itmz/minecraft-server の特定のタグを指定することを想定している
+ARG MCSERVER_BASE_IMAGE
+FROM ${MCSERVER_BASE_IMAGE}
 
 # JMX exporter と設定ファイルをイメージに移す
 COPY --from=jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
