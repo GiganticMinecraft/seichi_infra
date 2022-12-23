@@ -24,7 +24,7 @@ spec:
         mcserver: kagawa
     spec:
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa:sha-a0766ba
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa:sha-56c1ebb
           name: minecraft
           resources:
             requests:
