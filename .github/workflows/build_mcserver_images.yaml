@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: seichi_minecraft_server_base
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_base
             build_context: ./docker-images/mcservers/base-server-image
 
     steps:
