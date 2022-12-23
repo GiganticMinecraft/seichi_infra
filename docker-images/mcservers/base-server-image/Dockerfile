@@ -16,7 +16,7 @@ RUN wget \
 FROM itzg/minecraft-server:2022.12.0-java8-jdk
 
 # JMX exporter と設定ファイルをイメージに移す
-COPY --from jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
+COPY --from=jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
 COPY ./jmx-exporter-config.yaml /jmx-exporter/jmx-exporter-config.yaml
 
 ##---
