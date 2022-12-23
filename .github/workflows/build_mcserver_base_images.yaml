@@ -7,7 +7,7 @@ on:
 
 env:
   DOCKER_OUTPUT_IMAGE_NAME: ghcr.io/giganticminecraft/seichi_minecraft_server_base
-  DOCKER_BUILD_CONTEXT: ./docker-images/mcservers/production/one-day-to-reset
+  DOCKER_BUILD_CONTEXT: ./docker-images/mcservers/base-server-image
 
 jobs:
   build-image:
