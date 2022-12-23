@@ -1,3 +1,5 @@
+ARG MCSERVER_BASE_IMAGE
+
 ##---
 # JVM exporter をダウンロードする stage
 FROM busybox:1.35.0 as jmx-prometheus-exporter-downloader
@@ -10,7 +12,6 @@ RUN wget \
 #
 # MCSERVER_BASE_IMAGE は、 build args を通して
 #   itmz/minecraft-server の特定のタグを指定することを想定している
-ARG MCSERVER_BASE_IMAGE
 FROM ${MCSERVER_BASE_IMAGE}
 
 # JMX exporter と設定ファイルをイメージに移す
