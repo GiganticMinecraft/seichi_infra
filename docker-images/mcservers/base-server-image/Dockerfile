@@ -44,7 +44,12 @@ ENV SYNC_SKIP_NEWER_IN_DESTINATION="false"
 #   `MOD` 環境変数や `SPIGET_RESOURCES` で自動ダウンロードができないプラグインは
 #   何らかの手段によって /plugins ディレクトリ直下にマウントすると良い。
 ENV REMOVE_OLD_MODS="true"
+
+ENV TZ="Asia/Tokyo"
 # ---
 
 # サーバー自体の設定ファイル
 COPY ./minecraft-server-configs /config
+
+# プラグインの設定ファイル
+COPY ./common-plugin-configs /plugins

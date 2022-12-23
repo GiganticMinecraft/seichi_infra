@@ -6,7 +6,7 @@ ConfigVersion: 1.24.0
 
 # Bot token: 取得したトークンはここに設定してください。設定方法は、プラグインの導入手順を参照してください。
 # このオプションを変更した後、サーバーを再起動する必要があります
-BotToken: "${CFG_DISCORDSRV_TOKEN}"
+BotToken: "${CFG_REPLACEMENT__DISCORDSRV_TOKEN}"
 
 # ゲームからDiscordへのチャンネルリンク
 # 構文は Channels: {"Minecraftからのゲーム内チャネル名": "Discordからの数値チャネルID", "Minecraftからの別のゲーム内チャネル名": "Discordからの別の数値チャネルID"}
@@ -26,10 +26,10 @@ BotToken: "${CFG_DISCORDSRV_TOKEN}"
 #
 # チャンネルペアの最初の部分はDiscordチャンネル名ではありません！
 # このオプションを変更した後、サーバーを再起動する必要があります
-Channels: {"global": "${CFG_DISCORDSRV_GLOBAL_CHANNEL_ID}"}
+Channels: {"global": "${CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID}"}
 
 # コンソールチャンネルの数値のID(チャンネル名ではありません)。コンソールチャンネルを全て無効にするなら、空のままにしてください。
-DiscordConsoleChannelId: "${CFG_DISCORDSRV_CONSOLE_CHANNEL_ID}"
+DiscordConsoleChannelId: "${CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID}"
 
 # /discordの使用時にプレーヤーに表示される招待リンク、およびリンクが強制されるときにリンクされていないプレーヤーに表示されるメッセージに表示される招待リンク
 DiscordInviteLink: "discord.gg/changethisintheconfig.yml"
