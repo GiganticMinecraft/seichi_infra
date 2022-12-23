@@ -16,10 +16,11 @@ jobs:
     strategy:
       matrix:
         include:
-          # TODO: let renovate recognize image tags
-          - mcserver_base_image: itzg/minecraft-server:2022.15.0-java8-jdk
+          # mcserver_base_image_with_tag は renovate によって更新される可能性があるので、
+          # リネームする必要があれば renovate.json も見直すこと。
+          - mcserver_base_image_with_tag: itzg/minecraft-server:2022.15.0-java8-jdk
             output_image_prefix: java8-jdk-
-          - mcserver_base_image: itzg/minecraft-server:2022.15.0-java17-jdk
+          - mcserver_base_image_with_tag: itzg/minecraft-server:2022.15.0-java17-jdk
             output_image_prefix: java17-jdk-
 
     steps:
@@ -61,5 +62,5 @@ jobs:
           # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
           cache-to: type=gha,mode=max
           build-args: |
-            MCSERVER_BASE_IMAGE=${{ matrix.mcserver_base_image }}
+            MCSERVER_BASE_IMAGE=${{ matrix.mcserver_base_image_with_tag }}
 
