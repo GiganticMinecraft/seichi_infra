@@ -5,6 +5,10 @@ on:
       - ".github/workflows/build_mcserver_base_images.yaml"
       - "docker-images/mcservers/base-server-image/**"
 
+env:
+  DOCKER_OUTPUT_IMAGE_NAME: ghcr.io/giganticminecraft/seichi_minecraft_server_base
+  DOCKER_BUILD_CONTEXT: ./docker-images/mcservers/production/one-day-to-reset
+
 jobs:
   build-image:
     name: Build docker image (and publish on main)
@@ -39,7 +43,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/giganticminecraft/seichi_minecraft_server_base
+          images: ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}
           tags: |
             type=sha,prefix=${{ matrix.output_image_prefix }},suffix=,format=short
             type=schedule,pattern={{date 'YYYYMMDD'}}
@@ -48,7 +52,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.build_context }}
+          context: ${{ env.DOCKER_BUILD_CONTEXT }}
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
