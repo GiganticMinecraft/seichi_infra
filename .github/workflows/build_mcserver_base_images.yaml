@@ -62,7 +62,7 @@ jobs:
           tags: |
             type=sha,prefix=upstreamVersion-${{ matrix.mcserver_base_image_tag }}-,suffix=,format=short
             type=raw,value=upstreamVersion-${{ matrix.mcserver_base_image_tag }}
-            type=raw,value=v1.0.0-${{ matrix.java_version_component_in_tag }}
+            type=raw,value=1.0.0-${{ matrix.java_version_component_in_tag }}
 
       - name: Build (and push if on main)
         id: docker_build
