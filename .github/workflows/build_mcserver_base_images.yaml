@@ -16,11 +16,14 @@ jobs:
     strategy:
       matrix:
         include:
-          # itzg/minecraft-server のタグ。
-          # mcserver_base_image_tag は renovate によって更新される可能性があるので、
-          # リネームする必要があれば renovate.json も見直すこと。
+          # mcserver_base_image_tag:
+          #   itzg/minecraft-server のタグ。
+          #   mcserver_base_image_tag の値は renovate によって更新したいため、
+          #   mcserver_base_image_tag そのものをリネームする必要があれば renovate.json も見直すこと。
           - mcserver_base_image_tag: 2022.15.0-java8-jdk
+            java_version_component_in_tag: java8-jdk
           - mcserver_base_image_tag: 2022.15.0-java17-jdk
+            java_version_component_in_tag: java17-jdk
 
     steps:
       - name: checkout
@@ -46,7 +49,8 @@ jobs:
           images: ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}
           tags: |
             type=sha,prefix=${{ matrix.mcserver_base_image_tag }}-,suffix=,format=short
-            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=raw,value=${{ matrix.mcserver_base_image_tag }}
+            type=raw,value=${{ matrix.java_version_component_in_tag }}
 
       - name: Build (and push if on main)
         id: docker_build
