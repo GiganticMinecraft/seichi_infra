@@ -24,7 +24,7 @@ spec:
         mcserver: one-day-to-reset
     spec:
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:sha-f6ceac2
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset@sha256:069178218cedbd7aa1bb38763ed23575b251145a6887c748f66b842d3d02a14c
           name: minecraft
           resources:
             requests:
