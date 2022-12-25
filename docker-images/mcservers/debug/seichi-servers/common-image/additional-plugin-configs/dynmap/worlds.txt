@@ -1,0 +1,292 @@
+# These are examples of world-specific settings - customize your content as you see fit
+#
+# NOTES:
+#   All lines here are commented with the # symbol - delete the # symbol on copied lines you wish to enable
+#   Definitions of a world made here will superecede any world definition with the same name in configuration.txt
+#   Deleting this file will result in a fresh copy being produced by dynmap.jar on the next startup.
+#
+
+worlds:
+  - name: world_spawn
+    title: "スポーン"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+
+  - name: world
+    title: "旧メイン"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+  - name: world_2
+    title: "新メイン"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+  - name: world_nether
+    title: "メイン・ネザー"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: nethershadows
+        # Map background color (day or night)
+        background: "#300806"
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+
+
+  - name: world_the_end
+    title: "メイン・ジ・エンド"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: brightnight
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+
+
+  - name: world_SW
+    title: "整地#1(保護無,自動再生成有)"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+
+  - name: world_SW_2
+    title: "整地#2(保護有)"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+
+  - name: world_SW_3
+    title: "整地#3(保護無)"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+
+  - name: world_SW_4
+    title: "整地#4(保護有)"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: shadows
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: shadows
+        mapzoomin: 0
+
+
+  - name: world_SW_nether
+    title: "整地ネザー"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: nethershadows
+        # Map background color (day or night)
+        background: "#300806"
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: nethershadows
+        # Map background color (day or night)
+        background: "#300806"
+        mapzoomin: 0
+
+  - name: world_SW_the_end
+    title: "整地・ジ・エンド"
+    enabled : true
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: brightnight
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: brightnight
+        mapzoomin: 0
+

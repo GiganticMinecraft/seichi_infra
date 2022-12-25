@@ -9,3 +9,11 @@ RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.
 
 # プラグインの設定ファイル
 COPY ./additional-plugin-configs /plugins
+
+# 環境変数として指定されるべきプラグインの設定
+ENV CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST=""
+ENV CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT=""
+ENV CFG_REPLACEMENT__COREPROTECT_MYSQL_USER=""
+ENV CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD=""
+
+ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="deb112マップ - ギガンティック☆整地鯖"
