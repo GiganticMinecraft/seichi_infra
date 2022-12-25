@@ -1,0 +1,89 @@
+Messages:
+  Dont_Have_Permission: "&cYou don't have permission." 
+  Not_Available: "&cNot available in this world." 
+  Config_Reloaded: "&aConfig has been reloaded." 
+  Fixed: "&aWas fixed display time." 
+  Help:
+    Help: "Show this help." 
+    Show: "Show title of this world." 
+    Fix: "Fix display time." 
+    Reload: "Reload config file." 
+
+FixTitleTime:
+# Will fix the display time of Title at the time of login of the player.
+# It provides fixes in command even when it is set to false.
+  Enable: true
+# In seconds...
+  Fadein: 0.5
+  Show: 3.0
+  Fadeout: 0.5
+
+Worlds:
+  world_spawn:
+    title: "&2スポーンワールド" 
+    subtitle: "ここから各ワールドに移動できます" 
+    actionbar: "&c&l/spawnコマンドでいつでもこのワールドに戻ってこれるぞ！"
+  world_2:
+    title: "&2メインワールド" 
+    subtitle: "保護の上建築が可能なワールドです" 
+    actionbar: "&c&l土地は保護しないと編集できませんのでご注意ください"
+  world_nether:
+    title: "&cメインネザー" 
+    subtitle: "保護の上建築が可能なワールドです" 
+    actionbar: "&c&l土地は保護しないと編集できませんのでご注意ください"
+  world_the_end:
+    title: "&8メインエンド" 
+    subtitle: "保護の上建築が可能なワールドです" 
+    actionbar: "&c&l土地は保護しないと編集できませんのでご注意ください"
+  world_S:
+    title: "&2資源メイン" 
+    subtitle: "資源採取用ワールドです" 
+    actionbar: "&c&l整地スキル使用不可・ガチャ券獲得不可・整地量は上昇しません"
+  world_nether_S:
+    title: "&c資源ネザー" 
+    subtitle: "資源採取用ワールドです" 
+    actionbar: "&c&l整地スキル使用不可・ガチャ券獲得不可・整地量は上昇しません"
+  world_the_end_S:
+    title: "&8資源エンド" 
+    subtitle: "資源採取・エンドラ召喚＆討伐用ワールドです" 
+    actionbar: "&c&l整地スキル使用不可・ガチャ券獲得不可・整地量は上昇しません"
+  world_SW:
+    title: "&2第1整地" 
+    subtitle: "自由に整地可能なワールドです" 
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし・毎週自動リセットされます"
+  world_SW_2:
+    title: "&2第2整地" 
+    subtitle: "保護の上整地が可能なワールドです"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_3:
+    title: "&2第3整地" 
+    subtitle: "自由に整地可能なワールドです" 
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_zero:
+    title: "整地zero" 
+    subtitle: "スキルが使えない整地ワールドです"
+    actionbar: "&c&l代わりに整地量及びガチャ券獲得量が2倍！"
+  world_SW_nether:
+    title: "&c整地ネザー"
+    subtitle: "鬼畜な整地をあなたに。自由に整地が可能"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_the_end:
+    title: "&8整地エンド" 
+    subtitle: "鬼畜な整地をあなたに。自由に整地が可能"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_TT:
+    title: "メインTT" 
+    subtitle: "公共TTの設置＆利用が可能なワールドです" 
+  world_nether_TT:
+    title: "&cネザーTT" 
+    subtitle: "公共TTの設置＆利用が可能なワールドです" 
+  world_the_end_TT:
+    title: "&8エンドTT" 
+    subtitle: "公共TTの設置＆利用が可能なワールドです" 
+# Syntax ------>
+#  world_name:
+#    title: "maintitle message." 
+#    subtitle: "&c&o&l&o&r&c&o&d&e subtitle message.(&&escape is &&)" 
+#    actionbar: "vs EnderDragon" 
+# <------ Syntax
+# Color code is lowercase.
