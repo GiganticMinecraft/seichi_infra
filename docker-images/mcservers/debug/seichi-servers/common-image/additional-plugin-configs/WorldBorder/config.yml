@@ -1,0 +1,127 @@
+cfg-version: 11
+message: '&cYou have reached the edge of this world.'
+round-border: false
+debug-mode: false
+whoosh-effect: true
+portal-redirection: true
+knock-back-dist: 3.0
+timer-delay-ticks: 5
+remount-delay-ticks: 0
+dynmap-border-enabled: true
+dynmap-border-message: The border of the world.
+player-killed-bad-spawn: false
+deny-enderpearl: true
+fill-autosave-frequency: 30
+bypass-list-uuids: []
+fill-memory-tolerance: 500
+prevent-block-place: false
+prevent-mob-spawn: false
+worlds:
+  world:
+    x: -271.0
+    z: 99.0
+    radiusX: 2000
+    radiusZ: 2000
+    wrapping: false
+  world_spawn:
+    x: 368.73718948212434
+    z: 177.34140559519165
+    radiusX: 2000
+    radiusZ: 2000
+    wrapping: false
+  world_the_end:
+    x: 0.0
+    z: 0.0
+    radiusX: 300
+    radiusZ: 300
+    wrapping: false
+  world_nether:
+    x: 0.0
+    z: 0.0
+    radiusX: 2000
+    radiusZ: 2000
+    wrapping: false
+  world_nether_S:
+    x: 0.0
+    z: 0.0
+    radiusX: 2000
+    radiusZ: 2000
+    wrapping: false
+  world_S:
+    x: 0.0
+    z: 0.0
+    radiusX: 2000
+    radiusZ: 2000
+    wrapping: false
+  world_the_end_S:
+    x: -18.703605626414305
+    z: 0.7697986578690368
+    radiusX: 4000
+    radiusZ: 4000
+    wrapping: false
+  world_SW:
+    x: 8.0
+    z: 8.0
+    radiusX: 1500
+    radiusZ: 1500
+    wrapping: false
+  world_TT:
+    x: 0.0
+    z: 0.0
+    radiusX: 1500
+    radiusZ: 1500
+    wrapping: false
+  world_nether_TT:
+    x: 0.0
+    z: 0.0
+    radiusX: 1500
+    radiusZ: 1500
+    wrapping: false
+  world_the_end_TT:
+    x: 0.0
+    z: 0.0
+    radiusX: 600
+    radiusZ: 600
+    wrapping: false
+  world_SW_2:
+    x: 0.0
+    z: 0.0
+    radiusX: 8000
+    radiusZ: 8000
+    wrapping: false
+  world_SW_nether:
+    x: 8.0
+    z: 8.0
+    radiusX: 3000
+    radiusZ: 3000
+    wrapping: false
+  world_SW_the_end:
+    x: 0.5608572283796753
+    z: 0.4568195979848949
+    radiusX: 3000
+    radiusZ: 3000
+    wrapping: false
+  world_2:
+    x: 7.391662742900197
+    z: -7.527636809428989
+    radiusX: 4000
+    radiusZ: 4000
+    wrapping: false
+  world_SW_zero:
+    x: -224.0
+    z: -100.0
+    radiusX: 3000
+    radiusZ: 3000
+    wrapping: false
+  world_SW_3:
+    x: -69.7197439183497
+    z: 248.0
+    radiusX: 8000
+    radiusZ: 8000
+    wrapping: false
+  world_SW_4:
+    x: 0.0
+    z: 0.0
+    radiusX: 8000
+    radiusZ: 8000
+    wrapping: false
