@@ -1,0 +1,62 @@
+general:
+  cancel-trade-death: '&4Dein Handelspartner ist gestorben!'
+  cancel-trade-cancel: '&6$[player] hat den Handel abgebrochen!'
+  cancel-trade-decline: '&6Du hast den Handel mit $[player] abgebrochen!'
+  cancel-trade-left-world: '&4Dein Handelspartner hat die Welt verlassen!'
+  cancel-trade-moved-away: '&4Dein Handelspartner ist jetzt zu weit weg!'
+  cancel-trade-player-left: '&4Dein Handelspartner hat das Spiel verlassen!'
+  cancel-trade-timeout: '&6Zeit für Handelsanfrage abgelaufen.'
+  cancel-server-shutdown: '&cHandel abgebrochen, da das Plugin deaktiviert wurde'
+  not-enough-xp: '&cDu hast nicht genügend XP um das zu machen!'
+  no-xp-offer: '&cDu bietest kein XP-Angebot!'
+  not-enough-money: '&cDu verfügst über nicht genügend Geld um das zu tun!'
+  no-negative-money-offer: '&cDein Geldangebot kann nicht negativ sein!'
+  cannot-trade-item: '&cDu kannst mit diesem Item nicht handeln'
+  inventory-full-items-dropped: '&cDein Inventar ist voll! Der Rest der Items wurde
+    auf den Boden gedroppt'
+  trade-requested: '&6Du hast eine Handelsanfrage an $[player] gesendet!'
+  trade-request-received: '&6$[player] möchte mit dir handeln.\nBenutze /trade accept
+    oder Shift+Rechts-Klicke ihn um zu handeln!'
+  partner-already-involved: '&6$[player] ist bereits mit im Handel mit einem anderen
+    Spieler'
+  no-pending-requests: '&6Du hast derzeit keine Handelsanfragen'
+  request-timed-out: '&6Zeit für Handelsanfrage abgelaufen.'
+  trade-accepted: '&6$[player] hat deine Handelsanfrage angenommen.'
+  partner-in-creative: '&4$[player] kann nicht handeln, du oder dein Handelspartner
+    sind noch im Kreativmodus'
+  trade-confirmed: '&6$[player] hat deinen Handel bestätigt'
+  trade-request-declined: '&6Dein Handelspartner hat deine Anfrage abgelehnt.'
+  trade-declined: '&6Du hast die Handelsanfrage von $[player] abgelehnt.'
+  max-trade-amount-reached: '&cDu hast den maximalen Geldwert erreicht, der gehandelt
+    werden kann!'
+inventory:
+  exp-info-title: '&2XP-Handel'
+  money-info-title: '&6Geld-Handel'
+  accept-trade-title: '&aHandel akzeptieren'
+  decline-trade-title: '&cHandel ablehnen'
+  trade-status-title: $[color]Handelsstatus
+  one-player-accepted: '&fEin Spieler hat den Handel akzeptiert'
+  waiting-for-other-player-lore: '&fWarte darauf das ein anderer Spieler akzeptiert'
+  offer-lore: '&8$[player] bietet: &7&l$[offer]'
+  add-money-lore: '&7Links-Klicke um mehr Geld zu bieten\n&7Rechts-Klicke um weniger
+    Geld zu bieten'
+  add-exp-lore: '&7Links-Klicke um $[exp] XP bieten\n&7Rechts-Klicke um $[exp] XP
+    weniger zu bieten'
+  add-exp-title: '&fEntferne oder füge $[exp] XP hinzu'
+  add-remove-money-lore: '&f$[money] hinzufügen/entfernen'
+  level-info: '&6&l$[level-diff] Level'
+command:
+  only-player: '&cNur Spieler können diesen Befehl ausführen!'
+  not-a-number: '&c$[number] ist keine Zahl!'
+  usage: '&cBenutzung: $[usage]'
+  insufficient-permission: '&cDu verfügst über nicht genügend Berechtigungen'
+  partner-too-far-away: '&cDein Handelspartner ist zu weit entfernt!'
+  configurations-reloaded: '&7Plugin Konfigurationen neugeladen.'
+  no-lore-with-number: '&cEs gibt keine Lore mit der Nummer $[number]!'
+  no-item-in-hand: '&cDu hast kein Item in deiner Hand!'
+  lore-applied: '&7Die Lore wurde dem Item in deiner Hand hinzugefügt.'
+  player-not-found: '&cSpieler mit dem Namen $[player] konnte nicht gefunden werden!'
+  no-self-trade: '&cDu kannst nicht mit dir selbst handeln!'
+  cannot-trade-in-world: '&cDu kannst in dieser Welt nicht handeln!'
+  cannot-trade-in-world-partner: '&cDein Partner befindet sich in einer Welt, in der
+    nicht gehandelt werden kann!'

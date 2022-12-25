@@ -1,0 +1,10 @@
+# PlaceholderAPI version 2.7.1
+# Created by extended_clip
+
+check_updates: true
+cloud_enabled: true
+injector_enabled: true
+boolean:
+  'true': 'yes'
+  'false': 'no'
+date_format: MM/dd/yy HH:mm:ss

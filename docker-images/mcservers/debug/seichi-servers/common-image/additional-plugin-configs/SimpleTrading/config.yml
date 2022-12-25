@@ -1,0 +1,105 @@
+########################################
+## -- SimpleTrading  -  Configuration ##
+########################################
+#
+# This is the main configuration file of SimpleTrading
+#
+blocks:
+  # Block to accept trade
+  accept: 'ink_sack:10'
+  # Block to decline trade
+  decline: 'ink_sack:1'
+  # Block to seperate inventories
+  seperator: 'barrier'
+  # Block for money status
+  money-status: 'gold_nugget'
+  # Block for money add/remove buttons
+  money-add-remove: 'gold_nugget'
+  # Block for xp status
+  xp-status: 'exp_bottle'
+  # Block for xp add/remove buttons
+  xp-add-remove: 'exp_bottle'
+inventory:
+  # Specifies the inventory-gui name while trading
+  # Note: Use @p as a placeholder for the playername
+  name: 'SimpleTrading - @p'
+
+  # These key-value sets define the amount of money a
+  # player can add or remove in the trading inventory
+  money-value-1: 50
+  money-value-2: 100
+  money-value-3: 500
+
+  # Same thing with exp. Define the exp amount of each
+  # button in the trading inventory
+  exp-value-1: 5
+  exp-value-2: 50
+  exp-value-3: 100
+localization:
+  # The language this plugin is using. Currently
+  # an english, german, russian, french and chinese (taiwan)
+  # translation is available.
+  #
+  # Possible values:
+  # en_US - English
+  # de_DE - German
+  # ru_RU - Russian (translated by nixbeast)
+  # fr_FR - French (translated by MisterJeu)
+  # zh_TW - Chinese / Taiwan (translated by TWKEVINXD)
+  #
+  # If you want to help with the translation of SimpleTrading
+  # feel free to translate it into your own language.
+  # To get started, use the file located under
+  # /language/locale_en_US.yml as a template for your translation.
+  # Your translated file should have the following
+  # format: locale_<language-code>_<country-code>.yml
+  locale: ja_JP
+global:
+  # The maximum distance where players are able to initiate a trade
+  # Set to -1 to disable max distance and world checking
+  max-distance: 15
+  # Specifies wether trading in creative mode is enabled or not
+  creative-trading: true
+  # Specifies the timeout for trading requests in seconds
+  timeout: 60
+  # Specifies wether to use xp trading or not
+  use-xp-trading: true
+  # Specifies wether to use money trading or not
+  use-money-trading: true
+  # Specifies wether to use the shift-right-click feature or not
+  use-shift-trading: true
+  # Defines the maximum amount of money that can be traded at once
+  # Set to -1 to disable this feature
+  max-money-trading: -1
+  # If set to true clicking on the decline button aborts the trade
+  abort-on-decline: false
+item-control:
+  # The control mode the plugin is running
+  # Available modes: blacklist, whitelist
+  # Explanation:
+  #   blacklist: All items can be traded except the
+  #              items configured not to be.
+  #   whitelist: No items can be traded except the
+  #              items configured to be.
+  control-mode: blacklist
+  
+  # A list of items that cannot be traded or can be traded
+  # depending on your control-mode setting
+  item-list:
+  - 'cake'
+  
+  # A list of lores (the description text of an item) marking
+  # an item to be untradable or tradeable depending on your
+  # control-mode setting
+  item-lore:
+  - '[Untradeable]'
+world-control:
+  # Same as the control mode in the item-control section
+  control-mode: blacklist
+
+  # A list of worlds in which trading is allowed or disallowed
+  # depending on your control mode setting
+  world-list:
+  - ''
+
+config-version: 7

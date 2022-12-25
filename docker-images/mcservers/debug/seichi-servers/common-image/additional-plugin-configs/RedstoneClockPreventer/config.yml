@@ -1,0 +1,42 @@
+# This is the maximum signal switches a redstone wire may experience within the below configured time period before RSCP acts
+MaxSignalChanges: 1500
+# This is the above described time period (in seconds)
+TimePeriod: 10
+
+# Should player who have the permission rscp.getnotified or op be notified about new found and blocked redstone clocks?
+NotifyAdmins: true
+
+# The clock will be stopped by replacing a redstone with a block that you can choose here
+# It can be everything, like a SAPLING, WATER or even AIR, if you want a written sign remember to write SIGN_POST
+# If you write REDSTONE_WIRE, it will replace the wire with air, wait until the clocks loses its power and place the redstone wire back where it was
+ClockBlocker: SIGN_POST
+
+# Here you can edit the lines on the sign, in the case you chose SIGN_POST as the ClockBlocker
+Sign:
+  Line1: '&4&l===ATTENTION!==='
+  Line2: '&lクロック回路は'
+  Line3: '&l連続使用'
+  Line4: '&l出来ません！'
+
+# Here you can add worlds in which the plugin should check on redstone clocks and stop them
+Worlds:
+- world
+- world_2
+- world_nether
+- world_the_end
+- world_spawn
+- world_S
+- world_nether_S
+- world_the_end_S
+- world_SW
+- world_SW_2
+- world_SW_nether
+- world_SW_the_end
+- world_SW_zero
+
+# These features only work if you have the plugin WorldGuard on your server!
+WorldGuard:
+# Redstone clocks in these regions will not get blocked by this plugin
+  RegionWhitelist:
+#  - redstone
+#  - area
