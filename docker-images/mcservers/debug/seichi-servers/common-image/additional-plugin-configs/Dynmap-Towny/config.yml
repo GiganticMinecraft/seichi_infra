@@ -1,0 +1,52 @@
+# Dynmap-Towny configuration
+update:
+  period: 300
+layer:
+  name: Towny
+  hidebydefault: false
+  layerprio: 2
+  minzoom: 0
+  showShops: false
+  showArenas: false
+  showEmbassies: false
+  showWilds: false
+visibility-by-town: true
+visibility-by-nation: true
+dynamic-nation-colors: true
+infowindow: <div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br
+  /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates
+  <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>
+regionstyle:
+  strokeColor: '#FF0000'
+  strokeOpacity: 0.8
+  strokeWeight: 3
+  fillColor: '#FF0000'
+  fillOpacity: 0.35
+  homeicon: blueflag
+  capitalicon: king
+  fillColorShops: '#0000FF'
+  fillColorArenas: '#FF00FF'
+  fillColorEmbassies: '#00FFFF'
+  fillColorWilds: '#00FF00'
+  boost: false
+visibleregions: []
+hiddenregions: []
+custstyle:
+  customregion1:
+    strokeColor: '#00FF00'
+    y: 64
+  customregion2:
+    strokeColor: '#007F00'
+    y: 64
+    boost: false
+nationstyle:
+  NationOfBlue:
+    strokeColor: '#0000FF'
+    fillColor: '#0000FF'
+    boost: false
+  _none_:
+    homeicon: greenflag
+chat:
+  sendlogin: true
+  sendquit: true
+  format: '&color;2[WEB] %playername%: &color;f%message%'

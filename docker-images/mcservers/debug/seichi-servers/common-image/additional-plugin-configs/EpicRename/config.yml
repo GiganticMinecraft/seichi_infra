@@ -1,0 +1,64 @@
+# EpicRename Configuration File
+# This is Color Code compatible (&)
+
+# To opt out of sending anonymous stats to mcstats.org change this to true.
+opt-out: 'false'
+
+# Prefix for all messages
+prefix: '&8[&bEpic&fRename&8] &f' 
+
+# Economy Settings
+economy:
+   use: false
+   costs:
+      rename: 100      
+      lore: 100
+      renameentity: 100
+      
+# Don't change This
+Config Version: 4
+
+# When a player doesn't have permission.
+no permission: '&cYou don''t have permission!'
+
+# When player puts too many or too little args. example: if a player types (/rename test good) or (/rename) without putting a name.
+not enough or too many args: '&cToo many or too little arguments.'
+
+# When a player tries to rename air. (Not a good idea :D)
+item in hand is air: '&cItem in hand is air.'
+
+#For /rename only.
+you do not have permission for that item: '&cYou don''t have the correct permission for that material.'
+
+# What prints to console when item is renamed in /rename. example: playername (automatic) + your msg (below) + the renamed item name (automatic)
+your msg: ' renamed an item to '
+
+#What gets sent to the player when a item is renamed.
+rename complete: '&aItem renamed.'
+
+#What gets said if player doesn't give at least one word after /lore
+lore usage: '&cPlease put at least one word after /lore'
+
+# What gets said when a item is /lore successfully
+lore complete: '&aItem Relored'
+
+color or blacklist permission not found: '&cYou do not have permission to use that color or formatting code.'
+
+#Blacklist Section
+
+# List of valid bukkit materials that can't be renamed.
+material blacklist:
+ - EXAMPLE_MATERIAL
+ - 
+
+#If the plugin finds a blacklisted word.
+found blacklisted word: '&4Sorry that message contains a blacklisted word.'
+
+#If the plugin finds a blacklisted word.
+found blacklisted material: '&4Sorry that material is blacklisted.'
+
+#If any of these words are found the plugin will stop the rename and print the message above.
+blacklist:
+ - blacklist
+ -
+ -
