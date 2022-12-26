@@ -1,0 +1,12 @@
+host: 0.0.0.0
+port: ${CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT}
+enable_metrics:
+  entities_total: true
+  living_entities_total: true
+  loaded_chunks_total: true
+  jvm_memory: true
+  players_online_total: true
+  players_total: true
+  tps: true
+  player_online: true
+  player_statistic: true
