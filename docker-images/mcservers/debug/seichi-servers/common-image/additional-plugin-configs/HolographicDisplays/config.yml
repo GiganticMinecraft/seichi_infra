@@ -1,0 +1,31 @@
+# .
+# .  Read the tutorial at: http://dev.bukkit.org/bukkit-plugins/holographic-displays/
+# .
+# .  Plugin created by filoghost.
+# .
+space-between-lines: 0.02
+images:
+  symbol: '[x]'
+  transparency:
+    space: ' [|] '
+    color: '&7'
+bungee:
+  refresh-seconds: 3
+  use-RedisBungee: false
+  pinger:
+    enable: true
+    timeout: 500
+    offline-motd: '&cOffline, couldn''t get the MOTD.'
+    status:
+      online: '&a&lOnline'
+      offline: '&c&lOffline'
+    motd-remove-leading-trailing-spaces: true
+    servers:
+      - 'deb-s1: mcserver--deb-s1.seichi-debug-minecraft:25565'
+      - 'deb-s2: mcserver--deb-s2.seichi-debug-minecraft:25565'
+time:
+  format: H:mm
+  zone: GMT+9
+update-notification: false
+debug: false
+precise-hologram-movement: true
