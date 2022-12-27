@@ -1,0 +1,460 @@
+Confirm: "confirm"
+Cancel: "cancel"
+Menu_Information: "Menu Info"
+
+Town_Menu:
+  Main_Menu_Title: "&2&lTown Menu"
+  Toggle_Menu_Button: "&3&lToggle Settings Menu"
+  Toggle_Menu_Button_Lore:
+    - ""
+    - "Turn on and off"
+    - "various town settings."
+  Resident_Menu_Button: "&6&lResident Menu"
+  Resident_Menu_Button_Lore:
+    - ""
+    - "View all resident info"
+    - "and settings."
+  Permissions_Menu_Button: "&c&lPermission Menu"
+  Permissions_Menu_Button_Lore:
+    - ""
+    - "Adjust town permissions"
+    - "for residents, nation"
+    - "allies and outsiders."
+  Economy_Menu_Button: "&a&lEconomy Management Menu"
+  Economy_Menu_Button_Lore:
+    - ""
+    - "Manage your town's money"
+  General_Settings_Menu_Button: "&2&lOther Settings Menu"
+  General_Settings_Menu_Button_Lore:
+    - ""
+    - "Change various"
+    - "extra town settings."
+  Invite_Player_Menu_Button: "&d&lInvite Player Menu"
+  Invite_Player_Menu_Button_Lore:
+    - ""
+    - "Invite an online player"
+    - "to your town."
+  Extra_Info_Menu_Button: "&e&lExtra Towny Info"
+  Extra_Info_Menu_Button_Lore:
+    - ""
+    - "Learn how to claim land plus"
+    - "some useful commands"
+  Plot_Menu_Button: "&9&lPlot Management Menu"
+  Plot_Menu_Button_Lore:
+    - ""
+    - "Manage the plot at"
+    - "your current location."
+Toggle_Menu:
+  Menu_Title: "&2&lToggle Settings Menu"
+  Info:
+    - "Adjust toggleable settings"
+    - "for your town!"
+  Toggle_Off: "&eClick to Turn &cOff"
+  Toggle_On: "&eClick to Turn &aOn"
+  Fire: "&6&lToggle Firespread"
+  Mobs: "&a&lToggle Mob Spawning"
+  Explode: "&c&lToggle Explosions"
+  PVP: "&4&lToggle PVP"
+  Public: "&9&lToggle Public"
+  Open: "&3&lToggle Open"
+  Tax_Percent: "&2&lToggle Tax Percent"
+Resident_Menu:
+  Menu_Title: "&2&lResident Menu"
+  Info:
+    - "Click on a resident"
+    - "to manage them!"
+  Online: "Last online: "
+  Kick: "&c&lKick Player"
+  Kick_Lore:
+    - ""
+    - "Click to kick resident"
+    - "from your town"
+  Title: "&a&lSet Resident Title"
+  Title_Lore:
+    - ""
+    - "Give a title to"
+    - "this resident."
+  Rank: "&3&lSet Resident Rank"
+  Rank_Lore:
+    - ""
+    - "Give a town rank"
+    - "to a a player"
+  Mayor: "&a&lGive Resident Mayor"
+  Mayor_Lore:
+    - ""
+    - "Make this resident"
+    - "the mayor."
+    - ""
+    - "&4&lIrreversible"
+Player_Permission_Menu:
+  Menu_Title: "&2&lPermissions Menu"
+  Info:
+    - ""
+    - "Set permissions for"
+    - "different groups"
+    - "in your town."
+  True_Msg: "&atrue"
+  False_Msg: "&cfalse"
+  Change: "&eClick to change!"
+  Reset: "&c&lReset All Fields"
+  Reset_Lore:
+    - ""
+    - "Turn off all permissions"
+    - "for all groups."
+  On_Msg: "&a&lTurn On All Fields"
+  On_Msg_Lore:
+    - ""
+    - "Turn on all permissions"
+    - "for all groups."
+  Build: "&3&lBuild"
+  Build_Lore:
+    - ""
+    - "Who has permission"
+    - "to build in"
+    - "your town."
+  Break: "&c&lBreak"
+  Break_Lore:
+    - ""
+    - "Who has permission"
+    - "to break blocks in"
+    - "your town."
+  Use: "&6&lItem Use"
+  Use_Lore:
+    - ""
+    - "Who has permission"
+    - "to use items in"
+    - "your town."
+    - ""
+    - "E.g. take water from cauldron"
+  Switch: "&2&lSwitch"
+  Switch_Lore:
+    - ""
+    - "Who has permission"
+    - "to switch in"
+    - "your town."
+    - ""
+    - "E.g. use a lever or door"
+  Build_Res: "&6&lBuild Resident Perm"
+  Build_Res2: "Can Residents Build: "
+  Build_Nation: "&6&lBuild Nation Perm"
+  Build_Nation2: "Can Nation Members Build: "
+  Build_Ally: "&6&lBuild Ally Perm"
+  Build_Ally2: "Can Naton Allies Build: "
+  Build_Outsider: "&6&lBuild Outsider Perm"
+  Build_Outsider2: "Can Outsiders Build: "
+  Break_Res: "&6&lBreak Resident Perm"
+  Break_Res2: "Can Residents Break Blocks: "
+  Break_Nation: "&6&lBreak Nation Perm"
+  Break_Nation2: "Can Nation Members Break Blocks: "
+  Break_Ally: "&6&lBreak Ally Perm"
+  Break_Ally2: "Can Nation Allies Break Blocks: "
+  Break_Outsider: "&6&lBreak Outsider Perm"
+  Break_Outsider2: "Can Outsiders Break Blocks: "
+  Use_Res: "&6&lItem Use Resident Perm"
+  Use_Res2: "Can Residents Use Items: "
+  Use_Nation: "&6&lItem Use Nation Perm"
+  Use_Nation2: "Can Nation Members Use Items: "
+  Use_Ally: "&6&lItem Use Ally Perm"
+  Use_Ally2: "Can Nation Allies Use Items: "
+  Use_Outsider: "&6&lItem Use Outsider Perm"
+  Use_Outsider2: "Can Outsiders Use Items: "
+  Switch_Res: "&6&lSwitch Resident Perm"
+  Switch_Res2: "Can Residents Switch: "
+  Switch_Nation: "&6&lSwitch Nation Perm"
+  Switch_Nation2: "Can Nation Members Switch: "
+  Switch_Ally: "&6&lSwitch Ally Perm"
+  Switch_Ally2: "Can Nation Allies Switch: "
+  Switch_Outsider: "&6&lSwitch Outsider Perm"
+  Switch_Outsider2: "Can Outsiders Switch: "
+Economy_Menu:
+  Menu_Title: "&2&lEconomy Menu"
+  Balance: "&2&lCurrent Town Balance"
+  Upkeep: "Current Upkeep: "
+  Withdraw: "&c&lWithdraw Money"
+  Withdraw_Lore:
+    - ""
+    - "Withdraw money from"
+    - "your town bank."
+  Deposit: "&a&lDeposit Money"
+  Deposit_Lore:
+    - ""
+    - "Deposit money into"
+    - "your town bank."
+  Tax: "&c&lSet Tax Amount"
+  Tax_Percentage: "Set tax percentage"
+  Tax_Amount: "Set tax amount"
+General_Settings_Menu:
+  Menu_Title: "&2&lGeneral Settings Menu"
+  Info:
+    - "Adjust other"
+    - "extra town settings."
+  Set_Home_Block_Msg: "&eSet home block to your location!"
+  Spawn_Reminder: "&bMake sure to also set your town spawn again!"
+  Set_Home_Block: "&3&lSet Home Block"
+  Set_Home_Block_Lore:
+    - ""
+    - "Set the home block"
+    - "of your town."
+  Set_Spawn_Msg: "&eSet town spawn to current location."
+  Set_Spawn: "&b&lSet Town Spawn"
+  Set_Spawn_Lore:
+    - ""
+    - "Set the location for"
+    - "teleporting with"
+    - "/t spawn"
+    - ""
+    - "&cMust be in the Home Block."
+  Set_Name: "&6&lSet Town Name"
+  Set_Name_Lore:
+    - ""
+    - "Change the name"
+    - "of your town."
+  Set_Board: "&2&lSet Town Board"
+  Set_Board_Lore:
+    - ""
+    - "Set the town board"
+    - "of your town."
+Extra_Info_Menu:
+  Claiming: "&6&lClaiming Info"
+  Claiming_Lore:
+    - ""
+    - "&a/t claim &7- claim a chunk of land"
+    - "Claiming requires money in"
+    - "your town bank"
+    - "and requires you to be in a"
+    - "chunk bordering your town."
+    - "Use &aF3+G &7to see chunks and"
+    - "&a/towny map &7to see claimed land."
+  Commands: "&2&lExtra Commands"
+  Commands_Lore:
+    - ""
+    - "&a/t outlaw &7- make a player an outlaw"
+    - "&a/t buy &7- chunk purchase info"
+    - "&a/t online &7- online town members"
+    - "&a/t say &7- broadcast a town message"
+
+
+
+
+
+Plot_Menu:
+  Main_Menu_Title: "&2Plot Menu"
+  Toggle_Settings_Menu_Button: "&3&lToggle Settings Menu"
+  Toggle_Settings_Menu_Button_Lore:
+    - ""
+    - "Turn on and off"
+    - "various plot settings"
+  Permissions_Menu_Button: "&c&lPermission Menu"
+  Permissions_Menu_Button_Lore:
+    - ""
+    - "Adjust plot permissions"
+    - "for friends, nation"
+    - "allies and outsiders"
+  Plot_Admin_Menu_Button: "&5&lPlot Administration Menu"
+  Plot_Admin_Menu_Button_Lore:
+    - ""
+    - "Advanced plot management"
+    - "and settings"
+  Friend_Menu_Button: "&aFriend Menu"
+  Friend_Menu_Button_Lore:
+    - ""
+    - "Friend management menu"
+Friend_Menu:
+  Menu_Title: "&2Friend Menu"
+  Remove: "&cRemoved {player} from your friends list!"
+  Add: "&3Added &b{player} &3to your friends list!"
+Plot_Toggle_Menu:
+  Menu_Title: "&2&lToggle Settings Menu"
+  Info:
+    - "Adjust toggleable settings"
+    - "for your plot!"
+  Toggle_Off: "&eClick to Turn &cOff"
+  Toggle_On: "&eClick to Turn &aOn"
+  Fire: "&6&lToggle Firespread"
+  Mobs: "&a&lToggle Mob Spawning"
+  Explode: "&c&lToggle Explosions"
+  PVP: "&4&lToggle PVP"
+Plot_Player_Permission_Menu:
+  Menu_Title: "&2&lPermissions Menu"
+  Info:
+    - ""
+    - "Set permissions for"
+    - "different groups"
+    - "in your plot."
+  True_Msg: "&atrue"
+  False_Msg: "&cfalse"
+  Change: "&eClick to change!"
+  Reset: "&c&lReset All Fields"
+  Reset_Lore:
+    - ""
+    - "Turn off all permissions"
+    - "for all groups."
+  On_Msg: "&a&lTurn On All Fields"
+  On_Msg_Lore:
+    - ""
+    - "Turn on all permissions"
+    - "for all groups."
+  Build: "&3&lBuild"
+  Build_Lore:
+    - ""
+    - "Who has permission"
+    - "to build in"
+    - "your plot."
+  Break: "&c&lBreak"
+  Break_Lore:
+    - ""
+    - "Who has permission"
+    - "to break blocks in"
+    - "your plot."
+  Use: "&6&lItem Use"
+  Use_Lore:
+    - ""
+    - "Who has permission"
+    - "to use items in"
+    - "your town."
+    - ""
+    - "E.g. take water from cauldron"
+  Switch: "&2&lSwitch"
+  Switch_Lore:
+    - ""
+    - "Who has permission"
+    - "to switch in"
+    - "your town."
+    - ""
+    - "E.g. use a lever or door"
+  Build_Res: "&6&lBuild Resident/Friend Perm"
+  Build_Res2: "Can Resident/Friends Build: "
+  Build_Nation: "&6&lBuild Town/Nation Perm"
+  Build_Nation2: "Can Town/Nation Members Build: "
+  Build_Ally: "&6&lBuild Ally Perm"
+  Build_Ally2: "Can Naton Allies Build: "
+  Build_Outsider: "&6&lBuild Outsider Perm"
+  Build_Outsider2: "Can Outsiders Build: "
+  Break_Res: "&6&lBreak Resident/Friend Perm"
+  Break_Res2: "Can Resident/Friends Break Blocks: "
+  Break_Nation: "&6&lBreak Town/Nation Perm"
+  Break_Nation2: "Can Town/Nation Members Break Blocks: "
+  Break_Ally: "&6&lBreak Ally Perm"
+  Break_Ally2: "Can Nation Allies Break Blocks: "
+  Break_Outsider: "&6&lBreak Outsider Perm"
+  Break_Outsider2: "Can Outsiders Break Blocks: "
+  Use_Res: "&6&lItem Use Resident/Friend Perm"
+  Use_Res2: "Can Resident/Friends Use Items: "
+  Use_Nation: "&6&lItem Use Town/Nation Perm"
+  Use_Nation2: "Can Town/Nation Members Use Items: "
+  Use_Ally: "&6&lItem Use Ally Perm"
+  Use_Ally2: "Can Nation Allies Use Items: "
+  Use_Outsider: "&6&lItem Use Outsider Perm"
+  Use_Outsider2: "Can Outsiders Use Items: "
+  Switch_Res: "&6&lSwitch Resident/Friend Perm"
+  Switch_Res2: "Can Resident/Friends Switch: "
+  Switch_Nation: "&6&lSwitch Town/Nation Perm"
+  Switch_Nation2: "Can Town/Nation Members Switch: "
+  Switch_Ally: "&6&lSwitch Ally Perm"
+  Switch_Ally2: "Can Nation Allies Switch: "
+  Switch_Outsider: "&6&lSwitch Outsider Perm"
+  Switch_Outsider2: "Can Outsiders Switch: "
+Plot_Admin_Menu:
+  Menu_Title: "&2Plot Admin Menu"
+  For_Sale: "&a&lSet Plot For Sale"
+  For_Sale_Lore:
+    - ""
+    - "Put the current plot"
+    - "up for sale with"
+    - "a specified price"
+  Not_For_Sale: "&c&lSet Plot Not For Sale"
+  Not_For_Sale_Lore:
+    - ""
+    - "Make a plot"
+    - "not purchasable"
+  Set_Type: "&3&lSet Plot Type"
+  Set_Type_Lore:
+    - ""
+    - "Determine what type of"
+    - "plot this is."
+  Evict: "&4&lEvict Plot Owner"
+  Evict_Lore:
+    - ""
+    - "Evict the resident"
+    - "of this plot"
+
+
+
+
+Town_Conversables:
+  Board:
+    Prompt: "&3Type in a message for your town's board: "
+    Response: "&3Successfully set town board!"
+  Deposit:
+    Prompt: "&3Type in the amount you would like to deposit in your town: &c(Type cancel to exit prompt)"
+    Invalid: "&cPlease enter only whole numbers and make sure you have enough money to deposit."
+    Response: "&3Deposited &b{money_symbol}{input} &3into your town account."
+  Mayor:
+    Prompt: "&cAre you sure you would like to give &b{player} &cthe Mayor position? &3(Type &bconfirm &3or &4deny&3)"
+    Response: "&3Successfully set &b{player} &3as mayor!"
+  Kick:
+    Prompt: "&cAre you sure you would like to kick &b{player} &cfrom your town? Type &bconfirm &cor &4cancel &cnow:"
+    Response: "&3Successfully kicked &b{player} &3from your town."
+  Name:
+    Prompt: "&3Type in the name you would like to give to your town: (under 10 characters) &bCurrent Name: {town} &cType cancel to exit."
+    Invalid: "&cName must be unique and less than 10 characters."
+    Response: "&3Successfully set town name to {input}"
+    Return: "&cNot enough money in town bank to change town name."
+  Rank:
+    Remove: "remove"
+    Prompt: "&3Type in the rank you would like to give to &b{player} &3now: &b(Options: {ranks}) &3Type &ccancel &3to cancel or &cremove &3to remove their rank."
+    Invalid: "&cThis player either already has this rank or the rank does not exist. (Options: {ranks}) &cType &c&lcancel &cto cancel or remove to remove their ranks."
+    Response: "&aSuccessfully set {player}'s &arank to {input}"
+    Removed_All: "&cRemoved all ranks from resident {player}"
+  Tax:
+    Prompt: "&3Type in the amount you would like to set as a tax for your town: &c(Type cancel to exit prompt)"
+    Invalid_Percent: "&cPlease enter only a whole number between 0 and {max_percent} for your tax percent."
+    Invalid_Amount: "&cPlease enter a whole number between 0 and {max_amount} for your tax amount."
+    Response_Percent: "&3Tax percent set to &b{input}"
+    Response_Amount: "&3Tax amount set to &b{money_symbol}{input}"
+  Title:
+    Prompt: "&3Type in the title you would like to give to &b{player} &3now: (under 10 characters) &cType cancel to exit."
+    Response: "&3Successfully set &b{player}'s &3title to &b{input}"
+  Withdraw:
+    Prompt: "&3Type in the amount you would like to deposit in your town: &c(Type cancel to exit prompt)"
+    Invalid: "&cPlease enter only whole numbers and make sure you have enough money to deposit."
+    Response: "&3Withdrew &b{money_symbol}{input} &3from your town account."
+Plot_Conversables:
+  Evict:
+    Prompt: "&cWould you like to evict the resident of this plot? Type &aconfirm &cor cancel:"
+    Invalid: "&cPlot does not have any residents."
+    Response: "&cPlot resident evicted."
+  For_Sale:
+    Prompt: "&3Type in the amount you would like to set this plot for sale: &c(Type cancel to exit prompt)"
+    Invalid: "&cPlease enter only whole numbers and is less than the max plot price: {max_price}"
+    Response: "&3Plot price set to &b{money_symbol}{input}."
+  Not_For_Sale:
+    Prompt: "&3Would you like to set this plot not for sale? Type &aconfirm &3or &ccancel&6:"
+    Response: "&cPlot set not for sale."
+  Set_Type:
+    Prompt: "&3What type would you like to set this plot? &b(Options: {options})"
+    Invalid: "&cPlease enter a valid plot type. Valid types: {options})"
+    Response: "&3Plot type set to: &b{input}"
+
+
+
+
+Error:
+  No_Permission: "&cYou do not have the permission to use this command."
+  No_Town: "&cYou do not have a town."
+  War_Time: "&cYou may not do this action during war time."
+  Must_Be_In_Own_Plot: "&cYou can only do this in a plot you own."
+  Must_Be_In_Town: "&cYou must be in your town to do this."
+  Must_Be_In_Bank: "&cYou must be in a bank plot to do this."
+  Toggle_PVP_Outsiders: "&cCannot toggle PVP while outsiders are in your town."
+  Toggle_PVP_Cooldown: "&cYou cannot toggle pvp until the cooldown is complete."
+  Cannot_Select_Self: "&cYou cannot select yourself."
+  Cannot_Set_Homeblock: "&cCannot set Home block here."
+  Cannot_Set_Spawn: "&cCannot set town spawn here."
+  Cannot_Change_Name: "&cMust be mayor to change town name."
+  Cannot_Change_Board: "&cMust be mayor to change town board."
+
+
+
+# DO NOT TOUCH VERSION
+Version: 2
