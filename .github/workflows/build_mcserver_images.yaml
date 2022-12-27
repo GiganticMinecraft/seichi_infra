@@ -26,10 +26,8 @@ jobs:
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2
             build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_12_2
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
-            force_build: ${{ true }}
             build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
-            force_build: ${{ true }}
             build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
 
     steps:
