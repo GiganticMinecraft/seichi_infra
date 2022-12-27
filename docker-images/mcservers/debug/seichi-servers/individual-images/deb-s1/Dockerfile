@@ -1,4 +1,4 @@
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2@sha256:394a41dc92b194a35128143b12048795855b1dc39fa6f24498ca36343b6284ec
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2@sha256:b24cb39ba0fd9502339f6bc5985ff1e6e29b61857fe8fd2dcb607bae07b9fdda
 
 # プラグインリスト
 #   このイメージでは基底のリスト (/extras/plugin-list.ini) に追記する
