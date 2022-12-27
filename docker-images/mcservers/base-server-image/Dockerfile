@@ -59,3 +59,8 @@ COPY ./common-plugin-list.ini /extras/plugin-list.ini
 
 # プラグインの設定ファイル
 COPY ./common-plugin-configs /plugins
+
+# 環境変数として指定されるべきプラグインの設定
+ENV CFG_REPLACEMENT__DISCORDSRV_TOKEN=""
+ENV CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID=""
+ENV CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID=""
