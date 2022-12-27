@@ -16,6 +16,8 @@ jobs:
             build_context: ./docker-images/mcservers/production/kagawa
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset
             build_context: ./docker-images/mcservers/production/one-day-to-reset
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2
+            build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_12_2
 
     steps:
       - name: checkout
