@@ -3,15 +3,15 @@
 # @license    LGPLv3
 # @copyright  Copyright ucchy 2014
 
-prefix: '&f[‚Í‚é]'
-preStartSec: '&dŠJn‚Ü‚Å %d•b'
-start: '&dŠJnI'
-rest300sec: '&dc‚è 5•ª‚Å‚·'
-rest180sec: '&dc‚è 3•ª‚Å‚·'
-rest60sec: '&dc‚è 1•ª‚Å‚·'
-preEndSec: '&dc‚è %d•b‚Å‚·'
-end: '&dI—¹I'
-onTeamWon: '%sƒ`[ƒ€‚ÌŸ—˜‚Å‚·I'
+prefix: '&f[ExpTimer]'
+preStartSec: '&dé–‹å§‹ã¾ã§ %dç§’'
+start: '&dé–‹å§‹ï¼'
+rest300sec: '&dæ®‹ã‚Š 5åˆ†ã§ã™'
+rest180sec: '&dæ®‹ã‚Š 3åˆ†ã§ã™'
+rest60sec: '&dæ®‹ã‚Š 1åˆ†ã§ã™'
+preEndSec: '&dæ®‹ã‚Š %dç§’ã§ã™'
+end: '&dçµ‚äº†ï¼'
+onTeamWon: '%sãƒãƒ¼ãƒ ã®å‹åˆ©ã§ã™ï¼'
 
-sidebarTitle: '&6c‚èŠÔ'
-bossbarTitle: '&6c‚èŠÔ - %s'
+sidebarTitle: '&6æ®‹ã‚Šæ™‚é–“'
+bossbarTitle: '&6æ®‹ã‚Šæ™‚é–“ - %s'
