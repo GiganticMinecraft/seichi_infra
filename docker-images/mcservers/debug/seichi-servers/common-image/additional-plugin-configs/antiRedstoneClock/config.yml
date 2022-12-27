@@ -1,0 +1,35 @@
+version: 0.7
+metrics: true
+MaxPulses: 150
+Delay: 300
+NotifyAdmins: true
+DropItems: true
+CreateSignWhenClockIsBreak: true
+Sign:
+  Line1: The RedstonClock
+  Line2: Are
+  Line3: '&4prohibited'
+  Line4: ''
+IgnoreWorlds: redstoneWorld/survival
+IgnoreRegions: redstone/admins
+checkedClock:
+  comparator: false
+  observer: true
+  piston: false
+  redstoneAndRepeater: false
+AutomaticallyBreakDetectedClock: true
+Msg:
+  default:
+    prefix: '&bAntiRedstoneClock &9&l> &r&b '
+    error: '&4AntiRedstoneClock &l> &r&c '
+    no_permission: '&4Error &9&l> &r&bYou don''t have permission to do that!'
+    command_use: '&4AntiRedstoneClock &l> &r&cCommand usage: &6/arc $command'
+  message:
+    MsgToAdmin: Redstone clock disable in x:$X y:$Y Z:$Z. In the world $World
+    unknownCmd: Unknown command. Type "/help" for help.
+    reloadSuccess: Reload Success!
+    newValueInConfig: The new value of $setting is $value
+    RedStoneClockListHeader: 'RedstoneClockList: $page'
+    RedStoneClockListFooter: ''
+  Exception:
+    duplicate_object: This list already contains this redstone

@@ -1,0 +1,136 @@
+messages_yml_version: 8
+epicrename:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  no_args: '&cType /epicrename help for commands. (No Arguments)'
+  license: '&6View license information at: http://bit.ly/2eMknxx'
+  help:
+  - '&6/rename <name>'
+  - '&6/lore <lore>'
+  - '&6/setloreline <linenum> <text>'
+  - '&6/removeloreline <linenum>'
+  - '&6/glow'
+  - '&6/removeglow'
+  - '&6See more command help at https://www.spigotmc.org/resources/epicrename.4341/'
+  - '&6/epicrename <help, license, reload, debug, version>'
+  reload_success: '&aReloaded the plugin successfully!'
+  debug_enable: '&6Plugin debug messages are now &a&lON&6.'
+  debug_disable: '&6Plugin debug messages are now &4&lOFF&6.'
+  invalid_args: '&cInvalid arguments. Please put help, license, reload, debug, or
+    version after /epicrename.'
+  version: '&6You are running &bEpic&fRename &6version {version}.'
+rename:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  wrong_sender: '&cSorry only a player can use that command.'
+  no_args: '&cYou need to place at least one argument after /rename.'
+  blacklisted_word_found: '&cSorry that name contains a blacklisted word.'
+  blacklisted_material_found: '&cSorry that material is blacklisted.'
+  blacklisted_existing_name_found: '&cSorry that item has an existing name that is
+    blacklisted.'
+  blacklisted_existing_lore_found: '&cSorry that item has an existing line of lore
+    that is blacklisted.'
+  cannot_rename_air: '&cSorry you can''t rename nothing.'
+  no_permission_for_material: '&cSorry you don''t have permission for that material.'
+  success: '&aRenamed the item successfully.'
+  log: '&aThe player &f{player} &ajust renamed an item to: &f"{name}&f"&a.'
+  disabled_world: '&cYou are in a disabled world.'
+lore:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  wrong_sender: '&cSorry only a player can use that command.'
+  no_args: '&cYou need to place at least one argument after /lore.'
+  blacklisted_word_found: '&cSorry that name contains a blacklisted word.'
+  blacklisted_material_found: '&cSorry that material is blacklisted.'
+  blacklisted_existing_name_found: '&cSorry that item has an existing name that is
+    blacklisted.'
+  blacklisted_existing_lore_found: '&cSorry that item has an existing line of lore
+    that is blacklisted.'
+  cannot_lore_air: '&cSorry you can''t relore nothing.'
+  no_permission_for_material: '&cSorry you don''t have permission for that material.'
+  success: '&aRelored the item successfully.'
+  disabled_world: '&cYou are in a disabled world.'
+setloreline:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  wrong_sender: '&cSorry only a player can use that command.'
+  wrong_args: '&cYou need to place some arguments after /setloreline. /setloreline
+    <linenumber> <text>'
+  not_an_int: '&cYou need to provide an integer as the first argument.'
+  invalid_number: '&cSorry that line number is not valid.'
+  provide_text: '&cPlease provide some text. /setloreline <linenumber> <text>'
+  blacklisted_word_found: '&cSorry that name contains a blacklisted word.'
+  blacklisted_material_found: '&cSorry that material is blacklisted.'
+  blacklisted_existing_name_found: '&cSorry that item has an existing name that is
+    blacklisted.'
+  blacklisted_existing_lore_found: '&cSorry that item has an existing line of lore
+    that is blacklisted.'
+  cannot_edit_air: '&cSorry you can''t relore nothing.'
+  no_permission_for_material: '&cSorry you don''t have permission for that material.'
+  success: '&aRelored the item successfully.'
+  disabled_world: '&cYou are in a disabled world.'
+removeloreline:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  wrong_sender: '&cSorry only a player can use that command.'
+  wrong_args: '&cYou need to place some arguments after /removeloreline. /removeloreline
+    <linenumber>'
+  not_an_int: '&cYou need to provide an integer as the first argument.'
+  invalid_number: '&cSorry that line number is not valid.'
+  has_no_lore: '&cThat item has no lore.'
+  out_of_bounds: '&cThat line number does not exist in this lore.'
+  blacklisted_material_found: '&cSorry that material is blacklisted.'
+  blacklisted_existing_name_found: '&cSorry that item has an existing name that is
+    blacklisted.'
+  blacklisted_existing_lore_found: '&cSorry that item has an existing line of lore
+    that is blacklisted.'
+  cannot_edit_air: '&cSorry you can''t edit nothing.'
+  no_permission_for_material: '&cSorry you don''t have permission for that material.'
+  success: '&aRelored the item successfully.'
+  disabled_world: '&cYou are in a disabled world.'
+glow:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  wrong_sender: '&cSorry only a player can use that command.'
+  cannot_edit_air: '&cSorry you can''t edit nothing.'
+  no_permission_for_material: '&cSorry you don''t have permission for that material.'
+  success: '&aAdded glow to the item successfully.'
+  has_enchants: '&cSorry that item has enchantments or is already glowing.'
+  disabled_world: '&cYou are in a disabled world.'
+  blacklisted_material_found: '&cSorry that material is blacklisted.'
+  blacklisted_existing_name_found: '&cSorry that item has an existing name that is
+    blacklisted.'
+  blacklisted_existing_lore_found: '&cSorry that item has an existing line of lore
+    that is blacklisted.'
+removeglow:
+  no_permission: '&cSorry you don''t have permission to perform that command.'
+  wrong_sender: '&cSorry only a player can use that command.'
+  cannot_edit_air: '&cSorry you can''t edit nothing.'
+  no_permission_for_material: '&cSorry you don''t have permission for that material.'
+  success: '&aRemoved glow from the item successfully.'
+  not_glowing: '&cThat item is not glowing or has other enchantments.'
+  disabled_world: '&cYou are in a disabled world.'
+  blacklisted_material_found: '&cSorry that material is blacklisted.'
+  blacklisted_existing_name_found: '&cSorry that item has an existing name that is
+    blacklisted.'
+  blacklisted_existing_lore_found: '&cSorry that item has an existing line of lore
+    that is blacklisted.'
+rename_character_limit:
+  name_too_long: '&cSorry that name is too long. The character limit is {char}.'
+  bypass_msg: '&aYou just bypassed the character limit of {char}.'
+format_code_permission:
+  no_permission: '&cYou don''t have permission for the format code "{code}".'
+format_code_limit:
+  min_not_reached: '&cYou didn''t reach the minimum amount of formatting codes. Please
+    use more than {min} formatting codes.'
+  max_reached: '&cYou reached the maximum amount of formatting codes. Please use less
+    than {max} formatting codes.'
+  bypass_min: '&aYou bypassed the minimum formatting code limit.'
+  bypass_max: '&aYou bypassed the maximum formatting code limit.'
+blacklists:
+  material:
+    bypass: '&aYou just bypassed the material blacklist.'
+  text:
+    bypass: '&aYou just bypassed the text blacklist.'
+  existingname:
+    bypass: '&aYou just bypassed the existing name blacklist.'
+  existinglore:
+    bypass: '&aYou just bypassed the existing lore blacklist.'
+economy:
+  bypass: '&aYou just bypassed the economy requirement.'
+  transaction_success: '&aJust took {cost} from your balance.'
+  transaction_error: '&cThere was a problem taking money from your balance: {error}'

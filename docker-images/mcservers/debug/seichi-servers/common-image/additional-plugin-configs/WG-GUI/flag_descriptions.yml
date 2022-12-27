@@ -1,0 +1,206 @@
+allow-shop:
+- '&7Not used by WorldGuard at this time,'
+- '&7but third-party plugins may use it'
+allowed-cmds:
+- '&7A list of commands to permit'
+block-break:
+- '&7Whether blocks can be mined'
+block-place:
+- '&7Whether blocks can be placed'
+blocked-cmds:
+- '&7A list of commands to block'
+build:
+- '&3Everything:'
+- ''
+- '  &7• Whether blocks can be mined or placed'
+- '  &7• Whether doors, levers, etc. (but not inventories) can be used'
+- '  &7• Whether entities and blocks can be interacted with'
+- '  &7• Whether player versus player combat is permitted'
+- '  &7• Whether sleeping in a bed is permitted'
+- '  &7• Whether inventories can be accessed'
+- '  &7• Whether vehicles (boats, minecarts) can be placed'
+- '  &7• etc.'
+buyable:
+- '&7Not used by WorldGuard at this time,'
+- '&7but third-party plugins may use it'
+chest-access:
+- '&7Whether inventories can be accessed'
+chorus-fruit-teleport:
+- '&7Whether chorus fruit can be used'
+creeper-explosion:
+- '&7Whether creepers can do damage'
+damage-animals:
+- '&7Whether players can harm friendly animals (cows, sheep, etc)'
+deny-message:
+- '&7The message issued to players that are denied an action'
+deny-spawn:
+- '&7A list of entity types that cannot spawn'
+enderdragon-block-damage:
+- '&7Whether enderdragons can do block damage'
+enderman-grief:
+- '&7Whether endermen will grief'
+enderpearl:
+- '&7Whether enderpearls can be used'
+entity-item-frame-destroy:
+- '&7Whether non-player entities can destroy item frames'
+entity-painting-destroy:
+- '&7Whether non-player entities can destroy paintings'
+entry:
+- '&7Whether players can enter the region'
+entry-deny-message:
+- '&7The message issued to players that aren''t permitted to enter region'
+exit:
+- '&7Whether players can exit the region'
+exit-deny-message:
+- '&7The message issued to players that aren''t permitted to exited region'
+exit-override:
+- '&7Flag that can be used on an entry=allow region'
+- '&7that players can walk into from an entry=deny region'
+exit-via-teleport:
+- '&7Whether players can exit the region via teleport'
+exp-drops:
+- '&7Whether XP drops are permitted'
+fall-damage:
+- '&7Whether players can take damage from falling'
+farewell:
+- '&7The message that appears upon leaving the region'
+feed-amount:
+- '&7The amount of half food points to give (...or take if negative)'
+- '&7the player at the rate of feed-delay'
+feed-delay:
+- '&7The number of seconds between feeds (if feed-amount is set)'
+feed-max-hunger:
+- '&7The maximum number of half food points that damage (via feed-amount)'
+- '&7will not exceed'
+feed-min-hunger:
+- '&7The minimum number of half food points that damage (via feed-amount)'
+- '&7will not exceed'
+fire-spread:
+- '&7Whether fire can spread'
+firework-damage:
+- '&7Whether players can take damage from fireworks'
+game-mode:
+- '&7The gamemode (survival, creative, adventure, spectator)'
+- '&7that will be applied to players that enter the region'
+ghast-fireball:
+- '&7Whether ghast fireballs can do damage'
+grass-growth:
+- '&7Whether grass will grow'
+greeting:
+- '&7The message that appears upon entering the region'
+heal-amount:
+- '&7The amount of half hearts to heal (...or hurt if negative)'
+- '&7the player at the rate of heal-delay'
+heal-delay:
+- '&7The number of seconds between heals (if heal-amount is set)'
+heal-max-health:
+- '&7The maximum number of half hearts that damage (via heal-amount)'
+- '&7will not exceed'
+heal-min-health:
+- '&7The minimum number of half hearts that damage (via heal-amount)'
+- '&7will not exceed'
+ice-form:
+- '&7Whether ice will form'
+ice-melt:
+- '&7Whether ice will melt'
+interact:
+- '&3Everything that involves ‘using’ a block or entity:'
+- ''
+- '  &7• Whether doors, levers, etc. (but not inventories) can be used'
+- '  &7• Whether inventories can be accessed'
+- '  &7• Whether vehicles (including animals) can be mounted'
+- '  &7• etc.'
+invincible:
+- '&7Whether players are invincible'
+item-drop:
+- '&7Whether items can be dropped'
+item-pickup:
+- '&7Whether items can be picked up'
+lava-fire:
+- '&7Whether lava can start fires'
+lava-flow:
+- '&7Whether lava can flow'
+leaf-decay:
+- '&7Whether leaves will decay'
+lighter:
+- '&7Whether flint and steel can be used'
+lightning:
+- '&7Whether lightning can strike'
+mob-damage:
+- '&7Whether mobs can hurt players'
+mob-spawning:
+- '&7Whether mobs can spawn'
+mushroom-growth:
+- '&7Whether mushrooms will grow'
+mycelium-spread:
+- '&7Whether mycelium will spread'
+notify-enter:
+- '&7Whether players with the worldguard.notify permission'
+- '&7are notified when another player enters the region'
+notify-leave:
+- '&7Whether players with the worldguard.notify permission'
+- '&7are notified when another player leaves the region'
+other-explosion:
+- '&7Whether explosions can do damage'
+passthrough:
+- '&3This flag is short for ‘passthrough build’.'
+- '&3It has nothing to do with movement.'
+- ''
+- '  &7• If not set (default), then the region protects its area.'
+- '  &7• If set to deny, then the region protects its area.'
+- '  &7• If set to allow, then the region no longer protects its area.'
+- ''
+- '  &7• When you are using other flags (PvP, healing, etc.)'
+- '  &7  and you don’t want to prevent building.'
+- '  &7• Why not set build to allow instead?'
+- '  &7  That would override other regions and let people build!'
+pistons:
+- '&7Whether pistons can be used'
+potion-splash:
+- '&7Whether potions can have splash effects'
+price:
+- '&7Not used by WorldGuard at this time,'
+- '&7but third-party plugins may use it'
+pvp:
+- '&7Whether player versus player combat is permitted'
+receive-chat:
+- '&7Whether players can receive chat'
+ride:
+- '&7Whether vehicles (including animals) can be mounted'
+send-chat:
+- '&7Whether players can send chat'
+sleep:
+- '&7Whether sleeping in a bed is permitted'
+snow-fall:
+- '&7Whether snow will fall'
+snow-melt:
+- '&7Whether snow will melt'
+soil-dry:
+- '&7Whether soil will dry'
+spawn:
+- '&7The location to teleport to when a player'
+- '&7dies within the region'
+teleport:
+- '&7The location to teleport to when the'
+- '&7/rg teleport command is used within the region'
+time-lock:
+- '&7Time of day in ticks (between 0 and 24000) that players'
+- '&7will see the world as while in the region.'
+- '&7Use + or - for time relative to the world time.'
+tnt:
+- '&7Whether TNT detonation or damage is permitted'
+use:
+- '&7Whether doors, levers, etc. (but not inventories) can be used'
+vehicle-destroy:
+- '&7Whether vehicles can be destroyed'
+vehicle-place:
+- '&7Whether vehicles (boats, minecarts) can be placed'
+vine-growth:
+- '&7Whether vines will grow'
+water-flow:
+- '&7Whether water can flow'
+weather-lock:
+- '&7Type of weather players will see when in the region.'
+- '&7This does not affect world mechanics. Valid values are downfall and clear.'
+wither-damage:
+- '&7Protects from explosion of the wither itself, not the skull projectiles.'

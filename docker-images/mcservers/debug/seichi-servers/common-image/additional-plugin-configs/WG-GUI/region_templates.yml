@@ -1,0 +1,41 @@
+InvSize: 9
+Templates:
+  Empty:
+    DisplayName: Empty
+    Description: '&eEmpty template.'
+    Icon: PAPER
+  Mixed:
+    DisplayName: Mixed
+    Description: '&eTemplate for many types of games/events (e.g. parkour, maze).'
+    Icon: ELYTRA
+    Flags:
+      invincible: allow
+      pvp: deny
+      mob-spawning: deny
+      use: allow
+      chest-access: allow
+      interact: allow
+  PvP:
+    DisplayName: PvP
+    Description: '&eTemplate for pvp-related events/games.'
+    Icon: IRON_SWORD
+    Flags:
+      invincible: deny
+      pvp: allow
+      mob-spawning: deny
+      use: allow
+      chest-access: allow
+      interact: allow
+  MobArena:
+    DisplayName: MobArena
+    Description: '&eTemplate for MobArena event/game.'
+    Icon: MONSTER_EGG
+    Flags:
+      invincible: deny
+      pvp: deny
+      mob-spawning: allow
+      use: allow
+      chest-access: allow
+      interact: allow
+      mob-damage: allow
+      damage-animals: allow

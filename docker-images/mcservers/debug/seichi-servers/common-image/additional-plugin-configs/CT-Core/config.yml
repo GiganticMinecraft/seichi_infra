@@ -1,0 +1,14 @@
+updateNotification: true
+formatting:
+  module: '&9%module% >&7 '
+  error: '&cError >&7 '
+  element: '&d%var%&7'
+  name: '&e%var%&7'
+  'on': '&2On'
+  'off': '&cOff'
+  'yes': '&2Yes'
+  'no': '&cNo'
+inventorygui:
+  back: '&f&lBack'
+  next page: '&f&lNext page'
+  current page: '&f&lCurrent Page: %page%'

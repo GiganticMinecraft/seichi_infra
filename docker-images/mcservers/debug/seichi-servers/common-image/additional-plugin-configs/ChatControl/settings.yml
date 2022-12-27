@@ -1,0 +1,188 @@
+# !---------------------------------------------------------!
+# ! File automatically updated at 13.01.2019 18:31:54
+# ! to plugin version v5.7.2
+# !---------------------------------------------------------!
+# ! Unfortunatelly due to how Bukkit handles YAML
+# ! configurations, all comments (#) were wiped. 
+# ! For reference values and comments visit
+# ! https://github.com/kangarko/chatcontrol
+# !---------------------------------------------------------!
+
+Anti_Bot:
+  Rejoin_Delay_Seconds: 0
+  Block_Actions_Until_Moved:
+    Chat: true
+Anti_Caps:
+  Enabled: false
+  Warn_Player: true
+  Ignore_Usernames: false
+  Min_Message_Length: 5
+  Min_Caps_Percentage: 50
+  Min_Caps_In_A_Row: 5
+  Whitelist:
+  - OMG
+  - LOL
+  - WTF
+  - WOW
+  - ROFL
+Anti_Spam:
+  Similarity_Check:
+    Ignore_Special_Characters: false
+    Ignore_Duplicate_Characters: false
+    Ignore_First_Arguments_In_Commands: true
+  Commands:
+    Delay_Between_Commands: 0
+    Similar_Percentage_Block: 0
+    Whitelist_Similarity:
+    - tell
+    - pm
+    - t
+    - w
+    - r
+    Whitelist_Delay:
+    - spawn
+    - home
+  Chat:
+    Delay_Between_Messages: 5
+    Similar_Percentage_Block: 80
+    Regex_In_Whitelist: false
+    Whitelist_Similarity:
+    - hello
+    - hey
+    Whitelist_Delay:
+    - true
+Chat:
+  Formatter:
+    Enabled: false
+    Message_Format: '%pl_prefix%player:%pl_suffix %message'
+    Global_Message_Format: '&8[GLOBAL]&f %pl_prefix%player:%pl_suffix %message'
+    Spy_Message_Format: '&8SPY: [%world&8]&f %pl_prefix%player:%pl_suffix %message'
+    Ranged_Mode: false
+    Range: 100.0
+  Grammar:
+    Insert_Dot:
+      Enabled: false
+      Min_Message_Length: 5
+    Capitalize:
+      Enabled: false
+      Min_Message_Length: 5
+Clear:
+  Broadcast: true
+  Do_Not_Clear_For_Staff: true
+  Console_Lines_To_Clear: 300
+Messages:
+  Join: default
+  Quit: default
+  Kick: default
+  Show_Quit_Only_When_Logged: true
+  Timed:
+    Enabled: false
+    Random_Order: false
+    Random_No_Repeat: true
+    Prefix: '&8[&2Tip&8]&2'
+    Suffix: ''
+    Delay_Seconds: 180
+    Message_List:
+      global:
+      - Hey, %player, did you know that this server is running ChatControl?
+      - 'Visit developer website: &ahttps://goo.gl/CT3Zdl'
+      hardcore:
+      - Grief is not permitted what-so-ever and every griefer will be banned.
+      - Can you survive the night on %world world?
+      hardcore_nether:
+      - includeFrom hardcore
+      ignored-world:
+      - excludeGlobal
+      creative:
+      - excludeGlobal
+      - Welcome on Creative world. Enjoy your gamemode :)
+Mute:
+  Broadcast: true
+  Silence:
+    Join_Messages: false
+    Quit_Messages: false
+    Kick_Messages: false
+    Death_Messages: false
+  Disabled_Commands_During_Mute:
+  - me
+  - tell
+  - msg
+  - r
+  - w
+Packets:
+  Enabled: true
+  Tab_Complete:
+    Disable: true
+    Disable_Only_In_Commands: true
+    Allow_When_Message_Has_Space: true
+    Allow_When_Length_Above: 0
+Rules:
+  Check_Chat: false
+  Check_Commands: false
+  Check_Signs: false
+  Check_Packets: false
+  Packets:
+    Deserialize_Json: true
+Console:
+  Filter:
+    Enabled: false
+    Filter_Console_Messages:
+    - Reached end of stream for
+    - Connection reset
+    - lost connection
+Signs:
+  Duplication:
+    Deny_Signs_With_Same_Text: false
+    Alert_Staff: false
+    Block_When_Violates_A_Rule: false
+    Drop_Sign: true
+Sound_Notify:
+  Enabled: false
+  Notify_Only_When_Afk: true
+  Notify_Only_If_Prefixed_With: '@'
+  Sound: ENTITY_CHICKEN_EGG, 1F, 1.5F
+  Enabled_In_Commands:
+  - msg
+  - tell
+  - t
+  - w
+  - r
+Groups:
+  Enabled: false
+  Always_Check_Updates: false
+  Group_List:
+    trusted:
+      Message_Delay: 0
+    guest:
+      Message_Delay: 4
+      Command_Delay: 6
+    vip:
+      Join_Message: '&6[VIP] &e%player has joined the game'
+      Leave_Message: '&6[VIP] &e%player has left the game'
+      Kick_Message: none
+Updater:
+  Enabled: false
+  Notify: false
+  Download: false
+  Check_Notes: false
+Writer:
+  Write_Chat_Communication: true
+  Strip_Colors: true
+  Write_Commands:
+  - tell
+  Ignore_Players:
+  - ignoredAdmin
+Listener_Priority:
+  Formatter: NORMAL
+  Checker: NORMAL
+Minimum_Players_To_Enable_Checks: 0
+Regex_Timeout_Milis: 100
+Locale: en
+Log_Lag_Over_Milis: 100
+Verbose_Rules: true
+Silent_Startup: true
+Reset_Cache_On_Quit: false
+Enforce_New_Line: false
+Lookup_Geo_Data: true
+Debug: false
+Version: 4

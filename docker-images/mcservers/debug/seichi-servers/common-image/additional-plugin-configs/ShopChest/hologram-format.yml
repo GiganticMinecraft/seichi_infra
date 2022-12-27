@@ -1,0 +1,78 @@
+# ===============================================
+# === ShopChest's hologram configuration file ===
+# ===============================================
+#
+# Valid requirements are:
+# VENDOR, AMOUNT, ITEM_TYPE, ITEM_NAME, HAS_ENCHANTMENT, BUY_PRICE,
+# SELL_PRICE, HAS_POTION_EFFECT, IS_MUSIC_DISC, IS_POTION_EXTENDED,
+# IS_WRITTEN_BOOK, ADMIN_SHOP, NORMAL_SHOP, IN_STOCK, MAX_STACK,
+# CHEST_SPACE, DURABILITY
+#
+# You can also use the requirements for conditions.
+# ITEM_TYPE will return the type of the item (-> item_names.txt),
+# ITEM_NAME can be compared against a custom named item's name (may be null).
+#
+# Examples:
+#   - IN_STOCK > 0
+#   - VENDOR == "EpicEric"
+#   - BUY_PRICE <= SELL_PRICE
+#   - ITEM_TYPE == "STONE:2"
+#   - ITEM_TYPE != "IRON_INGOT"
+#   - ITEM_NAME == "The Mighty Sword"
+#   - (AMOUNT > 10) && (AMOUNT <= 20)
+#   - (IN_STOCK > 0) || ADMIN_SHOP
+#
+# Valid placeholders are:
+# %VENDOR%, %AMOUNT%, %ITEM-NAME%, %ENCHANTMENT%, %BUY-PRICE%,
+# %SELL-PRICE%, %POTION-EFFECT%, %MUSIC-TITLE%, %GENERATION%,
+# %STOCK%, %MAX-STACK%, %CHEST-SPACE%, %DURABILITY%
+#
+# In the format, placeholders can also be used for scripts.
+# Examples:
+#   - "In Stock: {%STOCK% / 64} Stk."
+#   - "In Stock: {(%STOCK% - (%STOCK% % 64)) / 64} Stk. {%STOCK% % 64}"
+#
+# Other information:
+# - Options can be called however you want.
+# - Color codes can be used in the format.
+# - Options are checked from top to bottom; the first to
+#   fulfill the requirements will be taken.
+# - All scripts have to be in JavaScript syntax.
+# - Lines start with 0.
+
+lines:
+  0:
+    options:
+      normal-shop:
+        format: "%VENDOR%"
+        requirements:
+          - NORMAL_SHOP
+
+      admin-shop:
+        format: "&cAdmin Shop"
+        requirements:
+          - ADMIN_SHOP
+
+  1:
+    options:
+      default:
+        format: "%AMOUNT% x %ITEMNAME%"
+        requirements:
+
+  2:
+    options:
+      buy-and-sell:
+        format: "Buy %BUY-PRICE% | %SELL-PRICE% Sell"
+        requirements:
+          - BUY_PRICE > 0
+          - SELL_PRICE > 0
+
+      only-buy:
+        format: "Buy %BUY-PRICE%"
+        requirements:
+          - BUY_PRICE > 0
+
+      only-sell:
+        format: "Sell %SELL-PRICE%"
+        requirements:
+          - SELL_PRICE > 0

@@ -1,0 +1,65 @@
+# ###################################################
+# ############## Channel Configuration ##############
+# ###################################################
+# 
+# This is the channel configuration.
+# You can change and copy this file to create as many channels you want.
+# This is the default options:
+# 
+# name: Global - The name of channel.
+# alias: g - The alias to use the channel
+# across-worlds: true - Send messages of this channel to all worlds?
+# distance: 0 - If across worlds is false, distance to receive this messages.
+# color: &b - The color of channel
+# tag-builder: ch-tags,world,clan-tag,marry-tag,group-prefix,nickname,group-suffix,message - Tags of this channel
+# need-focus: false - Player can use the alias or need to use '/ch g' to use this channel?
+# canLock: true - Change if the player can use /<channel> to lock on channel.receivers-message: true - Send chat messages like if 'no players near to receive the message'?
+# cost: 0.0 - Cost to player use this channel.
+# use-this-builder: false - Use this tag builder or use the 'config.yml' tag-builder?
+# channelAlias - Use this channel as a command alias.
+#   enable: true - Enable this execute a command alias?
+#   sendAs: player - Send the command alias as 'player' or 'console'?
+#   cmd: '' - Command to send on every message send by this channel.
+# available-worlds - Worlds and only this world where this chat can be used and messages sent/received.
+# discord:
+#   mode: NONE - The options are NONE, SEND, LISTEN, BOTH. If enabled and token code set and the channel ID matches with one discord channel, will react according the choosen mode.
+#   hover: &3Discord Channel: &a{dd-channel}\n&3Role Name: {dd-rolecolor}{dd-rolename}
+#   format-to-mc: {ch-color}[{ch-alias}]&b{dd-rolecolor}[{dd-rolename}]{sender}&r: 
+#   format-to-dd: :thought_balloon: **{sender}**: {message} 
+#   allow-server-cmds: false - Use this channel to send commands from discord > minecraft.
+#   channelID: '' - The IDs of your Discord Channels. Enable debug on your discord to get the channel ID.
+#   Note: You can add more than one discord id, just separate by "," like: 13246579865498,3216587898754
+
+name: Admin
+alias: ad
+color: '&b'
+jedis: false
+char-alias: ''
+canLock: true
+need-focus: false
+channelAlias:
+  cmd: ''
+  sendAs: player
+  enable: false
+cost: 0.0
+discord:
+  mode: none
+  format-to-mc: '{ch-color}[{ch-alias}]&b{dd-rolecolor}[{dd-rolename}]{sender}&r: '
+  allow-server-cmds: false
+  hover: |-
+    &3Discord Channel: &a{dd-channel}
+    &3Role Name: {dd-rolecolor}{dd-rolename}
+  format-to-dd: ':regional_indicator_g: **{sender}**: {message}'
+  allow-bot: true
+  channelID: ''
+bungee: false
+available-worlds: []
+use-this-builder: false
+receivers-message: false
+across-worlds: true
+dynmap:
+  enable: false
+allow-hand: true
+distance: 0
+tag-builder: world,marry-tag,ch-tags,clan-tag,factions,group-prefix,nickname,group-suffix,message
+password: ''

@@ -1,0 +1,31 @@
+# Dynmap-WorldGuard configuration
+update:
+  period: 120
+layer:
+  name: WorldGuard保護範囲表示
+  hidebydefault: true
+  layerprio: 0
+  minzoom: 0
+use3dregions: false
+infowindow: <div class=\"infowindow\"><span style=\"font-size:20pt;"><b>%regionname%</b></span><br
+  />(%parent%) - %priority%<br /><br /><span style=\"font-size:16pt;">Owners(保護オーナー)</span><br
+  /><span style="font-weight:bold;">%playerowners%<br/>%groupowners%</span><br/><span
+  style=\"font-size:16pt;">Members(保護メンバー)</span><br /><span style="font-weight:bold;">%playermembers%<br/>%groupmembers%</span><br/><span
+  style=\"font-size:16pt;">Flags(フラグ設定一覧)</span><br /><span style="font-weight:bold;">%flags%</span></div>
+regionstyle:
+  strokeColor: '#FF0000'
+  strokeOpacity: 0.5
+  strokeWeight: 3
+  fillColor: '#FF0000'
+  fillOpacity: 0.3
+  unownedStrokeColor: '#00FF00'
+visibleregions: []
+hiddenregions: []
+custstyle:
+  customregion1:
+    strokeColor: '#00FF00'
+ownerstyle:
+  kingoftheworld:
+    strokecolor: '#C0C0C0'
+maxdepth: 16
+updates-per-tick: 20
