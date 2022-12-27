@@ -4,11 +4,11 @@ ENV VERSION="1.12.2"
 
 # プラグインリスト
 #   このイメージでは基底のリスト (/extras/plugin-list.ini) に追記する
-COPY ./additional-plugin-list.ini /extras/additional-plugin-list.ini
+COPY --link ./additional-plugin-list.ini /extras/additional-plugin-list.ini
 RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.ini"
 
 # プラグインの設定ファイル
-COPY ./additional-plugin-configs /plugins
+COPY --link ./additional-plugin-configs /plugins
 
 # 環境変数として指定されるべきプラグインの設定
 ENV CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST=""
