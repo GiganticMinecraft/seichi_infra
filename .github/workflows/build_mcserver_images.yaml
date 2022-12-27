@@ -12,12 +12,23 @@ jobs:
     strategy:
       matrix:
         include:
+          ###
+          # 本番サーバーのイメージ
+          #
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa
             build_context: ./docker-images/mcservers/production/kagawa
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset
             build_context: ./docker-images/mcservers/production/one-day-to-reset
+
+          ###
+          # デバッグサーバーのイメージ
+          #
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2
             build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_12_2
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
+            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
+            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
 
     steps:
       - name: checkout
