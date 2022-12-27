@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 ARG MCSERVER_BASE_IMAGE
 
 ##---
@@ -15,8 +16,8 @@ RUN wget \
 FROM ${MCSERVER_BASE_IMAGE}
 
 # JMX exporter と設定ファイルをイメージに移す
-COPY --from=jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
-COPY ./jmx-exporter-config.yaml /jmx-exporter/jmx-exporter-config.yaml
+COPY --link --from=jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
+COPY --link ./jmx-exporter-config.yaml /jmx-exporter/jmx-exporter-config.yaml
 
 # ---
 # サーバー群に共通する環境変数
@@ -52,13 +53,13 @@ ENV MODS_FILE="/extras/plugin-list.ini"
 # ---
 
 # サーバー自体の設定ファイル
-COPY ./common-minecraft-server-configs /config
+COPY --link ./common-minecraft-server-configs /config
 
 # プラグインリスト
-COPY ./common-plugin-list.ini /extras/plugin-list.ini
+COPY --link ./common-plugin-list.ini /extras/plugin-list.ini
 
 # プラグインの設定ファイル
-COPY ./common-plugin-configs /plugins
+COPY --link ./common-plugin-configs /plugins
 
 # 環境変数として指定されるべきプラグインの設定
 ENV CFG_REPLACEMENT__DISCORDSRV_TOKEN=""
