@@ -284,7 +284,7 @@ imageRepository: "k8s.gcr.io"
 networking:
   serviceSubnet: "10.96.0.0/16"
   podSubnet: "10.128.0.0/16"
-kubernetesVersion: "v1.24.7"
+kubernetesVersion: "v1.24.1"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
