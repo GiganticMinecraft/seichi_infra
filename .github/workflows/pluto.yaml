@@ -19,8 +19,8 @@ jobs:
 
       - name: Use pluto
         run: |
-          pluto detect-files -d helm-charts/cloudflared-tunnel --target-versions k8s=v1.24.0
+          pluto detect-files -d helm-charts/cloudflared-tunnel --target-versions k8s=v1.25.5
 
       - name: Use pluto
         run: |
-          pluto detect-files -d seichi-onp-k8s/manifests/seichi-kubernetes/apps --target-versions k8s=v1.24.0
+          pluto detect-files -d seichi-onp-k8s/manifests/seichi-kubernetes/apps --target-versions k8s=v1.25.5
