@@ -26,14 +26,14 @@ data:
       millis: 4000
 
   RedisBungee-config.yml: |
-    server-id: ""
-    use-random-id-string: true
+    proxy-id: ""
     redis-server: 192.168.1.188
     redis-port: 11787
     redis-password: ""
-    max-redis-connections: 8
+    max-redis-connections: 10
     useSSL: false
-    register-bungee-commands: true
+    register-legacy-commands: true
+    override-bungee-commands: true
     exempt-ip-addresses: []
 
   SwiftMOTD-config.yml: |

@@ -26,14 +26,14 @@ data:
       millis: 4000
 
   RedisBungee-config.yml: |
-    server-id: ""
-    use-random-id-string: true
+    proxy-id: ""
     redis-server: seichi-debug-redisbungee-redis-master.seichi-debug-minecraft
     redis-port: 6379
     redis-password: ""
-    max-redis-connections: 8
+    max-redis-connections: 10
     useSSL: false
-    register-bungee-commands: true
+    register-legacy-commands: true
+    override-bungee-commands: true
     exempt-ip-addresses: []
 
   SwiftMOTD-config.yml: |
