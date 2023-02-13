@@ -1,7 +1,9 @@
----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: metallb-system
+
 resources:
-  - https://raw.githubusercontent.com/metallb/metallb/v0.13.7/manifests/namespace.yaml
-  - https://raw.githubusercontent.com/metallb/metallb/v0.13.7/manifests/metallb.yaml
-  - metallb-cm.yaml
+  - github.com/metallb/metallb/config/frr?ref=v0.13.7
+
+patchesStrategicMerge:
+  - ./metallb-address-pool.yaml
