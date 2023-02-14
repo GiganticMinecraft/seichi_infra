@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build go build -o /mod-downloader
 
 FROM gcr.io/distroless/static:nonroot
 
-COPY --link --from=builder --chown=nonroot:nonroot /mod-downloader /bin/
+COPY --from=builder --chown=nonroot:nonroot /mod-downloader /bin/
 ENV MINIO_ENDPOINT=""
 ENV MINIO_ACCESS_KEY=""
 ENV MINIO_ACCESS_SECRET=""
