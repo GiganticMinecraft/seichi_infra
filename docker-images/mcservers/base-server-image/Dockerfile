@@ -3,7 +3,7 @@ ARG MCSERVER_BASE_IMAGE
 
 ##---
 # JVM exporter をダウンロードする stage
-FROM busybox:1.35.0 as jmx-prometheus-exporter-downloader
+FROM busybox:1.36.0 as jmx-prometheus-exporter-downloader
 RUN wget \
   -O /root/jmx_prometheus_javaagent.jar \
   https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar
