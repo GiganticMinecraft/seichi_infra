@@ -1,9 +1,13 @@
 FROM golang:1.20-bullseye as builder
 WORKDIR /go/src
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN go build -o /mod-downloader
+COPY --link go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
+COPY --link . .
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -o /mod-downloader
 
 FROM gcr.io/distroless/static:nonroot
 
