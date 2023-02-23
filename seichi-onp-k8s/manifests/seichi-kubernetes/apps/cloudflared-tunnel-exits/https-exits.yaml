@@ -27,7 +27,7 @@ spec:
           # 自己署名証明書で保護されているため、 noTLSVerify で無視する。
           - name: proxmox
             external-hostname: proxmox.onp.admin.seichi.click
-            internal-authority: 192.168.1.150:8006
+            internal-authority: 192.168.1.154:8006
 
           # Redmine
           - name: redmine
