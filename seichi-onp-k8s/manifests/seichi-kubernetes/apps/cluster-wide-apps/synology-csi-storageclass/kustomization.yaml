@@ -1,11 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/controller.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/csi-driver.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/node.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/storage-class.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/controller.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/csi-driver.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/node.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/storage-class.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
 patchesStrategicMerge:
   - ./storageclass.yaml
+
+images:
+  - name: synology/synology-csi
+    newTag: latest
