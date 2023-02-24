@@ -12,6 +12,8 @@ kind: L2Advertisement
 metadata:
   name: default-advertisement
   namespace: metallb-system
-# spec:
-#   ipAddressPools:
-#   - default-pool
+spec:
+  ipAddressPools:
+  - default-pool
+  interfaces:
+  - ens18
