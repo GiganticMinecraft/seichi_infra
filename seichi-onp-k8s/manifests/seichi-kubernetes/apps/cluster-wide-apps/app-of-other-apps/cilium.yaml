@@ -32,6 +32,7 @@ spec:
             - icmp
             - http
             - port-distribution
+            - policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelContext=source_namespace;destination_namespace
             serviceMonitor:
               enabled: true
               labels:

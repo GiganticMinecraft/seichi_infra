@@ -104,6 +104,10 @@ spec:
                 gnetId: 16613
                 revision: 1
                 datasource: Prometheus
+              cilium-verdicts:
+                gnetId: 18015
+                revision: 3
+                datasource: Prometheus
               argocd:
                 gnetId: 14584
                 revision: 1
