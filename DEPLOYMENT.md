@@ -34,3 +34,48 @@
 
 旧来の VM 方式です。独自プラグインを複数含むようなマイクラ鯖を立ち上げる時は現時点で運用方針が定まっているのはこの方法だけなので選択肢に上がります。
 鯖自体が増えることも多くはないため、基本的には必要がない限り新しい VM を作ることはないでしょう。そのためこのガイドでも大きくは取り上げないこととします。
+
+## Seichi Kubernetes デプロイガイド
+
+Kubernetes 上にアプリケーションをデプロイする際に必要な情報は大きく分けて
+
+- 想定する CPU / メモリー消費量
+- アプリケーションのコンテナイメージ取得先(コンテナレジストリの接続情報)
+- (Web アプリケーションなら)使いたいポートや FQDN など
+- ストレージ永続化必要性の有無
+
+です。Kubernetes では、「この YAML に書かれた通りにアプリケーションを実行し続けてください」と命令を送ることでデプロイが行われます。
+そのために書かれる YAML ファイルのことを、マニフェスト(宣言書)と呼びます。具体的には以下のようなファイルを指します。
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+```
+
+これを Kubernetes クラスターに登録しておくことによって、`nginx:1.14.2` のアプリケーションが常に実行され続けるように管理が行われます。例えばアプリケーションが起動に失敗した場合や、接続チェックに失敗した場合などにはコンテナプロセスの再起動あるいは再作成をすることで正常性を担保し、必要とあらば複数起動することで冗長性を確保することもあります。
+
+### The Twelve-Factor App
+
+アプリケーションの設計方針の1つとして「[The Twelve-Factor App](https://12factor.net/ja/)」と呼ばれる概念があります。ソフトウェア設計の基本の1つであるため、覚えておくようにしましょう。また、それに幾つかの近代的な要素を加えた「[Beyond the Twelve-Factor App](https://tanzu.vmware.com/content/blog/beyond-the-twelve-factor-app)」もあるため、可能な限り読んでおいてください。特に重要な点を示します
+
+- アプリケーション全体の動作に関わるようなステートを変数のスコープで終わらせない
+- システム上必要な構成設定は極力環境変数で管理できるようにする
+- Graceful Shutdown やオートスケーリングの足枷にならない作りにする
+
+ほかにも、アプリケーションのパフォーマンスやエラーの状況がわかるような可観測性を意識したり、集計がしやすいフォーマットでアプリケーションログを出力するなど、重要な話は多岐にわたります。
+
+## 整地鯖環境でデプロイする時はどうするの？
+
+整地鯖の Kubernetes クラスターには [Argo CD](https://argo-cd.readthedocs.io/en/stable/) がインストールされていて、所定の[ Git リポジトリ](https://github.com/GiganticMinecraft/seichi_infra/)にマニフェストを登録しておくだけで勝手にデプロイが行われるようになっています。
+
+[Argo CD](https://argocd.onp-k8s.admin.seichi.click/) は GitHub SSO を経由して Web 上でも動作を確認できます。[こちらの YAML](https://github.com/GiganticMinecraft/seichi_infra/blob/main/seichi-onp-k8s/manifests/seichi-kubernetes/argocd-apps-helm-chart-values.yaml) に最初に読み込む Git リポジトリが記されているので確認すると、[./seichi-onp-k8s/manifests/seichi-kubernetes/apps/root](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/root) には `Application` リソースと `AppProject` リソースがあります。これが、Argo CD で管理対象に入るリポジトリ及びそのパスを示しています。詳しくは [./seichi-onp-k8s/README.md](./seichi-onp-k8s/README.md) あたりにも説明があります。
+
+文字だけでは説明が難しい部分もあるので、一旦は`マニフェストを書いて　Git の所定の場所に配置する`ことと、`Argo CD というツールが自動的にデプロイ処理を請け負ってくれる`ことだけ理解しておけば大丈夫です。
