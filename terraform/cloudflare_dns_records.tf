@@ -27,7 +27,7 @@ resource "cloudflare_record" "github_pages" {
 resource "cloudflare_record" "portal" {
   zone_id = local.cloudflare_zone_id
   name    = "portal"
-  value   = "giganticminecraft.github.io"
+  value   = "${cloudflare_pages_project.seichi_portal.name}.pages.dev"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
