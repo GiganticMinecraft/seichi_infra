@@ -12,8 +12,9 @@ resource "cloudflare_pages_project" "seichi_portal" {
   source {
     type = "github"
     config {
-      owner     = local.github_org_name
-      repo_name = "seichi-portal-frontend"
+      owner             = local.github_org_name
+      repo_name         = "seichi-portal-frontend"
+      production_branch = "main"
     }
   }
 }
