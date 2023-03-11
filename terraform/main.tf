@@ -202,8 +202,8 @@ variable "minio_root_password" {
 
 #region credentials for newrelic agents
 
-variable "newrelic_licencekey" {
-  description = "newrelic licencekey"
+variable "newrelic_licensekey" {
+  description = "newrelic licensekey"
   type        = string
   sensitive   = true
 }
