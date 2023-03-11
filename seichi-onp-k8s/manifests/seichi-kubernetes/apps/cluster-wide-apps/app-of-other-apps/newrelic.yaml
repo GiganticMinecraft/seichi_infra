@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: newrelic
+  namespace: newrelic
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: nri-bundle
+    repoURL: https://helm-charts.newrelic.com
+    targetRevision: 5.0.4
+    helm:
+      values: |
+        newrelic-infrastructure:
+          privileged: true
+        global:
+          lowDataMode: true
+          customSecretName: "newrelic-credentials"
+          customSecretLicenseKey: "LicenseKey"
+          cluster: seichi-onp-k8s
+        kube-state-metrics:
+          enabled: true
+          image:
+            tag: "v2.7.0"
+        kubeEvents
+          enabled: true
+        newrelic-prometheus-agent:
+          enabled: true
+          lowDataMode: true
+          config:
+            kubernetes:
+              integrations_filter:
+                enabled: false
+        newrelic-pixie:
+          enabled: true
+          # https://github.com/newrelic/helm-charts/blob/newrelic-pixie-2.0.2/charts/newrelic-pixie/values.yaml
+          customSecretApiKeyName: "newrelic-credentials"
+          customSecretApiKeyKey: "PixieApiKey"
+        pixie-chart:
+          enabled: true
+          # https://github.com/pixie-io/pixie/blob/release/operator/v0.0.35/k8s/operator/helm/values.yaml
+          # The deploy key may be read from a custom secret in the Pixie namespace.
+          # This secret should be formatted where the key of the deploy key is "deploy-key".
+          customDeployKeySecret: "newrelic-credentials"
+          clusterName: seichi-onp-k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: newrelic
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

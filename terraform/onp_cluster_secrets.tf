@@ -82,3 +82,20 @@ resource "kubernetes_secret" "minio_root_user" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "newrelic_credentials" {
+  depends_on = [kubernetes_namespace.newrelic]
+
+  metadata {
+    name      = "newrelic-credentials"
+    namespace = "newrelic"
+  }
+
+  data = {
+    "LicenseKey"          = var.newrelic_licencekey
+    "PixieApiKey"         = var.newrelic_pixie_api_key
+    "deploy-key"          = var.newrelic_pixie_chart_deploy_key
+  }
+
+  type = "Opaque"
+}
