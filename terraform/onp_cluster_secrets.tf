@@ -92,9 +92,9 @@ resource "kubernetes_secret" "newrelic_credentials" {
   }
 
   data = {
-    "LicenseKey"          = var.newrelic_licensekey
-    "PixieApiKey"         = var.newrelic_pixie_api_key
-    "deploy-key"          = var.newrelic_pixie_chart_deploy_key
+    "LicenseKey"  = var.newrelic_licensekey
+    "PixieApiKey" = var.newrelic_pixie_api_key
+    "deploy-key"  = var.newrelic_pixie_chart_deploy_key
   }
 
   type = "Opaque"
