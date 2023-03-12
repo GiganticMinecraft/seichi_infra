@@ -22,7 +22,7 @@ resource "cloudflare_pages_project" "seichi_portal" {
 resource "cloudflare_pages_domain" "seichi_portal_domain" {
   account_id   = local.cloudflare_account_id
   project_name = cloudflare_pages_project.seichi_portal.name
-  domain       = "portal.${local.root_domain}"
+  domain       = "${cloudflare_pages_project.seichi_portal.subdomain}.${local.root_domain}"
 }
 
 #endregion
