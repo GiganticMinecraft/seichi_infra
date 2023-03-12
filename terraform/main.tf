@@ -20,9 +20,12 @@ terraform {
 }
 
 locals {
-  cloudflare_zone_id = "77c10fdfa7c65de4d14903ed8879ebcb"
-  root_domain        = "seichi.click"
-  github_org_name    = "GiganticMinecraft"
+  // NOTE: account_idとzone_idは非シークレット
+  // https://github.com/cloudflare/wrangler-legacy/issues/209#issuecomment-541654484
+  cloudflare_account_id = "9e9e88e2b19878c4a911c3c8a715a168"
+  cloudflare_zone_id    = "77c10fdfa7c65de4d14903ed8879ebcb"
+  root_domain           = "seichi.click"
+  github_org_name       = "GiganticMinecraft"
 }
 
 #region cloudflare provider
