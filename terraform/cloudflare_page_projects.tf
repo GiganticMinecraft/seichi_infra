@@ -10,6 +10,9 @@ resource "cloudflare_pages_project" "seichi_portal" {
     root_dir        = "/"
   }
   deployment_configs {
+    preview {
+      # No config
+    }
     production {
       environment_variables = {
         NODE_ENV                        = "production"
