@@ -15,7 +15,7 @@ resource "cloudflare_pages_project" "seichi_portal" {
         NODE_ENV                        = "production"
         NEXT_PUBLIC_BACKEND_API_URL     = var.cloudflare_pages__seichi_portal__next_public_backend_api_url
         NEXT_PUBLIC_MS_APP_CLIENT_ID    = var.cloudflare_pages__seichi_portal__next_public_ms_app_client_id
-        NEXT_PUBLIC_MS_APP_REDIRECT_URL = "https://${cloudflare_pages_domain.seichi_portal_domain.domain}"
+        NEXT_PUBLIC_MS_APP_REDIRECT_URL = "https://portal.${local.root_domain}"
       }
     }
   }
