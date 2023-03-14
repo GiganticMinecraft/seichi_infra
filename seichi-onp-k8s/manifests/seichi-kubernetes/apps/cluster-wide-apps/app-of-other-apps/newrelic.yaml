@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: newrelic
-  namespace: newrelic
+  namespace: argocd
 spec:
   project: cluster-wide-apps
   source:
