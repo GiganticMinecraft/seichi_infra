@@ -10,6 +10,7 @@ spec:
     repoURL: https://helm-charts.newrelic.com
     targetRevision: 5.0.4
     helm:
+      # https://github.com/newrelic/helm-charts/blob/nri-bundle-5.0.4/charts/nri-bundle/values.yaml
       values: |
         newrelic-infrastructure:
           privileged: true
@@ -31,14 +32,16 @@ spec:
             kubernetes:
               integrations_filter:
                 enabled: false
+        # nri-bundle の subchart である newrelic-pixie の設定
+        # https://github.com/newrelic/helm-charts/blob/newrelic-pixie-2.0.2/charts/newrelic-pixie/values.yaml
         newrelic-pixie:
           enabled: true
-          # https://github.com/newrelic/helm-charts/blob/newrelic-pixie-2.0.2/charts/newrelic-pixie/values.yaml
           customSecretApiKeyName: "newrelic-credentials"
           customSecretApiKeyKey: "PixieApiKey"
+        # nri-bundle の subchart である pixie-operator-chart の設定
+        # https://github.com/pixie-io/pixie/blob/release/operator/v0.0.35/k8s/operator/helm/values.yaml
         pixie-chart:
           enabled: true
-          # https://github.com/pixie-io/pixie/blob/release/operator/v0.0.35/k8s/operator/helm/values.yaml
           # The deploy key may be read from a custom secret in the Pixie namespace.
           # This secret should be formatted where the key of the deploy key is "deploy-key".
           customDeployKeySecret: "newrelic-credentials"
