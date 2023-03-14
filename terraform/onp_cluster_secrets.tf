@@ -82,3 +82,23 @@ resource "kubernetes_secret" "minio_root_user" {
 
   type = "Opaque"
 }
+
+resource "kubernetes_secret" "newrelic_credentials" {
+  depends_on = [kubernetes_namespace.newrelic]
+
+  metadata {
+    name      = "newrelic-credentials"
+    namespace = "newrelic"
+  }
+
+  # "deploy-key"は本来であれば他のkeyと命名規則を統一するべきだが
+  # 20230314現在、helm-chart(pixie-operator-chart:0.0.35)でハードコードされているため命名を変更できない。
+  # https://github.com/pixie-io/pixie/blob/release/operator/v0.0.35/k8s/operator/helm/values.yaml#L31-L33
+  data = {
+    "LicenseKey"  = var.newrelic_licensekey
+    "PixieApiKey" = var.newrelic_pixie_api_key
+    "deploy-key"  = var.newrelic_pixie_chart_deploy_key
+  }
+
+  type = "Opaque"
+}

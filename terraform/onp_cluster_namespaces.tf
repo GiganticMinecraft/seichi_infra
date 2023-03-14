@@ -51,3 +51,9 @@ resource "kubernetes_namespace" "minio" {
     name = "minio"
   }
 }
+
+resource "kubernetes_namespace" "newrelic" {
+  metadata {
+    name = "newrelic"
+  }
+}
