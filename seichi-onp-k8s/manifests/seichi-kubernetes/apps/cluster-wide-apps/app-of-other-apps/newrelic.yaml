@@ -23,7 +23,7 @@ spec:
           enabled: true
           image:
             tag: "v2.7.0"
-        kubeEvents
+        kubeEvents:
           enabled: true
         newrelic-prometheus-agent:
           enabled: true
