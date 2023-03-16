@@ -233,8 +233,6 @@ variable "minecraft__prod_game_db__password" {
 
 #region env variables for Cloudflare Pages projects
 
-#region Seichi Portal
-
 variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
   description = "The url of Seichi Portal backend API"
   type        = string
@@ -246,7 +244,5 @@ variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
   type        = string
   sensitive   = true
 }
-
-#endregion
 
 #endregion
