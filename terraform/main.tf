@@ -20,9 +20,12 @@ terraform {
 }
 
 locals {
-  cloudflare_zone_id = "77c10fdfa7c65de4d14903ed8879ebcb"
-  root_domain        = "seichi.click"
-  github_org_name    = "GiganticMinecraft"
+  # NOTE: account_idとzone_idは非シークレット
+  # https://github.com/cloudflare/wrangler-legacy/issues/209#issuecomment-541654484
+  cloudflare_account_id = "9e9e88e2b19878c4a911c3c8a715a168"
+  cloudflare_zone_id    = "77c10fdfa7c65de4d14903ed8879ebcb"
+  root_domain           = "seichi.click"
+  github_org_name       = "GiganticMinecraft"
 }
 
 #region cloudflare provider
@@ -244,6 +247,22 @@ variable "minecraft__prod_kagawa__morning_glory_seed_webhook_url" {
 
 variable "minecraft__prod_game_db__password" {
   description = "Password set to the production game database"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
+#region env variables for Cloudflare Pages projects
+
+variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
+  description = "The url of Seichi Portal backend API"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
+  description = "The application cliend ID on Microsoft Azure Portal for Seichi Portal"
   type        = string
   sensitive   = true
 }
