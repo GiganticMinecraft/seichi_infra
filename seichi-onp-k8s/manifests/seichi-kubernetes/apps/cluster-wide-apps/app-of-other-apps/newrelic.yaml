@@ -8,7 +8,7 @@ spec:
   source:
     chart: nri-bundle
     repoURL: https://helm-charts.newrelic.com
-    targetRevision: 5.0.7
+    targetRevision: 5.0.10
     helm:
       # https://github.com/newrelic/helm-charts/blob/nri-bundle-5.0.4/charts/nri-bundle/values.yaml
       values: |
