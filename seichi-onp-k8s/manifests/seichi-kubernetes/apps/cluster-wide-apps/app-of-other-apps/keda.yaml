@@ -8,7 +8,7 @@ spec:
   source:
     chart: keda
     repoURL: https://kedacore.github.io/charts
-    targetRevision: 2.10.1
+    targetRevision: 2.10.2
     helm:
       releaseName: keda
       values: |
