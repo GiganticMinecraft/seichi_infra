@@ -8,7 +8,7 @@ spec:
   source:
     chart: minio
     repoURL: https://charts.min.io/
-    targetRevision: 5.0.7
+    targetRevision: 5.0.8
     helm:
       releaseName: seichi-private-plugin-blackhole
       values: |
