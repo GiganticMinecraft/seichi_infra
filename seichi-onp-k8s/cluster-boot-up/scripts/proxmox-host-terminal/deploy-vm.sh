@@ -29,10 +29,14 @@ VM_LIST=(
 # download the image(ubuntu 22.04 LTS)
 wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 
+# install qemu-guest-agent to image using libguestfs-tools
+apt install libguestfs-tools -y
+virt-customize -a jammy-server-cloudimg-amd64.img --install liburing2 --install qemu-guest-agent
+
 # create a new VM and attach Network Adaptor
 # vmbr0=Service Network Segment (192.168.0.0/20)
 # vmbr1=Storage Network Segment (192.168.16.0/22)
-qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --name seichi-onp-k8s-template
+qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --agent enabled=1,fstrim_cloned_disks=1 --name seichi-onp-k8s-template
 
 # import the downloaded disk to $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME storage
 qm importdisk $TEMPLATE_VMID jammy-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
