@@ -76,7 +76,7 @@ do
         ssh -n "${targetip}" qm move-disk "${vmid}" scsi0 "${BOOT_IMAGE_TARGET_VOLUME}" --delete true
 
         # resize disk (Resize after cloning, because it takes time to clone a large disk)
-        ssh -n "${targetip}" qm resize "${vmid}" scsi0 30G
+        ssh -n "${targetip}" qm resize "${vmid}" scsi0 100G
 
         # create snippet for cloud-init(user-config)
         # START irregular indent because heredoc
