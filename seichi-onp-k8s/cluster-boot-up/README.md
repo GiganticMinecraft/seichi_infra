@@ -64,7 +64,7 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
 2022/05/23現在、クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L14-L19)。
 
 クラスタの作成は以下のツール群で行っています。
-  - kubeadm, kubectl, kubelet v1.26.1
+  - kubeadm, kubectl, kubelet v1.27.1
 
 CNI には Cilium を利用しています。
 
