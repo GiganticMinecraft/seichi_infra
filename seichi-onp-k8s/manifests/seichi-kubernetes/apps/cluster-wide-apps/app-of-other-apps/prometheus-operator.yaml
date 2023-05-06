@@ -46,6 +46,7 @@ spec:
           defaultDashboardsTimezone: Asia/Tokyo
           plugins:
             - grafana-piechart-panel
+            - isovalent-hubble-datasource
           grafana.ini:
             log:
               level: warn
