@@ -12,31 +12,51 @@ spec:
     helm:
       releaseName: cilium
       values: |
+        containerRuntime:
+          integration: containerd
+          socketPath: /var/run/containerd/containerd.sock
         kubeProxyReplacement: strict
         k8sServiceHost: 192.168.18.100 # modify it if necessary
         k8sServicePort: 8443
+        pprof:
+          enabled: true
         loadBalancer:
           algorithm: maglev
         hubble:
           enabled: true
           relay:
             enabled: true
+            podDisruptionBudget:
+              enabled: true
+            pprof:
+              enabled: true
+            prometheus:
+              serviceMonitor:
+                enabled: true
+                labels:
+                  release: prometheus
           ui:
             enabled: true
           metrics:
             enabled:
-            - dns:query;ignoreAAAA
-            - drop
-            - tcp
-            - flow
-            - icmp
-            - http
-            - port-distribution
-            - policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelContext=source_namespace;destination_namespace
+              - dns:query;ignoreAAAA
+              - drop
+              - tcp
+              - flow
+              - icmp
+              - http
+              - port-distribution
+              - policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelContext=source_namespace;destination_namespace
+              - httpV2:sourceContext=workload-name|pod-name|reserved-identity;destinationContext=workload-name|pod-name|reserved-identity;labelsContext=source_namespace,destination_namespace,traffic_direction
+              - kafka:sourceContext=workload-name|pod-name|reserved-identity;destinationContext=workload-name|pod-name|reserved-identity;labelsContext=source_namespace,destination_namespace,traffic_direction
+            enableOpenMetrics: true
             serviceMonitor:
               enabled: true
               labels:
                 release: prometheus
+            dashboards:
+              enabled: true
+              namespace: monitoring
         operator:
           prometheus:
             enabled: true
@@ -44,6 +64,8 @@ spec:
               enabled: true
               labels:
                 release: prometheus
+          pprof:
+            enabled: true
         prometheus:
           enabled: true
           serviceMonitor:
