@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 COPY --link . .
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    go build -o /mod-downloader
+    go build -buildvcs=false -ldflags="-s -w" -trimpath -o /mod-downloader
 
 FROM gcr.io/distroless/static:nonroot
 
