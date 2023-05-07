@@ -29,6 +29,11 @@ spec:
             external-hostname: proxmox.onp.admin.seichi.click
             internal-authority: 192.168.1.154:8006
 
+          # Sentry
+          - name: sentry
+            external-hostname: sentry.onp.admin.seichi.click
+            internal-authority: 192.168.8.119:9000
+
           # Redmine
           - name: redmine
             external-hostname: redmine.seichi.click
