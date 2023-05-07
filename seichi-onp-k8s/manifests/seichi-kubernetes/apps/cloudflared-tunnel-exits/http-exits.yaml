@@ -40,7 +40,7 @@ spec:
           # Sentry
           - name: sentry
             external-hostname: sentry.onp.admin.seichi.click
-            internal-authority: 192.168.8.19:9000
+            internal-authority: "192.168.8.19:9000"
 
           # 各サーバーの Dynmap ウェブサーバー
           - name: dynmap-s1
