@@ -58,10 +58,10 @@ spec:
               default_timezone: Asia/Tokyo
             auth:
               disable_login_form: true
-              oauth_auto_login: true
             auth.github:
               enabled: true
               allow_sign_up: true
+              auto_login: true
               client_id: client_id
               client_secret: client_secret
               scopes: user:email,read:org
@@ -73,6 +73,11 @@ spec:
               cookie_secure: true
               strict_transport_security: true
               content_security_policy: true
+            log.frontend:
+              enabled: true
+              provider: sentry
+              sentry_dsn: https://17a38cb83525428b9d8834edd59e0cb7@sentry.onp.admin.seichi.click/5
+              sample_rate: 0.25
           deploymentStrategy:
             type: Recreate
           envFromSecret: "grafana-github-oauth-app-secret"
