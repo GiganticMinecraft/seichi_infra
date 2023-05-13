@@ -4,6 +4,10 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
 
 概要図は [`diagrams`](./diagrams) 以下で、 draw.io によってパース可能なsvgファイルとして管理されています。これらを編集する場合は [Draw.io VS Code Integration](https://github.com/hediet/vscode-drawio) の利用を推奨します。
 
+## 開発者向けデプロイガイド
+
+[DEPLOYMENT.md](./DEPLOYMENT.md) を参照してください。
+
 ## ディレクトリ構成
 
  - [`diagrams`](./diagrams/)

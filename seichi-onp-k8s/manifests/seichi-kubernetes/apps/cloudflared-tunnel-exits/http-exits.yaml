@@ -37,6 +37,11 @@ spec:
             external-hostname: hubble-ui.onp-k8s.admin.seichi.click
             internal-authority: "hubble-ui.kube-system:80"
 
+          # Sentry
+          - name: sentry
+            external-hostname: sentry.onp.admin.seichi.click
+            internal-authority: "192.168.8.19:9000"
+
           # 各サーバーの Dynmap ウェブサーバー
           - name: dynmap-s1
             external-hostname: s1.map.gigantic.seichi.click
@@ -69,6 +74,11 @@ spec:
           - name: seichi-ranking
             external-hostname: ranking-gigantic.seichi.click
             internal-authority: "192.168.3.1:80"
+
+          # phpMyAdmin
+          - name: phpmyadmin
+            external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
+            internal-authority: "phpmyadmin.seichi-minecraft:80"
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
@@ -78,7 +88,7 @@ spec:
       source:
         repoURL: https://giganticminecraft.github.io/seichi_infra
         chart: cloudflared-tunnel
-        targetRevision: "1.0.5"
+        targetRevision: "1.0.6"
         helm:
           # サービス一つに対してトンネルを一つずつ生やす
           releaseName: cloudflared-tunnel-http-exit--{{name}}

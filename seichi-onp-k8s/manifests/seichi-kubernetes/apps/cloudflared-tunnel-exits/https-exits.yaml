@@ -27,7 +27,7 @@ spec:
           # 自己署名証明書で保護されているため、 noTLSVerify で無視する。
           - name: proxmox
             external-hostname: proxmox.onp.admin.seichi.click
-            internal-authority: 192.168.1.150:8006
+            internal-authority: 192.168.1.154:8006
 
           # Redmine
           - name: redmine
@@ -43,7 +43,7 @@ spec:
       source:
         repoURL: https://giganticminecraft.github.io/seichi_infra
         chart: cloudflared-tunnel
-        targetRevision: "1.0.5"
+        targetRevision: "1.0.6"
         helm:
           # サービス一つに対してトンネルを一つずつ生やす
           releaseName: cloudflared-tunnel-https-exit--{{name}}

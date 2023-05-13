@@ -1,0 +1,110 @@
+awe:
+  version: 21
+  rendering:
+    interval: 15
+    talk-interval: 10
+    queue-max-size-hard: 100000000
+    queue-max-size-soft: 50000000
+    talk-cooldown: 5
+  dispatcher:
+    max-jobs: 2000
+    max-idle-runs: 200
+    max-time: 20
+  forceFlushBlocks: 10000
+  checkVersion: true
+  physicsFreez: true
+  strings: english.yml
+  blocksHub:
+    access:
+      isEnabled: false
+      allowNull: false
+      allowUnknown: true
+      allowConsole: true
+      allowOffline: false
+      isDcEnabled: false
+    log:
+      isEnabled: true
+      isDcEnabled: false
+  permissionGroups:
+    default:
+      isDefault: true
+      maxJobs: 1
+      cleanOnLogout: true
+      defaultMode: true
+      renderer:
+        blocks: 10000
+        time: 75
+      queue:
+        limit-hard: 500000
+        limit-soft: 250000
+      messages:
+        progress-bar: true
+        progress-chat: true
+        talkative: true
+        progress-bar-min: 100
+      disableUndo: false
+      worldedit:
+        maxBlockChanged: -1
+        disallowedBlocks:
+        - 6
+        - 7
+        - 14
+        - 15
+        - 16
+        - 26
+        - 27
+        - 28
+        - 29
+        - 39
+        - 31
+        - 32
+        - 33
+        - 34
+        - 36
+        - 37
+        - 38
+        - 39
+        - 40
+        - 46
+        - 50
+        - 51
+        - 56
+        - 59
+        - 69
+        - 73
+        - 74
+        - 75
+        - 76
+        - 77
+        - 81
+        - 83
+        historySize: 15
+        disallowedBlocksUsage:
+          patterns: true
+          blockSet: false
+  disabledOperations: []
+  permissions:
+    opHasAll: true
+    disableQueueBypass: true
+  memory:
+    minimumHard: 100000
+    minimumSoft: 150000
+    gcTimeout: 10000
+  undo:
+    memoryLowMain: cancel
+    memoryLow: wait
+    storeOnDisk: true
+    keepUndoFileFor: 0
+    keepSessionOnLogoutFor: 0
+    undoFileCleanupInterval: 30
+  directChunk:
+    autoRelight: true
+    newSectionLightLevel: 0
+    blockLightLevel: -1
+  overrides:
+    disableForWeApi: false
+    disableForConsole: false
+    disableForUnknown: false
+  messages:
+    debug: false
+    undoCleanup: 'on'

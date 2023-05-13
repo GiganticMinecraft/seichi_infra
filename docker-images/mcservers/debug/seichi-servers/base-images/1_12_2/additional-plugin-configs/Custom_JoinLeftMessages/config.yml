@@ -1,0 +1,29 @@
+# Custom JoinLeftMessages by IclearshOt                   
+# Plugin by IclearshOt ! Please visite my website on http://iclearshot.fr
+
+Default:
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''
+OP:
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''
+Rank1:
+  Permission: cjlm.rank1
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''
+Rank2:
+  Permission: cjlm.rank2
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''
+Rank3:
+  Permission: cjlm.rank3
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''
+Rank4:
+  Permission: cjlm.rank4
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''
+Rank5:
+  Permission: cjlm.rank5
+  JoinMessage: '&7%PLAYER &7がログインしました'
+  LeftMessage: ''

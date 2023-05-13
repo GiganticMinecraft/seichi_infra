@@ -1,0 +1,20 @@
+#
+# Welcome to the main settings file.
+#
+# For help, visit https://discord.gg/MMgtDwc
+# Report all bugs and issues at https://github.com/Tolmikarc/TownyMenu
+#
+
+# The prefix for messages from the plugin
+Prefix: "&b&lTM &7// "
+# The Language this plugin's messages will be run in. Check the localization folder for options
+Locale: en
+# The symbol used in messages for money
+Money_Symbol: "$"
+# How many milliseconds should an action take before the lag is logged to console
+Log_Lag_Over_Milis: 100
+
+# Do not touch below this line
+# ---------------------------------------------------------------
+Debug: []
+Version: 1

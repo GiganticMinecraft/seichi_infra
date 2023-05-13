@@ -1,0 +1,199 @@
+# ExpTimer v2.5.0
+# @author     ucchy
+# @license    LGPLv3
+# @copyright  Copyright ucchy 2014
+
+# デフォルトのタイマー設定です。defaultコンフィグは削除しないでください。
+default:
+  seconds: 600
+  readySeconds: 10
+  commandsOnStart: []
+  commandsOnMid: []
+  commandsOnEnd: []
+  consoleCommandsOnStart: []
+  consoleCommandsOnMid: []
+  consoleCommandsOnEnd: []
+  countdownOnStart: 3
+  countdownOnEnd: 5
+  runCommandsOnMidSeconds: []
+  restAlertSeconds: [60, 180, 300]
+  playSound: true
+  useExpBar: true
+  useSideBar: false
+  useBossBar: false
+  useTitle: false
+  endWithCTTeamDefeat: false
+  endWithCTLeaderDefeat: false
+  endWithCTKillTrophy: false
+  endWithTeamPointUnder: -99999
+  endWithTeamPointOver: 99999
+  announceToOnlyTeamMembers: false
+
+# 100秒のタイマー設定サンプルです。/timer start Timer1 で、実行することが可能です。
+# commandsOnStartにコマンドを設定すると、タイマー開始時に、
+# commandsOnEndにコマンドを設定すると、タイマー終了時に、
+# それぞれのコマンドが実行されます。
+Timer1:
+  seconds: 100
+  readySeconds: 10
+  commandsOnStart: ['say 今から100秒間、ハードモードになります！', 'difficulty 4']
+  commandsOnEnd: ['say ハードモード終了です！ピースフルに戻ります。', 'difficulty 0']
+
+# タイマー開始と同時にホワイトリストをオフにし、
+# タイマー終了と同時に全員キックしてホワイトリストをオンにするサンプルです。
+# コマンドブロックのコマンドパラメータ（@a や @p など）が使用可能です。
+# また、useSideBar、useBossBar を true に設定すると、それぞれ
+# サイドバー、ボスMOBの体力バーを、タイマーのゲージとして使用可能です。
+# （useBossBar を使用するには、BarAPIプラグインを別途導入してください。）
+Timer2:
+  seconds: 1200
+  readySeconds: 10
+  commandsOnStart: ['say server open!']
+  consoleCommandsOnStart: ['whitelist off']
+  commandsOnEnd: ['say game over!']
+  consoleCommandsOnEnd: ['kick @a', 'whitelist on']
+  countdownOnStart: 5
+  countdownOnEnd: 10
+  playSound: false
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+
+# commandsOnMidにコマンドを設定すると、
+# runCommandsOnMidSecondsで指定した時間に、コマンドが実行できます。
+# restAlertSecondsに時間を設定すると、
+# 指定した時間に「残り？秒です」というメッセージを表示することができます。
+Timer3:
+  seconds: 30
+  readySeconds: 0
+  commandsOnStart: ['say スタート！']
+  commandsOnMid: ['say ファイト！']
+  commandsOnEnd: ['say 終了！']
+  runCommandsOnMidSeconds: [10,20]
+  restAlertSeconds: [5,15,25]
+  countdownOnEnd: 3
+  useSideBar: true
+
+# 無限に繰り返されるタイマーのサンプルです。
+# nextConfigにタイマー設定名を指定すると、タイマー終了時にそのタイマー設定を起動することが可能です。
+# タイマー設定自身の設定名を指定すると、そのタイマー設定を無限に繰り返すことができます。
+# タイマーを停止するには、/timer end または /timer cancel を実行してください。
+infiniteTimer:
+  seconds: 20
+  readySeconds: 0
+  commandsOnStart: ['say スタート！']
+  countdownOnStart: 0
+  countdownOnEnd: 0
+  playSound: true
+  nextConfig: 'infiniteTimer'
+
+# Title表示を使ったタイマーのサンプルです。
+# Bukkit 1.8 以降のサーバーでしか効果が無いことにご注意ください。
+titleTimer:
+  seconds: 10
+  readySeconds: 5
+  commandsOnStart: ['say スタート！']
+  commandsOnEnd: ['say 終了！']
+  countdownOnStart: 3
+  countdownOnEnd: 5
+  useTitle: true
+
+# ColorTeamingと連携した場合の、タイマー設定のサンプルです。
+# endWithCTTeamDefeat→1チームを残して他のチームが全て全滅したとき
+# endWithCTLeaderDefeat→1チームを残して他のチームのリーダーが全て倒されたとき
+# endWithCTKillTrophy→既定のキル数を達成したとき
+# endWithTeamPointUnder→チームポイントが指定された値を下回ったとき
+# endWithTeamPointOver→チームポイントが指定された値を上回ったとき
+# に、自動的にタイマーが停止します。
+# また、commandsOnEnd と consoleCommandsOnEnd に、
+# 勝ったチームに置き換わるキーワード %winteam を使用できます。
+# タイマー時間切れで勝ちチームが決まらない場合は、%winteam を含んだコマンドは実行されません。
+ColorTeaming:
+  seconds: 150
+  readySeconds: 10
+  commandsOnStart: ['say バトル開始！！']
+  consoleCommandsOnStart: ['rc', 'cclass all knight', 'ctp all spawn']
+  commandsOnEnd: ['say バトル終了！！']
+  consoleCommandsOnEnd: ['clear @a', 'effect @a clear', 'cgive %winteam DIAMOND:5', 'ct removeall']
+  countdownOnStart: 3
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: true
+  endWithCTTeamDefeat: true
+  endWithCTLeaderDefeat: true
+  endWithCTKillTrophy: true
+  endWithTeamPointUnder: 0
+  endWithTeamPointOver: 3000
+
+stat1:
+  seconds: 60
+  readySeconds: 5
+  commandsOnStart: ['stat start']
+  commandsOnEnd: ['stat end']
+  countdownOnStart: 3
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+
+stat5:
+  seconds: 300
+  readySeconds: 5
+  consoleCommandsOnStart: ['/stat start']
+  consoleCommandsOnEnd: ['/stat end']
+  countdownOnStart: 5
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+
+stat10:
+  seconds: 600
+  readySeconds: 5
+  consoleCommandsOnStart: ['/stat start']
+  consoleCommandsOnEnd: ['/stat end']
+  countdownOnStart: 5
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+
+stat30:
+  seconds: 1800
+  readySeconds: 5
+  consoleCommandsOnStart: ['/stat start']
+  consoleCommandsOnEnd: ['/stat end']
+  countdownOnStart: 5
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+
+stat60:
+  seconds: 3600
+  readySeconds: 5
+  consoleCommandsOnStart: ['/stat start']
+  consoleCommandsOnEnd: ['/stat end']
+  countdownOnStart: 5
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+
+stat90:
+  seconds: 5400
+  readySeconds: 5
+  consoleCommandsOnStart: ['/stat start']
+  consoleCommandsOnEnd: ['/stat end']
+  countdownOnStart: 5
+  countdownOnEnd: 5
+  playSound: true
+  useExpBar: false
+  useSideBar: true
+  useBossBar: true
+

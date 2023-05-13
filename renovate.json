@@ -13,5 +13,16 @@
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
       "^seichi-onp-k8s/manifests/seichi-kubernetes/kustomize-bases/.+\\.yaml$"
     ]
-  }
+  },
+  "regexManagers": [
+    {
+      "fileMatch": ["^.github/workflows/build_mcserver_base_images.yaml$"],
+      "matchStrings": [
+        "- mcserver_base_image_tag: (?<currentValue>.*)\n\\s+mcserver_base_image_digest: \"(?<currentDigest>sha256:[a-f0-9]+)\""
+      ],
+      "depNameTemplate": "itzg/minecraft-server",
+      "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
+      "datasourceTemplate": "docker"
+    }
+  ]
 }

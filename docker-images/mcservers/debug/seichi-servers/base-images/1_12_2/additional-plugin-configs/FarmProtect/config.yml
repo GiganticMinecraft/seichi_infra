@@ -1,0 +1,9 @@
+# ================= [FarmProtect] ================== #
+# 
+# Copyright 2012 Licence LinCraft(?)
+# http://dev.bukkit.org/licenses/2049-lin-craft-license/
+# 
+# Multi world support?
+UpdateCheck: true
+AutoUpdate: false
+MultiWorld: false

@@ -1,0 +1,57 @@
+# https://github.com/BenWoodworth/FastCraft/wiki/Configuration
+language: EN
+default-enabled: true
+toolbar:
+  gap: true
+  layout:
+    page-prev: 0
+    page-next: 8
+    multiplier: 3
+    workbench: 4
+    refresh: 5
+  multiplier-order: 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64
+debug: false
+disable-recipes:
+  recipe-ids: []
+recipe-calculations:
+  max-tick-usage: 0.1
+player-defaults:
+  enabled: true
+layout:
+  height: 6
+  recipes:
+    row: 0
+    column: 0
+    width: 7
+    height: 6
+  buttons:
+    crafting-grid:
+      enable: true
+      item: minecraft:crafting_table
+      row: 0
+      column: 8
+    craft-amount:
+      enable: true
+      item: minecraft:anvil
+      row: 1
+      column: 8
+    refresh:
+      enable: true
+      item: minecraft:nether_star
+      row: 2
+      column: 8
+    page:
+      enable: true
+      item: minecraft:iron_sword
+      row: 5
+      column: 8
+  items:
+    custom-button-example:
+      enable: false
+      item: minecraft:stone_button
+      row: 3
+      column: 8
+      command: say $player pressed a custom button
+  background:
+    enable: false
+    item: minecraft:stained_glass_pane:8

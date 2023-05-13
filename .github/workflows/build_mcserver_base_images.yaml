@@ -1,0 +1,80 @@
+name: Build Minecraft Server Base Images
+on: 
+  push:
+    paths:
+      - ".github/workflows/build_mcserver_base_images.yaml"
+      - "docker-images/mcservers/base-server-image/**"
+
+env:
+  DOCKER_OUTPUT_IMAGE_NAME: ghcr.io/giganticminecraft/seichi_minecraft_server_base
+  DOCKER_BUILD_CONTEXT: ./docker-images/mcservers/base-server-image
+
+jobs:
+  build-image:
+    name: Build docker image (and publish on main)
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          # mcserver_base_image_tag / mcserver_base_image_digest:
+          #   itzg/minecraft-server のタグと digest 値。
+          #   これらの値は renovate によって更新したいため、
+          #     mcserver_base_image_tag / mcserver_base_image_digest そのものをリネームする必要があれば、
+          #     renovate.json も見直すこと。
+          #   また、 renovate に認識させるため、 [mcserver_base_image_tag, mcserver_base_image_digest] の順で
+          #     フィールドを記述すること。
+          # java_version_component_in_tag:
+          #   mcserver_base_image_tag に含まれる Java バージョンを含む文字列。
+          #   当ワークフローが生成する整地鯖の基底イメージは、タグとして
+          #     java_version_component_in_tag を含むように設定されている。
+          #   renovate に各サーバーのイメージ更新 PR を出してもらえるように、
+          #     各サーバーの基底イメージ指定は
+          #     java_version_component_in_tag + digest pinning で行うこととしている。
+          - mcserver_base_image_tag: 2022.15.0-java8-jdk
+            mcserver_base_image_digest: "sha256:8f3ee6b8ea88e1ab00c7bb3794cb439a0111743b7ad7df93a7e2d90f387d9c37"
+            java_version_component_in_tag: java8-jdk
+          - mcserver_base_image_tag: 2022.15.0-java17-jdk
+            mcserver_base_image_digest: "sha256:70300d50a8dc7c57f04b531e69a5926581ca6d8476d7091d838577c0df030bde"
+            java_version_component_in_tag: java17-jdk
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=upstreamVersion-${{ matrix.mcserver_base_image_tag }}-,suffix=,format=short
+            type=raw,value=upstreamVersion-${{ matrix.mcserver_base_image_tag }}
+            type=raw,value=1.0.0-${{ matrix.java_version_component_in_tag }}
+
+      - name: Build (and push if on main)
+        id: docker_build
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ env.DOCKER_BUILD_CONTEXT }}
+          builder: ${{ steps.buildx.outputs.name }}
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
+          cache-to: type=gha,mode=max
+          build-args: |
+            MCSERVER_BASE_IMAGE=itzg/minecraft-server:${{ matrix.mcserver_base_image_tag }}@${{ matrix.mcserver_base_image_digest }}

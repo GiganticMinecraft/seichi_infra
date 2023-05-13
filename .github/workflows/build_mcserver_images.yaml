@@ -1,0 +1,85 @@
+name: Build Minecraft Server Images
+on: 
+  push:
+    paths:
+      - ".github/workflows/build_mcserver_images.yaml"
+      - "docker-images/mcservers/**"
+
+jobs:
+  build-image:
+    name: Build docker image (and publish on main)
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          ###
+          # 本番サーバーのイメージ
+          #
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa
+            build_context: ./docker-images/mcservers/production/kagawa
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset
+            build_context: ./docker-images/mcservers/production/one-day-to-reset
+
+          ###
+          # デバッグサーバーのイメージ
+          #
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2
+            build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_12_2
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
+            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
+            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            image_definition:
+              - ${{ matrix.build_context }}/**
+
+      - id: should_build
+        run: |
+          echo "should_build=${{ matrix.force_build || steps.changes.outputs.image_definition }}" >> $GITHUB_OUTPUT
+
+      - if: steps.should_build.outputs.should_build == 'true'
+        name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - if: steps.should_build.outputs.should_build == 'true'
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: steps.should_build.outputs.should_build == 'true'
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=sha,prefix=sha-,suffix=,format=short
+            type=schedule,pattern={{date 'YYYYMMDD'}}
+
+      - if: steps.should_build.outputs.should_build == 'true'
+        name: Build (and push if on main)
+        id: docker_build
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ matrix.build_context }}
+          builder: ${{ steps.buildx.outputs.name }}
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
+          cache-to: type=gha,mode=max

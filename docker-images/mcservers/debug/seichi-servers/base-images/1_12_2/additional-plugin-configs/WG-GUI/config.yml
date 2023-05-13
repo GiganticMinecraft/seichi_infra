@@ -1,0 +1,9 @@
+# You may have to change some items (e.g. TOTEM) if you're running older versions!
+Items:
+  FlagItem: REDSTONE_TORCH_ON
+  RegionItem: END_CRYSTAL
+  WorldItem: GRASS
+  OwnerMemberItem: TOTEM
+  GUIItem:
+    Material: WATCH
+    Name: '&3&lWG-GUI'

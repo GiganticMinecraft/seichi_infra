@@ -1,0 +1,32 @@
+# 
+# AutoMessages configuration for UltimateChat:
+# 
+# You can use the placeholder {clicked} on "onclick" to get the name of player who clicked on message.
+# 
+# This is the default configuration:
+# 
+# interval: 60 #Interval in seconds.
+# silent: true #Do not log the messages on console?messages
+#   '0': #The index (order) to show the messages.
+#     minPlayers: 4 #Minimun players to show the message. Set to 0 to always send the message.
+#     text: Your plain text message here! #Plain text.
+#     hover: Your hover text message here! #Hover text.
+#     onclick: Command on click here! #On click text with placeholder {clicked} to show who clicked.
+#     suggest: Put the text to suggest on player chat on click.
+#     url: http://google.com # Some url to go on click. Need to have "http://" to url work.
+# 
+# *If you dont want hover message or click command, set to '' (blank quotes)
+
+
+enable: false
+silent: true
+interval: 60
+messages:
+  '0':
+    minPlayers: 4
+    text: This is UChat Automessage! Put your plain text message here!
+    hover: Your hover text message here!
+    onclick: Command on click here!
+    suggest: Text to suggest on click
+    url: http://google.com
+    permission: ''

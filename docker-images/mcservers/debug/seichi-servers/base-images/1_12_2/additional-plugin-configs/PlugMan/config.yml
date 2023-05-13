@@ -1,0 +1,11 @@
+# 
+# A list of plugins that we should ignore when doing enable, disable, restart, load, reload, and unload.
+use-metrics: true
+skip-on-reload:
+- Spout
+- dynmap
+- Essentials
+ignored-plugins:
+- PlugMan
+update-alerts: false
+updater-type: download

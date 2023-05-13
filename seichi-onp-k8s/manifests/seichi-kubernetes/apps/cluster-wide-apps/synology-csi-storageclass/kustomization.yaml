@@ -1,11 +1,27 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/controller.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/csi-driver.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/node.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/storage-class.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.0/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/controller.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/csi-driver.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/node.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/storage-class.yml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
+  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.1/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
 patchesStrategicMerge:
   - ./storageclass.yaml
+
+images:
+  - name: synology/synology-csi
+    newTag: latest
+  - name: k8s.gcr.io/sig-storage/csi-snapshotter
+    newName: registry.k8s.io/sig-storage/csi-snapshotter
+  - name: k8s.gcr.io/sig-storage/csi-provisioner
+    newName: registry.k8s.io/sig-storage/csi-provisioner
+  - name: k8s.gcr.io/sig-storage/csi-attacher
+    newName: registry.k8s.io/sig-storage/csi-attacher
+  - name: k8s.gcr.io/sig-storage/csi-resizer
+    newName: registry.k8s.io/sig-storage/csi-resizer
+  - name: k8s.gcr.io/sig-storage/csi-node-driver-registrar
+    newName: registry.k8s.io/sig-storage/csi-node-driver-registrar
+  - name: k8s.gcr.io/sig-storage/csi-snapshotter
+    newName: registry.k8s.io/sig-storage/csi-snapshotter

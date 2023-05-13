@@ -15,11 +15,13 @@ data:
       "player_disconnects": "true",
       "server_list_pings": "true",
       "managed_servers": "true",
+      "installed_network_plugins": "true",
       "online_players": "true",
-      "redis_player_connects": "false",
-      "redis_player_disconnects": "false",
-      "redis_online_players": "false",
-      "redis_bungee_online_proxies": "false"
+      "online_player_latency": "true",
+      "redis_player_connects": "true",
+      "redis_player_disconnects": "true",
+      "redis_online_players": "true",
+      "redis_bungee_online_proxies": "true"
     }
 
   BungeeHubCommand-config.yml: |

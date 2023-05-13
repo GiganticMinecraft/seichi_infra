@@ -1,0 +1,17 @@
+# ExpTimer v2.3.7
+# @author     ucchy
+# @license    LGPLv3
+# @copyright  Copyright ucchy 2014
+
+prefix: '&f[ExpTimer]'
+preStartSec: '&d開始まで %d秒'
+start: '&d開始！'
+rest300sec: '&d残り 5分です'
+rest180sec: '&d残り 3分です'
+rest60sec: '&d残り 1分です'
+preEndSec: '&d残り %d秒です'
+end: '&d終了！'
+onTeamWon: '%sチームの勝利です！'
+
+sidebarTitle: '&6残り時間'
+bossbarTitle: '&6残り時間 - %s'

@@ -20,9 +20,12 @@ terraform {
 }
 
 locals {
-  cloudflare_zone_id = "77c10fdfa7c65de4d14903ed8879ebcb"
-  root_domain        = "seichi.click"
-  github_org_name    = "GiganticMinecraft"
+  # NOTE: account_idとzone_idは非シークレット
+  # https://github.com/cloudflare/wrangler-legacy/issues/209#issuecomment-541654484
+  cloudflare_account_id = "9e9e88e2b19878c4a911c3c8a715a168"
+  cloudflare_zone_id    = "77c10fdfa7c65de4d14903ed8879ebcb"
+  root_domain           = "seichi.click"
+  github_org_name       = "GiganticMinecraft"
 }
 
 #region cloudflare provider
@@ -200,6 +203,28 @@ variable "minio_root_password" {
 
 #endregion
 
+#region credentials for newrelic agents
+
+variable "newrelic_licensekey" {
+  description = "newrelic licensekey"
+  type        = string
+  sensitive   = true
+}
+
+variable "newrelic_pixie_api_key" {
+  description = "newrelic pixie api key"
+  type        = string
+  sensitive   = true
+}
+
+variable "newrelic_pixie_chart_deploy_key" {
+  description = "newrelic pixie chart deploy key"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region on-premise minecraft config secrets
 
 variable "minecraft__discordsrv_bot_token" {
@@ -228,7 +253,17 @@ variable "minecraft__prod_game_db__password" {
 
 #endregion
 
-#region on-premise discord bot config secrets
+variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
+  description = "The url of Seichi Portal backend API"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
+  description = "The application cliend ID on Microsoft Azure Portal for Seichi Portal"
+  type        = string
+  sensitive   = true
+}
 
 variable "discord_bot__discord_spam_reporter__token" {
   description = "discord-spam-reporter bot token"

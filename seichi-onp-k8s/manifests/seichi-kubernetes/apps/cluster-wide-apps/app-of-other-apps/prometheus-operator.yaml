@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/prometheus-community/helm-charts.git
     path: charts/kube-prometheus-stack/crds/
-    targetRevision: kube-prometheus-stack-40.0.0
+    targetRevision: kube-prometheus-stack-45.0.0
     directory:
       recurse: true
   destination:
@@ -33,7 +33,7 @@ spec:
   source:
     chart: kube-prometheus-stack
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 40.1.0
+    targetRevision: 45.27.2
     helm:
       releaseName: prometheus
       skipCrds: true
@@ -46,6 +46,7 @@ spec:
           defaultDashboardsTimezone: Asia/Tokyo
           plugins:
             - grafana-piechart-panel
+            - isovalent-hubble-datasource
           grafana.ini:
             log:
               level: warn
@@ -57,10 +58,10 @@ spec:
               default_timezone: Asia/Tokyo
             auth:
               disable_login_form: true
-              oauth_auto_login: true
             auth.github:
               enabled: true
               allow_sign_up: true
+              auto_login: true
               client_id: client_id
               client_secret: client_secret
               scopes: user:email,read:org
@@ -68,10 +69,17 @@ spec:
               token_url: https://github.com/login/oauth/access_token
               api_url: https://api.github.com/user
               allowed_organizations: GiganticMinecraft
+              allow_assign_grafana_admin: true
+              role_attribute_path: contains(groups[*], '@GiganticMinecraft/onp-admin-proxmox') && 'GrafanaAdmin' || contains(groups[*], '@GiganticMinecraft/onp-admin-grafana') && 'Editor' || 'Viewer'
             security:
               cookie_secure: true
               strict_transport_security: true
               content_security_policy: true
+            log.frontend:
+              enabled: true
+              provider: sentry
+              sentry_dsn: https://17a38cb83525428b9d8834edd59e0cb7@sentry.onp.admin.seichi.click/5
+              sample_rate: 0.25
           deploymentStrategy:
             type: Recreate
           envFromSecret: "grafana-github-oauth-app-secret"
@@ -89,6 +97,7 @@ spec:
                 - name: Loki
                   type: loki
                   url: http://loki:3100
+                  isDefault: false
           dashboards:
             default:
               cilium-agent:
@@ -102,6 +111,10 @@ spec:
               cilium-hubble:
                 gnetId: 16613
                 revision: 1
+                datasource: Prometheus
+              cilium-verdicts:
+                gnetId: 18015
+                revision: 3
                 datasource: Prometheus
               argocd:
                 gnetId: 14584
@@ -125,6 +138,44 @@ spec:
             resources:
               requests:
                 memory: 2Gi
+            additionalScrapeConfigs:
+              - job_name: 'moco-controller'
+                kubernetes_sd_configs:
+                - role: pod
+                relabel_configs:
+                - source_labels: [__meta_kubernetes_namespace,__meta_kubernetes_pod_label_app_kubernetes_io_component,__meta_kubernetes_pod_container_port_name]
+                  action: keep
+                  regex: moco-system;moco-controller;metrics
+              - job_name: 'moco-agent'
+                kubernetes_sd_configs:
+                - role: pod
+                relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name,__meta_kubernetes_pod_container_port_name,__meta_kubernetes_pod_label_statefulset_kubernetes_io_pod_name]
+                  action: keep
+                  regex: mysql;agent-metrics;moco-.*
+                - source_labels: [__meta_kubernetes_namespace]
+                  action: replace
+                  target_label: namespace
+              - job_name: 'moco-mysql'
+                kubernetes_sd_configs:
+                - role: pod
+                relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name,__meta_kubernetes_pod_container_port_name,__meta_kubernetes_pod_label_statefulset_kubernetes_io_pod_name]
+                  action: keep
+                  regex: mysql;mysqld-metrics;moco-.*
+                - source_labels: [__meta_kubernetes_namespace]
+                  action: replace
+                  target_label: namespace
+                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+                  action: replace
+                  target_label: name
+                - source_labels: [__meta_kubernetes_pod_label_statefulset_kubernetes_io_pod_name]
+                  action: replace
+                  target_label: index
+                  regex: .*-([0-9])
+                - source_labels: [__meta_kubernetes_pod_label_moco_cybozu_com_role]
+                  action: replace
+                  target_label: role
         alertmanager:
           alertmanagerSpec:
             storage:
