@@ -2,6 +2,10 @@
   "extends": [
     "config:base"
   ],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths"
+  ],
   "argocd": {
     "fileMatch": [
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"
