@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -51,7 +52,8 @@ func main() {
 			return
 		}
 		fmt.Println("Downloading object:", object.Key)
-		err = minioClient.FGetObject(context.Background(), bucketName, prefixName+object.Key, downloadTargetDirPath+object.Key, minio.GetObjectOptions{})
+		// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
+		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, downloadTargetDirPath+strings.TrimPrefix(object.Key, prefixName), minio.GetObjectOptions{})
 		if err != nil {
 			fmt.Println(err)
 			return
