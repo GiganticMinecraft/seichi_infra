@@ -1,4 +1,7 @@
 FROM golang:1.20-bullseye as builder
+# Build
+ARG GOOS=linux
+ARG GOARCH=amd64
 WORKDIR /go/src
 COPY --link go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -7,7 +10,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 COPY --link . .
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    go build -buildvcs=false -ldflags="-s -w" -trimpath -o /mod-downloader
+    CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -buildvcs=false -ldflags="-s -w" -trimpath -o /mod-downloader
 
 FROM gcr.io/distroless/static:nonroot
 
