@@ -51,12 +51,20 @@ func main() {
 			fmt.Println(object.Err)
 			return
 		}
-		fmt.Println("Downloading object:", object.Key)
 		// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
-		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, downloadTargetDirPath+strings.TrimPrefix(object.Key, prefixName), minio.GetObjectOptions{})
+		filePathToSave := downloadTargetDirPath + strings.TrimPrefix(object.Key, prefixName)
+		fmt.Println("Downloading object:", object.Key)
+		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, filePathToSave, minio.GetObjectOptions{})
 		if err != nil {
 			fmt.Println(err)
 			return
+		}
+		// 保存したファイルの所有権をitzg/minecraftに渡す ref. https://github.com/itzg/docker-minecraft-server/issues/1583
+		err := os.Chown(filePathToSave, 1000, 1000)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("File ownership changed successfully")
 		}
 	}
 
