@@ -51,9 +51,9 @@ func main() {
 			fmt.Println(object.Err)
 			return
 		}
+		// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
 		filePathToSave := downloadTargetDirPath + strings.TrimPrefix(object.Key, prefixName)
 		fmt.Println("Downloading object:", object.Key)
-		// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
 		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, filePathToSave, minio.GetObjectOptions{})
 		if err != nil {
 			fmt.Println(err)
