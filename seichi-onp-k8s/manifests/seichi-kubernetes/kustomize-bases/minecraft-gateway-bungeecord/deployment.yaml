@@ -22,7 +22,7 @@ spec:
     spec:
       initContainers:
         - name: server-icon-downloader
-          image: busybox:1.36.0
+          image: busybox:1.36.1
           env:
             - name: SERVER_ICON_URL
               # https://github.com/GiganticMinecraft/branding/blob/01438e6d18c3a2824e39e73354ab4105c9e8a89c/server-icon.png
@@ -35,7 +35,7 @@ spec:
             - "-c"
             - 'wget -O /root/server-icon-download/server-icon.png "${SERVER_ICON_URL}"'
         - name: jmx-exporter-downloader
-          image: busybox:1.36.0
+          image: busybox:1.36.1
           env:
             - name: JMX_EXPORTER_URL
               value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar"

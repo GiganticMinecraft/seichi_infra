@@ -22,7 +22,7 @@ spec:
     spec:
       initContainers:
         - name: jmx-exporter-downloader
-          image: busybox:1.36.0
+          image: busybox:1.36.1
           env:
             - name: JMX_EXPORTER_URL
               value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar"
