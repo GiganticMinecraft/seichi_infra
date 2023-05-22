@@ -30,7 +30,8 @@ VM_LIST=(
 wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 
 # install qemu-guest-agent to image using libguestfs-tools
-apt install libguestfs-tools -y
+apt-get update
+apt-get install libguestfs-tools -y
 virt-customize -a jammy-server-cloudimg-amd64.img --install liburing2 --install qemu-guest-agent
 
 # create a new VM and attach Network Adaptor
