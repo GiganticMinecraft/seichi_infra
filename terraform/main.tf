@@ -8,6 +8,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.5.1"
+    }
   }
 
   cloud {
@@ -193,10 +197,35 @@ variable "onp_k8s_cloudflared_tunnel_credential" {
 
 #endregion
 
-#region on-premise MinIO root user password
+#region on-premise MinIO
 
 variable "minio_root_password" {
   description = "MinIO root password"
+  type        = string
+  sensitive   = true
+}
+
+variable "minio_prod_access_key" {
+  description = "MinIO access key in production environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minio_prod_access_secret" {
+  description = "MinIO access secret in production environment"
+  type        = string
+  sensitive   = true
+}
+
+
+variable "minio_debug_access_key" {
+  description = "MinIO access key in debug environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minio_debug_access_secret" {
+  description = "MinIO access secret in debug environment"
   type        = string
   sensitive   = true
 }
