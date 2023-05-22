@@ -138,44 +138,6 @@ spec:
             resources:
               requests:
                 memory: 2Gi
-            additionalScrapeConfigs:
-              - job_name: 'moco-controller'
-                kubernetes_sd_configs:
-                - role: pod
-                relabel_configs:
-                - source_labels: [__meta_kubernetes_namespace,__meta_kubernetes_pod_label_app_kubernetes_io_component,__meta_kubernetes_pod_container_port_name]
-                  action: keep
-                  regex: moco-system;moco-controller;metrics
-              - job_name: 'moco-agent'
-                kubernetes_sd_configs:
-                - role: pod
-                relabel_configs:
-                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name,__meta_kubernetes_pod_container_port_name,__meta_kubernetes_pod_label_statefulset_kubernetes_io_pod_name]
-                  action: keep
-                  regex: mysql;agent-metrics;moco-.*
-                - source_labels: [__meta_kubernetes_namespace]
-                  action: replace
-                  target_label: namespace
-              - job_name: 'moco-mysql'
-                kubernetes_sd_configs:
-                - role: pod
-                relabel_configs:
-                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name,__meta_kubernetes_pod_container_port_name,__meta_kubernetes_pod_label_statefulset_kubernetes_io_pod_name]
-                  action: keep
-                  regex: mysql;mysqld-metrics;moco-.*
-                - source_labels: [__meta_kubernetes_namespace]
-                  action: replace
-                  target_label: namespace
-                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
-                  action: replace
-                  target_label: name
-                - source_labels: [__meta_kubernetes_pod_label_statefulset_kubernetes_io_pod_name]
-                  action: replace
-                  target_label: index
-                  regex: .*-([0-9])
-                - source_labels: [__meta_kubernetes_pod_label_moco_cybozu_com_role]
-                  action: replace
-                  target_label: role
         alertmanager:
           alertmanagerSpec:
             storage:
