@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mariadb-operator
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: mariadb-operator
+    repoURL: https://mariadb-operator.github.io/mariadb-operator
+    targetRevision: 0.14.0
+    helm:
+      releaseName: mariadb-operator
+      values: |
+        metrics:
+          enabled: true
+        webhook:
+          certificate:
+            certManager: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mariadb-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
