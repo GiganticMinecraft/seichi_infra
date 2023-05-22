@@ -83,6 +83,38 @@ resource "kubernetes_secret" "minio_root_user" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "minio_prod_access_secret" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "minio-access-secret"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    "MINIO_ACCESS_KEY" = var.minio_prod_access_key
+    "MINIO_ACCESS_SECRET" = var.minio_prod_access_secret
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "minio_debug_access_secret" {
+  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
+
+  metadata {
+    name      = "minio-access-secret"
+    namespace = "seichi-debug-minecraft"
+  }
+
+  data = {
+    "MINIO_ACCESS_KEY" = var.minio_debug_access_key
+    "MINIO_ACCESS_SECRET" = var.minio_debug_access_secret
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "newrelic_credentials" {
   depends_on = [kubernetes_namespace.newrelic]
 

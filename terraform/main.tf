@@ -193,10 +193,35 @@ variable "onp_k8s_cloudflared_tunnel_credential" {
 
 #endregion
 
-#region on-premise MinIO root user password
+#region on-premise MinIO
 
 variable "minio_root_password" {
   description = "MinIO root password"
+  type        = string
+  sensitive   = true
+}
+
+variable "minio_prod_access_key" {
+  description = "MinIO access key in production environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minio_prod_access_secret" {
+  description = "MinIO access secret in production environment"
+  type        = string
+  sensitive   = true
+}
+
+
+variable "minio_debug_access_key" {
+  description = "MinIO access key in debug environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minio_debug_access_secret" {
+  description = "MinIO access secret in debug environment"
   type        = string
   sensitive   = true
 }
@@ -263,6 +288,34 @@ variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
 
 variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
   description = "The application cliend ID on Microsoft Azure Portal for Seichi Portal"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
+#region env variables for MariaDB
+
+variable "minecraft__prod_mariadb_root_password" {
+  description = "MariaDB root password in production environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minecraft__prod_mariadb_mcserver_password" {
+  description = "MariaDB mcserver password in production environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minecraft__debug_mariadb_root_password" {
+  description = "MariaDB root password in debug environment"
+  type        = string
+  sensitive   = true
+}
+
+variable "minecraft__debug_mariadb_mcserver_password" {
+  description = "MariaDB mcserver password in debug environment"
   type        = string
   sensitive   = true
 }
