@@ -64,7 +64,7 @@ data:
       millis: 4000
 
   RedisBungee-config.yml: |
-    # https://github.com/ProxioDev/RedisBungee/blob/0.10.1/RedisBungee-API/src/main/resources/config.yml
+    # https://github.com/ProxioDev/RedisBungee/blob/0.11.1/RedisBungee-API/src/main/resources/config.yml
 
     # RedisBungee configuration file.
     # Get Redis from http://redis.io/
