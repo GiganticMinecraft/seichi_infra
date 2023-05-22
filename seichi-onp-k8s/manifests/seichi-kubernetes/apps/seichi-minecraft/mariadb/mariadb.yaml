@@ -28,9 +28,7 @@ spec:
       podIndex: 0
       automaticFailover: true
       service:
-        type: LoadBalancer
-        annotations:
-          metallb.universe.tf/loadBalancerIPs: 172.18.0.130
+        type: ClusterIP
       connection:
         secretName: primary-mariadb-conn
         secretTemplate:
@@ -69,9 +67,6 @@ spec:
     storageClassName: synology-iscsi-storage
     accessModes:
       - ReadWriteOnce
-
-  service:
-    type: ClusterIP
 
   metrics:
     exporter:
