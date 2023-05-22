@@ -60,11 +60,15 @@ resource "kubernetes_secret" "onp_minecraft_prod_kagawa_secrets" {
 }
 
 resource "random_password" "minecraft__prod_mariadb_root_password" {
-  length = 64
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 resource "random_password" "minecraft__prod_mariadb_mcserver_password" {
-  length = 64
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
