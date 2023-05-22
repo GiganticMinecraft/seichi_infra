@@ -68,7 +68,7 @@ resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
   }
 
   data = {
-    "root-password" = var.minecraft__prod_mariadb_root_password
+    "root-password"     = var.minecraft__prod_mariadb_root_password
     "mcserver-password" = var.minecraft__prod_mariadb_mcserver_password
   }
 
@@ -84,7 +84,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   }
 
   data = {
-    "root-password" = var.minecraft__debug_mariadb_root_password
+    "root-password"     = var.minecraft__debug_mariadb_root_password
     "mcserver-password" = var.minecraft__debug_mariadb_mcserver_password
   }
 

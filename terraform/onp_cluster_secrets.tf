@@ -92,7 +92,7 @@ resource "kubernetes_secret" "minio_prod_access_secret" {
   }
 
   data = {
-    "MINIO_ACCESS_KEY" = var.minio_prod_access_key
+    "MINIO_ACCESS_KEY"    = var.minio_prod_access_key
     "MINIO_ACCESS_SECRET" = var.minio_prod_access_secret
   }
 
@@ -108,7 +108,7 @@ resource "kubernetes_secret" "minio_debug_access_secret" {
   }
 
   data = {
-    "MINIO_ACCESS_KEY" = var.minio_debug_access_key
+    "MINIO_ACCESS_KEY"    = var.minio_debug_access_key
     "MINIO_ACCESS_SECRET" = var.minio_debug_access_secret
   }
 
