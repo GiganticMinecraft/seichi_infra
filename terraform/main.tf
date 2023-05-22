@@ -8,6 +8,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.5.1"
+    }
   }
 
   cloud {
@@ -288,34 +292,6 @@ variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
 
 variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
   description = "The application cliend ID on Microsoft Azure Portal for Seichi Portal"
-  type        = string
-  sensitive   = true
-}
-
-#endregion
-
-#region env variables for MariaDB
-
-variable "minecraft__prod_mariadb_root_password" {
-  description = "MariaDB root password in production environment"
-  type        = string
-  sensitive   = true
-}
-
-variable "minecraft__prod_mariadb_mcserver_password" {
-  description = "MariaDB mcserver password in production environment"
-  type        = string
-  sensitive   = true
-}
-
-variable "minecraft__debug_mariadb_root_password" {
-  description = "MariaDB root password in debug environment"
-  type        = string
-  sensitive   = true
-}
-
-variable "minecraft__debug_mariadb_mcserver_password" {
-  description = "MariaDB mcserver password in debug environment"
   type        = string
   sensitive   = true
 }
