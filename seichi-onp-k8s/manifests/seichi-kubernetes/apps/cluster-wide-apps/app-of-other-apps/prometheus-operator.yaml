@@ -43,6 +43,9 @@ spec:
           create: true
           rules:
             kubeProxy: false
+            alertmanager: false
+        grafana:
+          enabled: false
         prometheus:
           prometheusSpec:
             storageSpec:
@@ -55,13 +58,7 @@ spec:
               requests:
                 memory: 2Gi
         alertmanager:
-          alertmanagerSpec:
-            storage:
-              volumeClaimTemplate:
-                spec:
-                  resources:
-                    requests:
-                      storage: 20Gi
+          enabled: false
         kubeProxy:
           enabled: false
         kubeEtcd:
