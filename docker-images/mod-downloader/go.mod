@@ -2,7 +2,7 @@ module github.com/GiganticMinecraft/mod-downloader
 
 go 1.20
 
-require github.com/minio/minio-go/v7 v7.0.54
+require github.com/minio/minio-go/v7 v7.0.55
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
