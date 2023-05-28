@@ -46,6 +46,6 @@ spec:
           cpu: 300m
           memory: 512Mi
     serviceMonitor:
-      prometheusRelease: kube-prometheus-stack
+      prometheusRelease: prometheus
       interval: 10s
       scrapeTimeout: 10s
