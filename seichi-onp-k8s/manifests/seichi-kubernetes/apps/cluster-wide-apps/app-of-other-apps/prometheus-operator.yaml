@@ -57,6 +57,7 @@ spec:
             resources:
               requests:
                 memory: 2Gi
+            retention: 60d
         alertmanager:
           enabled: false
         kubeProxy:
