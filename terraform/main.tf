@@ -232,28 +232,6 @@ variable "minio_debug_access_secret" {
 
 #endregion
 
-#region credentials for newrelic agents
-
-variable "newrelic_licensekey" {
-  description = "newrelic licensekey"
-  type        = string
-  sensitive   = true
-}
-
-variable "newrelic_pixie_api_key" {
-  description = "newrelic pixie api key"
-  type        = string
-  sensitive   = true
-}
-
-variable "newrelic_pixie_chart_deploy_key" {
-  description = "newrelic pixie chart deploy key"
-  type        = string
-  sensitive   = true
-}
-
-#endregion
-
 #region on-premise minecraft config secrets
 
 variable "minecraft__discordsrv_bot_token" {
