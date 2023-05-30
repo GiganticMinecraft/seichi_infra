@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: cluster-wide-apps
 resources:
   # descheduler
-  - github.com/kubernetes-sigs/descheduler/kubernetes/cronjob?ref=v0.27.0
+  - github.com/kubernetes-sigs/descheduler/kubernetes/cronjob?ref=v0.27.1
 
 patchesStrategicMerge:
   - ./patch-schedule.yaml
