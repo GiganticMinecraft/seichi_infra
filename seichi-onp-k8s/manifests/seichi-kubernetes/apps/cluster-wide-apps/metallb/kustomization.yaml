@@ -3,5 +3,5 @@ kind: Kustomization
 namespace: metallb-system
 
 resources:
-  - github.com/metallb/metallb/config/native?ref=v0.13.9
+  - github.com/metallb/metallb/config/native?ref=v0.13.10
   - ./metallb-address-pool.yaml
