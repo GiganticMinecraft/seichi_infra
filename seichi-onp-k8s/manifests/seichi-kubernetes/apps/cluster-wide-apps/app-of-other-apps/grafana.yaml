@@ -22,6 +22,10 @@ spec:
         grafana.ini:
           log:
             level: warn
+          log.frontend:
+            enabled: true
+            provider: sentry
+            sentry_dsn: https://f4ad337621934ce7babe78cea992e56b@sentry.onp.admin.seichi.click/8
           server:
             enforce_domain: true
             domain: grafana.onp-k8s.admin.seichi.click
