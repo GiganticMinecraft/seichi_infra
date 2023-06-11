@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: seichi-timed-stats-conifers-ingestor
+  namespace: seichi-minecraft
+spec:
+  # every 5 minutes
+  # https://crontab.guru/#*/5_0_*_*_*
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Replace
+  startingDeadlineSeconds: 240
+  jobTemplate:
+    spec:
+      backoffLimit: 5
+      template:
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+            - name: migration
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-bb9dcbd
+              env:
+                - name: DB_HOST_AND_PORT
+                  value: "mariadb:3306"
+                - name: DB_USER
+                  value: "seichi-timed-stats-conifers"
+                - name: DB_DATABASE_NAME
+                  value: "seichi-timed-stats-conifers"
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: seichi-timed-stats-conifers-db-credentials
+                      key: password
+          containers:
+            - name: ingestor
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-bb9dcbd
+              env:
+                - name: DB_HOST_AND_PORT
+                  value: "mariadb:3306"
+                - name: DB_USER
+                  value: "seichi-timed-stats-conifers"
+                - name: DB_DATABASE_NAME
+                  value: "seichi-timed-stats-conifers"
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: seichi-timed-stats-conifers-db-credentials
+                      key: password
