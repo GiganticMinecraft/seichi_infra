@@ -49,3 +49,7 @@ spec:
                       key: password
                 - name: GAME_DATA_SERVER_GRPC_ENDPOINT_URL
                   value: "http://seichi-game-data-server:80"
+                - name: RUST_LOG
+                  value: "debug,h2::codec::framed_read=info"
+                - name: RUST_BACKTRACE
+                  value: "1"
