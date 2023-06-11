@@ -4,14 +4,14 @@ metadata:
   name: seichi-timed-stats-conifers-ingestor
   namespace: seichi-minecraft
 spec:
-  # every 1 minutes
-  # https://crontab.guru/#*/1_0_*_*_*
-  schedule: "*/1 * * * *"
+  # every 5 minutes
+  # https://crontab.guru/#*/5_0_*_*_*
+  schedule: "*/5 * * * *"
   concurrencyPolicy: Replace
   startingDeadlineSeconds: 240
   jobTemplate:
     spec:
-      backoffLimit: 1
+      backoffLimit: 5
       template:
         spec:
           restartPolicy: OnFailure
