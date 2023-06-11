@@ -20,7 +20,7 @@ spec:
               image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-82ba78a
               env:
                 - name: DB_HOST_AND_PORT
-                  value: "mariadb:3306"
+                  value: "primary-mariadb:3306"
                 - name: DB_USER
                   value: "seichi-timed-stats-conifers"
                 - name: DB_DATABASE_NAME
@@ -35,7 +35,7 @@ spec:
               image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-82ba78a
               env:
                 - name: DB_HOST_AND_PORT
-                  value: "mariadb:3306"
+                  value: "primary-mariadb:3306"
                 - name: DB_USER
                   value: "seichi-timed-stats-conifers"
                 - name: DB_DATABASE_NAME
