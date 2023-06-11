@@ -45,3 +45,5 @@ spec:
                     secretKeyRef:
                       name: seichi-timed-stats-conifers-db-credentials
                       key: password
+                - name: GAME_DATA_SERVER_GRPC_ENDPOINT_URL
+                  value: "http://seichi-game-data-server:80"
