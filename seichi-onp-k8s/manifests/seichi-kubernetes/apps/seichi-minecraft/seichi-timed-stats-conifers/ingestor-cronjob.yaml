@@ -53,3 +53,7 @@ spec:
                   value: "debug,h2::codec::framed_read=info"
                 - name: RUST_BACKTRACE
                   value: "1"
+                - name: SENTRY_ENVIRONMENT_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
