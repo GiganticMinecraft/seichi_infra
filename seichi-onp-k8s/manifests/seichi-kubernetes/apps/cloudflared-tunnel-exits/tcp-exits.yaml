@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cloudflared-tunnel-tcp-exits
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        # 出口を生成するリスト。
+        # オンプレネットワーク内で TCP で公開されているサービスを外部に露出したい時は、
+        # このリストに
+        #   - トンネル名の suffix として使われる文字列 (name)
+        #   - 露出されるサービスが外部から見えるようになるドメイン (external-hostname)
+        #   - Pod から見た、サービスが公開されている authority ({{domain-name}}:{{port}} の形式の文字列) (internal-authority)
+        # の三つのプロパティを持つ要素を追加すればよい。
+        elements:
+          # seichi-game-data-server の gRPC endpoint。
+          # 2023/06 現在 Cloudflare tunnel が HTTP/2 をサポートしていないため、TCP サービスとして露出している。
+          # デバッグ用途の利用のみを想定しており、 Cloudflare でアクセス制御をしている。
+          # 
+          # TODO: できれば SeichiAssist と seichi-game-data-server を手軽にローカルで建てられるようにしたい…
+          #       2023/06 現状、 SeichiAssist はミニマルに建てようと思っても様々な設定を書く必要があり、
+          #       (seichi-game-data-server 含めて) 本番環境と同等のものをローカルで動かすまでが大変。
+          #       SeichiAssist 側に seichi-game-data-server までを含んだサービス群を一発で立ち上げる
+          #       Dockerfile ないし k8s manifest を置くなどすると良いのかもしれない
+          - name: game-data-server
+            external-hostname: game-data-server.readonly-internal.onp-k8s.admin.seichi.click
+            internal-authority: "seichi-game-data-server.seichi-minecraft:80"
+  template:
+    metadata:
+      name: "cloudflared-tunnel-tcp-exit--{{name}}"
+      namespace: argocd
+    spec:
+      project: cloudflared-tunnel-exits
+      source:
+        repoURL: https://giganticminecraft.github.io/seichi_infra
+        chart: cloudflared-tunnel
+        targetRevision: "1.0.7"
+        helm:
+          # サービス一つに対してトンネルを一つずつ生やす
+          releaseName: cloudflared-tunnel-tcp-exit--{{name}}
+          values: |
+            installationName: {{name}}
+            tunnelNamePrefix: "seichi-onp-k8s--tcp--"
+            tunnelCredentialSecretName: "cloudflared-tunnel-credential"
+            tunnelConfigContent: |
+              ingress:
+                - hostname: {{external-hostname}}
+                  service: "tcp://{{internal-authority}}"
+                # Catch-all service
+                - service: http_status:404
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: cloudflared-tunnel-exits
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m

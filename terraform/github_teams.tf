@@ -41,6 +41,12 @@ resource "github_team" "onp_admin_minio" {
   privacy     = "closed"
 }
 
+resource "github_team" "prod_seichi_minecraft_readonly_services_access" {
+  name        = "prod-seichi-minecraft-readonly-services-access"
+  description = "本番環境の read-only なサービスにアクセスできる Team"
+  privacy     = "closed"
+}
+
 resource "github_team" "onp_hubble_ui" {
   name        = "onp-hubble-ui"
   description = "Cilium Hubble UIに接続できるTeam"
