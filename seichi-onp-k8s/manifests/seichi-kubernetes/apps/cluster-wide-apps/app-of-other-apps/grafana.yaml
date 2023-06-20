@@ -46,11 +46,13 @@ spec:
             api_url: https://api.github.com/user
             allowed_organizations: GiganticMinecraft
             allow_assign_grafana_admin: true
-            role_attribute_path: contains(groups[*], '@GiganticMinecraft/onp-admin-proxmox') && 'GrafanaAdmin' || contains(groups[*], '@GiganticMinecraft/onp-admin-grafana') && 'Editor' || 'Viewer'
+            role_attribute_path: contains(groups[*], '@GiganticMinecraft/onp-admin-proxmox') && 'GrafanaAdmin' || 'Viewer'
           security:
             cookie_secure: true
             strict_transport_security: true
             content_security_policy: true
+          users:
+            viewers_can_edit: true
         deploymentStrategy:
           type: Recreate
         envFromSecret: "grafana-github-oauth-app-secret"
