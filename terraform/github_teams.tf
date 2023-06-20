@@ -35,6 +35,12 @@ resource "github_team" "onp_admin_proxmox" {
   privacy     = "closed"
 }
 
+resource "github_team" "onp_admin_raritan" {
+  name        = "onp-admin-raritan"
+  description = "オンプレミス環境のraritan(PDU)に接続できるTeam"
+  privacy     = "closed"
+}
+
 resource "github_team" "onp_admin_minio" {
   name        = "onp-admin-minio"
   description = "オンプレミス環境のminioに接続できるTeam"

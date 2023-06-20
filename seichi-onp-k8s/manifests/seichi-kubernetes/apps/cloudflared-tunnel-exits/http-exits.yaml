@@ -26,6 +26,11 @@ spec:
             external-hostname: grafana.onp.admin.seichi.click
             internal-authority: "192.168.3.20:3000"
 
+          # raritan(PDU)
+          - name: raritan
+            external-hostname: raritan.onp.admin.seichi.click
+            internal-authority: "192.168.19.200:80"
+
           # プライベートなminecraft pluginをアップロードするためのMinIO。
           # 肝心のオブジェクトストレージは seichi-private-plugin-blackhole-minio.minio:9000 にClusterIPでアクセスすればよい。
           - name: minio-console
