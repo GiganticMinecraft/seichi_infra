@@ -24,6 +24,4 @@ spec:
         - name: HTTP_PORT
           value: 9000
         - name: ENV_NAME
-          value: prod
-
-
+          value: production
