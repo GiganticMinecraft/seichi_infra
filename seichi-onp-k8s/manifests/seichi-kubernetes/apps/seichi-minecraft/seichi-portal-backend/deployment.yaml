@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: seichi-portal-backend
+  namespace: seichi-minecraft
+spec:
+  containers:
+    - name: seichi-portal-backend
+      image: ghcr.io/giganticminecraft/seichi-portal-backend:latest
+      env:
+        - name: MYSQL_DATABASE
+          value: seichi-portal
+        - name: MYSQL_USER
+          value: seichi-portal
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seichi-portal-db-credentials
+              key: password
+        - name: MYSQL_HOST
+          value: primary-mariadb
+        - name: MYSQL_PORT
+          value: 3306
+        - name: HTTP_PORT
+          value: 9000
+        - name: ENV_NAME
+          value: prod
+
+
