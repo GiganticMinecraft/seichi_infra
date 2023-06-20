@@ -1,0 +1,52 @@
+apiVersion: "secretgenerator.mittwald.de/v1alpha1"
+kind: "StringSecret"
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal-db-credentials
+spec:
+  forceRegenerate: false
+  fields:
+    - fieldName: "password"
+      encoding: "hex"
+      length: "32"
+
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal
+spec:
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: seichi-portal-db-credentials
+    key: password
+
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal
+spec:
+  mariaDbRef:
+    name: mariadb
+  characterSet: utf8
+  collate: utf8_general_ci
+
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal
+spec:
+  mariaDbRef:
+    name: mariadb
+  privileges:
+    - "ALL"
+  database: "seichi-portal"
+  table: "*"
+  username: "seichi-portal"
+  grantOption: false
