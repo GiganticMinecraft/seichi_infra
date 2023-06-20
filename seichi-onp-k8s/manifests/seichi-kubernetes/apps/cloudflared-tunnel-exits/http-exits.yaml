@@ -70,6 +70,11 @@ spec:
             external-hostname: seichi-game-data.public-gigantic-api.seichi.click
             internal-authority: "seichi-game-data-publisher-cache-proxy.seichi-minecraft:80"
 
+          # 整地サーバーのフォームを置き換えるポータルサイトのバックエンドAPI。
+          - name: seichi-portal-backend
+            external-hostname: portal.public-gigantic-api.seichi.click
+            internal-authority: "seichi-portal-backend.seichi-minecraft:80"
+
           # SeichiRanking の web サーバー。
           - name: seichi-ranking
             external-hostname: ranking-gigantic.seichi.click
