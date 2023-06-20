@@ -22,8 +22,6 @@ spec:
   passwordSecretKeyRef:
     name: seichi-portal-db-credentials
     key: password
-  # This field is immutable and defaults to 10
-  maxUserConnections: 20
 
 ---
 apiVersion: mariadb.mmontes.io/v1alpha1
