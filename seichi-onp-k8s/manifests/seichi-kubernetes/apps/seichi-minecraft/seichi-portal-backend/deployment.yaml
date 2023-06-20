@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
     - name: seichi-portal-backend
-      image: ghcr.io/giganticminecraft/seichi-portal-backend:latest
+      image: ghcr.io/giganticminecraft/seichi-portal-backend:main-0c396fd
       env:
         - name: MYSQL_DATABASE
           value: seichi-portal
