@@ -3,7 +3,7 @@ resource "cloudflare_page_rule" "global" {
   priority = 1
   # 全サブドメイン配下の全パスについて適用する
   # https://developers.cloudflare.com/support/page-rules/understanding-and-configuring-cloudflare-page-rules-page-rules-tutorial/#helpful-tips
-  target   = "*_${local.root_domain}/*"
+  target = "*_${local.root_domain}/*"
 
   actions {
     # https://github.com/GiganticMinecraft/seichi_infra/issues/1094#issuecomment-1599150661
