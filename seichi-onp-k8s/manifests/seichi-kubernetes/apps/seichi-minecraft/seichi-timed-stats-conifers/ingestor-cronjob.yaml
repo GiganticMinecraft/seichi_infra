@@ -17,7 +17,7 @@ spec:
           restartPolicy: OnFailure
           initContainers:
             - name: migration
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-5d357e2
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-3454134
               env:
                 - name: DB_HOST_AND_PORT
                   value: "primary-mariadb:3306"
@@ -32,7 +32,7 @@ spec:
                       key: password
           containers:
             - name: ingestor
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-5d357e2
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-3454134
               env:
                 - name: DB_CONNECTION_HOST_AND_PORT
                   value: "primary-mariadb:3306"
