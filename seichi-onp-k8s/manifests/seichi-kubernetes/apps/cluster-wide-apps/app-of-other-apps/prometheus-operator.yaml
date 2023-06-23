@@ -44,7 +44,12 @@ spec:
           rules:
             kubeProxy: false
             alertmanager: false
+        loki:
+          isDefault: false
         grafana:
+          sidecar:
+            datasources:
+              enabled: true
           defaultDashboardsTimezone: Asia/Tokyo
           plugins:
             - grafana-piechart-panel
