@@ -45,7 +45,96 @@ spec:
             kubeProxy: false
             alertmanager: false
         grafana:
-          enabled: false
+          defaultDashboardsTimezone: Asia/Tokyo
+          plugins:
+            - grafana-piechart-panel
+            - isovalent-hubble-datasource
+          grafana.ini:
+            log:
+              level: warn
+            server:
+              enforce_domain: true
+              domain: grafana.onp-k8s.admin.seichi.click
+              root_url: https://%(domain)s/
+            date_formats:
+              default_timezone: Asia/Tokyo
+            auth:
+              disable_login_form: true
+            auth.github:
+              enabled: true
+              allow_sign_up: true
+              auto_login: true
+              client_id: client_id
+              client_secret: client_secret
+              scopes: user:email,read:org
+              auth_url: https://github.com/login/oauth/authorize
+              token_url: https://github.com/login/oauth/access_token
+              api_url: https://api.github.com/user
+              allowed_organizations: GiganticMinecraft
+              allow_assign_grafana_admin: true
+              role_attribute_path: contains(groups[*], '@GiganticMinecraft/onp-admin-proxmox') && 'GrafanaAdmin' || 'Viewer'
+            security:
+              cookie_secure: true
+              strict_transport_security: true
+              content_security_policy: true
+            users:
+              viewers_can_edit: true
+          deploymentStrategy:
+            type: Recreate
+          envFromSecret: "grafana-github-oauth-app-secret"
+          persistence:
+            enabled: true
+            size: 10Gi
+          datasources:
+            datasources.yaml:
+              apiVersion: 1
+              datasources:
+                - name: Prometheus
+                  type: prometheus
+                  url: http://prometheus-kube-prometheus-prometheus:9090
+                  isDefault: true
+                - name: Loki
+                  type: loki
+                  url: http://loki:3100
+                  isDefault: false
+          dashboardProviders:
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+                - name: 'addons'
+                  orgId: 2
+                  folder: ''
+                  type: file
+                  allowUiUpdates: true
+                  disableDeletion: true
+                  editable: false
+                  options:
+                    path: /var/lib/grafana/dashboards/addons
+          dashboards:
+            addons:
+              cilium-agent:
+                gnetId: 16611
+                revision: 1
+                datasource: Prometheus
+              cilium-operator:
+                gnetId: 16612
+                revision: 1
+                datasource: Prometheus
+              cilium-hubble:
+                gnetId: 16613
+                revision: 1
+                datasource: Prometheus
+              argocd:
+                gnetId: 14584
+                revision: 1
+              synology-details:
+                gnetId: 14284
+                revision: 9
+                datasource: Prometheus
+              synology-overview:
+                gnetId: 14364
+                revision: 8
+                datasource: Prometheus
         prometheus:
           prometheusSpec:
             storageSpec:

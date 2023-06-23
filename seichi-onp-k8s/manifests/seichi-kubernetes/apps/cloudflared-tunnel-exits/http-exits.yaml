@@ -18,7 +18,7 @@ spec:
           # grafana側でGitHub-SSO認証が掛かっているため、Cloudflare のレイヤではアクセス制御はしていない。
           - name: grafana-k8s
             external-hostname: grafana.onp-k8s.admin.seichi.click
-            internal-authority: "grafana.monitoring:80"
+            internal-authority: "prometheus-grafana.monitoring:80"
 
           # オンプレにもともとあった Grafana。
           # grafana側でGitHub-SSO認証が掛かっているため、Cloudflare のレイヤではアクセス制御はしていない。
