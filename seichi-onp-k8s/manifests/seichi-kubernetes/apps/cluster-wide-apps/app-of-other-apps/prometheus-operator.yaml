@@ -102,44 +102,6 @@ spec:
                   type: loki
                   url: http://loki:3100
                   isDefault: false
-          dashboardProviders:
-            dashboardproviders.yaml:
-              apiVersion: 1
-              providers:
-                - name: 'addons'
-                  orgId: 2
-                  folder: ''
-                  type: file
-                  allowUiUpdates: true
-                  disableDeletion: true
-                  editable: false
-                  options:
-                    path: /var/lib/grafana/dashboards/addons
-          dashboards:
-            addons:
-              cilium-agent:
-                gnetId: 16611
-                revision: 1
-                datasource: Prometheus
-              cilium-operator:
-                gnetId: 16612
-                revision: 1
-                datasource: Prometheus
-              cilium-hubble:
-                gnetId: 16613
-                revision: 1
-                datasource: Prometheus
-              argocd:
-                gnetId: 14584
-                revision: 1
-              synology-details:
-                gnetId: 14284
-                revision: 9
-                datasource: Prometheus
-              synology-overview:
-                gnetId: 14364
-                revision: 8
-                datasource: Prometheus
         prometheus:
           prometheusSpec:
             storageSpec:
