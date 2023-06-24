@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 FROM debian:bullseye-slim
 
-LABEL org.opencontainers.image.authors="Kohei Ota <kela@inductor.me>"
+LABEL org.opencontainers.image.authors="outductor <inductor.kela+seichi@gmail.com>"
 LABEL org.opencontainers.image.url="https://github.com/GiganticMinecraft/seichi_infra"
 LABEL org.opencontainers.image.source="https://github.com/GiganticMinecraft/seichi_infra/blob/main/docker-images/mod-downloader/Dockerfile"
 

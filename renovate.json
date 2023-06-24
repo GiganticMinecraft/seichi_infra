@@ -3,7 +3,7 @@
     "config:base"
   ],
   "timezone": "Asia/Tokyo",
-  "reviewers": ["inductor"],
+  "reviewers": ["outductor"],
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths"
