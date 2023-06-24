@@ -114,3 +114,39 @@ resource "kubernetes_secret" "minio_debug_access_secret" {
 
   type = "Opaque"
 }
+
+resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "kubernetes_secret" "onp_minecraft_grafana_mariadb_monitoring_password" {
+  depends_on = [kubernetes_namespace.onp_monitoring]
+
+  metadata {
+    name      = "mariadb-monitoring"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "monitoring-password" = random_password.minecraft__prod_mariadb_monitoring_password.result
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "onp_minecraft_prod_mariadb_monitoring_password" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "mariadb-monitoring"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    "monitoring-password" = random_password.minecraft__prod_mariadb_monitoring_password.result
+  }
+
+  type = "Opaque"
+}

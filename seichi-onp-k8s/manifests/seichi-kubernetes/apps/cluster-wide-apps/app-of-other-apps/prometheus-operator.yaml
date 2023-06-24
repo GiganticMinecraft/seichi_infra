@@ -86,6 +86,11 @@ spec:
               viewers_can_edit: true
           deploymentStrategy:
             type: Recreate
+          envValueFrom:
+            MARIADB_MONITORING_PASSWORD:
+              secretKeyRef:
+                name: mariadb-monitoring
+                key: monitoring-password
           envFromSecret: "grafana-github-oauth-app-secret"
           persistence:
             enabled: true
@@ -102,6 +107,12 @@ spec:
                   type: loki
                   url: http://loki:3100
                   isDefault: false
+                - name: MariaDB
+                  type: mysql
+                  url: mariadb.seichi-minecraft:3306
+                  isDefault: false
+                  user: monitoring
+                  password: ${MARIADB_MONITORING_PASSWORD}
         prometheus:
           prometheusSpec:
             storageSpec:
