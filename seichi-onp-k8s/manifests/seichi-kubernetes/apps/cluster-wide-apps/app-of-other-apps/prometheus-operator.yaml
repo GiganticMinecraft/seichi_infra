@@ -113,7 +113,7 @@ spec:
                   isDefault: false
                   user: monitoring
                   secureJsonData:
-                    password: ${GRAFANA_MYSQL_PASSWORD}
+                    password: ${MARIADB_MONITORING_PASSWORD}
         prometheus:
           prometheusSpec:
             storageSpec:
