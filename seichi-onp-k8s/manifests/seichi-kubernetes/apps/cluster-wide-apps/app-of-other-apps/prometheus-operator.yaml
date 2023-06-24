@@ -112,7 +112,8 @@ spec:
                   url: mariadb.seichi-minecraft:3306
                   isDefault: false
                   user: monitoring
-                  password: ${MARIADB_MONITORING_PASSWORD}
+                  secureJsonData:
+                    password: ${MARIADB_MONITORING_PASSWORD}
         prometheus:
           prometheusSpec:
             storageSpec:
