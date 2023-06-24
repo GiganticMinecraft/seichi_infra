@@ -23,6 +23,8 @@ spec:
     name: mariadb
   privileges:
     - "SELECT"
+    - "SHOW DATABASES"
+    - "SHOW VIEW"
   database: "*"
   table: "*"
   username: "monitoring"
