@@ -54,6 +54,8 @@ spec:
           plugins:
             - grafana-piechart-panel
             - isovalent-hubble-datasource
+            - pyroscope-datasource
+            - pyroscope-panel
           grafana.ini:
             log:
               level: warn
@@ -109,7 +111,7 @@ spec:
                   isDefault: false
                 - name: Pyroscope
                   type: pyroscope
-                  url: http://pyroscope-server:4040
+                  url: http://pyroscope:4040
                   isDefault: false
                 - name: MariaDB
                   type: mysql
