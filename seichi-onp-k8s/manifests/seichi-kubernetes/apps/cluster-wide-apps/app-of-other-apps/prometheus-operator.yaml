@@ -56,8 +56,7 @@ spec:
           plugins:
             - grafana-piechart-panel
             - isovalent-hubble-datasource
-            - pyroscope-datasource
-            - pyroscope-panel
+            - grafana-sentry-datasource
           grafana.ini:
             log:
               level: warn
@@ -110,10 +109,6 @@ spec:
                 - name: Loki
                   type: loki
                   url: http://loki:3100
-                  isDefault: false
-                - name: Pyroscope
-                  type: Pyroscope
-                  url: http://pyroscope:4040
                   isDefault: false
                 - name: MariaDB
                   type: mysql
