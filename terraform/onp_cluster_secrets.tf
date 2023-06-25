@@ -118,7 +118,7 @@ resource "kubernetes_secret" "minio_debug_access_secret" {
 resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   length           = 16
   special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  override_special = "!#$%&*-_=+[]{}<>:?"
 }
 
 resource "kubernetes_secret" "onp_minecraft_grafana_mariadb_monitoring_password" {
