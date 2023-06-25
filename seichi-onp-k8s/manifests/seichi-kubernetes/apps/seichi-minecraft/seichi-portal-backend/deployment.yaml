@@ -17,7 +17,7 @@ spec:
     spec:  
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:main-96addef
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:main-7a49766
           resources:
             requests:
               cpu: 250m
