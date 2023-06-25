@@ -112,7 +112,7 @@ spec:
                   url: http://loki:3100
                   isDefault: false
                 - name: Pyroscope
-                  type: pyroscope
+                  type: Pyroscope
                   url: http://pyroscope:4040
                   isDefault: false
                 - name: MariaDB
