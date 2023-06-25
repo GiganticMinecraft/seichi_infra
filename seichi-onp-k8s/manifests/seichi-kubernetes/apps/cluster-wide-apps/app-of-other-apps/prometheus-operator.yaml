@@ -107,6 +107,10 @@ spec:
                   type: loki
                   url: http://loki:3100
                   isDefault: false
+                - name: Pyroscope
+                  type: pyroscope
+                  url: http://pyroscope-server:4040
+                  isDefault: false
                 - name: MariaDB
                   type: mysql
                   url: mariadb.seichi-minecraft:3306
