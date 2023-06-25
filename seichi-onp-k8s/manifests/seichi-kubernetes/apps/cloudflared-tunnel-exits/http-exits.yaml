@@ -42,6 +42,11 @@ spec:
             external-hostname: hubble-ui.onp-k8s.admin.seichi.click
             internal-authority: "hubble-ui.kube-system:80"
 
+          # pyroscope
+          - name: pyroscope
+            external-hostname: pyroscope.onp-k8s.admin.seichi.click
+            internal-authority: "pyroscope.monitoring:4040"
+
           # Sentry
           - name: sentry
             external-hostname: sentry.onp.admin.seichi.click
