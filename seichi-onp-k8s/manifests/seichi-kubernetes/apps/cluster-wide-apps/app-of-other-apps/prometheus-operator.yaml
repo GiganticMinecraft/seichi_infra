@@ -49,7 +49,9 @@ spec:
         grafana:
           sidecar:
             datasources:
+              enabled: false
               defaultDatasourceEnabled: false
+              isDefaultDatasource: false
           defaultDashboardsTimezone: Asia/Tokyo
           plugins:
             - grafana-piechart-panel
