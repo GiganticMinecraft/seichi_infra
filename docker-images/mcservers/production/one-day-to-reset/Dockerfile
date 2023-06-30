@@ -1,6 +1,6 @@
 FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:6469483fa46be1dc0c28b6296b3b3f00691f39e4a503613ccae5c4adbbd08cc5
 
-ENV VERSION="1.19.2"
+ENV VERSION="1.20.1"
 ENV DIFFICULTY="normal"
 
 # プラグインリスト
