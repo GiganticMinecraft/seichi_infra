@@ -24,6 +24,14 @@ resource "cloudflare_record" "github_pages" {
   ttl     = 1 # automatic
 }
 
+resource "cloudflare_record" "github_pages" {
+  zone_id = local.cloudflare_zone_id
+  name    = "cmd"
+  value = "giganticminecraft.github.io"
+  type = "CNAME"
+  ttl = 1 # automatic
+}
+
 resource "cloudflare_record" "portal" {
   zone_id = local.cloudflare_zone_id
   name    = "portal"
