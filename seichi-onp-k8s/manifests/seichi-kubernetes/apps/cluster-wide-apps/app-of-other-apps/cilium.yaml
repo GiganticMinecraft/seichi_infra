@@ -24,6 +24,8 @@ spec:
           algorithm: maglev
         hubble:
           enabled: true
+          tls:
+            enabled: false
           relay:
             enabled: true
             podDisruptionBudget:
@@ -35,6 +37,9 @@ spec:
                 enabled: true
                 labels:
                   release: prometheus
+            tls:
+              server:
+                enabled: false
           ui:
             enabled: true
           metrics:
@@ -46,7 +51,7 @@ spec:
               - icmp
               - http
               - port-distribution
-              - httpV2:exemplars=true;labelsContext=source_ip
+              # - httpV2:exemplars=true;labelsContext=source_ip
               - source_namespace
               - source_workload
               - destination_ip
