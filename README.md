@@ -18,14 +18,7 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
    - オンプレ環境の k8s クラスタの定義を管理するディレクトリ。詳細は [README](./seichi-onp-k8s/README.md) を参照してください。
 
  - [`terraform`](./terraform/)
-   - [Terraform Cloud](https://app.terraform.io/app/GiganticMinecraft/workspaces/seichi_infra) に管理させているインフラ全般の設定です。
-   - 2022/03/18現在、 Terraform Cloud 管理下にある設定および定義は以下の通りです
-     - GitHub Teamsの定義
-     - Cloudflare周りの設定
-       - 証明書の管理
-       - GitHub Teamsを用いたアクセス制御の定義
-     - オンプレ環境の k8s クラスタ上の一部リソースの管理
-       - 現時点では主に `Secret` リソースと `Namespace` リソースだけ Terraform で管理している
+   - Terraformを用いて一部のインフラを管理しており、それらの設定はすべてこのディレクトリで管理されています。詳細は [README](./terraform/README.md) を参照してください。
 
  - [`util-scripts`](./util-scripts/)
    - サーバーなどが利用できるように組まれた雑多なインストールスクリプト等を管理しています。
