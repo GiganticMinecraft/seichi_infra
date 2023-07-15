@@ -85,11 +85,6 @@ spec:
             external-hostname: portal.public-gigantic-api.seichi.click
             internal-authority: "seichi-portal-backend.seichi-minecraft:80"
 
-          # SeichiRanking の web サーバー。
-          - name: seichi-ranking
-            external-hostname: ranking-gigantic.seichi.click
-            internal-authority: "192.168.3.1:80"
-
           # phpMyAdmin
           - name: phpmyadmin
             external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
