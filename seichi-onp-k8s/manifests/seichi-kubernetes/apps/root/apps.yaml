@@ -31,6 +31,7 @@ spec:
           allowEmpty: true
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
         retry:
           limit: -1
           backoff:
@@ -71,6 +72,7 @@ spec:
           allowEmpty: true
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
         retry:
           limit: -1
           backoff:
@@ -111,6 +113,7 @@ spec:
           allowEmpty: true
         syncOptions:
           - CreateNamespace=true
+          - ServerSideApply=true
         retry:
           limit: -1
           backoff:
