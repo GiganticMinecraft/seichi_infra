@@ -8,7 +8,7 @@ spec:
   source:
     chart: redis
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 17.11.8
+    targetRevision: 17.13.2
     helm:
       releaseName: seichi-redisbungee-redis
       values: |
