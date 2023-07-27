@@ -15,9 +15,6 @@ spec:
         kubeProxyReplacement: strict
         k8sServiceHost: 192.168.18.100 # modify it if necessary
         k8sServicePort: 8443
-        preflight:
-          # -- Enable Cilium pre-flight resources (required for upgrade)
-          enabled: true
         pprof:
           enabled: true
         loadBalancer:
@@ -77,6 +74,7 @@ spec:
             enabled: true
         prometheus:
           enabled: true
+          trustCRDsExist: true
           serviceMonitor:
             enabled: true
             labels:
