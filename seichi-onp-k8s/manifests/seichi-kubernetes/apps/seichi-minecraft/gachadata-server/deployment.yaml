@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gachadata-server
+  namespace: seichi-minecraft
+  labels:
+    app: gachadata-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gachadata-server
+  template:
+    metadata:
+      labels:
+        app: gachadata-server
+    spec:  
+      containers:
+        - name: gachadata-server
+          image: ghcr.io/giganticminecraft/gachadata-server:sha-beab594
+          resources:
+            requests:
+              cpu: 250m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          env:
+            - name: MYSQL_USER
+              value: mc-server
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: GAME_DB_PASSWORD
+            - name: MYSQL_HOST
+              value: "192.168.2.186"
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: HTTP_PORT
+              value: "80"
