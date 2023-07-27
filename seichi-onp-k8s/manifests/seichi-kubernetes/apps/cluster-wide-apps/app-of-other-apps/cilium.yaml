@@ -22,9 +22,17 @@ spec:
         hubble:
           enabled: true
           tls:
-            enabled: false
+            enabled: true
+            auto:
+              enabled: true
+              method: certmanager
+              certManagerIssuerRef:
+                group: cert-manager.io
+                kind: ClusterIssuer
+                name: ca-issuer
           relay:
             enabled: true
+            rollOutPods: true
             podDisruptionBudget:
               enabled: true
             pprof:
@@ -39,6 +47,7 @@ spec:
                 enabled: false
           ui:
             enabled: true
+            rollOutPods: true
           metrics:
             enabled:
               - dns:query;ignoreAAAA
