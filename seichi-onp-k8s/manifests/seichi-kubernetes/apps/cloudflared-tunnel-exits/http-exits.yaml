@@ -85,6 +85,11 @@ spec:
             external-hostname: portal.public-gigantic-api.seichi.click
             internal-authority: "seichi-portal-backend.seichi-minecraft:80"
 
+          # gachadata.sqlを公開するためのエンドポイント。
+          - name: gachadata-server
+            external-hostname: gachadata.public-gigantic-api.seichi.click
+            internal-authority: "gachadata-server.seichi-minecraft:80"
+
           # phpMyAdmin
           - name: phpmyadmin
             external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
