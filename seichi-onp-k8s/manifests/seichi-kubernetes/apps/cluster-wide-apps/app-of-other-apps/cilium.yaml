@@ -12,12 +12,12 @@ spec:
     helm:
       releaseName: cilium
       values: |
-        containerRuntime:
-          integration: containerd
-          socketPath: /var/run/containerd/containerd.sock
         kubeProxyReplacement: strict
         k8sServiceHost: 192.168.18.100 # modify it if necessary
         k8sServicePort: 8443
+        preflight:
+          # -- Enable Cilium pre-flight resources (required for upgrade)
+          enabled: true
         pprof:
           enabled: true
         loadBalancer:
