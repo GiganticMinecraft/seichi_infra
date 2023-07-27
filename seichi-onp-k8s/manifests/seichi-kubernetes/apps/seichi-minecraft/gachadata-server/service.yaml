@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: seichi-minecraft
+  name: gachadata-server
+spec:
+  type: ClusterIP
+  ports:
+    - name: gachadata-server-web
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: gachadata-server
