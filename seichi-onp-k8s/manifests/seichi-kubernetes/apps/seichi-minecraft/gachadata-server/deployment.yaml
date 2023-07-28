@@ -27,7 +27,7 @@ spec:
               memory: 256Mi
           env:
             - name: MYSQL_USER
-              value: mc-server
+              value: mcserver
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
