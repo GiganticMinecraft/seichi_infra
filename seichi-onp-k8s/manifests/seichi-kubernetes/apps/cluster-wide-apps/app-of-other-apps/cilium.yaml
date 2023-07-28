@@ -22,14 +22,14 @@ spec:
         hubble:
           enabled: true
           tls:
-            enabled: true
-            auto:
-              enabled: true
-              method: certmanager
-              certManagerIssuerRef:
-                group: cert-manager.io
-                kind: ClusterIssuer
-                name: ca-issuer
+            enabled: false # todo: eventually enable tls as it's not a good manner
+            # auto:
+            #   enabled: true
+            #   method: certmanager
+            #   certManagerIssuerRef:
+            #     group: cert-manager.io
+            #     kind: ClusterIssuer
+            #     name: ca-issuer
           relay:
             enabled: true
             rollOutPods: true
