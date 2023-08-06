@@ -16,7 +16,7 @@ spec:
       values: |
         persistence:
           enabled: true
-          size: 20Gi
+          size: 50Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
