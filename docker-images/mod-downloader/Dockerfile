@@ -1,4 +1,5 @@
-FROM golang:1.21-bullseye as builder
+# syntax=docker/dockerfile:1.4
+FROM golang:1.21-bookworm as builder
 # Build
 ARG GOOS=linux
 ARG GOARCH=amd64
@@ -12,7 +13,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -buildvcs=false -ldflags="-s -w" -trimpath -o /mod-downloader
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.authors="outductor <inductor.kela+seichi@gmail.com>"
 LABEL org.opencontainers.image.url="https://github.com/GiganticMinecraft/seichi_infra"
