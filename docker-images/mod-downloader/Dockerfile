@@ -1,4 +1,4 @@
-FROM golang:1.20-bullseye as builder
+FROM golang:1.21-bullseye as builder
 # Build
 ARG GOOS=linux
 ARG GOARCH=amd64
