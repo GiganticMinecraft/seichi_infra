@@ -29,7 +29,7 @@ jobs:
   build-image:
     name: Build docker image (and publish on master)
     needs: [lint-and-test]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         working-directory: docker-images/mod-downloader
