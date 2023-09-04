@@ -1,0 +1,6 @@
+- name: Wait 1200 seconds (20 minutes) for target connection to become reachable/usable
+  wait_for_connection:
+    timeout: 1200
+
+- name: Gather facts for first time
+  setup:
