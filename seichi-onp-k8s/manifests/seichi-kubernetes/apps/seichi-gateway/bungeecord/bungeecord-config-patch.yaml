@@ -37,24 +37,12 @@ data:
         address: 192.168.1.187:25574
         restricted: false
         motd: ''
-      h1:
-        address: 192.168.1.187:25567
-        restricted: false
-        motd: ''
-      spade:
-        address: 192.168.1.187:25501
-        restricted: false
-        motd: ''
       reset:
         address: mcserver--one-day-to-reset.seichi-minecraft:25565
         restricted: false
         motd: ''
       kagawa:
         address: mcserver--kagawa.seichi-minecraft:25565
-        restricted: false
-        motd: ''
-      petra:
-        address: 192.168.1.187:25585
         restricted: false
         motd: ''
 
