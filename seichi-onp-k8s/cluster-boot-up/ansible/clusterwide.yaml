@@ -1,4 +1,10 @@
 ---
+- name: 00-wait-to-host-reachable
+  hosts: k8s-servers
+  gather_facts: no
+  roles:
+    - 00-wait-to-host-reachable
+
 - name: 01-ssh-keygen
   hosts: k8s-servers-cp-leader-with-ssh
   roles:
