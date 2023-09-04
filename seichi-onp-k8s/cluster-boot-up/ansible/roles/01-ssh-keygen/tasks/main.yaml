@@ -1,0 +1,9 @@
+- name: mkdir .ssh
+  become: yes
+  file: dest=/root/.ssh/ state=directory owner=root group=root
+
+- name: generate ssh-key
+  become: yes
+  openssh_keypair:
+    path: /root/.ssh/id_ed25519
+    type: ed25519

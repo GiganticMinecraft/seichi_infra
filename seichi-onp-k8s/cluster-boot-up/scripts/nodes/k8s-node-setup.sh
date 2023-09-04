@@ -369,3 +369,17 @@ discovery:
     token: "$KUBEADM_BOOTSTRAP_TOKEN"
     unsafeSkipCAVerification: true
 EOF
+
+# install ansible
+sudo apt-get install -y ansible git sshpass
+
+# clone repo
+git clone -b "${TARGET_BRANCH}" https://github.com/GiganticMinecraft/seichi_infra.git "$HOME"/seichi_infra
+
+# export ansible.cfg target
+export ANSIBLE_CONFIG="$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/ansible.cfg
+
+# run ansible-playbook
+ansible-galaxy role install -r "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/roles/requirements.yaml
+ansible-galaxy collection install -r "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/roles/requirements.yaml
+ansible-playbook -i "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/inventory "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/site.yaml

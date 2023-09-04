@@ -1,0 +1,5 @@
+- name: Copy kubeconfig file
+  shell: |
+    mkdir -p ~/.kube
+    sudo cp /etc/kubernetes/admin.conf ~/.kube/config
+    sudo chown cloudinit:cloudinit ~/.kube/config
