@@ -1,0 +1,26 @@
+- name: Copy file
+  ansible.builtin.copy:
+    src: /root/.ssh/id_ed25519.pub
+    dest: /home/cloudinit/.ssh/id_ed25519.pub
+
+- name: Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: cloudinit
+    state: present
+    key: "{{ lookup('file', '/home/cloudinit/.ssh/id_ed25519.pub') }}"
+
+- name: Configure sshd
+  become: yes
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regex: "^(#)?{{item.key}}"
+    line: "{{item.key}} {{item.value}}"
+    state: present
+  loop:
+    - { key: "PermitRootLogin", value: "no" }
+    - { key: "PasswordAuthentication", value: "no" } 
+ 
+- name: restart sshd
+  become: yes
+  service: name=sshd state=restarted
+ 
