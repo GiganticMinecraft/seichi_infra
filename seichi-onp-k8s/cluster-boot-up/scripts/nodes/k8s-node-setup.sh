@@ -92,10 +92,10 @@ sudo apt-get update && sudo apt-get install -y containerd.io
 sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
 
-if grep -q "systemd_cgroup = false" "/etc/containerd/config.toml"; then
+if grep -q "SystemdCgroup = true" "/etc/containerd/config.toml"; then
 echo "Config found, skip rewriting..."
 else
-sed -i -e "s/systemd_cgroup \= false/systemd_cgroup \= true/g" /etc/containerd/config.toml
+sed -i -e "s/SystemdCgroup \= false/SystemdCgroup \= true/g" /etc/containerd/config.toml
 fi
 
 sudo systemctl restart containerd
