@@ -400,29 +400,29 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
     ```sh
     # unchama-sv-prox01上に存在するクラスタを構成するVMを停止する
-    ssh 192.168.16.150 qm stop 1001
-    ssh 192.168.16.150 qm stop 1101
+    ssh 192.168.16.151 qm stop 1001
+    ssh 192.168.16.151 qm stop 1101
     # unchama-sv-prox02上に存在するクラスタを構成するVMを停止する
-    ssh 192.168.16.151 qm stop 1002
-    ssh 192.168.16.151 qm stop 1102
+    ssh 192.168.16.153 qm stop 1002
+    ssh 192.168.16.153 qm stop 1102
     # unchama-sv-prox04上に存在するクラスタを構成するVMを停止する
-    ssh 192.168.16.153 qm stop 1003
-    ssh 192.168.16.153 qm stop 1103
+    ssh 192.168.16.154 qm stop 1003
+    ssh 192.168.16.154 qm stop 1103
     ```
 
  1. **proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、クラスタを構成するVMを削除します。
 
     ```sh
     # unchama-sv-prox01上に存在するクラスタを構成するVMを削除する
-    ssh 192.168.16.150 qm destroy 9050 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.150 qm destroy 1001 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.150 qm destroy 1101 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.151 qm destroy 9050 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.151 qm destroy 1001 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.151 qm destroy 1101 --destroy-unreferenced-disks true --purge true
     # unchama-sv-prox02上に存在するクラスタを構成するVMを削除する
-    ssh 192.168.16.151 qm destroy 1102 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.151 qm destroy 1002 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.153 qm destroy 1102 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.153 qm destroy 1002 --destroy-unreferenced-disks true --purge true
     # unchama-sv-prox04上に存在するクラスタを構成するVMを削除する
-    ssh 192.168.16.153 qm destroy 1003 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.153 qm destroy 1103 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.154 qm destroy 1003 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.154 qm destroy 1103 --destroy-unreferenced-disks true --purge true
     ```
 
 ### クラスタの削除後、クラスタの再作成に失敗する場合
@@ -440,7 +440,7 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
     1. その後、**proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、残ったデバイスを削除します。
 
        ```sh
-       for host in 192.168.16.150 192.168.16.151 192.168.16.153 ; do
+       for host in 192.168.16.151 192.168.16.153 192.168.16.154 ; do
          ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--cloudinit
          ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1002--cloudinit
          ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1003--cloudinit
