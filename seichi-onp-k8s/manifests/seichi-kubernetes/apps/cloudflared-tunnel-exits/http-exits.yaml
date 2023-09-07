@@ -103,7 +103,7 @@ spec:
       source:
         repoURL: https://giganticminecraft.github.io/seichi_infra
         chart: cloudflared-tunnel
-        targetRevision: "1.0.7"
+        targetRevision: "1.0.8"
         helm:
           # サービス一つに対してトンネルを一つずつ生やす
           releaseName: cloudflared-tunnel-http-exit--{{name}}
