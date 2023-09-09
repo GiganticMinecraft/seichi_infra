@@ -24,20 +24,22 @@ spec:
   replicas: 3
 
   replication:
+    enabled: true
     primary:
       podIndex: 0
       automaticFailover: true
-      service:
-        type: ClusterIP
-      connection:
-        secretName: primary-mariadb-conn
-        secretTemplate:
-          key: dsn
     replica:
       waitPoint: AfterSync
       connectionTimeout: 10s
       connectionRetries: 10
       syncTimeout: 10s
+
+  primaryService:
+    type: ClusterIP
+  primaryConnection:
+    secretName: primary-mariadb-conn
+    secretTemplate:
+      key: dsn
 
   affinity:
     podAntiAffinity:
