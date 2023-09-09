@@ -36,7 +36,7 @@ spec:
                   name: seichi-portal-db-credentials
                   key: password
             - name: MYSQL_HOST
-              value: primary-mariadb
+              value: mariadb-primary
             - name: MYSQL_PORT
               value: "3306"
             - name: HTTP_PORT
