@@ -2,5 +2,10 @@
   wait_for_connection:
     timeout: 1200
 
+- name: Wait until the file /usr/bin/kubeadm is present before continuing
+  ansible.builtin.wait_for:
+    path: /usr/bin/kubeadm
+    timeout: 1200
+
 - name: Gather facts for first time
   setup:
