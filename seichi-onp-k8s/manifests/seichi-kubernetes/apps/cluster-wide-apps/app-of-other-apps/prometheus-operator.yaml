@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/prometheus-community/helm-charts.git
     path: charts/kube-prometheus-stack/charts/crds/
-    targetRevision: kube-prometheus-stack-50.2.0
+    targetRevision: kube-prometheus-stack-51.0.2
     directory:
       recurse: true
   destination:
@@ -35,7 +35,7 @@ spec:
   source:
     chart: kube-prometheus-stack
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 50.3.1
+    targetRevision: 51.0.2
     helm:
       releaseName: prometheus
       skipCrds: true
