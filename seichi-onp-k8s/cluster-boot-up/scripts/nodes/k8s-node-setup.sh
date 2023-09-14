@@ -118,8 +118,8 @@ sysctl --system
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 apt-get update
-apt-get install -y kubelet=1.27.5-00 kubeadm=1.27.5-00 kubectl=1.27.5-00
-apt-mark hold kubelet kubeadm kubectl
+apt-get install -y kubeadm kubelet=1.27.5-00 kubectl=1.27.5-00
+apt-mark hold kubelet kubectl
 
 # Disable swap
 swapoff -a
@@ -265,10 +265,11 @@ esac
 
 # Set kubeadm bootstrap token using openssl
 KUBEADM_BOOTSTRAP_TOKEN=$(openssl rand -hex 3).$(openssl rand -hex 8)
+KUBEADM_LOCAL_ENDPOINT=$(ip -4 addr show ens19 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | awk 'NR==1{print $1}')
 
 # Set init configuration for the first control plane
 cat > "$HOME"/init_kubeadm.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 bootstrapTokens:
 - token: "$KUBEADM_BOOTSTRAP_TOKEN"
@@ -276,8 +277,16 @@ bootstrapTokens:
   ttl: "24h"
 nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
+  kubeletExtraArgs:
+    node-ip: "$KUBEADM_LOCAL_ENDPOINT"
+	imagePullPolicy: "IfNotPresent"
+localAPIEndpoint:
+	advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
+	bindPort: 6443
+skipPhases:
+  - addon/kube-proxy
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 networking:
   serviceSubnet: "10.96.0.0/16"
@@ -304,6 +313,7 @@ controllerManager:
 scheduler:
   extraArgs:
     bind-address: "0.0.0.0"
+clusterName: "unchama-cloud"
 
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -340,10 +350,15 @@ kind: KubeletConfiguration
 cgroupDriver: "systemd"
 protectKernelDefaults: true
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: JoinConfiguration
 nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
+  kubeletExtraArgs:
+    node-ip: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
+localAPIEndpoint:
+	advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
+	bindPort: 6443
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
@@ -360,10 +375,12 @@ kind: KubeletConfiguration
 cgroupDriver: "systemd"
 protectKernelDefaults: true
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: JoinConfiguration
 nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
+  kubeletExtraArgs:
+    node-ip: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
