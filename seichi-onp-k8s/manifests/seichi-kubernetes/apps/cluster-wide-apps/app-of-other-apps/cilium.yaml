@@ -20,58 +20,58 @@ spec:
         loadBalancer:
           algorithm: maglev
         hubble:
-          enabled: true
-          tls:
-            enabled: false # todo: eventually enable tls as it's not a good manner
-            # auto:
-            #   enabled: true
-            #   method: certmanager
-            #   certManagerIssuerRef:
-            #     group: cert-manager.io
-            #     kind: ClusterIssuer
-            #     name: ca-issuer
-          relay:
-            enabled: true
-            rollOutPods: true
-            podDisruptionBudget:
-              enabled: true
-            pprof:
-              enabled: true
-            prometheus:
-              serviceMonitor:
-                enabled: true
-                labels:
-                  release: prometheus
-            tls:
-              server:
-                enabled: false
-          ui:
-            enabled: true
-            rollOutPods: true
-          metrics:
-            enabled:
-              - dns:query;ignoreAAAA
-              - drop
-              - tcp
-              - flow
-              - icmp
-              - http
-              - port-distribution
-              # - httpV2:exemplars=true;labelsContext=source_ip
-              - source_namespace
-              - source_workload
-              - destination_ip
-              - destination_namespace
-              - destination_workload
-              - traffic_direction
-            enableOpenMetrics: true
-            serviceMonitor:
-              enabled: true
-              labels:
-                release: prometheus
-            dashboards:
-              enabled: true
-              namespace: monitoring
+          enabled: false # disable for now
+          # tls:
+          #   enabled: false # todo: eventually enable tls as it's not a good manner
+          #   # auto:
+          #   #   enabled: true
+          #   #   method: certmanager
+          #   #   certManagerIssuerRef:
+          #   #     group: cert-manager.io
+          #   #     kind: ClusterIssuer
+          #   #     name: ca-issuer
+          # relay:
+          #   enabled: true
+          #   rollOutPods: true
+          #   podDisruptionBudget:
+          #     enabled: true
+          #   pprof:
+          #     enabled: true
+          #   prometheus:
+          #     serviceMonitor:
+          #       enabled: true
+          #       labels:
+          #         release: prometheus
+          #   tls:
+          #     server:
+          #       enabled: false
+          # ui:
+          #   enabled: true
+          #   rollOutPods: true
+          # metrics:
+          #   enabled:
+          #     - dns:query;ignoreAAAA
+          #     - drop
+          #     - tcp
+          #     - flow
+          #     - icmp
+          #     - http
+          #     - port-distribution
+          #     # - httpV2:exemplars=true;labelsContext=source_ip
+          #     - source_namespace
+          #     - source_workload
+          #     - destination_ip
+          #     - destination_namespace
+          #     - destination_workload
+          #     - traffic_direction
+          #   enableOpenMetrics: true
+          #   serviceMonitor:
+          #     enabled: true
+          #     labels:
+          #       release: prometheus
+          #   dashboards:
+          #     enabled: true
+          #     namespace: monitoring
         operator:
           prometheus:
             enabled: true
