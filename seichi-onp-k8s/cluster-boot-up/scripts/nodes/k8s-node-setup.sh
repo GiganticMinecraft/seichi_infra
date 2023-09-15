@@ -279,10 +279,10 @@ nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
   kubeletExtraArgs:
     node-ip: "$KUBEADM_LOCAL_ENDPOINT"
-	imagePullPolicy: "IfNotPresent"
+    imagePullPolicy: "IfNotPresent"
 localAPIEndpoint:
-	advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
-	bindPort: 6443
+  advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
+  bindPort: 6443
 skipPhases:
   - addon/kube-proxy
 ---
@@ -357,8 +357,8 @@ nodeRegistration:
   kubeletExtraArgs:
     node-ip: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
 localAPIEndpoint:
-	advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
-	bindPort: 6443
+  advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
+  bindPort: 6443
 discovery:
   bootstrapToken:
     apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
