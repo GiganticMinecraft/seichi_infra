@@ -118,7 +118,7 @@ sysctl --system
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 apt-get update
-apt-get install -y kubeadm kubelet=1.27.5-00 kubectl=1.27.5-00
+apt-get install -y kubeadm kubelet=1.27.6-00 kubectl=1.27.6-00
 apt-mark hold kubelet kubectl
 
 # Disable swap
@@ -291,7 +291,7 @@ kind: ClusterConfiguration
 networking:
   serviceSubnet: "10.96.0.0/16"
   podSubnet: "10.128.0.0/16"
-kubernetesVersion: "v1.27.5"
+kubernetesVersion: "v1.27.6"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
