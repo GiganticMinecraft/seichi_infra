@@ -1,0 +1,82 @@
+# BlackScarx All right reserved
+# The list of the stairs
+#     - acacia_stairs
+#     - birch_wood_stairs
+#     - brick_stairs
+#     - cobblestone_stairs
+#     - dark_oak_stairs
+#     - jungle_wood_stairs
+#     - nether_brick_stairs
+#     - quartz_stairs
+#     - red_sandstone_stairs
+#     - sandstone_stairs
+#     - smooth_stairs
+#     - spruce_wood_stairs
+#     - wood_stairs
+#     - purpur_stairs
+# The list of the slabs
+#     - stone_slab
+#     - sandstone_slab
+#     - cobblestone_slab
+#     - bricks_slab
+#     - stone_bricks_slab
+#     - nether_brick_slab
+#     - quartz_slab
+#     - oak_wood_slab
+#     - spruce_wood_slab
+#     - brich_wood_slab
+#     - jungle_wood_slab
+#     - acacia_wood_slab
+#     - dark_oak_wood_slab
+#     - red_sandstone_slab
+#     - purpur_slab
+
+Update Checker: true
+Use permission for sit: false
+Enable Stairs Block:
+- acacia_stairs
+- birch_wood_stairs
+- brick_stairs
+- cobblestone_stairs
+- dark_oak_stairs
+- jungle_wood_stairs
+- nether_brick_stairs
+- quartz_stairs
+- red_sandstone_stairs
+- sandstone_stairs
+- smooth_stairs
+- spruce_wood_stairs
+- wood_stairs
+- purpur_stairs
+Use slab: false
+Enable Slab Block:
+- stone_slab
+- sandstone_slab
+- cobblestone_slab
+- bricks_slab
+- stone_bricks_slab
+- nether_brick_slab
+- quartz_slab
+- oak_wood_slab
+- spruce_wood_slab
+- brich_wood_slab
+- jungle_wood_slab
+- acacia_wood_slab
+- dark_oak_wood_slab
+- red_sandstone_slab
+- purpur_slab
+Send message when player sit: false
+Send message when player standing: false
+Send message if the chairs is already occupied: false
+Send message if the word is disable: false
+Disable world:
+- example1
+- example2
+AutoTurn: true
+Distance of the stairs: 2
+Need to sign or chair on each side: false
+Send message if the Chairs need sign or chair: false
+No item in hand: true
+Regen need permission: false
+Regen when sit: false
+Amplifier: 1

@@ -1,0 +1,100 @@
+# LagMonitor main config
+
+# If this option is enabled, this plugin will check for events which should run on the main
+# thread. If this not the cause the plugin will throw an exception to inform you. Therefore
+# you can detect thread-safety issues which could end up in ConcurrentModificationExceptions
+# or other issues.
+thread-safety-check: true
+
+# Check peridically if a server (especially a plugin) is doing block I/O operations on the main Thread.
+# Operations like SQL-, HTTP-Request, File or Scoket-Connections should be performed in a seperate Thread.
+# If this is not the case, the server will wait for the response and therefore causes lags.
+thread-block-detection: false
+
+# This does the same as the option above, but is more performant by as a proxy. This means it can only check for
+# Socket connections -> HTTP, SQL, but not for file operations
+socket-block-detection: true
+
+# This is a more efficient system as the method above (thread-block detection)
+# By setting a new security manager we can receive the operations above as events and don't have
+# to check it peridically.
+# Warning: this may override the existing security manager which could be set by your hoster
+securityMangerBlockingCheck: false
+
+# If you see something like: "Server is performing a blocking socket connection ..." and then a long list with "at .."
+# It's proparly one of the four features above. The last part is the stacktrace. 
+# This can help developers where their was running in order to find the source.
+# 
+# If the developer is unreachable and it's too spamy for you can deactivite it here. Then you still get the warning
+# but you don't see the stacktrace.
+hideStacktrace: false
+
+# Show the warning from above only once per plugin
+oncePerPlugin: false
+
+# By hooking into the network management of Minecraft we can read how many bytes
+# the server is receiving or is sending.
+traffic-counter: true
+
+# With this options it's possible to access more native features of the OS like:
+# * CPU MHZ
+# * File reads/writes (per second or since startup)
+# * Network download/upload (per second or since startup)
+# * OS uptime
+# * Network adapter speed
+# * RAM cache
+# * CPU i/o wait percentage
+#
+# This makes it possible to use graphs also for these infos. Similar to the Ubuntu util:
+# System load indicator: http://i.imgur.com/sxTfTjB.png
+#
+# Download it from here: https://support.hyperic.com/display/SIGAR/Home#Home-download
+# Then place the driver for your OS into the plugin folder where this config is located.
+# You can find the drivers in the zip file in the folder "hyperic-sigar-1.6.4/sigar-bin/lib"
+#
+# If you don't know which driver you need, you can invoke /env or activate this option and
+# invoke /hardware - This plugin will show which driver it exactly want.
+native-library: false
+
+# If you enable this, it will save some monitoring data peridically into a MySQL database
+# There you can find lag sources with a history
+# And you could create a webinterface for monitoring your server
+monitor-database: true
+
+# Database configuration
+# Recommened is the use of MariaDB (a better version of MySQL)
+host: ${CFG_REPLACEMENT__LAGMONITOR_MYSQL_HOST}
+port: ${CFG_REPLACEMENT__LAGMONITOR_MYSQL_PORT}
+database: lagmonitor
+username: ${CFG_REPLACEMENT__LAGMONITOR_MYSQL_USER}
+password: ${CFG_REPLACEMENT__LAGMONITOR_MYSQL_PASSWORD}
+tablePrefix: ""
+
+# Interval is in seconds
+
+# Containing the current TPS and a updated timestamp
+tps-save-interval: 300
+
+# Containing some monitoring information to analyze your log
+monitor-save-interval: 900
+
+# Information about your server which is good to see, but might not be really useful for finding lag sources
+# Some information might be NULL if you disabled the feature above
+# For example: native and minecraft-traffic-counter
+native-save-interval: 1200
+
+# A permissions independent way to whitelist certain commands
+#
+# Everything starts with 'whitelist-' and then the command name
+#
+# Here an example for the native command:
+# whitelist-native:
+#     - PlayerName
+#     - Example
+whitelist-commandname:
+    - PlayerName
+    - Example
+
+# You can add as many commands as you want to
+# If the command doesn't exist here it won't be whitelisted at all
+# Everyone who has the permission for that command can then use it.

@@ -1,0 +1,12 @@
+config-version: 3
+notify:
+  any-chest: true
+  silent-chest: true
+items: {}
+settings:
+  disable-saving: false
+toggles:
+  silent-chest:
+    b7c16b91-57ca-4bbb-95f7-9e9144474799: false
+    54f680b2-ce8d-4a29-a362-c85cf8d5d711: true
+    903383f4-e683-4788-baea-82025e88ac7a: false

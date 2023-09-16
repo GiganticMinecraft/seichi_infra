@@ -1,0 +1,82 @@
+General:
+  Reloaded: '&fConfigurations reloaded.'
+  NoPermission: '&cYou don''t have permission.'
+  OnlyPlayer: '&fYou have to be player to run this command.'
+  TypeRegionName: '&fType name of your region. If you want to abort, type ''q''.'
+  TypePlayerName: '&fType name of player you want to add/remove. If you want to abort,
+    type ''q''.'
+  TypeStringValue: '&fType new String value for &a<flagName> &fflag. If you want to
+    abort, type ''q''.'
+  TypeIntegerValue: '&fType new numeric value (without decimals) for &a<flagName>
+    &fflag. If you want to abort, type ''q''.'
+  TypeDoubleValue: '&fType new numeric value (with optional decimals) for &a<flagName>
+    &fflag. If you want to abort, type ''q''.'
+  TypeLocationValue: '&fGo to the desired location for &a<flagName> &fflag and type
+    ''set''. If you want to abort, type ''q''.'
+  TypeSetValue: '&fType new value (followed by ''+'' character) you want to add to
+    &a<flagName> &fflag. If there are already other values in set, they will not be
+    deleted. If you want to abort, type ''q''. Example values: ''+/heal'', ''+ZOMBIE'''
+  MakeWESelection: '&fNow use WorldEdit to set region boundaries and type ''create''
+    (or ''edit'' if you''re editing existsing region). If you want to abort, type
+    ''q''.'
+  Aborted: '&fOperation aborted.'
+  RegionCreated: '&fRegion &a<regionName> &fhas been created.'
+  RegionExists: '&fRegion with given name already exists in this world.'
+  RegionDoesntExist: '&fSelected region doesn''t exist. Was it removed?'
+  MatchRegex: '&fYour input may contain only letters, numbers and ''/'', ''_'' characters.'
+  MatchRegexPlayer: '&fYour input may contain only letters, numbers and ''_'' characters.'
+  RegionOverlapsNoPermission: '&fYou can''t create region that overlaps unowned regions.'
+  MemberAdded: '&fPlayer &a<player> &fis now member of region &a<region>.'
+  OwnerAdded: '&fPlayer &a<player> &fis now owner of region &a<region>.'
+  MemberRemoved: '&fPlayer &a<player> &fis no longer member of region &a<region>.'
+  OwnerRemoved: '&fPlayer &a<player> &fis no longer owner of region &a<region>.'
+  RegionRemoved: '&fRegion &a<region> &fhas been removed.'
+  RegionEdited: '&fRegion settings have been modified.'
+  RegionFlagsCopied: '&a<regionTo> &fnow has the same flag values as &a<regionFrom>
+    &fregion.'
+  InvClosedOnDisable: '&fYour inventory has been closed due to plugin disable.'
+  RegionParentSet: '&a<region> &fregion is now parent of &a<childregion> &fregion.'
+  RegionRenamed: '&a<oldName> &fregion has been renamed to: &a<newName>&f.'
+  GUIItemHelp: You've got WG-GUI Item. Press right-click to use it.
+GUI:
+  MainMenuTitle: WG-GUI Main Menu
+  MainMenuCreateNew: Create new region
+  MainMenuEditExisting: Edit existing region
+  MainMenuReload: Reload configurations
+  Exit: Exit
+  SelectTemplate: Select region template
+  SelectWorld: Select World
+  SelectRegion: Select Region
+  ChangeRegionVisibility: Change region visibility
+  ShowAllRegions: Showing all regions
+  ShowOwnedRegions: Showing owned regions
+  RegionOptions: Region Options
+  EditFlagsOption: Edit flags
+  EditFlagsTitle: Edit flags
+  SelectTemplateOption: Select template
+  SelectTemplateTitle: Select template
+  TemplateNoName: No name
+  TemplateNoDescription: No description
+  EditOwnerMemberOption: Edit owners/members of this region
+  EditOwnerMemberTitle: Edit owners/members of this region
+  RemoveRegionOption: Remove this region
+  SetFlagsFromOtherRegionOption: Set flags from other region
+  SetParentRegionOption: Set parent region
+  RenameRegionOption: Rename region
+  AddOwnerPlayerOption: Add player owner to this region
+  AddMemberPlayerOption: Add player member to this region
+  DeleteMemberPlayerOption: Delete player member from this region
+  DeleteOwnerPlayerOption: Delete player owner from this region
+  EditRegionBoundsOption: Edit region boundaries
+  SelectPlayerTitle: Select player
+  Value: '&9Value:'
+  DefaultValue: '&fDEFAULT'
+  NextPage: Next page
+  PreviousPage: Previous page
+  HelpItemName: '&eHelp'
+  HelpItemLore:
+  - '&3 Left Click - Change flag value'
+  - '&3 Right Click - Reset flag to default value'
+  ConfirmMessage: '&eAre you sure?'
+  ParentWarn: '&cRegion can''t be it''s own parent!'
+  GetItem: Get GUI Item

@@ -1,0 +1,27 @@
+# 
+#  spawntp: You have been teleported to spawn.
+Settings:
+  forcespawn: false
+  forcedeathspawn: false
+  walkspeed: 0.3
+  spawnmsg: true
+  spawncooldown: 0.9
+  spawnworld: world_2
+  spawnX: 7.0
+  spawnY: 64.0
+  spawnZ: -8.0
+  pitch: 6.1499968
+  yaw: -180.39546
+  direction:
+    ==: Vector
+    x: 0.984807753012208
+    y: 0.17364817766693033
+    z: 6.030208312509488E-17
+Sounds:
+  volume: 10
+  sound: EXPLODE
+  enabled: false
+Messages:
+  spawntp: スポーンワールドへテレポートしました
+  spawnset: You have setup new spawn!
+  nopermission: You have no permission for this command!

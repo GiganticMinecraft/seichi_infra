@@ -1,0 +1,18 @@
+Time1: .01:00:00
+Command1: plugman dump
+Time2: .05:00:00
+Command2: rmp remove world_SW_2 7
+Time3: .05:01:00
+Command3: rmp remove world_SW_4 7
+Time4: .03:59:00
+Command4: say ===============お知らせ=================
+Time5: .03:59:01
+Command5: say あと1分で、サーバが再起動します。
+Time6: .03:59:02
+Command6: say 引き続きプレイされるプレイヤーの皆様は
+Time7: .03:59:03
+Command7: say 数分後に再接続をお願いいたします。
+Time8: .03:59:04
+Command8: say ========================================
+Time9: .04:00:00
+Command9: stop

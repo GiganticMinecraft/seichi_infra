@@ -1,0 +1,350 @@
+# Uchat configuration file
+# Author: FabioZumbi12
+# We recommend you to use NotePad++ to edit this file and avoid TAB errors!
+# ------------------------------------------------------------------------
+# Tags is where you can customize what will show on chat, on hover or on click on tag.
+# To add a tag, you can copy an existent and change the name and the texts.
+# After add and customize your tag, put the tag name on 'general > default-tag-builder'.
+# ------------------------------------------------------------------------
+
+# Available replacers:
+
+# uChat:
+#  - {default-format-full}: Use this tag to see all plugin tags using the default bukkit format. # Normally used by 'myth' plugins and temporary tags.# If you want to use only of this tags you can use the replacer bellow and get number of tag separated by spaces;
+#  - {default-format-0}: use this tag to show only one of the tags described on '{default-format-full}'. # The number is the posiotion separated by spaces;
+#  - {world}: Replaced by sender world;
+#  - {message}: Message sent by player;
+#  - {playername}: The name of player;
+#  - {nickname}: The nickname of player. If not set, will show realname;
+#  - {ch-name}: Channel name;
+#  - {ch-alias}: Channel alias;
+#  - {ch-color}: Channel color;
+#  - {hand-type}: Item type;
+#  - {hand-name}: Item name;
+#  - {hand-amount}: Item quantity;
+#  - {hand-lore}: Item description (lore);
+#  - {hand-durability}: Item durability;
+#  - {hand-enchants}: Item enchantments;
+#  - {time-now}: Prints the time now on server;
+
+# Vault:
+#  - {group-prefix}: Get group prefix;
+#  - {group-all-prefixes}: Get all player group prefixes and show on chat;
+#  - {group-suffix}: Get group suffix;
+#  - {group-all-suffixes}: Get all player group suffixes and show on chat;
+#  - {balance}: Get the sender money;
+#  - {prim-group}: Get the primary group tag;
+#  - {player-groups}: Get all groups names the sender has;
+#  - {player-groups-prefixes}: Get all group prefixes the sender has;
+#  - {player-groups-suffixes}: Get all group suffixes the sender has;
+
+# Simpleclans:
+#  - {clan-tag}: Clan tag without colors;
+#  - {clan-fulltag}: Clan tag with brackets, colors and separator;
+#  - {clan-ctag}: Clan with colors;
+#  - {clan-name}: Clan name;
+#  - {clan-kdr}: Player clan KDR;
+#  - {clan-isleader}: The player is leader;
+#  - {clan-rank}: Player rank on Clan;
+#  - {clan-totalkdr}: Clan KDR (not player kdr);
+
+# Marry Plugins:
+#  - {marry-partner}: Get the partner name;
+#  - {marry-prefix}: Get the married prefix tag, normally the heart;
+#  - {marry-suffix}: Get the married suffix tag, or male tag for Marriage Reloaded;
+
+# BungeeCord:
+# - {bungee-id}: Server ID from sender;
+
+# Jedis (redis):
+# - {jedis-id}: This server id;
+
+# Factions:
+# Gets the info of faction to show on chat.
+# - {fac-id}: Faction ID;
+# - {fac-name}: Faction Name;
+# - {fac-motd}: Faction MOTD;
+# - {fac-description}: Faction Description;
+# - {fac-relation-name}: Faction name in relation of reader of tag;
+# - {fac-relation-color}: Faction color in relation of reader of tag;
+
+
+# Dont touch <3
+config-version: 1.6
+debug:
+  messages: false
+  timings: false
+
+# Available languages: EN-US, PT-BR, FR-FR, FR-ES, HU-HU, RU, SP-ES and ZH-CN
+language: 'EN-US'
+
+# Jedis configuration.
+# Use Jedis to send messages between other servers running Jedis.
+# Consider a replecement as Bungeecoord.
+jedis:
+  enable: false
+  # Change to a unique identification and use on tags with {jedis-id}.
+  server-id: '&e[ChangeThis]&r '
+  ip: 'localhost'
+  port: 6379
+  pass: ''
+
+# Enable the two way chat into discord and minecraft.
+# Generate your bot token following this instructions: https://goo.gl/utfRRv
+discord:
+  use: false
+  update-status: true
+  # The default status of bot. Available status: DEFAULT, LISTENING, WATCHING and STREAMING"
+  game-type: 'DEFAULT'
+  # If game-type = STREAMING, set the twitch url.
+  twitch: ''
+  # Follow this instructions to generate your token: https://goo.gl/5Do8LJ
+  token: ''
+  log-channel-id: ''
+  # Channel id to spy private messages
+  tell-channel-id: ''
+  # In-Game commands to do not send to discord
+  # This is the commands names, not aliases without arguments and without \
+  log-ignored-commands: []
+  # Channel id to send commands issued by players.
+  commands-channel-id: ''
+  # Set your vanish plugin pemrissions here to do not announce player join/leave players with this permission.
+  vanish-perm: 'essentials.vanish'
+  # Put the id on 'commands-channel-id' option or/and enable server commands on channel configuration to use this.
+  server-commands:
+    # This alias is not needed if using the channel set on 'commands-channel-id' option.
+    alias: '!cmd'
+    whitelist: []
+    blacklist:
+    - 'stop'
+    - 'whitelist'
+
+# UChat Api configs.
+api:
+  # Using uchat api, format messages sent to console?
+  format-console-messages: false
+  # If using tag plugins from legendchat, put the tags here.
+  legendchat-tags: []
+
+# Use mentions on chat to change the player name color and play a sound on mention.
+mention:
+  enable: true
+  color-template: '&e@{mentioned-player}{group-suffix}'
+  # May change if using old minecraft version.
+  playsound: 'note_pling'
+  hover-message: '&e{playername} mentioned you!'
+general:
+  # Template to show when players send links or urls.
+  URL-template: '&3Click to open &n{url}&r'
+  # Deny muted players to use this commands.
+  muted-deny-cmds:
+  - 'mail'
+  # Tag to show when sent messages from console to channels.
+  console-tag: '&6 {console}&3'
+  # Remove this from chat (like empty tags)
+  remove-from-chat:
+  - '[]'
+  - '&7[]'
+  - '&7[&7]'
+  # Remove not converted PlaceholdersAPI from tags.
+  remove-unnused-placeholderapi: true
+  channel-cmd-aliases: 'channel, ch'
+  # Aliases to send commands from system to players (without any format, good to send messages from other plugins direct to players)
+  umsg-cmd-aliases: 'upv'
+  # False if your server don't support json or if /tellraw is not available.
+  json-events: true
+  default-channels:
+    # Default channel for new added worlds
+    default-channel: 'l'
+    # Default channel for each world. The channel must exist.
+    worlds:
+      world:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_nether_TT:
+        channel: 'l'
+        force: false
+      world_sougen:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_TT:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_build:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_2:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_SW_nether:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_the_end_TT:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_SW_3:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_SW:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_SW_2:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_SW_the_end:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_towny:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_SW_4:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+      world_spawn:
+        channel: 'l'
+        # Force player to join this channel on change world?
+        force: false
+  # Chat spy format.
+  spy-format: '&c&o[Spy] {output}'
+  # Enable Spy on join?
+  spy-enable-onjoin: true
+  # If using the placeholder "{group-all-prefixes/suffixes}", exclude this groups from tags.
+  dont-show-groups:
+  - 'default'
+  # Use the tag builder from channel configuration and ignore this tag builder.
+  use-channel-tag-builder: true
+  # This is the main tag builder.
+  # Change the order of this tags to change how tag is displayed on chat.
+  # This tags represent the names of tag in this configuration.
+  default-tag-builder: 'world,marry-tag,ch-tags,clan-tag,factions,group-prefix,nickname,group-suffix,message'
+  # Enable to allow parse tags and placeholders on messages.
+  enable-tags-on-messages: false
+  # Remember the channel the player is when logout/login until server restart?
+  persist-channels: true
+  item-hand:
+    enable: true
+    # Text to show on chat when using @hand.
+    # Placeholders: {hand-amount}, {hand-type}, {hand-name}
+    format: '&6[{hand-amount} {hand-type}]{group-suffix}'
+    # Placeholder to use on chat by players to show your item in hand.
+    placeholder: '@hand'
+  # Example alias for rename world name to other name. Support color codes.
+  world-names:
+    my-nether: '&4Hell&r'
+    my-end: '&5The-End&r'
+  # Example alias for rename Group name to other name. Support color codes.
+  group-names:
+    my-admin: '&4Admin&r'
+    my-moderation: '&2Mod&r'
+  # This will make a check if the player channel is available on destination world and put on the world channel if is not available.
+  check-channel-change-world: false
+tell:
+  cmd-aliases: 'tell,t,w,m,msg,private,priv,r'
+  prefix: '&6[&c{playername} &6-> &c{receivername}&6]: '
+  format: '{message}'
+  hover-messages: []
+bungee:
+  # Change to a unique identification, and use on tags with {bungee-id}.
+  server-id: '&4ChangeMe'
+broadcast:
+  # Enable custom broadcasts.
+  enable: true
+  # Tag to use on broadcast message to set a hover message.
+  on-hover: 'hover:'
+  # Tag to use on broadcast message to set a click event.
+  on-click: 'click:'
+  # Tag to use on broadcast message to suggest a command.
+  suggest: 'suggest:'
+  # Tag to use on broadcast message to set a website url on click (with www).
+  url: 'url:'
+  # Permission check for receivers.
+  permission: 'perm:'
+  # Aliases to use for broadcast.
+  aliases: 'ubroad,uannounce,usay,uaction,all,anunciar,todos'
+
+# This is where you will create as many tags you want.
+# You can use the tag "custom-tag" as base to create your own tags.
+# When finish, get the name of your tag and put on "general.default-tag-build" 
+# or on channel builder on "channels" folder.
+tags:
+  group-prefix:
+    format: '&7[{group-prefix}&7]&r'
+    hover-messages:
+    - '&bRank: &e{prim-group}'
+  playername:
+    format: '{playername}'
+    click-cmd: 'tpa {playername}'
+    hover-messages:
+    - '&7Click to send teleport request'
+  nickname:
+    format: '{nickname}'
+    hover-messages:
+    - '&6Realname: {playername}'
+  group-suffix:
+    format: '&r{group-suffix}: '
+  world:
+    format: '&7[{world}&7]&r'
+    hover-messages: '&7[{world}]&r'
+  message:
+    format: '{message}'
+  ch-tags:
+    format: '{ch-color}[{ch-alias}]&r'
+    click-cmd: 'ch {ch-alias}'
+    hover-messages:
+    - '&3Channel name: {ch-color}{ch-name}'
+    - '&bClick to go to this channel!'
+  clan-tag:
+    format: '{clan-tag}'
+    click-cmd: 'clan search {playername}'
+    hover-messages:
+    - '&bClan Tag: &7{clan-tag}'
+    - '&bClan Name: &7{clan-name}'
+    - '&bClan KDR: &7{clan-totalkdr}'
+    - '&bPlayer KDR: &7{clan-kdr}'
+    - '&bPlayer Rank: &7{clan-rank}'
+    - '&bIs Leader: &7{clan-isleader}'
+    - '&3Click for more info about this player'
+  marry-tag:
+    format: '{marry-prefix}{marry-suffix}'
+    hover-messages:
+    - '&cMarried with {marry-partner}'
+  admin-chat:
+    format: '&b[&r{playername}&b] '
+  bungee:
+    format: '&7[{world}]{ch-color}[bungee-{bungee-id}] {playername}: &7'
+    hover-messages:
+    - '{ch-color}Sent from server -{bungee-id}-'
+  factions:
+    format: '&7[{fac-relation-color}{fac-relation-name}&7]&r'
+    hover-messages:
+    - '&7Faction name: {fac-relation-color}{fac-name}'
+    - '&7Motd: &a{fac-motd}'
+    - '&7Description: {fac-description}'
+  jedis:
+    format: '{jedis-id}'
+    hover-messages:
+    - '&7Server: {jedis-id}'
+    - '&cChange me on configuration!'
+  # Use this tag as reference to create other new tags.
+  custom-tag:
+    format: '&7[&2MyTag&7]&r'
+    click-cmd: ''
+    click-url: ''
+    suggest-cmd: ''
+    permission: 'any-name-perm.custom-tag'
+    hover-messages: []
+    show-in-worlds: []
+    hide-in-worlds: []

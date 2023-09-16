@@ -1,0 +1,22 @@
+# ShulkerBox BackPacks for Craftbukkit / Spigot
+# Author: Brandon (ThirtyVirus) Calabrese
+#
+# YouTube:      https://www.youtube.com/channel/UC04QdEl71CFDogk8pzY7Geg
+# Twitter:      https://twitter.com/Thirtyvirus
+# SpigotMC:     https://www.spigotmc.org/members/thirtyvirus.179587/
+
+# Permissions to use the plugin's featues
+permission: ShulkerBoxBackPacks.use
+nesting-permission: ShulkerBoxBackPacks.nesting
+
+# Allow nesting of Shulker Boxes
+nesting: false
+# Maximum depth of shulker box nesting (-1 is infinite)
+nesting-depth: -1
+
+# Disable plugin functions for renamed Shulker Boxes (for compatability with other plugins)
+use-renamed-boxes: true
+
+# Disable plugin functions for renamed Shulker Boxes with special formatting ONLY (ex. Colors, bold, italics, etc...)
+# This option is automatically disabled if the above is false
+use-formatted-renamed-boxes: true

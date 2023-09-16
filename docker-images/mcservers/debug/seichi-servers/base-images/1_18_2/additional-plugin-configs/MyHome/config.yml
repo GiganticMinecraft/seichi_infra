@@ -1,0 +1,48 @@
+settings:
+  compassPointer: true
+  allowSetHome: true
+  respawnToHome: true
+  bedsCanSethome: 0
+  bedsDuringDay: false
+  enableBypassPerms: true
+  loadChunks: true
+  opPermissions: true
+  noHomeRespawnWorlds: {}
+locale:
+  locale: en
+  useColors: true
+economy:
+  enabled: false
+  enableFreePerms: true
+  globalSetHomeCost: 0
+  globalHomeCost: 0
+  costByPerms: false
+  additionalCosts: false
+timers:
+  globalCoolDown: 0
+  globalWarmUp: 0
+  globalCoolDownSetHome: 0
+  coolDownNotify: false
+  warmUpNotify: true
+  timerByPerms: false
+  additionalTime: false
+  abortOnDamage: 0
+  abortOnMove: false
+distances:
+  applyDistanceLimits: false
+  enableDistanceBypassPerm: true
+  distanceByPerms: true
+  additionalDistance: false
+  globalMaxDistance: 0
+libraries:
+  downloadLibs: true
+  sqliteLib: true
+  mysqlLib: true
+mysql:
+  enabled: false
+  host: localhost
+  port: 3306
+  database: minecraft
+  table: homeTable
+  username: root
+  password: password
