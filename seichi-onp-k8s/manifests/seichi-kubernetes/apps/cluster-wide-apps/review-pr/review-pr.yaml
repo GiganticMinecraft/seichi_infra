@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: review-pr
+  namespace: argocd
+spec:
+  generators:
+    - pullRequest:
+        github:
+          owner: GiganticMinecraft
+          repo: SeichiAssist
+          # tokenRef:
+          #   secretName: git-creds
+          #   key: password
+          labels:
+            - ready-for-review
+        requeueAfterSeconds: 1800
+  template:
+    metadata:
+      name: "review-{{number}}"
+      annotations:
+        notifications.argoproj.io/subscribe.on-deployed.github: ""
+        notifications.argoproj.io/subscribe.on-health-degraded.github: ""
+        github.repoURL: https://github.com/GiganticMinecraft/SeichiAssist
+        github.revision: "{{head_sha}}"
+    spec:
+      project: review-pr
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra.git
+        targetRevision: main
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/review-pr/overlays/develop
+        plugin:
+          name: kustomize-with-replacements
+          env:
+            - name: FQDN
+              value: "review-{{number}}.play-debug.seichi-click"
+            - name: NAMESPACE
+              value: "review-{{number}}"
+            - name: IMAGES
+              value: >-
+                revision={{head_sha}}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "review-{{number}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
