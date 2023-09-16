@@ -1,0 +1,65 @@
+# Chat protection.
+chat-protection:
+  chat-enhancement:
+    disable-on-channels: []
+    enabled: true
+    end-with-dot: true
+    minimum-length: 3
+  anti-flood:
+    disable-on-channels:
+    - Local
+    enable: true
+    whitelist-flood-characs:
+    - k
+    - w
+  caps-filter:
+    disable-on-channels: []
+    enabled: true
+    minimum-length: 3
+  antispam:
+    disable-on-channels:
+    - Local
+    enabled: false
+    time-between-messages: 1
+    count-of-same-message: 5
+    time-between-same-messages: 10
+    cooldown-msg: '&6Slow down your messages!'
+    wait-message: '&cWait to send the same message again!'
+    cmd-action: kick {player} Relax, slow down your messages frequency ;)
+  censor:
+    disable-on-channels: []
+    enabled: true
+    replace-by-symbol: true
+    by-symbol: '*'
+    replace-partial-word: false
+    replace-words:
+      fuck: '*flower*'
+      ass: '*finger*'
+    use-pre-actions: true
+    action:
+      cmd: ''
+      on-partial-words: false
+      only-on-channels:
+      - global
+  anti-ip:
+    disable-on-channels: []
+    enabled: true
+    custom-ip-regex: (([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+    custom-url-regex: ((http:\/\/|https:\/\/)?(www.)?(([a-zA-Z0-9-]){2,}\.){1,4}([a-zA-Z]){2,6}(\/([a-zA-Z-_\/\.0-9#:?=&;,]*)?)?)
+    check-for-words:
+    - www.google.com
+    whitelist-words:
+    - www.myserver.com
+    - prntscr.com
+    - gyazo.com
+    cancel-or-replace: cancel
+    cancel-msg: '&cYou cant send websites or ips on chat'
+    replace-by-word: -removed-
+    punish:
+      enable: false
+      max-attempts: 3
+      mute-or-cmd: mute
+      mute-duration: 1
+      mute-msg: '&cYou have been muted for send IPs or URLs on chat!'
+      cmd-punish: tempban {player} 10m &cYou have been warned about send links or
+        IPs on chat!

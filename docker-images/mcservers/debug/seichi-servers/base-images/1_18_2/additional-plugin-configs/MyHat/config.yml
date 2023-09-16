@@ -1,0 +1,13 @@
+# MyHat By DevLeeo #
+
+Prefix: "&3[MyHat]&b"
+
+NoPermission: "{prefix} &cYou do not have access to this command."
+
+HatSucess: "{prefix} Enjoy your new hat"
+
+NeedHolding: "{prefix} &cYou need be holding something."
+
+CannotUse: "{prefix} &cYou cannot use this item as a hat."
+
+OnlyOne: "{prefix} &cYou should be with only one item at hand."

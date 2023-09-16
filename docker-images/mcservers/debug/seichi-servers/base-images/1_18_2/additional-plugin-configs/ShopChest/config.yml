@@ -1,0 +1,271 @@
+# ===============================================
+# ====== Configuration File of 'ShopChest' ======
+# ===============================================
+#
+# Lines starting with '#' are comments and are ignored by the server.
+
+# Set the main command you have to enter to manage the shops
+# (default: "/shop ...")
+main-command-name: "shop"
+
+# Set the language of the item-, enchantment-, potion- and arrow-effect names
+# The value must equal to the name of one of a file in the 'lang' folder
+# (without the '.lang' extension)
+language-file: "en_US"
+
+# Set whether the floating shop items on top of the chest should be shown
+show-shop-items: true
+
+# Set the quality (speed) for hologram and item updating.
+# Valid values are (from slowest to fastest):
+# 'SLOWEST', 'SLOWER', 'SLOW', 'NORMAL', 'FAST', 'FASTER', 'FASTEST'
+# The faster the value, the more performance will be used, which
+# may lead to TPS loss.
+update-quality: NORMAL
+
+# Set the item with which a player can click a shop to retrieve information.
+# You can set this to an empty string to disable this feature.
+shop-info-item: "STICK"
+
+# Set whether interaction with the hologram should be enabled.
+# If set to true, a player can do the exact same thing with the
+# hologram, as with the chest. You can even open the chest if you
+# are the vendor or have permission.
+enable-hologram-interaction: true
+
+# Set whether a debug log file should be created.
+# The file may get large! Please enable this setting when reporting bugs.
+enable-debug-log: false
+
+# Set whether WorldGuard integration should be enabled
+# Of course, this only works if WorldGuard is installed
+enable-worldguard-integration: true
+
+# Set whether Towny integration should be enabled
+# Of course, this only works if Towny is installed
+enable-towny-integration: true
+
+# Set whether AuthMe integration should be enabled
+# Of course, this only works if AuthMe is installed
+enable-authme-integration: true
+
+# Set whether PlotSquared integration should be enabled
+# Of course, this only works if PlotSquared is installed
+enable-plotsquared-integration: true
+
+# Set whether uSkyBlock integration should be enabled
+# Of course, this only works if uSkyBlock is installed
+enable-uskyblock-integration: true
+
+# Set whether ASkyBlock integration should be enabled
+# Of course, this only works if ASkyBlock is installed
+enable-askyblock-integration: true
+
+# Set whether IslandWorld integration should be enabled
+# Of course, this only works if IslandWorld is installed
+enable-islandworld-integration: true
+
+# Set whether GriefPrevention integration should be enabled
+# Of course, this only works if GriefPrevention is installed
+enable-griefprevention-integration: true
+
+# Set whether AreaShop integration should be enabled
+# Of course, this only works if AreaShop and WorldGuard is installed
+enable-areashop-integration: true
+
+# Set whether the vendor of a shop should get messages when players
+# buy or sell something from/to his shop or if his shop is out of stock
+enable-vendor-messages: true
+
+# Set whether only the shops a player has in sight should be shown to him.
+# If set to false, every shop near the player (with the specified
+# distance) will be shown to him.
+only-show-shops-in-sight: true
+
+# Set whether only the shop a player is looking at should be shown to him.
+# This only has effect if 'only-show-shops-in-sight' is enabled
+only-show-first-shop-in-sight: true
+
+# Set whether the hologram's location should be fixed at the bottom,
+# so when it gets more lines, it won't interfere with the item or chest,
+# but goes higher.
+hologram-fixed-bottom: true
+
+# Set the amount (may be negative) a hologram should be lifted in the y-axis.
+# A value of '1' equals to one block, and a value of '0.25' is equal to the
+hologram-lift: 0
+
+# Set whether players should be allowed to sell their items, even if the
+# amount they have, is lower than the amount, the shop owner has set for the
+# given price, or if the inventory of the chest doesn't have enough space
+# for all the items, but only for a few, or if the player only has enough
+# money for a few items, but not for the amount, the shop owner has set.
+# When set to true, players may also buy items from a shop, even if the
+# amount of items in the chest is lower than the amount, the shop owner has
+# set for the given price, or if they don't have enough space in the
+# inventory for all of the items, but only for a few, or if the shop owner
+# doesn't have enough money to buy all of the items, the player wants to
+# sell. The price will be calculated correspondingly.
+# (If it's not clear enough, please let me know)
+auto-calculate-item-amount: false
+
+# Set whether prices may contain decimals (prices of existing shops will stay)
+allow-decimals-in-price: true
+
+# Set whether players should be allowed to sell/buy broken items
+allow-broken-items: false
+
+# Set whether the level of a potion or tipped arrow (if upgraded) should be
+# appended to the item name. If set to true, the level ("II") will be
+# displayed after the item name, but only if the item does NOT have a
+# custom name. If set to false, it will only be shown in the
+# shop info message.
+append-potion-level-to-item-name: false
+
+# Set whether shops should automatically be removed from the database if
+# an error occurred while loading e.g. when no chest is found at a
+# shop's location.
+# This might be useful if you're removing shop chests with WorldEdit,
+# resetting plots, or similar
+remove-shop-on-error: false
+
+# Set whether the mouse buttons should be inverted.
+# Default:
+# Right-Click -> Buy
+# Left-Click -> Sell
+invert-mouse-buttons: false
+
+# Set the maximal distance (in blocks) to the shop where the
+# player can see the hologram.
+maximal-distance: 2
+
+# Set the maximal distance (in blocks) to the shop where the
+# player can see the floating shop item.
+maximal-item-distance: 40
+
+# Set the price a player has to pay in order to create...
+# You can set this to 0 to disable costs.
+# Value MUST be a number (e.g. 1, 1.5, 2.75, ...)
+shop-creation-price:
+
+  # ...a normal shop
+  normal: 5
+
+  # ...an admin shop
+  admin: 0
+
+# Set whether the shop's chest should be protected by hoppers
+hopper-protection: true
+
+# Set whether the shop's chest should be protected by explosions
+explosion-protection: true
+
+# Set whether the buy price must be greater than or equal sell price.
+buy-greater-or-equal-sell: true
+
+# Set the minimum prices for each individual Item. Not per Stack, per single Item!
+# To add an item, follow the format below.
+# Important: You must have exactly 2 leading spaces in each line
+# You can find the item names in the 'item_names.txt' file.
+minimum-prices:
+# "STONE:1": 0.5
+# "DIAMOND_SWORD": 100
+
+# Set the maximum prices for each individual Item. Not per Stack, per single Item!
+# To add an item, follow the format below.
+# Important: You must have exactly 2 leading spaces in each line
+# You can find the item names in the 'item_names.txt' file.
+maximum-prices:
+# "STONE:1": 19.9
+# "DIAMOND_SWORD": 1000
+
+# Set the items of which a player can't create a shop.
+# To add an item, follow the format below.
+# Important: You must have exactly 2 leading spaces in each line
+# You can find the item names in the 'item_names.txt' file.
+blacklist:
+# - "STONE:1"
+  - "DIAMOND_BLOCK"
+
+# Set the events of AreaShop when shops on that region should be removed.
+# Important: You must have exactly 2 leading spaces in each line
+# Valid values are: DELETE, UNRENT, RESELL, SELL
+areashop-remove-shops:
+  - "DELETE"
+  - "UNRENT"
+  - "RESELL"
+  - "SELL"
+
+# Set whether the custom WorldGuard flags should be allowed by default
+# (true = Allowed by default, false = Denied by default)
+# This can, of course, be overridden in specific regions and is only
+# enabled if WorldGuard is installed and WorldGuard integration is enabled
+worldguard-default-flag-values:
+
+  create-shop: false
+  use-shop: false
+  use-admin-shop: false
+
+# Set the types of Towny plots where shop creation should be allowed for...
+# Important: You must have exactly 4 leading spaces in each line
+# Valid values are:
+# RESIDENTIAL, COMMERCIAL, ARENA, EMBASSY, WILDS, SPLEEF, INN, JAIL, FARM
+towny-shop-plots:
+
+  residents:
+    - "COMMERCIAL"
+
+  mayor:
+    - "COMMERCIAL"
+
+  king:
+    - "COMMERCIAL"
+
+# Configuration of the database, where everything is stored.
+# Shops are found in the table 'shop_list', and logged economy
+# transactions are found in the table 'shop_log'
+database:
+
+  # Select the type of database which should be used
+  # Either use 'SQLite' or 'MySQL'. Otherwise you will break the plugin!
+  type: "SQLite"
+
+  # If the specified type is 'MySQL', here you configure the...
+  # (You can leave this empty if you're using SQLite)
+  mysql:
+
+    # ...interval in seconds, when the database should be pinged,
+    # to keep the connection alive
+    # You can set this to '0' to disable the ping interval
+    ping-interval: 3600
+
+    # ...hostname where the database is accessible
+    hostname: ""
+
+    # ...port where the database is accessible (default: 3306)
+    port: 3306
+
+    # ...database you want to use
+    database: ""
+
+    # ...username you are going to login with
+    username: ""
+
+    # ...password you are going to login with
+    # Be careful, as anyone who can read this file, can read the password!
+    password: ""
+
+# Shop limits are handled with permissions.
+# A player with permission "shopchest.limit.X" has a limit of X shops,
+# a player with permission "shopchest.limit.*" does not have a shop limit.
+shop-limits:
+
+  # Set whether admin shops should be excluded of the shop limits.
+  # If set to true, admin shops won't be added to a player's shop count.
+  exclude-admin-shops: true
+
+  # Set the amount of shops that anyone who doesn't have a
+  # specific permission may have.
+  # If you don't want the players to have a limit by default
+  # set the value to -1.
+  default: 5

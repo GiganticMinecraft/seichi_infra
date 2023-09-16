@@ -21,7 +21,7 @@ jobs:
             build_context: ./docker-images/mcservers/production/one-day-to-reset
 
           ###
-          # デバッグサーバーのイメージ
+          # デバッグサーバーのイメージ (1.12.2)
           #
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2
             build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_12_2
@@ -29,6 +29,16 @@ jobs:
             build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
             build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
+
+          ###
+          # デバッグサーバーのイメージ (1.18.2)
+          #
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2
+            build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_18_2
+          # - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
+          #   build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
+          # - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
+          #   build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
 
     steps:
       - name: checkout

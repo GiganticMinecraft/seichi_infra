@@ -1,0 +1,11 @@
+periodical:
+  date: '2117-09-17T15:02:34.721+09:00'
+  interval: 10080
+  worlds:
+  - world_SW
+command:
+  before:
+  - say Start regenerating %world%
+  after:
+  - say Finish regenerating %world%
+tp-world: world

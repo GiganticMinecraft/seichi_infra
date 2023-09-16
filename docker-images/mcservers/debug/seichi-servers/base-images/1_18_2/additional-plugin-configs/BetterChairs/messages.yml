@@ -1,0 +1,11 @@
+# BlackScarx All right reserved
+
+Cant use message: '&cYou don''t have permission for that'
+Message to send when player toggle chairs to off: '&cYou can''t sit now'
+Message to send when player toggle chairs to on: '&aYou can sit now'
+Message to send when player sit: '&aYou are now sitting. Take a break.'
+Message to send when player standing: '&aYou are no longer sitting.'
+Message to send if the word is disable: '&cThe Chairs is not enable in this world'
+Message to send if the chairs is occupied: '&cThis chairs is already occupied by {player}'
+Message to send if the chairs need sign or chair: '&cIf you want to sit on this stairs
+  you need to place a sign or stairs on each side'

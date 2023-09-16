@@ -1,0 +1,44 @@
+# This file is used to determine what recipes appear in the FastCraft interface.
+#
+# use-as-whitelist:     By default, this file will tell FastCraft what items to
+#                       not show in its interface. If use-as-whitelist is set to
+#                       true, then nothing will show up in the interface, unless
+#                       it is listed in this file.
+#
+#
+# hashes:               This section can be used to disable specific recipes. each
+#                       recipe in the FastCraft interface is associated with a
+#                       hash code, which is what you will use to reference the
+#                       recipe. To see a recipe's hashcode, open the FastCraft
+#                       interface with the command "/fc craft fastcraft*". A
+#                       recipe's hashcode will be under its list of ingredients.
+#
+#
+# results/ingredients:  Specific items can be listed here. Items should be listed
+#                       using this format: [type, data, metadata]
+#
+#                       Both data and metadata are optional, but type is required.
+#                       Type can be the name of any item, such as 'minecraft:gold'.
+#                       If data or metadata are left out, items with any type or
+#                       metadata will be matched.
+#
+#                       For data, either a number can be listed, or ANY if all
+#                       item data should be matched.
+#
+#                       If the metadata is not stated, then items with any metadata
+#                       will be matched. If items with no metadata should be matched,
+#                       then '{}' can be used.
+
+use-as-whitelist: false
+
+hashes:
+#  dummy item: abc123
+
+results:
+#  thick sword: ['minecraft:diamond_sword', 0, '{display:{Name:"Thick Sword"}}']
+
+ingredients:
+#  all planks: ['minecraft:planks']
+#  oak plank: ['minecraft:planks', 0]
+#  all planks named Zombie: ['minecraft:planks', ANY, '{display:{Name:"Zombie"}}']
+#  all planks without data: ['minecraft:planks', ANY, '{}']

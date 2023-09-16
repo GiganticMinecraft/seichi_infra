@@ -1,0 +1,59 @@
+# Auto-glide
+# If this feature is enabled player will not require
+# to press "space" to start gliding.
+auto-glide:
+  enable: false
+  required-air-under-player: 3
+  auto-equip: false
+constant-flight:
+  enable: false
+  velocity: 1.1
+shift-speed-up:
+  enable: true
+  max-activation-speed: 1.2
+  velocity-multiplier: 1.5
+  cooldown:
+    enable: true
+    time: 0.2s
+speed-up:
+  enable: true
+  cooldown:
+    enable: false
+    time: 3s
+  activation:
+    angle-min: 30
+    angle-max: 90
+    speed-min: 0.5
+    speed-max: 1.5
+    multiplier: 1.3
+run-up:
+  enable: true
+  activation:
+    angle-min: 10
+    angle-max: 70
+  boost: 1.5
+  cooldown:
+    enable: true
+    time: 1s
+g-force:
+  damage-elytra: 0
+  damage-player: 0.0
+particles:
+  enable: true
+  type: SPELL_WITCH
+  radius: 0.3
+  amount: 15
+  extra-param: 0.0
+  play-repeat: 3
+sound:
+  enable: true
+  activation:
+    type: ENTITY_BAT_TAKEOFF
+    pitch: 0.8
+    volume: 0.5
+    play-repeat: 3
+    play-delay-ticks: 3
+  cooldown-fail:
+    type: UI_BUTTON_CLICK
+    pitch: 0.8
+    volume: 0.5

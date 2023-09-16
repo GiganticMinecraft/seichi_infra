@@ -1,0 +1,8 @@
+Changeline_erorrmessage: '&cYou need to put your eyes on a sign.'
+Command_argument_exception: '&cError usage: &b&l%USAGE%'
+Command_nopermission_exception: '&4You dont have permissions to perform thhis command.'
+Sign_remover_joinmessage: '&5You are now in the signremover mode, in this mode u can
+  only break &6signs.'
+Sign_remover_leavemessage: '&cYou are no longer in signremover mode, now you can breake
+  any &6block.'
+Sign_commandgive_gratulations: '&bHere are your signs :)'

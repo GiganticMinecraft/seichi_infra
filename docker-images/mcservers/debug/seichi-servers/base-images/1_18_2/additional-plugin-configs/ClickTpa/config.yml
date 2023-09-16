@@ -1,0 +1,143 @@
+# Config message for ClickTpa
+# Version v1.5.1
+# Author: jklmao
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#                ClickTpa Config                #
+#                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # 
+
+#           Be aware of all warnings!           #
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#                 Place Holders                 #
+#                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# Use '%player%' for the player who sent the request.
+# Use '%accept%' for the 'Click-to-accept' message.
+# Use '%deny%' for the 'Click-to-deny' message.
+# Use '%target%' for the player who they wanted to teleport to, and for the 'Player-sent-request' message.
+# Example: /tpa <player>, where <player> is '%target%'.
+
+Player-only-command: '&cOnly players can use this command!'
+
+Insufficient-permission: '&cこのコマンドを実行する権限がありません！ (&cYou do not have sufficient permission!)'
+
+Player-deny-tpa-message: '&cテレポート申請を拒否されました。 (&cTeleportation request has been denied.)'
+
+Target-deny-tpa-message: '&cテレポート申請は拒否されました。 (&cTeleportation request has been denied.)'
+
+Target-teleportion-canceled: '&cテレポート申請をキャンセルしました。 (&cTeleportation canceled...)'
+
+Player-got-accepted-tpa: '&bテレポート申請が許可されました。 (&bTeleportation request has been accepted.)'
+
+Countdown-until-tpa: '&e3秒後にテレポートします... (&eTeleporting in 3 seconds...)'
+
+Player-no-pendingtpa-message: '&cテレポート申請は受け取っていません。 (&cYou do not have a pending request!)'
+
+Target-accepted-tpa-request: '&eテレポート申請を許可しました。 (&eRequest for teleportation is accepted.)'
+
+No-player-found: '&cそのプレイヤーは存在しません。 (&cThis player does not exist!)'
+
+Target-is-offline: '&cそのプレイヤーは現在オフラインです。 (&cThat player is currently offline.)'
+
+Player-teleporting-self: '&c自分自身にはテレポートできません！ (&cYou can not teleport yourself!)'
+
+Player-already-requested: '&cすでにテレポート申請済みです。 (&cYou already requested, please wait..)'
+
+Player-teleportation-request-expire: '&cテレポート申請が時間切れになりました。 (&cTeleportation request has expired.)'
+
+Target-teleportation-request-expire: '&cテレポート申請が時間切れになりました。 (&cTeleportation request has expired.)'
+
+Player-currently-teleporting: '&bテレポート中... (&bTeleporting...)'
+
+Target-currently-teleporting: '&bテレポート中... (&bTeleporting...)'
+
+Player-TpToggle-Off: '&eテレポート申請を受け付けるようにしました。 (&eTeleportation canceller is now &6OFF)'
+
+Player-TpToggle-On: '&eテレポート申請を受け付けないようにしました。 (&eTeleportation canceller is now&6ON)'
+
+Target-Is-TpToggled: '&6%target% &eはテレポート申請を受け付けていません。 &6%target% &ehas teleportation off'
+
+Player-Is-TpToggled: '&cテレポート申請を受け付けない設定になっています。 (&cYou are tptoggled!)'
+
+Tpacancel-message: '&6テレポート申請がキャンセルされました。 (&6Tpa request has been canceled.)'
+
+
+# Seconds until tpa
+# Please use whole numbers
+
+Seconds-until-tpa: 3
+
+
+# Becareful in this part!
+# This is when a player uses not enough args
+# For example, when a player does '/tpa', it will say 'Usage: /tpa <player>'
+# So please fit the correct command under the correct message!
+# P.S '/tpohere' is also '/s' (essentials-type command).
+
+
+Tpa-usage: '&cUse: /tpa <player>'
+
+Tpahere-usage: '&cUse: /tpahere <player>'
+
+Tpaccept-usage: '&cUse: /tpaccept <player>'
+
+Tpdeny-usage: '&cUse: /tpadeny <player>'
+
+Tpo-usage: '&cUse: /tpo <player>'
+
+Tpohere-usage: '&cUse: /tpohere <player> or /s <player>' 
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # #
+#                                               #
+#                  Please Read!                 #
+#                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# This section is when a player gets a tpa request
+# Since the code used is broken into many parts, there will be many messages.
+# Whatever you do to the "Click-to-x" messages, will be the same in the 'Tpa-message'
+# Be careful!
+
+
+# Lets you choose if you want players to be able
+# to move before being teleported
+Allow-player-to-move: true
+
+Player-moved-before-tp: '&6The request was canceled because %player% moved!'
+
+Player-sent-request: '&6%target% にテレポート申請を送りました。 (&eYou have sent a request to &6%target%)'
+
+Tpa-message: 
+  - ''
+  - '&6%player% &eさんがあなたのところにテレポート申請しました。'
+  - '&e%accept% &eをクリックで許可、または、 &e %deny% &eをクリックで拒否します。'
+  - '&e何もしない場合、120秒後に自動でキャンセルされます。'
+  - ''
+
+Tpahere-message: 
+  - ''
+  - '&6%player% &eさんがあなたを相手の地点にテレポート申請しています。'
+  - '&e%accept% &eをクリックで許可、または、 &e %deny% &eをクリックで拒否します。'
+  - '&e何もしない場合、120秒後に自動でキャンセルされます。'
+  - ''
+
+# This will put additional spaces for the accept/deny messages
+Added-accept-deny-space: true
+
+Click-to-accept: '&a&l&n[許可]&r'
+Click-to-deny: '&c&l&n[拒否]&r'
+
+Hover-message-on-accept: '&aクリックで許可'
+Hover-message-on-deny: '&cクリックで拒否'
+
+
+#~~~~~~~~~~~~~~~~~~#
+# More Coming Soon!#
+#~~~~~~~~~~~~~~~~~~#
+

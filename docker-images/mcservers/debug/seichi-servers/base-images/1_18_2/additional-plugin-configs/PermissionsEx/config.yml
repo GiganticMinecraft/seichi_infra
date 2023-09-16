@@ -1,0 +1,23 @@
+multiserver:
+  use-netevents: true
+permissions:
+  debug: false
+  allowOps: false
+  user-add-groups-last: false
+  log-players: false
+  createUserRecords: false
+  backend: sql
+  informplayers:
+    changes: false
+  basedir: plugins/PermissionsEx
+  backends:
+    file:
+      type: file
+      file: permissions.yml
+    sql:
+      uri: ${CFG_REPLACEMENT__PERMISSIONSEX_MYSQL_URL}
+      user: ${CFG_REPLACEMENT__PERMISSIONSEX_MYSQL_USER}
+      password: ${CFG_REPLACEMENT__PERMISSIONSEX_MYSQL_PASSWORD}
+      type: sql
+updater: true
+alwaysUpdate: false

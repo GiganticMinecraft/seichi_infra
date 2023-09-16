@@ -1,0 +1,66 @@
+# This config adds custom recipes into the game.
+#
+# ------------------------------------ Details ------------------------------------
+#
+# Item format:
+#   An item contains an amount, type, data, and metadata. Data and metadata are optional:
+#     [amount, type, data, metadata]  or  [amount, type, data]  or  [amount, type]
+#
+#   An ingredient's data can be ANY if the ingredient doesn't require a specific data.
+#
+#   Examples:
+#     Three charcoal with custom name: [3, 'minecraft:coal', 1, '{display:{Name:"Dirty Coal"}}']
+#     One plank of any wood type:      [1, 'minecraft:planks', ANY]
+#     Four Sticks:                     [4, 'minecraft:stick']
+#
+# Recipe types:
+#   shaped:
+#     ingredients: A list of characters associated with different items.
+#     shape: Use characters defined in ingredients to create the recipe shape. If
+#            a character appears here that is not defined, then it will be empty.
+#     result: The item that will be crafted from this recipe.
+#
+#   shapeless:
+#     ingredients: The items that are required for this recipe.
+#                  Each ingredient can be labeled anything. It's for your own reference.
+#     result: The item  that will be crafted from this recipe.
+#
+# -------------------------------- Example Recipes --------------------------------
+#
+#thick_sword:
+#  type: shaped
+#  ingredients:
+#    p: [4, 'minecraft:planks', ANY, '{display:{Name:"Thick Stick"}}']
+#    d: [1, 'minecraft:diamond_block']
+#  shape:
+#  - 'd'
+#  - 'd'
+#  - 'p'
+#  result: [1, 'minecraft:diamond_sword', 0, '{display:{Name:"Thick Sword"}}']
+#
+#wooden_pants:
+#  type: shaped
+#  ingredients:
+#    p: [1, 'minecraft:planks']
+#  shape:
+#  - 'ppp'
+#  - 'p p'
+#  - 'p p'
+#  result: [1, 'minecraft:leather_leggings', 0, '{display:{Name:"Wooden Pants"}}']
+#
+#fish_stew:
+#  type: shapeless
+#  ingredients:
+#    bowl:       [1, 'minecraft:bowl']
+#    raw_fish:   [1, 'minecraft:fish']
+#    raw_salmon: [1, 'minecraft:fish', 1]
+#    clownfish:  [1, 'minecraft:fish', 2]
+#    pufferfish: [1, 'minecraft:fish', 3]
+#  result: [1, 'minecraft:mushroom_stew', 0, '{display:{Name:"Fish Stew"}}']
+#
+#coal_diamond
+#  type: shapeless
+#  ingredients:
+#    coal: [100, 'minecraft:coal']
+#  result: [1, 'minecraft:diamond']
+

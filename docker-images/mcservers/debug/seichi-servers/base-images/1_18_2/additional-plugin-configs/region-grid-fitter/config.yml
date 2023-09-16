@@ -1,0 +1,4 @@
+default_grid_size: 15
+
+grid_size:
+    world: 15
