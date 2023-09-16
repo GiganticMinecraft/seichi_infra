@@ -28,7 +28,7 @@ spec:
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra.git
         targetRevision: main
-        path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/review-pr/overlays/develop
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/review-pr/template
         plugin:
           name: kustomize-with-replacements
           env:
