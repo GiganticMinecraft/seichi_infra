@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=e0b695c2d32c88d857916ae13c3c621f73c172b2
+  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=29def90f43ad284326e7273809bd04509dc96652
 
 images:
   - name: controller
