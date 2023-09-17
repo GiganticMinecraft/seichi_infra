@@ -22,6 +22,7 @@ spec:
     #  - minio
     #  - monitoring
     #  - synology-csi
+    #  - seichi-gateway-operator
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: "kube-system"
@@ -39,6 +40,8 @@ spec:
     - namespace: "mariadb-operator"
       server: https://kubernetes.default.svc
     - namespace: "cert-manager"
+      server: https://kubernetes.default.svc
+    - namespace: "seichi-gateway-operator-system"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"
