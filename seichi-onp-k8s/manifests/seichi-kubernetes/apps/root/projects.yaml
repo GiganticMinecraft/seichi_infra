@@ -137,7 +137,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: seichi-game-debug-envs-on-seichiassist-prs
+  name: seichi-debug-minecrafts-on-seichiassist-prs
   namespace: argocd
 spec:
   description: The project of debug minecraft systems (on pull requests demand) for the seichi-network
