@@ -1,0 +1,9 @@
+apiVersion: seichi.click/v1alpha1
+kind: SeichiAssistDebugEnvRequest
+metadata:
+  labels:
+    app.kubernetes.io/part-of: seichi-gateway-operator
+    app.kubernetes.io/created-by: seichi-gateway-operator
+  name: seichireviewgateway-sample
+spec:
+  pullRequestNo: {{ .SeichiAssistPullRequestNumber }}

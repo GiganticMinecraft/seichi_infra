@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: seichi-debug-minecrafts-on-seichiassist-prs
+  namespace: argocd
+spec:
+  generators:
+    - pullRequest:
+        github:
+          owner: GiganticMinecraft
+          repo: SeichiAssist
+          labels:
+            - ready-for-review
+        requeueAfterSeconds: 120
+  template:
+    metadata:
+      name: "seichi-debug-minecraft-on-seichiassist-pr-{{number}}"
+      annotations:
+        notifications.argoproj.io/subscribe.on-deployed.github: ""
+        notifications.argoproj.io/subscribe.on-health-degraded.github: ""
+        github.repoURL: https://github.com/GiganticMinecraft/SeichiAssist
+        github.pullRequestNumber: "{{number}}"
+        github.revision: "{{head_sha}}"
+    spec:
+      project: seichi-debug-minecrafts-on-seichiassist-prs
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra.git
+        targetRevision: main
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/seichi-debug-minecraft-on-seichiassist-pr-template
+        helm:
+          releaseName: seichi-debug-minecraft-on-seichiassist-pr-{{number}}
+          values: |
+            SeichiAssistPullRequestNumber: "{{number}}"
+            PullRequestBranchHeadSHA: "{{head_sha}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "seichi-debug-minecraft-on-seichiassist-pr-{{number}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
