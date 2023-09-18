@@ -1,0 +1,5 @@
+apiVersion: v2
+name: "seichi-debug-minecraft-on-seichiassist-pr-template"
+version: "0.1.0"
+maintainers:
+  - name: GiganticMinecraft

@@ -1,0 +1,5 @@
+# この環境がデバッグすることを目的とする SeichiAssist pull request の PR 番号
+SeichiAssistPullRequestNumber: null
+
+# seichiAssistPullRequestNumber で指定される Pull Request の Head SHA
+PullRequestBranchHeadSha: null
