@@ -18,6 +18,30 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_argocd_applicationset_controller_github_app_secret" {
+  depends_on = [kubernetes_namespace.onp_argocd]
+
+  metadata {
+    name      = "argocd-applicationset-controller-github-app-secret"
+    namespace = "argocd"
+    labels = {
+      # seichi_infra 向けのアクセストークンであると決め打ちする　必要に応じて repo-creds にするなどすると良い
+      # repo-creds の詳細: https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
+
+  data = {
+    type = "git"
+    url = "https://github.com/GiganticMinecraft/seichi_infra"
+    githubAppID = var.onp_k8s_argocd_applicationset_controller_github_app_id
+    githubAppInstallationID = var.onp_k8s_argocd_applicationset_controller_github_app_installation_id
+    githubAppPrivateKey = var.onp_k8s_argocd_applicationset_controller_github_app_pem
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
   depends_on = [kubernetes_namespace.onp_monitoring]
 

@@ -11,6 +11,7 @@ spec:
           repo: SeichiAssist
           labels:
             - ready-for-review
+          appSecretName: argocd-applicationset-controller-github-app-secret
         requeueAfterSeconds: 120
   template:
     metadata:

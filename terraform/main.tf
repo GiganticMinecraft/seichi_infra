@@ -162,6 +162,26 @@ variable "onp_k8s_argocd_github_oauth_app_secret" {
   sensitive   = true
 }
 
+variable "onp_k8s_argocd_applicationset_controller_github_app_id" {
+  description = "App ID of the GitHub App used to avoid GitHub rate limit on the ApplicationSet Controller"
+  type        = string
+  sensitive   = true
+}
+
+# Found at
+# https://github.com/organizations/GiganticMinecraft/settings/installations/:installation_id
+variable "onp_k8s_argocd_applicationset_controller_github_app_installation_id" {
+  description = "Client installation ID of the GitHub App used to avoid GitHub rate limit on the ApplicationSet Controller"
+  type        = string
+  sensitive   = true
+}
+
+variable "onp_k8s_argocd_applicationset_controller_github_app_pem" {
+  description = "Client private key of the GitHub App used to avoid GitHub rate limit on the ApplicationSet Controller"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise Grafana to GitHub integration
