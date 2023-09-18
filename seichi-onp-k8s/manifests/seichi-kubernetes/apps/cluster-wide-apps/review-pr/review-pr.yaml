@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: review-pr
+  name: seichi-debug-minecrafts-on-seichiassist-prs
   namespace: argocd
 spec:
   generators:
@@ -9,39 +9,27 @@ spec:
         github:
           owner: GiganticMinecraft
           repo: SeichiAssist
-          # tokenRef:
-          #   secretName: git-creds
-          #   key: password
           labels:
             - ready-for-review
-        requeueAfterSeconds: 1800
+        requeueAfterSeconds: 120
   template:
     metadata:
-      name: "review-{{number}}"
+      name: "seichi-debug-minecraft-on-seichiassist-pr-{{number}}"
       annotations:
         notifications.argoproj.io/subscribe.on-deployed.github: ""
         notifications.argoproj.io/subscribe.on-health-degraded.github: ""
         github.repoURL: https://github.com/GiganticMinecraft/SeichiAssist
+        github.pullRequestNumber: "{{number}}"
         github.revision: "{{head_sha}}"
     spec:
-      project: review-pr
+      project: seichi-debug-minecrafts-on-seichiassist-prs
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra.git
         targetRevision: main
-        path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/review-pr/template
-        plugin:
-          name: kustomize-with-replacements
-          env:
-            - name: FQDN
-              value: "review-{{number}}.play-debug.seichi-click"
-            - name: NAMESPACE
-              value: "review-{{number}}"
-            - name: IMAGES
-              value: >-
-                revision={{head_sha}}
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/seichi-debug-minecraft-on-seichiassist-pr-template
       destination:
         server: https://kubernetes.default.svc
-        namespace: "review-{{number}}"
+        namespace: "seichi-debug-minecraft-on-seichiassist-pr-{{number}}"
       syncPolicy:
         automated:
           prune: true

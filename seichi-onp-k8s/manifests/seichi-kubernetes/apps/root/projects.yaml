@@ -134,6 +134,22 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
+  name: seichi-game-debug-envs-on-seichiassist-prs
+  namespace: argocd
+spec:
+  description: The project of debug minecraft systems (on pull requests demand) for the seichi-network
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
   name: seichi-minecraft
   namespace: argocd
 spec:
