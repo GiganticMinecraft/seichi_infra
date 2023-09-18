@@ -2,4 +2,4 @@
 SeichiAssistPullRequestNumber: null
 
 # seichiAssistPullRequestNumber で指定される Pull Request の Head SHA
-PullRequestBranchHeadSha: null
+PullRequestBranchHeadSHA: null

@@ -27,6 +27,11 @@ spec:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra.git
         targetRevision: main
         path: seichi-onp-k8s/manifests/seichi-kubernetes/seichi-debug-minecraft-on-seichiassist-pr-template
+        helm:
+          releaseName: seichi-debug-minecraft-on-seichiassist-pr-{{number}}
+          values: |
+            SeichiAssistPullRequestNumber: "{{number}}"
+            PullRequestBranchHeadSHA: "{{head_sha}}"
       destination:
         server: https://kubernetes.default.svc
         namespace: "seichi-debug-minecraft-on-seichiassist-pr-{{number}}"
