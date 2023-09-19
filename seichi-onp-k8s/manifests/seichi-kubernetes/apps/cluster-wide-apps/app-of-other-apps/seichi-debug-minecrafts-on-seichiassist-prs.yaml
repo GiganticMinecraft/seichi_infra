@@ -16,16 +16,10 @@ spec:
   template:
     metadata:
       name: "seichi-debug-minecraft-on-seichiassist-pr-{{number}}"
-      annotations:
-        notifications.argoproj.io/subscribe.on-deployed.github: ""
-        notifications.argoproj.io/subscribe.on-health-degraded.github: ""
-        github.repoURL: https://github.com/GiganticMinecraft/SeichiAssist
-        github.pullRequestNumber: "{{number}}"
-        github.revision: "{{head_sha}}"
     spec:
       project: seichi-debug-minecrafts-on-seichiassist-prs
       source:
-        repoURL: https://github.com/GiganticMinecraft/seichi_infra.git
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
         targetRevision: main
         path: seichi-onp-k8s/manifests/seichi-kubernetes/seichi-debug-minecraft-on-seichiassist-pr-template
         helm:
@@ -40,3 +34,13 @@ spec:
         automated:
           prune: true
           selfHeal: true
+          allowEmpty: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
