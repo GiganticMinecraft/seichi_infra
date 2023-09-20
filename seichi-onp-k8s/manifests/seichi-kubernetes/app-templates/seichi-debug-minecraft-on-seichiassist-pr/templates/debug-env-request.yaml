@@ -6,4 +6,4 @@ metadata:
     app.kubernetes.io/created-by: seichi-gateway-operator
   name: seichireviewgateway-sample
 spec:
-  pullRequestNo: {{ .SeichiAssistPullRequestNumber }}
+  pullRequestNo: {{ .Values.SeichiAssistPullRequestNumber }}
