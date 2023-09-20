@@ -103,7 +103,7 @@ spec:
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         targetRevision: "main"
-        path: seichi-onp-k8s/manifests/app-templates/cloudflared-tunnel
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/cloudflared-tunnel
         helm:
           # サービス一つに対してトンネルを一つずつ生やす
           releaseName: cloudflared-tunnel-http-exit--{{name}}
