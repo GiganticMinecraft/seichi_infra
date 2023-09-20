@@ -32,11 +32,11 @@ resource "kubernetes_secret" "onp_argocd_applicationset_controller_github_app_se
   }
 
   data = {
-    type = "git"
-    url = "https://github.com/GiganticMinecraft/seichi_infra"
-    githubAppID = var.onp_k8s_argocd_applicationset_controller_github_app_id
+    type                    = "git"
+    url                     = "https://github.com/GiganticMinecraft/seichi_infra"
+    githubAppID             = var.onp_k8s_argocd_applicationset_controller_github_app_id
     githubAppInstallationID = var.onp_k8s_argocd_applicationset_controller_github_app_installation_id
-    githubAppPrivateKey = var.onp_k8s_argocd_applicationset_controller_github_app_pem
+    githubAppPrivateKey     = var.onp_k8s_argocd_applicationset_controller_github_app_pem
   }
 
   type = "Opaque"
