@@ -4,6 +4,6 @@ metadata:
   labels:
     app.kubernetes.io/part-of: seichi-gateway-operator
     app.kubernetes.io/created-by: seichi-gateway-operator
-  name: seichireviewgateway-sample
+  name: debug-env-request
 spec:
   pullRequestNo: {{ .Values.SeichiAssistPullRequestNumber }}
