@@ -1,5 +1,6 @@
 apiVersion: v2
 name: "cloudflared-tunnel"
-version: "1.0.8"
+# Since we are using this chart directly from ArgoCD, we aren't making use of the chart versioning.
+version: "1.0.0"
 maintainers:
   - name: GiganticMinecraft
