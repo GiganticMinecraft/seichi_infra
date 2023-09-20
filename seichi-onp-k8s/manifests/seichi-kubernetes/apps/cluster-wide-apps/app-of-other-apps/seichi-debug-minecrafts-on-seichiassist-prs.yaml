@@ -21,7 +21,7 @@ spec:
       source:
         repoURL: https://github.com/GiganticMinecraft/seichi_infra
         targetRevision: main
-        path: seichi-onp-k8s/manifests/seichi-kubernetes/seichi-debug-minecraft-on-seichiassist-pr-template
+        path: seichi-onp-k8s/manifests/seichi-kubernetes/seichi-debug-minecraft-on-seichiassist-pr
         helm:
           releaseName: seichi-debug-minecraft-on-seichiassist-pr-{{number}}
           values: |
