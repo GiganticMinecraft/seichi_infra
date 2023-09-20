@@ -14,7 +14,7 @@ seichi.click network 向けの Kubernetes のクラスタ定義を管理する�
 
 ## BungeeCordの定期的な再起動
 
-BungeeCordは長期起動するとスローダウンを起こすため、kedaのCRDsである[`ScaledObjects`](./kustomize-bases/minecraft-gateway-bungeecord/scaledobject.yaml)によって定期的な再起動を行なっています。
+BungeeCordは長期起動するとスローダウンを起こすため、kedaのCRDsである[`ScaledObjects`](./app-templates/minecraft-gateway-bungeecord/scaledobject.yaml)によって定期的な再起動を行なっています。
 
 ## `Service` の VIP 割り当て
 

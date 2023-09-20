@@ -17,7 +17,7 @@
     "fileMatch": [
       "^helm-charts/[^/]+/templates/.+\\.yaml$",
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
-      "^seichi-onp-k8s/manifests/seichi-kubernetes/kustomize-bases/.+\\.yaml$"
+      "^seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/.+\\.yaml$"
     ]
   },
   "regexManagers": [
