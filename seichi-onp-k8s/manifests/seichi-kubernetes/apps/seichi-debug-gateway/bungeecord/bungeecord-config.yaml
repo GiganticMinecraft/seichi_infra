@@ -3,7 +3,7 @@ kind: BungeeConfigMapTemplate
 metadata:
   name: bungeecord-config
 spec:
-  dataGoTemplate:
+  dataGoTemplate: |-
     config.yml: |
       servers:
         deb-s1:
