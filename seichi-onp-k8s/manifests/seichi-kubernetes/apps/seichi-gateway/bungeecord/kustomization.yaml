@@ -3,9 +3,9 @@ kind: Kustomization
 namespace: seichi-gateway
 resources:
   - "../../../app-templates/minecraft-gateway-bungeecord"
+  - "./bungeecord-config.yaml"
 
 patchesStrategicMerge:
-  - "bungeecord-config-patch.yaml"
   - "bungeecord-metrics-patch.yaml"
   - "bungeecord-plugin-configs-patch.yaml"
   - "service-bungeecord-loadbalancer.yaml"

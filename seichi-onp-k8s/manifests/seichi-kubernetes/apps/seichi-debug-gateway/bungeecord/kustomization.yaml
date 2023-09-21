@@ -12,11 +12,11 @@ transformers:
 
 resources:
   - "../../../app-templates/minecraft-gateway-bungeecord"
+  - "./bungeecord-config.yaml"
   - "./bungeesemaphore-redis.yaml"
   - "./redisbungee-redis.yaml"
 
 patchesStrategicMerge:
-  - "bungeecord-config-patch.yaml"
   - "bungeecord-metrics-patch.yaml"
   - "bungeecord-plugin-configs-patch.yaml"
   - "service-bungeecord-loadbalancer.yaml"
