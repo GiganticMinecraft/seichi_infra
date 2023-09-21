@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: seichi-debug-gateway
 resources:
   - "../../../app-templates/minecraft-gateway-bungeecord"
+  - "./bungeesemaphore-redis.yaml"
+  - "./redisbungee-redis.yaml"
 
 patchesStrategicMerge:
   - "bungeecord-config-patch.yaml"
