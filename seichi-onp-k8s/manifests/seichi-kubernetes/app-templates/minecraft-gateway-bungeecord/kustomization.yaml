@@ -6,6 +6,5 @@ resources:
   - "./scaled-object.yaml"
   - "./service-bungeecord-loadbalancer.yaml"
   - "./service-bungeecord-metrics.yaml"
-  - "./configs/bungeecord-config.yaml"
   - "./configs/plugin-configs.yaml"
   - "./configs/jmx-exporter-config.yaml"
