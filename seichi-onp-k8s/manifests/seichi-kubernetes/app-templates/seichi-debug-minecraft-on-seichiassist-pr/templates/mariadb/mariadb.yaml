@@ -1,7 +1,6 @@
 apiVersion: mariadb.mmontes.io/v1alpha1
 kind: MariaDB
 metadata:
-  namespace: seichi-debug-minecraft
   name: mariadb
 spec:
   rootPasswordSecretKeyRef:
