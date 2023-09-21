@@ -4,7 +4,7 @@ metadata:
   name: seichi-debug-redisbungee-redis
   namespace: argocd
 spec:
-  project: seichi-debug-minecraft
+  project: seichi-debug-gateway
   source:
     chart: redis
     repoURL: https://charts.bitnami.com/bitnami
@@ -72,7 +72,7 @@ spec:
                     Redis&reg; instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
   destination:
     server: https://kubernetes.default.svc
-    namespace: seichi-debug-minecraft
+    namespace: seichi-debug-gateway
   syncPolicy:
     automated:
       prune: true
