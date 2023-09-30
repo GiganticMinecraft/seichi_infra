@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - ".github/workflows/pluto.yaml"
-      - "helm-charts/cloudflared-tunnel/**"
       - "seichi-onp-k8s/manifests/seichi-kubernetes/**"
 
 jobs:
@@ -19,8 +18,8 @@ jobs:
 
       - name: Use pluto
         run: |
-          pluto detect-files -d helm-charts/cloudflared-tunnel --target-versions k8s=v1.27.5
+          pluto detect-files -d seichi-onp-k8s/manifests/seichi-kubernetes/apps --target-versions k8s=v1.27.5
 
       - name: Use pluto
         run: |
-          pluto detect-files -d seichi-onp-k8s/manifests/seichi-kubernetes/apps --target-versions k8s=v1.27.5
+          pluto detect-files -d seichi-onp-k8s/manifests/seichi-kubernetes/app-templates --target-versions k8s=v1.27.5
