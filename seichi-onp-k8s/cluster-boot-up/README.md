@@ -192,14 +192,13 @@ CNI には Cilium を利用しています。
         ssh seichi-onp-k8s-wk-3 "hostname"
         ```
 
- 1. クラスタの基点となる cp-1 の初期化が終わっていることをチェックします。
+ 1. クラスタの基点となる cp-1 の初期化およびansible-playbookが終わっていることをチェックします。
 
     ```bash
-    # 最初のコントロールプレーンのkubeadm initが終わっているかチェック
     ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
     ```
 
- 1. 各VMの実行ログをチェックします。
+ 1. 何らかのエラーが発生している場合は、必要に応じて各VMの実行ログをチェックします。
 
     ```bash
     ssh seichi-onp-k8s-cp-1 "sudo cat /var/log/cloud-init-output.log"
@@ -226,39 +225,17 @@ CNI には Cilium を利用しています。
     ```bash
     /bin/bash <(curl -s "https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-up/scripts/local-terminal/deploy-k8s-api-cloudflared-resources-to-cp-1.sh") "${TARGET_BRANCH}"
     ```
+ 1. GitHub Actions で実行される terraform コマンドの実行に必要な `kubeconfig` を `seichi_infra` リポジトリの Actions secrets として設定します。
 
- 1. 作成した全ノードをクラスタ内に引き込みます。
-
-    以下のコマンドをローカル端末で実行してください。
-
-    ```sh
-    # join_kubeadm_cp.yaml を seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 にコピー
-    scp -3 seichi-onp-k8s-cp-1:~/join_kubeadm_cp.yaml seichi-onp-k8s-cp-2:~/
-    scp -3 seichi-onp-k8s-cp-1:~/join_kubeadm_cp.yaml seichi-onp-k8s-cp-3:~/
-
-    # seichi-onp-k8s-cp-2 と seichi-onp-k8s-cp-3 で kubeadm join
-    ssh seichi-onp-k8s-cp-2 "sudo kubeadm join --config ~/join_kubeadm_cp.yaml"
-    ssh seichi-onp-k8s-cp-3 "sudo kubeadm join --config ~/join_kubeadm_cp.yaml"
-
-    # join_kubeadm_wk.yaml を seichi-onp-k8s-wk-1 と seichi-onp-k8s-wk-2 と seichi-onp-k8s-wk-3 にコピー
-    scp -3 seichi-onp-k8s-cp-1:~/join_kubeadm_wk.yaml seichi-onp-k8s-wk-1:~/
-    scp -3 seichi-onp-k8s-cp-1:~/join_kubeadm_wk.yaml seichi-onp-k8s-wk-2:~/
-    scp -3 seichi-onp-k8s-cp-1:~/join_kubeadm_wk.yaml seichi-onp-k8s-wk-3:~/
-
-    # seichi-onp-k8s-wk-1 と seichi-onp-k8s-wk-2 と seichi-onp-k8s-wk-3 で kubeadm join
-    ssh seichi-onp-k8s-wk-1 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
-    ssh seichi-onp-k8s-wk-2 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
-    ssh seichi-onp-k8s-wk-3 "sudo kubeadm join --config ~/join_kubeadm_wk.yaml"
-    ```
-
- 1. コントロールプレーンの全ノードにkubeconfigを配布します。
-
-    以下のコマンドをローカル端末で実行してください。
+    https://github.com/GiganticMinecraft/seichi_infra/settings/secrets/actions にアクセスし `Repository secrets > TF_VAR_ONP_K8S_KUBECONFIG` に下記コマンドの標準出力を注入してください。
 
     ```bash
-    ssh seichi-onp-k8s-cp-2 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
-    ssh seichi-onp-k8s-cp-3 "mkdir -p \$HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config &&sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config"
+    ssh seichi-onp-k8s-cp-1 "cat ~/.kube/config" 
     ```
+
+ 1. GitHub Actions にて初回の `terraform apply` を実行します。
+
+    https://github.com/GiganticMinecraft/seichi_infra/actions/workflows/terraform_apply.yaml にアクセスし `Run workflow` をクリックするとポップアップが出てくるので `Use workflow from` は `main` ブランチを選択して `Run workflow` をクリックします。
 
  1. 軽い動作チェック
 
@@ -268,6 +245,15 @@ CNI には Cilium を利用しています。
     ssh seichi-onp-k8s-cp-1 "kubectl get node -o wide && kubectl get pod -A -o wide"
     ssh seichi-onp-k8s-cp-2 "kubectl get node -o wide && kubectl get pod -A -o wide"
     ssh seichi-onp-k8s-cp-3 "kubectl get node -o wide && kubectl get pod -A -o wide"
+    ```
+ 1. 各ノードの `cloudinit` ユーザーのパスワードを変更します。初期パスワードとして `zaq12wsx` が設定されています。
+
+    セキュリティの観点から、推測されにくく十分に堅牢なパスワードを設定してください。
+
+    ```bash
+    for host in seichi-onp-k8s-cp-1 seichi-onp-k8s-cp-2 seichi-onp-k8s-cp-3 seichi-onp-k8s-wk-1 seichi-onp-k8s-wk-2 seichi-onp-k8s-wk-3 ; do
+      ssh $host sudo passwd cloudinit
+    done
     ```
 
 ## クラスタ操作
