@@ -176,7 +176,7 @@ resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
   chart      = "raw-resources"
   name       = "mariadb-monitoring-password-raw-resource"
   namespace  = "kube-system"
-  version    = "0.2.0"
+  version    = "0.3.0"
 
   set_list {
     name = "manifests"
