@@ -174,7 +174,7 @@ resource "kubernetes_manifest" "onp_minecraft_mariadb_monitoring_password" {
       - seichi-minecraft
       - seichi-debug-minecraft-on-seichiassist-pr-*
     data:
-      monitoring-password: ${ base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result) }
+      monitoring-password: ${base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result)}
   EOS
   )
 }
