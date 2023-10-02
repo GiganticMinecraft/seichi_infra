@@ -178,8 +178,9 @@ resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
   namespace  = "kube-system"
   version    = "0.2.0"
 
-  values = {
-    manifests = [<<-EOS
+  set_sensitive {
+    name = "manifests"
+    value = [<<-EOS
       kind: ClusterSecret
       apiVersion: clustersecret.io/v1
       metadata:
