@@ -1,3 +1,19 @@
+# 複数 Namespace 間で共有する秘匿値があるので、ClusterSecret controller を利用する
+resource "helm_release" "onp_cluster_clustersecret" {
+  depends_on = [kubernetes_namespace.onp_clustersecret]
+
+  # https://github.com/zakkg3/ClusterSecret/tree/bab429d98b9da19debf97259fdba01211fa8dd43#using-the-official-helm-chart
+  repository = "https://charts.clustersecret.io/"
+  chart      = "cluster-secret"
+  name       = "clustersecret"
+  namespace  = "kube-system"
+  version    = "0.2.1"
+
+  reset_values    = true
+  recreate_pods   = true
+  cleanup_on_fail = true
+}
+
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   depends_on = [kubernetes_namespace.onp_argocd]
 
@@ -144,32 +160,21 @@ resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
 }
 
-resource "kubernetes_secret" "onp_minecraft_grafana_mariadb_monitoring_password" {
-  depends_on = [kubernetes_namespace.onp_monitoring]
+resource "kubernetes_manifest" "onp_minecraft_mariadb_monitoring_password" {
+  depends_on = [helm_release.onp_cluster_clustersecret]
 
-  metadata {
-    name      = "mariadb-monitoring"
-    namespace = "monitoring"
-  }
-
-  data = {
-    "monitoring-password" = random_password.minecraft__prod_mariadb_monitoring_password.result
-  }
-
-  type = "Opaque"
-}
-
-resource "kubernetes_secret" "onp_minecraft_prod_mariadb_monitoring_password" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
-
-  metadata {
-    name      = "mariadb-monitoring"
-    namespace = "seichi-minecraft"
-  }
-
-  data = {
-    "monitoring-password" = random_password.minecraft__prod_mariadb_monitoring_password.result
-  }
-
-  type = "Opaque"
+  manifest = yamldecode(<<-EOS
+    kind: ClusterSecret
+    apiVersion: clustersecret.io/v1
+    metadata:
+      namespace: clustersecret
+      name: mariadb-monitoring-password
+    matchNamespace:
+      - monitoring
+      - seichi-minecraft
+      - seichi-debug-minecraft-on-seichiassist-pr-*
+    data:
+      monitoring-password: ${base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result)}
+  EOS
+  )
 }
