@@ -160,21 +160,38 @@ resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
 }
 
-resource "kubernetes_manifest" "onp_minecraft_mariadb_monitoring_password" {
+resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
   depends_on = [helm_release.onp_cluster_clustersecret]
 
-  manifest = yamldecode(<<-EOS
-    kind: ClusterSecret
-    apiVersion: clustersecret.io/v1
-    metadata:
-      namespace: clustersecret
-      name: mariadb-monitoring-password
-    matchNamespace:
-      - monitoring
-      - seichi-minecraft
-      - seichi-debug-minecraft-on-seichiassist-pr-*
-    data:
-      monitoring-password: ${base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result)}
-  EOS
-  )
+  # ClusterSecret controller も helm_release で入れている (onp_cluster_clustersecret) ため、
+  # kubernetes_manifest リソースで ClusterSecret を入れようとすると、controller と ClusterSecret 両方を
+  # (クラスタ再作成時等に) 作成する際に plan が失敗し、apply できなくなる。
+  # https://github.com/hashicorp/terraform-provider-kubernetes/issues/1583
+  #
+  # これを回避するため、 values.yaml 内の manifest をそのまま apply するような Helm chart を作成し、
+  # それを経由して ClusterSecret を作成する。こうすると、Terraform は ClusterSecret manifest の diff を取らずに
+  # `onp_minecraft_mariadb_monitoring_password` に対応する Helm release が存在するかどうかだけを見るようになるので、
+  # 上手くいく。
+  repository = "https://giganticminecraft.github.io/seichi_infra/"
+  chart      = "raw-resources"
+  name       = "mariadb-monitoring-password-raw-resource"
+  namespace  = "kube-system"
+  version    = "0.2.0"
+
+  values = {
+    manifests = [<<-EOS
+      kind: ClusterSecret
+      apiVersion: clustersecret.io/v1
+      metadata:
+        namespace: clustersecret
+        name: mariadb-monitoring-password
+      matchNamespace:
+        - monitoring
+        - seichi-minecraft
+        - seichi-debug-minecraft-on-seichiassist-pr-*
+      data:
+        monitoring-password: ${base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result)}
+    EOS
+    ]
+  }
 }
