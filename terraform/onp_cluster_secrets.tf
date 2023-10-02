@@ -197,6 +197,11 @@ resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
   }
 }
 
+resource "random_password" "minecraft__pr_review_mariadb_root_password" {
+  length  = 16
+  special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
+}
+
 resource "random_password" "minecraft__pr_review_mariadb_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
@@ -222,6 +227,7 @@ resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
       matchNamespace:
         - seichi-debug-minecraft-on-seichiassist-pr-*
       data:
+        root-password: ${base64encode(random_password.minecraft__pr_review_mariadb_root_password.result)}
         mcserver-password: ${base64encode(random_password.minecraft__pr_review_mariadb_password.result)}
     EOS
     ]
