@@ -1,0 +1,2 @@
+# Array of manifest strings to be applied to the cluster
+manifests: []
