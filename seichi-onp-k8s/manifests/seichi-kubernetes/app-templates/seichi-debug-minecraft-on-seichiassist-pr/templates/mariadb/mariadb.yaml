@@ -10,7 +10,7 @@ spec:
   database: seichiassist
   username: mcserver
   passwordSecretKeyRef:
-    name: mariadb
+    name: mariadb-pr-review-password
     key: mcserver-password
 
   image:
