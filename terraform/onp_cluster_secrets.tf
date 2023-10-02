@@ -1,3 +1,17 @@
+# 複数 Namespace 間で共有する秘匿値があるので、ClusterSecret controller を利用する
+resource "helm_release" "onp_cluster_clustersecret" {
+  # https://github.com/zakkg3/ClusterSecret/tree/bab429d98b9da19debf97259fdba01211fa8dd43#using-the-official-helm-chart
+  repository = "https://charts.clustersecret.io/"
+  chart      = "cluster-secret"
+  name       = "clustersecret"
+  namespace  = "kube-system"
+  version    = "0.2.1"
+
+  reset_values    = true
+  recreate_pods   = true
+  cleanup_on_fail = true
+}
+
 resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   depends_on = [kubernetes_namespace.onp_argocd]
 
@@ -106,6 +120,8 @@ resource "kubernetes_secret" "minio_root_user" {
 
   type = "Opaque"
 }
+
+# TODO: replace with ClusterSecret
 
 resource "kubernetes_secret" "minio_prod_access_secret" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
