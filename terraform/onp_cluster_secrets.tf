@@ -196,3 +196,34 @@ resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
     ]
   }
 }
+
+resource "random_password" "minecraft__pr_review_mariadb_password" {
+  length  = 16
+  special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
+}
+
+resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
+  depends_on = [helm_release.onp_cluster_clustersecret]
+
+  repository = "https://giganticminecraft.github.io/seichi_infra/"
+  chart      = "raw-resources"
+  name       = "mariadb-pr-review-password-raw-resource"
+  namespace  = "kube-system"
+  version    = "0.3.0"
+
+  set_list {
+    name = "manifests"
+    value = [<<-EOS
+      kind: ClusterSecret
+      apiVersion: clustersecret.io/v1
+      metadata:
+        namespace: clustersecret
+        name: mariadb-pr-review-password
+      matchNamespace:
+        - seichi-debug-minecraft-on-seichiassist-pr-*
+      data:
+        mcserver-password: ${base64encode(random_password.minecraft__pr_review_mariadb_password.result)}
+    EOS
+    ]
+  }
+}
