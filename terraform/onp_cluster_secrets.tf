@@ -1,6 +1,6 @@
 # 複数 Namespace 間で共有する秘匿値があるので、ClusterSecret controller を利用する
 resource "helm_release" "onp_cluster_clustersecret" {
-  depends_on = [kubernetes_namespace.clustersecret]
+  depends_on = [kubernetes_namespace.onp_clustersecret]
 
   # https://github.com/zakkg3/ClusterSecret/tree/bab429d98b9da19debf97259fdba01211fa8dd43#using-the-official-helm-chart
   repository = "https://charts.clustersecret.io/"
