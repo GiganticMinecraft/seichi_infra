@@ -130,6 +130,48 @@ spec:
               requests:
                 memory: 2Gi
             retention: 60d
+        dashboardProviders:
+          dashboardproviders.yaml:
+            apiVersion: 1
+            providers:
+            - name: 'addons-by-helm'
+              orgId: 2
+              folder: 'addons-by-helm'
+              type: file
+              allowUiUpdates: true
+              disableDeletion: true
+              editable: false
+              options:
+                path: /var/lib/grafana/dashboards/addons-by-helm
+        dashboards:
+          addons-by-helm:
+            cilium-agent:
+              gnetId: 16611
+              revision: 1
+              datasource: Prometheus
+            cilium-operator:
+              gnetId: 16612
+              revision: 1
+              datasource: Prometheus
+            cilium-hubble:
+              gnetId: 16613
+              revision: 1
+              datasource: Prometheus
+            argocd:
+              gnetId: 14584
+              revision: 1
+            synology-details:
+              gnetId: 14284
+              revision: 9
+              datasource: Prometheus
+            synology-overview:
+              gnetId: 14364
+              revision: 8
+              datasource: Prometheus
+            disconnected-log-metrics-bungee:
+              gnetId: 19689
+              revision: 2
+              datasource: Loki
         alertmanager:
           enabled: false
         kubeProxy:
