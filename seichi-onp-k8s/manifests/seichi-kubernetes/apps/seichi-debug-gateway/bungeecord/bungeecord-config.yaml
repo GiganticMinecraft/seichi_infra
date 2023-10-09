@@ -6,12 +6,12 @@ spec:
   dataGoTemplate: |-
     config.yml: |
       servers:
-        {{ range . }}
+      {{- range . }}
         debug-pr-{{ . }}:
           address: mcserver--debug-s1.seichi-debug-minecraft-on-seichiassist-pr-{{ . }}:25565
           restricted: false
           motd: ''
-        {{ end }}
+      {{- end }}
 
       listeners:
         - priorities:
