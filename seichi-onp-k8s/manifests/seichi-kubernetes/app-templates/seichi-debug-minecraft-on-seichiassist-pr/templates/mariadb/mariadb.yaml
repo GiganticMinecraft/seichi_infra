@@ -4,13 +4,13 @@ metadata:
   name: mariadb
 spec:
   rootPasswordSecretKeyRef:
-    name: mariadb
+    name: mariadb-pr-review-password
     key: root-password
 
   database: seichiassist
   username: mcserver
   passwordSecretKeyRef:
-    name: mariadb
+    name: mariadb-pr-review-password
     key: mcserver-password
 
   image:
