@@ -15,9 +15,10 @@ spec:
 
       listeners:
         - priorities:
-            - deb-s1
+            # FIXME: PR が一個も出ていない時に壊れる。そもそもそのような状況で繋ぐサーバーを用意すべきかも
+            - debug-pr-{{ (index . 0) }}
           forced_hosts:
-            play-debug.seichi.click: deb-s1
+            play-debug.seichi.click: debug-pr-{{ (index . 0) }}
 
           query_port: 25565
           motd: ''
