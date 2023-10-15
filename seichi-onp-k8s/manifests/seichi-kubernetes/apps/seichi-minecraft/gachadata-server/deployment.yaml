@@ -14,10 +14,10 @@ spec:
     metadata:
       labels:
         app: gachadata-server
-    spec:  
+    spec:
       containers:
         - name: gachadata-server
-          image: ghcr.io/giganticminecraft/gachadata-server:sha-74b86fa
+          image: ghcr.io/giganticminecraft/gachadata-server:sha-1f08a77
           resources:
             requests:
               cpu: 250m
