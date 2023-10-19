@@ -13,10 +13,8 @@ spec:
     name: mariadb-pr-review-password
     key: mcserver-password
 
-  image:
-    repository: mariadb
-    tag: "10.11.4"
-    pullPolicy: IfNotPresent
+  image: mariadb:10.11.4"
+  imagePullPolicy: IfNotPresent
 
   port: 3306
 
