@@ -7,7 +7,7 @@ spec:
   mariaDbRef:
     name: mariadb
   passwordSecretKeyRef:
-    name: mariadb-monitoring
+    name: mariadb-monitoring-password
     key: monitoring-password
   # This field is immutable and defaults to 10
   maxUserConnections: 5
