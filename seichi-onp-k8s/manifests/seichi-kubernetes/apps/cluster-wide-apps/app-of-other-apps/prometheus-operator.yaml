@@ -93,7 +93,7 @@ spec:
           envValueFrom:
             MARIADB_MONITORING_PASSWORD:
               secretKeyRef:
-                name: mariadb-monitoring
+                name: mariadb-monitoring-password
                 key: monitoring-password
           envFromSecret: "grafana-github-oauth-app-secret"
           persistence:
