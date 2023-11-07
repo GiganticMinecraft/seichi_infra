@@ -16,7 +16,7 @@ spec:
         app: idea-reaction
     spec:
       - name: idea-reaction
-        image: ghcr.io/giganticminecraft/idea-reaction:latest
+        image: ghcr.io/giganticminecraft/idea-reaction:42a57b77637240c64672a6a64cc909a0c50509fa
         resources:
           requests:
             cpu: 250m
