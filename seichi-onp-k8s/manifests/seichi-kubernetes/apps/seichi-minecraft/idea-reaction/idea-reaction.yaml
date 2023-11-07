@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idea-reaction
+  namespace: seichi-minecraft
+  labels:
+    app: idea-reaction
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: idea-reaction
+  template:
+    metadata:
+      labels:
+        app: idea-reaction
+    spec:
+      - name: idea-reaction
+        image: ghcr.io/giganticminecraft/idea-reaction:latest
+        resources:
+          requests:
+            cpu: 250m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        env:
+          - name: TARGET_CHANNEL_ID
+            value: "959292335177486367"
+          # Webhook ID は Webhook の UserId と同一のため, 公開情報になる.
+          - name: TARGET_WEBHOOK_ID
+            value: "959307225413845072"
+          - name: TARGET_GUILD_ID
+            value: "237758724121427969"
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: idea-reaction-discord-token
+                key: IDEA_REACTION_DISCORD_TOKEN
+        envFrom:
+          - configMapRef:
+              name: idea-reaction-config

@@ -286,6 +286,12 @@ variable "minecraft__prod_game_db__password" {
   sensitive   = true
 }
 
+variable "minecraft__idea_reaction_discord_token" {
+  description = "Token set to the production idea-reaction"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region env variables for Cloudflare Pages projects
