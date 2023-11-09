@@ -1,5 +1,5 @@
 name: Build Minecraft Server Images
-on: 
+on:
   push:
     paths:
       - ".github/workflows/build_mcserver_images.yaml"
@@ -93,3 +93,10 @@ jobs:
           cache-from: type=gha
           # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
           cache-to: type=gha,mode=max
+          build-args: |
+            MINIO_ENDPOINT=seichi-private-plugin-blackhole-minio-console.minio:9001
+            MINIO_ACCESS_KEY= ${{ secrets.TF_VAR_MINIO_PROD_ACCESS_KEY }}
+            MINIO_ACCESS_SECRET=${{ secrets.TF_VAR_MINIO_PROD_ACCESS_SECRET }}
+            BUCKET_NAME=seichi-plugins 
+            BUCKET_PREFIX_NAME=deb-1-18-2 
+            DOWNLOAD_TARGET_DIR_PATH=/plugins
