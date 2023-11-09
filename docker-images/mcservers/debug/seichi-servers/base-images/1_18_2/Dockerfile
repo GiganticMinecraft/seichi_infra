@@ -2,13 +2,6 @@ FROM ghcr.io/giganticminecraft/mod-downloader:sha-39a89de as mod-downloader
 
 FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:57accce4686dfe6bf6cb5107a664b169f130e97ef697ea7b37778a14e7f942e6
 
-ARG MINIO_ENDPOINT
-ARG MINIO_ACCESS_KEY
-ARG MINIO_ACCESS_SECRET
-ARG BUCKET_NAME
-ARG BUCKET_PREFIX_NAME
-ARG DOWNLOAD_TARGET_DIR_PATH
-
 ENV VERSION="1.18.2"
 
 # プラグインリスト
