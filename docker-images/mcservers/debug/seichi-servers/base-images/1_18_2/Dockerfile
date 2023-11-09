@@ -1,3 +1,5 @@
+FROM ghcr.io/giganticminecraft/mod-downloader:sha-39a89de as mod-downloader
+
 FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:57accce4686dfe6bf6cb5107a664b169f130e97ef697ea7b37778a14e7f942e6
 
 ENV VERSION="1.18.2"
@@ -6,6 +8,9 @@ ENV VERSION="1.18.2"
 #   このイメージでは基底のリスト (/extras/plugin-list.ini) に追記する
 COPY --link ./additional-plugin-list.ini /extras/additional-plugin-list.ini
 RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.ini"
+
+COPY --from=mod-downloader ./bin/ /
+RUN /mod-downloader
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
