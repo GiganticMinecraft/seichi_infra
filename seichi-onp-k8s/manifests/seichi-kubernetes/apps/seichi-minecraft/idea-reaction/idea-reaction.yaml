@@ -20,10 +20,10 @@ spec:
         resources:
           requests:
             cpu: 250m
-            memory: 128Mi
+            memory: 16Mi
           limits:
             cpu: 500m
-            memory: 256Mi
+            memory: 32Mi
         volumeMounts:
           - name: idea-reaction-config-volume
             mountPath: /home/idea-reaction/assets/config.yaml
