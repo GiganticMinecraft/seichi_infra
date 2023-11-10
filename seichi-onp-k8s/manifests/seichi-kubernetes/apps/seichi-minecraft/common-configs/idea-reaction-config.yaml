@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+matadata:
+  name: idea-reaction-config
+data:
+  config.yaml: |
+    reactions: ["👍", "👎"]
