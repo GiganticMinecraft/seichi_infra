@@ -24,6 +24,9 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+        volumeMounts:
+          - name: idea-reaction-config-volume
+            mountPath: /home/idea-reaction/assets/config.yaml
         env:
           - name: TARGET_CHANNEL_ID
             value: "959292335177486367"
@@ -37,6 +40,7 @@ spec:
               secretKeyRef:
                 name: idea-reaction-discord-token
                 key: IDEA_REACTION_DISCORD_TOKEN
-        envFrom:
-          - configMapRef:
+        volumes:
+          - name: idea-reaction-config-volume
+            configMap:
               name: idea-reaction-config
