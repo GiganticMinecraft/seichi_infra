@@ -15,7 +15,7 @@ spec:
       labels:
         app: idea-reaction
     spec:
-      container:
+      containers:
         - name: idea-reaction
           image: ghcr.io/giganticminecraft/idea-reaction:42a57b77637240c64672a6a64cc909a0c50509fa
           resources:
