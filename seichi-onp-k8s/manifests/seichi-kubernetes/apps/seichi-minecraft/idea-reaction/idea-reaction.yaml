@@ -41,7 +41,7 @@ spec:
                 secretKeyRef:
                   name: idea-reaction-discord-token
                   key: IDEA_REACTION_DISCORD_TOKEN
-          volumes:
-            - name: idea-reaction-config-volume
-              configMap:
-                name: idea-reaction-config
+      volumes:
+        - name: idea-reaction-config-volume
+          configMap:
+            name: idea-reaction-config
