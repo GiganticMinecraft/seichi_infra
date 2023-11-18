@@ -43,7 +43,7 @@ spec:
                 secretKeyRef:
                   name: mcserver--common--config-secrets
                   key: MINIO_DEBUG_ACCESS_KEY
-            - name: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
               valueFrom:
                 secretKeyRef:
                   name: mcserver--common--config-secrets
