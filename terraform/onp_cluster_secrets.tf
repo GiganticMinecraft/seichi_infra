@@ -233,3 +233,16 @@ resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
     ]
   }
 }
+
+resource "kubernetes_secret" "idea_reaction_discord_token" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "idea-reaction-discord-token"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    IDEA_REACTION_DISCORD_TOKEN = var.minecraft__idea_reaction_discord_token
+  }
+}
