@@ -7,9 +7,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
   }
 
   data = {
-    DISCORDSRV_TOKEN          = var.minecraft__discordsrv_bot_token
-    MINIO_DEBUG_ACCESS_KEY    = var.minio_debug_access_key
-    MINIO_DEBUG_ACCESS_SECRET = var.minio_debug_access_secret
+    DISCORDSRV_TOKEN = var.minecraft__discordsrv_bot_token
   }
 
   type = "Opaque"
