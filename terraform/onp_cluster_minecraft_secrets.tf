@@ -24,9 +24,8 @@ resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
   }
 
   data = {
-    DISCORDSRV_TOKEN            = var.minecraft__discordsrv_bot_token
-    GAME_DB_PASSWORD            = var.minecraft__prod_game_db__password
-    IDEA_REACTION_DISCORD_TOKEN = var.minecraft__idea_reaction_discord_token
+    DISCORDSRV_TOKEN = var.minecraft__discordsrv_bot_token
+    GAME_DB_PASSWORD = var.minecraft__prod_game_db__password
   }
 
   type = "Opaque"
