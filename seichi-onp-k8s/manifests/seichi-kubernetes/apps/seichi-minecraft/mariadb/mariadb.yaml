@@ -21,47 +21,6 @@ spec:
 
   port: 3306
 
-  replicas: 3
-
-  replication:
-    enabled: true
-    primary:
-      podIndex: 0
-      automaticFailover: true
-    replica:
-      waitPoint: AfterSync
-      connectionTimeout: 10s
-      connectionRetries: 10
-      syncTimeout: 10s
-
-  primaryService:
-    type: ClusterIP
-  primaryConnection:
-    secretName: primary-mariadb-conn
-    secretTemplate:
-      key: dsn
-
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - topologyKey: "kubernetes.io/hostname"
-
-  tolerations:
-    - key: "mariadb.mmontes.io/ha"
-      operator: "Exists"
-      effect: "NoSchedule"
-
-  podDisruptionBudget:
-    minAvailable: "66%"
-
-  myCnf: |
-    [mysqld]
-    bind-address=0.0.0.0
-    default_storage_engine=InnoDB
-    binlog_format=row
-    innodb_autoinc_lock_mode=2
-    max_allowed_packet=256M
-
   volumeClaimTemplate:
     resources:
       requests:
