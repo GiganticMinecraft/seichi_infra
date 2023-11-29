@@ -1,10 +1,10 @@
 [k8s-servers]
-seichi-onp-k8s-cp-1 ansible_host=192.168.8.11
-seichi-onp-k8s-cp-2 ansible_host=192.168.8.12
-seichi-onp-k8s-cp-3 ansible_host=192.168.8.13
-seichi-onp-k8s-wk-1 ansible_host=192.168.8.21
-seichi-onp-k8s-wk-2 ansible_host=192.168.8.22
-seichi-onp-k8s-wk-3 ansible_host=192.168.8.23
+seichi-onp-k8s-cp-1 ansible_host=192.168.0.11
+seichi-onp-k8s-cp-2 ansible_host=192.168.0.12
+seichi-onp-k8s-cp-3 ansible_host=192.168.0.13
+seichi-onp-k8s-wk-1 ansible_host=192.168.0.21
+seichi-onp-k8s-wk-2 ansible_host=192.168.0.22
+seichi-onp-k8s-wk-3 ansible_host=192.168.0.23
 
 [k8s-servers:vars]
 ansible_ssh_pass=zaq12wsx
@@ -18,33 +18,33 @@ ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
 [k8s-servers-cp-with-ssh]
-seichi-onp-k8s-cp-1 ansible_host=192.168.8.11
-seichi-onp-k8s-cp-2 ansible_host=192.168.8.12
-seichi-onp-k8s-cp-3 ansible_host=192.168.8.13
+seichi-onp-k8s-cp-1 ansible_host=192.168.0.11
+seichi-onp-k8s-cp-2 ansible_host=192.168.0.12
+seichi-onp-k8s-cp-3 ansible_host=192.168.0.13
 
 [k8s-servers-cp-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
 [k8s-servers-cp-leader-with-ssh]
-seichi-onp-k8s-cp-1 ansible_host=192.168.8.11
+seichi-onp-k8s-cp-1 ansible_host=192.168.0.11
 
 [k8s-servers-cp-leader-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
 [k8s-servers-cp-follower-with-ssh]
-seichi-onp-k8s-cp-2 ansible_host=192.168.8.12
-seichi-onp-k8s-cp-3 ansible_host=192.168.8.13
+seichi-onp-k8s-cp-2 ansible_host=192.168.0.12
+seichi-onp-k8s-cp-3 ansible_host=192.168.0.13
 
 [k8s-servers-cp-follower-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
 [k8s-servers-wk-with-ssh]
-seichi-onp-k8s-wk-1 ansible_host=192.168.8.21
-seichi-onp-k8s-wk-2 ansible_host=192.168.8.22
-seichi-onp-k8s-wk-3 ansible_host=192.168.8.23
+seichi-onp-k8s-wk-1 ansible_host=192.168.0.21
+seichi-onp-k8s-wk-2 ansible_host=192.168.0.22
+seichi-onp-k8s-wk-3 ansible_host=192.168.0.23
 
 [k8s-servers-wk-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519

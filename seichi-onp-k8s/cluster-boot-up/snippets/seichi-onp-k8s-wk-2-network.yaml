@@ -4,9 +4,9 @@ config:
     name: ens18
     subnets:
     - type: static
-      address: '192.168.8.22'
-      netmask: '255.255.240.0'
-      gateway: '192.168.1.1'
+      address: '192.168.0.22'
+      netmask: '255.255.252.0'
+      gateway: '192.168.3.254'
   - type: physical
     name: ens19
     subnets:
@@ -15,6 +15,6 @@ config:
       netmask: '255.255.252.0'
   - type: nameserver
     address:
-    - '192.168.1.1'
+    - '192.168.100.1'
     search:
     - 'local'

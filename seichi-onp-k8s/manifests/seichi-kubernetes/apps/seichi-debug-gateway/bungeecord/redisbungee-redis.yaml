@@ -20,7 +20,7 @@ spec:
         master:
           service:
             type: LoadBalancer
-            loadBalancerIP: 192.168.8.134
+            loadBalancerIP: 192.168.0.134
           resources:
             requests:
               cpu: "250m"
