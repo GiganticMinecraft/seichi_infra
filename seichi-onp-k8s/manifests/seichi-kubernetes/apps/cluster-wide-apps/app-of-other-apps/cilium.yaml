@@ -15,6 +15,8 @@ spec:
         kubeProxyReplacement: strict
         k8sServiceHost: 192.168.18.100 # modify it if necessary
         k8sServicePort: 8443
+        bgpControlPlane:
+          enabled: true
         pprof:
           enabled: true
         loadBalancer:
@@ -95,3 +97,104 @@ spec:
     automated:
       prune: true
       selfHeal: true
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "lb-pool"
+spec:
+  cidrs:
+  # 10.96.0.0-10.96.3.255 をloadBalancerのIPに割当可能
+  - cidr: "10.96.0.0/22"
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-cp-1
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-cp-1
+  virtualRouters:
+  - localASN: 65184
+    exportPodCIDR: true
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-cp-2
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-cp-2
+  virtualRouters:
+  - localASN: 65184
+    exportPodCIDR: true
+    serviceSelector:
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-cp-3
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-cp-3
+  virtualRouters:
+  - localASN: 65184
+    exportPodCIDR: true
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-wk-1
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-wk-1
+  virtualRouters:
+  - localASN: 65184
+    exportPodCIDR: true
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-wk-2
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-wk-2
+  virtualRouters:
+  - localASN: 65184
+    exportPodCIDR: true
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-wk-3
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-wk-3
+  virtualRouters:
+  - localASN: 65184
+    exportPodCIDR: true
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+---

@@ -42,8 +42,8 @@ TCP パケットをそのまま送り届ける必要があります。
 
 | サービス                     | `Service` の VIP                                            | 
 | ---------------------------- | ----------------------------------------------------------- | 
-|  BungeeCord (本番環境用)     | [`192.168.0.130`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
-|  BungeeCord (デバッグ環境用) | [`192.168.0.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
+|  BungeeCord (本番環境用)     | [`10.96.0.130`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
+|  BungeeCord (デバッグ環境用) | [`10.96.0.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
 |  投票受付サーバー            | (まだ k8s 上に乗っていないので、 `Service` の VIP ではない) |
 
 ### オンプレネットワーク内からのトラフィックを受ける `Service`

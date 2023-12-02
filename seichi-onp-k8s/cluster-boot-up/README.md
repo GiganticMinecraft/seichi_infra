@@ -50,14 +50,16 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
  - Storage Network (192.168.16.0/22)
  - Kubernetes
    - Internal
-     - Pod Network (10.128.0.0/16)
-     - Service Network (10.96.0.0/16)
+    - Pod Network (10.96.128.0/18)
+    - Service Network (10.96.64.0/18)
    - External
      - Node IP
        - Service Network (192.168.0.0-192.168.0.127)
+         - 192.168.0.0/22 の一部を使用
        - Storage Network (192.168.18.0-192.168.18.127)
+         - 192.168.16.0/22 の一部を使用
      - API Endpoint (192.168.18.100)
-     - LoadBalancer VIP (192.168.0.128-192.168.0.255)
+    - LoadBalancer VIP (10.96.0.0/22)
 
 ## Kubernetesクラスタの構成
 
