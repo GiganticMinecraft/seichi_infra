@@ -9,9 +9,6 @@ nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
   kubeletExtraArgs:
     node-ip: "{{ host_addr_cls }}"
-localAPIEndpoint:
-  advertiseAddress: "{{ host_addr_cls }}"
-  bindPort: 6443
 discovery:
   bootstrapToken:
     apiServerEndpoint: "{{ kube_api_server_vip }}:8443"
@@ -19,3 +16,6 @@ discovery:
     unsafeSkipCAVerification: true
 controlPlane:
   certificateKey: "{{ kubeadm_uploaded_certs }}"
+  localAPIEndpoint:
+    advertiseAddress: "{{ host_addr_cls }}"
+    bindPort: 6443
