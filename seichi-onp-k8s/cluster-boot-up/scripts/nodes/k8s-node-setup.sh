@@ -343,15 +343,15 @@ helm install cilium cilium/cilium \
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
 
+# clone repo
+git clone -b "${TARGET_BRANCH}" https://github.com/GiganticMinecraft/seichi_infra.git "$HOME"/seichi_infra
+
 # add join information to ansible hosts variable
 echo "kubeadm_bootstrap_token: $KUBEADM_BOOTSTRAP_TOKEN" >> "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/group_vars/all.yaml
 echo "kubeadm_uploaded_certs: $KUBEADM_UPLOADED_CERTS" >> "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/group_vars/all.yaml
 
 # install ansible
 sudo apt-get install -y ansible git sshpass
-
-# clone repo
-git clone -b "${TARGET_BRANCH}" https://github.com/GiganticMinecraft/seichi_infra.git "$HOME"/seichi_infra
 
 # export ansible.cfg target
 export ANSIBLE_CONFIG="$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/ansible.cfg
