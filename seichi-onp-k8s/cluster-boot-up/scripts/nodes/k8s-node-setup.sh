@@ -118,8 +118,8 @@ sysctl --system
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 apt-get update
-apt-get install -y kubelet=1.27.5-00 kubeadm=1.27.5-00 kubectl=1.27.5-00
-apt-mark hold kubelet kubeadm kubectl
+apt-get install -y kubeadm kubelet=1.27.6-00 kubectl=1.27.6-00
+apt-mark hold kubelet kubectl
 
 # Disable swap
 swapoff -a
@@ -265,10 +265,11 @@ esac
 
 # Set kubeadm bootstrap token using openssl
 KUBEADM_BOOTSTRAP_TOKEN=$(openssl rand -hex 3).$(openssl rand -hex 8)
+KUBEADM_LOCAL_ENDPOINT=$(ip -4 addr show ens19 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | awk 'NR==1{print $1}')
 
 # Set init configuration for the first control plane
 cat > "$HOME"/init_kubeadm.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 bootstrapTokens:
 - token: "$KUBEADM_BOOTSTRAP_TOKEN"
@@ -276,13 +277,21 @@ bootstrapTokens:
   ttl: "24h"
 nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
+  kubeletExtraArgs:
+    node-ip: "$KUBEADM_LOCAL_ENDPOINT"
+    imagePullPolicy: "IfNotPresent"
+localAPIEndpoint:
+  advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
+  bindPort: 6443
+skipPhases:
+  - addon/kube-proxy
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 networking:
   serviceSubnet: "10.96.0.0/16"
   podSubnet: "10.128.0.0/16"
-kubernetesVersion: "v1.27.5"
+kubernetesVersion: "v1.27.6"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
@@ -304,6 +313,7 @@ controllerManager:
 scheduler:
   extraArgs:
     bind-address: "0.0.0.0"
+clusterName: "unchama-cloud"
 
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -333,43 +343,9 @@ helm install cilium cilium/cilium \
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
 
-# Set join configuration for other control plane nodes
-cat > "$HOME"/join_kubeadm_cp.yaml <<EOF
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-cgroupDriver: "systemd"
-protectKernelDefaults: true
----
-apiVersion: kubeadm.k8s.io/v1beta3
-kind: JoinConfiguration
-nodeRegistration:
-  criSocket: "unix:///var/run/containerd/containerd.sock"
-discovery:
-  bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
-    token: "$KUBEADM_BOOTSTRAP_TOKEN"
-    unsafeSkipCAVerification: true
-controlPlane:
-  certificateKey: "$KUBEADM_UPLOADED_CERTS"
-EOF
-
-# Set join configuration for worker nodes
-cat > "$HOME"/join_kubeadm_wk.yaml <<EOF
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-cgroupDriver: "systemd"
-protectKernelDefaults: true
----
-apiVersion: kubeadm.k8s.io/v1beta3
-kind: JoinConfiguration
-nodeRegistration:
-  criSocket: "unix:///var/run/containerd/containerd.sock"
-discovery:
-  bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
-    token: "$KUBEADM_BOOTSTRAP_TOKEN"
-    unsafeSkipCAVerification: true
-EOF
+# add join information to ansible hosts variable
+echo "kubeadm_bootstrap_token: $KUBEADM_BOOTSTRAP_TOKEN" >> "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/group_vars/all.yaml
+echo "kubeadm_uploaded_certs: $KUBEADM_UPLOADED_CERTS" >> "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/group_vars/all.yaml
 
 # install ansible
 sudo apt-get install -y ansible git sshpass
