@@ -36,7 +36,7 @@ virt-customize -a jammy-server-cloudimg-amd64.img --install liburing2 --install 
 # create a new VM and attach Network Adaptor
 # vmbr0=Service Network Segment (192.168.0.0/20)
 # vmbr1=Storage Network Segment (192.168.16.0/22)
-qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --agent enabled=1,fstrim_cloned_disks=1 --name seichi-onp-k8s-template
+qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --net2 virtio,bridge=vmbr2 --agent enabled=1,fstrim_cloned_disks=1 --name seichi-onp-k8s-template
 
 # import the downloaded disk to $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME storage
 qm importdisk $TEMPLATE_VMID jammy-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
@@ -119,24 +119,6 @@ runcmd:
 EOF
 # ----- #
         # END irregular indent because heredoc
-
-        # only seichi-onp-k8s-cp-1, append snippet for cloud-init(user-config)
-        if [ "${vmname}" = "seichi-onp-k8s-cp-1" ]
-        then
-            # START irregular indent because heredoc
-# --------- #
-cat >> "$SNIPPET_TARGET_PATH"/"$vmname"-user.yaml << EOF
-  # add kubeconfig to cloudinit user
-  - su - cloudinit -c "mkdir -p ~/.kube"
-  - su - cloudinit -c "sudo cp /etc/kubernetes/admin.conf ~/.kube/config"
-  - su - cloudinit -c "sudo chown cloudinit:cloudinit ~/.kube/config"
-  # copy kubeadm-join-config to cloudinit user home directory
-  - su - cloudinit -c "sudo cp /root/join_kubeadm_cp.yaml ~/join_kubeadm_cp.yaml"
-  - su - cloudinit -c "sudo cp /root/join_kubeadm_wk.yaml ~/join_kubeadm_wk.yaml"
-EOF
-# --------- #
-            # END irregular indent because heredoc
-        fi
         
         # download snippet for cloud-init(network)
         curl -s "${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-up/snippets/${vmname}-network.yaml" > "${SNIPPET_TARGET_PATH}"/"${vmname}"-network.yaml
