@@ -269,7 +269,7 @@ KUBEADM_LOCAL_ENDPOINT=$(ip -4 addr show ens20 | grep -oP '(?<=inet\s)\d+(\.\d+)
 
 # Set init configuration for the first control plane
 cat > "$HOME"/init_kubeadm.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta4
+apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 bootstrapTokens:
 - token: "$KUBEADM_BOOTSTRAP_TOKEN"
@@ -286,7 +286,7 @@ localAPIEndpoint:
 skipPhases:
   - addon/kube-proxy
 ---
-apiVersion: kubeadm.k8s.io/v1beta4
+apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 networking:
   serviceSubnet: "10.96.64.0/18"

@@ -3,7 +3,7 @@ kind: KubeletConfiguration
 cgroupDriver: "systemd"
 protectKernelDefaults: true
 ---
-apiVersion: kubeadm.k8s.io/v1beta4
+apiVersion: kubeadm.k8s.io/v1beta3
 kind: JoinConfiguration
 nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
