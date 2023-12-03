@@ -1,56 +1,74 @@
-[k8s-servers]
-seichi-onp-k8s-cp-1 ansible_host=192.168.0.11
-seichi-onp-k8s-cp-2 ansible_host=192.168.0.12
-seichi-onp-k8s-cp-3 ansible_host=192.168.0.13
-seichi-onp-k8s-wk-1 ansible_host=192.168.0.21
-seichi-onp-k8s-wk-2 ansible_host=192.168.0.22
-seichi-onp-k8s-wk-3 ansible_host=192.168.0.23
+[seichi-onp-k8s-cp-1]
+cp-1 ansible_host=192.168.0.11 host_addr_srv=192.168.0.11 host_addr_san=192.168.18.11 host_addr_cls=192.168.32.11
+
+[seichi-onp-k8s-cp-2]
+cp-2 ansible_host=192.168.0.12 host_addr_srv=192.168.0.12 host_addr_san=192.168.18.12 host_addr_cls=192.168.32.12
+
+[seichi-onp-k8s-cp-3]
+cp-3 ansible_host=192.168.0.13 host_addr_srv=192.168.0.13 host_addr_san=192.168.18.13 host_addr_cls=192.168.32.13
+
+[seichi-onp-k8s-wk-1]
+wk-1 ansible_host=192.168.0.21 host_addr_srv=192.168.0.21 host_addr_san=192.168.18.21 host_addr_cls=192.168.32.21
+
+[seichi-onp-k8s-wk-2]
+wk-2 ansible_host=192.168.0.22 host_addr_srv=192.168.0.22 host_addr_san=192.168.18.22 host_addr_cls=192.168.32.22
+
+[seichi-onp-k8s-wk-3]
+wk-3 ansible_host=192.168.0.23 host_addr_srv=192.168.0.23 host_addr_san=192.168.18.23 host_addr_cls=192.168.32.23
+
+
+[k8s-servers:children]
+seichi-onp-k8s-cp-1
+seichi-onp-k8s-cp-2
+seichi-onp-k8s-cp-3
+seichi-onp-k8s-wk-1
+seichi-onp-k8s-wk-2
+seichi-onp-k8s-wk-3
 
 [k8s-servers:vars]
 ansible_ssh_pass=zaq12wsx
 
 
 [k8s-servers-with-ssh:children]
-k8s-servers
+seichi-onp-k8s-cp-1
+seichi-onp-k8s-cp-2
+seichi-onp-k8s-cp-3
+seichi-onp-k8s-wk-1
+seichi-onp-k8s-wk-2
+seichi-onp-k8s-wk-3
 
 [k8s-servers-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
-[k8s-servers-cp-with-ssh]
-seichi-onp-k8s-cp-1 ansible_host=192.168.0.11
-seichi-onp-k8s-cp-2 ansible_host=192.168.0.12
-seichi-onp-k8s-cp-3 ansible_host=192.168.0.13
+[k8s-servers-cp-with-ssh:children]
+seichi-onp-k8s-cp-1
+seichi-onp-k8s-cp-2
+seichi-onp-k8s-cp-3
 
 [k8s-servers-cp-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
-[k8s-servers-cp-leader-with-ssh]
-seichi-onp-k8s-cp-1 ansible_host=192.168.0.11
+[k8s-servers-cp-leader-with-ssh:children]
+seichi-onp-k8s-cp-1
 
 [k8s-servers-cp-leader-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
-[k8s-servers-cp-follower-with-ssh]
-seichi-onp-k8s-cp-2 ansible_host=192.168.0.12
-seichi-onp-k8s-cp-3 ansible_host=192.168.0.13
+[k8s-servers-cp-follower-with-ssh:children]
+seichi-onp-k8s-cp-2
+seichi-onp-k8s-cp-3
 
 [k8s-servers-cp-follower-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
 
 
-[k8s-servers-wk-with-ssh]
-seichi-onp-k8s-wk-1 ansible_host=192.168.0.21
-seichi-onp-k8s-wk-2 ansible_host=192.168.0.22
-seichi-onp-k8s-wk-3 ansible_host=192.168.0.23
+[k8s-servers-wk-with-ssh:children]
+seichi-onp-k8s-wk-1
+seichi-onp-k8s-wk-2
+seichi-onp-k8s-wk-3
 
 [k8s-servers-wk-with-ssh:vars]
 ansible_ssh_private_key_file=/root/.ssh/id_ed25519
-
-
-[all:vars]
-ansible_python_interpreter=/usr/bin/python3
-ansible_port=22
-ansible_user=cloudinit
