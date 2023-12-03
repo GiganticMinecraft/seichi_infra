@@ -323,7 +323,7 @@ protectKernelDefaults: true
 EOF
 
 # Install Kubernetes without kube-proxy
-kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem --allow-experimental-api
+kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem
 
 mkdir -p "$HOME"/.kube
 cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
