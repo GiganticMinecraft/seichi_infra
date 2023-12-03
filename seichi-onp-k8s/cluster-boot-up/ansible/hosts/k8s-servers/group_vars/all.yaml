@@ -1,0 +1,5 @@
+---
+ansible_python_interpreter: /usr/bin/python3
+ansible_port: 22
+ansible_user: cloudinit
+kube_api_server_vip: 192.168.18.100

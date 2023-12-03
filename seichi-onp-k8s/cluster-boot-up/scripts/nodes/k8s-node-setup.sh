@@ -343,50 +343,9 @@ helm install cilium cilium/cilium \
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
 
-# Set join configuration for other control plane nodes
-cat > "$HOME"/join_kubeadm_cp.yaml <<EOF
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-cgroupDriver: "systemd"
-protectKernelDefaults: true
----
-apiVersion: kubeadm.k8s.io/v1beta4
-kind: JoinConfiguration
-nodeRegistration:
-  criSocket: "unix:///var/run/containerd/containerd.sock"
-  kubeletExtraArgs:
-    node-ip: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
-localAPIEndpoint:
-  advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
-  bindPort: 6443
-discovery:
-  bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
-    token: "$KUBEADM_BOOTSTRAP_TOKEN"
-    unsafeSkipCAVerification: true
-controlPlane:
-  certificateKey: "$KUBEADM_UPLOADED_CERTS"
-EOF
-
-# Set join configuration for worker nodes
-cat > "$HOME"/join_kubeadm_wk.yaml <<EOF
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-cgroupDriver: "systemd"
-protectKernelDefaults: true
----
-apiVersion: kubeadm.k8s.io/v1beta4
-kind: JoinConfiguration
-nodeRegistration:
-  criSocket: "unix:///var/run/containerd/containerd.sock"
-  kubeletExtraArgs:
-    node-ip: "$KUBEADM_LOCAL_ENDPOINT" //FIXME
-discovery:
-  bootstrapToken:
-    apiServerEndpoint: "${KUBE_API_SERVER_VIP}:8443"
-    token: "$KUBEADM_BOOTSTRAP_TOKEN"
-    unsafeSkipCAVerification: true
-EOF
+# add join information to ansible hosts variable
+echo "kubeadm_bootstrap_token: $KUBEADM_BOOTSTRAP_TOKEN" >> "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/group_vars/all.yaml
+echo "kubeadm_uploaded_certs: $KUBEADM_UPLOADED_CERTS" >> "$HOME"/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/hosts/k8s-servers/group_vars/all.yaml
 
 # install ansible
 sudo apt-get install -y ansible git sshpass

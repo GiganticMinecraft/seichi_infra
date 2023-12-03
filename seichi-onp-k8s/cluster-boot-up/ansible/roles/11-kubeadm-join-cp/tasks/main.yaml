@@ -1,10 +1,9 @@
-- name: Copy file
+- name: Deploy kubeadm join config file
   become: yes
-  ansible.builtin.copy:
-    src: /root/join_kubeadm_cp.yaml
+  template:
+    src: /home/cloudinit/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/roles/11-kubeadm-join-cp/templates/join_kubeadm_cp.yaml
     dest: /root/join_kubeadm_cp.yaml
 
 - name: Execute kubeadm join command
   become: yes
   shell: "kubeadm join --config /root/join_kubeadm_cp.yaml"
- 
