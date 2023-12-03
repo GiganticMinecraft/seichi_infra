@@ -251,6 +251,9 @@ systemctl reload haproxy
 # Pull images first
 kubeadm config images pull
 
+# install k9s
+wget https://github.com/derailed/k9s/releases/download/v0.28.2/k9s_Linux_amd64.tar.gz -O - | tar -zxvf - k9s && sudo mv ./k9s /usr/local/bin/
+
 # Ends except first-control-plane
 case $1 in
     seichi-onp-k8s-cp-1)
