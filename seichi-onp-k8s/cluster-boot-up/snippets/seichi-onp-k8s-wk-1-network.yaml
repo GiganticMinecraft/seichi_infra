@@ -13,6 +13,12 @@ config:
     - type: static
       address: '192.168.18.21'
       netmask: '255.255.252.0'
+  - type: physical
+    name: ens20
+    subnets:
+    - type: static
+      address: '192.168.32.21'
+      netmask: '255.255.255.0'
   - type: nameserver
     address:
     - '192.168.100.1'
