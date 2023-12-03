@@ -6,4 +6,4 @@
 
 - name: Execute kubeadm join command
   become: yes
-  shell: "kubeadm join --config /root/join_kubeadm_cp.yaml" --allow-experimental-api
+  shell: "kubeadm join --config /root/join_kubeadm_cp.yaml"
