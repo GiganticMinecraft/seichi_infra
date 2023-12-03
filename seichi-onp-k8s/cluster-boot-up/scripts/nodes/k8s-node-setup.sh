@@ -279,7 +279,6 @@ nodeRegistration:
   criSocket: "unix:///var/run/containerd/containerd.sock"
   kubeletExtraArgs:
     node-ip: "$KUBEADM_LOCAL_ENDPOINT"
-    imagePullPolicy: "IfNotPresent"
 localAPIEndpoint:
   advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
   bindPort: 6443
