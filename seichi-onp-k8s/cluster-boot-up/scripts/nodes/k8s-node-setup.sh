@@ -265,7 +265,7 @@ esac
 
 # Set kubeadm bootstrap token using openssl
 KUBEADM_BOOTSTRAP_TOKEN=$(openssl rand -hex 3).$(openssl rand -hex 8)
-KUBEADM_LOCAL_ENDPOINT=$(ip -4 addr show ens19 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | awk 'NR==1{print $1}')
+KUBEADM_LOCAL_ENDPOINT=$(ip -4 addr show ens20 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | awk 'NR==1{print $1}')
 
 # Set init configuration for the first control plane
 cat > "$HOME"/init_kubeadm.yaml <<EOF
@@ -323,7 +323,7 @@ protectKernelDefaults: true
 EOF
 
 # Install Kubernetes without kube-proxy
-kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem
+kubeadm init --config "$HOME"/init_kubeadm.yaml --skip-phases=addon/kube-proxy --ignore-preflight-errors=NumCPU,Mem --allow-experimental-api
 
 mkdir -p "$HOME"/.kube
 cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
