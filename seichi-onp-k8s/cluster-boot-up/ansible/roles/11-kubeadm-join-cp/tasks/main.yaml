@@ -1,7 +1,7 @@
 - name: Deploy kubeadm join config file
   become: yes
   template:
-    src: /home/cloudinit/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/roles/11-kubeadm-join-cp/templates/join_kubeadm_cp.yaml
+    src: /root/seichi_infra/seichi-onp-k8s/cluster-boot-up/ansible/roles/11-kubeadm-join-cp/templates/join_kubeadm_cp.yaml
     dest: /root/join_kubeadm_cp.yaml
 
 - name: Execute kubeadm join command
