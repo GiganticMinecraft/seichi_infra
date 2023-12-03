@@ -42,8 +42,8 @@ TCP パケットをそのまま送り届ける必要があります。
 
 | サービス                     | `Service` の VIP                                            | 
 | ---------------------------- | ----------------------------------------------------------- | 
-|  BungeeCord (本番環境用)     | [`192.168.8.130`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
-|  BungeeCord (デバッグ環境用) | [`192.168.8.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
+|  BungeeCord (本番環境用)     | [`10.96.0.130`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
+|  BungeeCord (デバッグ環境用) | [`10.96.0.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
 |  投票受付サーバー            | (まだ k8s 上に乗っていないので、 `Service` の VIP ではない) |
 
 ### オンプレネットワーク内からのトラフィックを受ける `Service`
@@ -54,10 +54,10 @@ TCP パケットをそのまま送り届ける必要があります。
 
 | サービス                       | `Service` の VIP                                            | 
 | ------------------------------ | ----------------------------------------------------------- | 
-| 本番 RedisBungee 用 Redis      | [`192.168.8.132`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/redisbungee-redis.yaml#L24) |
-| 本番 BungeeSemaphore 用 Redis  | [`192.168.8.133`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/bungeesemaphore-redis.yaml#L24) |
-| Debug RedisBungee 用 Redis     | [`192.168.8.134`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/redisbungee-redis.yaml#L24) |
-| Debug BungeeSemaphore 用 Redis | [`192.168.8.135`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/bungeesemaphore-redis.yaml#L24) |
+| 本番 RedisBungee 用 Redis      | [`192.168.0.132`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/redisbungee-redis.yaml#L24) |
+| 本番 BungeeSemaphore 用 Redis  | [`192.168.0.133`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/bungeesemaphore-redis.yaml#L24) |
+| Debug RedisBungee 用 Redis     | [`192.168.0.134`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/redisbungee-redis.yaml#L24) |
+| Debug BungeeSemaphore 用 Redis | [`192.168.0.135`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/bungeesemaphore-redis.yaml#L24) |
 
 
 ## Kubernetes クラスタのブートストラップについて

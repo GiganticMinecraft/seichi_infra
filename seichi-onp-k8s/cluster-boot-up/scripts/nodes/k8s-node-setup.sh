@@ -289,8 +289,8 @@ skipPhases:
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 networking:
-  serviceSubnet: "10.96.0.0/16"
-  podSubnet: "10.128.0.0/16"
+  serviceSubnet: "10.96.64.0/18"
+  podSubnet: "10.96.128.0/18"
 kubernetesVersion: "v1.27.6"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
@@ -338,7 +338,8 @@ helm install cilium cilium/cilium \
     --namespace kube-system \
     --set kubeProxyReplacement=strict \
     --set k8sServiceHost=${KUBE_API_SERVER_VIP} \
-    --set k8sServicePort=8443
+    --set k8sServicePort=8443 \
+    --set bgpControlPlane.enabled=true
 
 # Generate control plane certificate
 KUBEADM_UPLOADED_CERTS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
