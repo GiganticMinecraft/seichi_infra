@@ -32,7 +32,7 @@ spec:
           # Redmine
           - name: redmine
             external-hostname: redmine.seichi.click
-            internal-authority: 192.168.1.187:3443
+            internal-authority: 192.168.3.11:3443
 
   template:
     metadata:
