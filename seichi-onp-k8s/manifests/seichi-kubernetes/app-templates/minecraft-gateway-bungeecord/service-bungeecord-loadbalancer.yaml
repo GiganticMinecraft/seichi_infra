@@ -5,6 +5,7 @@ metadata:
   name: bungeecord
 spec:
   type: LoadBalancer
+  loadBalancerClass: io.cilium/bgp-control-plane
   ports:
     - name: bungee
       port: 25565

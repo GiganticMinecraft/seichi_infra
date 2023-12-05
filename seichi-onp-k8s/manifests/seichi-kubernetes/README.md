@@ -54,10 +54,10 @@ TCP パケットをそのまま送り届ける必要があります。
 
 | サービス                       | `Service` の VIP                                            | 
 | ------------------------------ | ----------------------------------------------------------- | 
-| 本番 RedisBungee 用 Redis      | [`192.168.0.132`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/redisbungee-redis.yaml#L24) |
-| 本番 BungeeSemaphore 用 Redis  | [`192.168.0.133`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/bungeesemaphore-redis.yaml#L24) |
-| Debug RedisBungee 用 Redis     | [`192.168.0.134`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/redisbungee-redis.yaml#L24) |
-| Debug BungeeSemaphore 用 Redis | [`192.168.0.135`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/bungeesemaphore-redis.yaml#L24) |
+| 本番 RedisBungee 用 Redis      | [`10.96.0.132`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/redisbungee-redis.yaml#L24) |
+| 本番 BungeeSemaphore 用 Redis  | [`10.96.0.133`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/bungeesemaphore-redis.yaml#L24) |
+| Debug RedisBungee 用 Redis     | [`10.96.0.134`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/redisbungee-redis.yaml#L24) |
+| Debug BungeeSemaphore 用 Redis | [`10.96.0.135`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/bungeesemaphore-redis.yaml#L24) |
 
 
 ## Kubernetes クラスタのブートストラップについて
