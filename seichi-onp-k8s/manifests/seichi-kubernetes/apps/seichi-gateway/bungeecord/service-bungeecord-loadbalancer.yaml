@@ -7,3 +7,5 @@ metadata:
     "io.cilium/lb-ipam-ips": "10.96.0.130"
 spec:
   type: LoadBalancer
+  loadBalancerClass: io.cilium/bgp-control-plane
+
