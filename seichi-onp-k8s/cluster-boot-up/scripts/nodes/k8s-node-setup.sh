@@ -293,6 +293,10 @@ kind: ClusterConfiguration
 networking:
   serviceSubnet: "10.96.64.0/18"
   podSubnet: "10.96.128.0/18"
+etcd:
+  local:
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
 kubernetesVersion: "v1.27.6"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
