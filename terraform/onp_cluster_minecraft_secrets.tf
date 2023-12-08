@@ -115,7 +115,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   type = "Opaque"
 }
 
-resource "helm_release" "onp_minecraft_debug_minio_secrets" { 
+resource "helm_release" "onp_minecraft_debug_minio_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
 
   repository = "https://giganticminecraft.github.io/seichi_infra/"
