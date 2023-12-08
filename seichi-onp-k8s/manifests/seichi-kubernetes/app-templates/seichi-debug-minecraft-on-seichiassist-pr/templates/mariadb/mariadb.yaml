@@ -13,7 +13,7 @@ spec:
     name: mariadb-pr-review-password
     key: mcserver-password
 
-  image: mariadb:10.11.6
+  image: mariadb:11.2.2
   imagePullPolicy: IfNotPresent
 
   port: 3306
