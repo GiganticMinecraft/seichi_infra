@@ -7,9 +7,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
   }
 
   data = {
-    DISCORDSRV_TOKEN          = var.minecraft__discordsrv_bot_token
-    MINIO_DEBUG_ACCESS_KEY    = var.minio_debug_access_key
-    MINIO_DEBUG_ACCESS_SECRET = var.minio_debug_access_secret
+    DISCORDSRV_TOKEN = var.minecraft__discordsrv_bot_token
   }
 
   type = "Opaque"
@@ -115,4 +113,32 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   }
 
   type = "Opaque"
+}
+
+resource "helm_release" "onp_minecraft_debug_minio_secrets" {
+  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
+
+  repository = "https://giganticminecraft.github.io/seichi_infra/"
+  chart      = "raw-resources"
+  name       = "seichi-debug-minecraft-minio-secrets"
+  namespace  = "kube-system"
+  version    = "0.3.0"
+
+  set_list {
+    name = "manifests"
+    value = [<<-EOS
+      kind: ClusterSecret
+      apiVersion: clustersecret.io/v1
+      metadata:
+        namespace: clustersecret
+        name: minio-secrets
+      matchNamespace:
+        - seichi-debug-minecraft-on-seichiassist-pr-*
+      data:
+        MINIO_ACCESS_KEY: ${base64encode(var.minio_debug_access_key)}
+        MINIO_DEBUG_ACCESS_SECRET: ${base64encode(var.minio_debug_access_secret)}
+    EOS
+    ]
+  }
+
 }

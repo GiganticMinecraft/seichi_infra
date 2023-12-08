@@ -41,13 +41,13 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: mcserver--common--config-secrets
-                  key: MINIO_DEBUG_ACCESS_KEY
+                  name: minio-secrets
+                  key: MINIO_ACCESS_KEY
             - name: MINIO_ACCESS_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: mcserver--common--config-secrets
-                  key: MINIO_DEBUG_ACCESS_SECRET
+                  name: minio-secrets
+                  key: MINIO_ACCESS_SECRET
             - name: BUCKET_NAME
               value: seichi-plugins
             - name: BUCKET_PREFIX_NAME
