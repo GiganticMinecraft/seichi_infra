@@ -35,7 +35,8 @@
       "matchStrings": [
         "github\\.com/stakater/Reloader/deployments/kubernetes\\?ref=v(?<currentValue>[^&]+)&submodules=false"
       ],
-      "depNameTemplate": "stakater/Reloader"
+      "depNameTemplate": "stakater/Reloader",
+      "datasourceTemplate": "github-tags"
     }
   ]
 }
