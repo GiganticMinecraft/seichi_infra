@@ -29,6 +29,15 @@
       "depNameTemplate": "itzg/minecraft-server",
       "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
       "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^kustomization\\.yaml$"],
+      "matchStrings": [
+        "github\\.com/stakater/Reloader/deployments/kubernetes\\?ref=v(?<currentValue>[^&]+)&submodules=false"
+      ],
+      "datasource": "github-tags",
+      "depNameTemplate": "stakater/Reloader",
+      "versioning": "semver"
     }
   ]
 }
