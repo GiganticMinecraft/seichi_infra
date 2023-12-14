@@ -23,6 +23,9 @@ spec:
           algorithm: maglev
         encryption:
           nodeEncryption: false
+        routingMode: native
+        bpf:
+          masquerade: true
         ipv4:
           enabled: true
         ipv6:
