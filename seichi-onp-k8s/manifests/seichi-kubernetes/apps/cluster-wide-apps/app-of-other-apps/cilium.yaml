@@ -28,14 +28,14 @@ spec:
           masquerade: true
         ipv4:
           enabled: true
-        ipv4NativeRoutingCIDR: "10.96.128.0/18"
+        ipv4NativeRoutingCIDR: "10.96.128.0/18" # modify it if necessary
         ipv6:
           enabled: false
         ipam:
           mode: cluster-pool
           operator:
             # -- IPv4 CIDR list range to delegate to individual nodes for IPAM.
-            clusterPoolIPv4PodCIDRList: ["10.96.128.0/18"]
+            clusterPoolIPv4PodCIDRList: ["10.96.128.0/18"] # modify it if necessary
             # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
             clusterPoolIPv4MaskSize: 24
         hubble:
