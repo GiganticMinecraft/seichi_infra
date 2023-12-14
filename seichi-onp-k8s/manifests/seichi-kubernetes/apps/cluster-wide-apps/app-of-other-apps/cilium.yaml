@@ -21,6 +21,12 @@ spec:
           enabled: true
         loadBalancer:
           algorithm: maglev
+        encryption:
+          nodeEncryption: false
+        ipv4:
+          enabled: true
+        ipv6:
+          enabled: false
         ipam:
           operator:
             # -- IPv4 CIDR list range to delegate to individual nodes for IPAM.
