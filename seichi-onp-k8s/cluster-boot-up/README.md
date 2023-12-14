@@ -21,7 +21,7 @@
 
 ### VM 環境
 
-VM環境は `Proxmox Virtual Environment 7.1-11` を利用しています。
+VM環境は `Proxmox Virtual Environment 8.1.3` を利用しています。
 
  - ベアメタル3ノード
 
@@ -32,8 +32,6 @@ VM環境は `Proxmox Virtual Environment 7.1-11` を利用しています。
      これはクラスタの各種機能を維持するために使用されています。また、手順やスクリプトの一部はこのSSH接続を前提としています。
      
      参考: [Role of SSH in Proxmox VE Clusters - proxmox wiki](https://pve.proxmox.com/wiki/Cluster_Manager#_role_of_ssh_in_proxmox_ve_clusters)
-
- - AMDとIntelが混在しているので、アーキテクチャを跨いだLive Migrationは不可
 
 KubernetesノードのVMは cloudinit イメージで作成されています。
 この cloudinit イメージのベースには `Ubuntu 22.04 LTS` を利用しています。
@@ -63,7 +61,7 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
 
 ## Kubernetesクラスタの構成
 
-2022/05/23現在、クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/9b6a9346371b8f2add3a786b6badbe4e13d4464c/seichi-onp-k8s/cluster-boot-scripts/deploy-vm.sh#L14-L19)。
+2022/05/23現在、クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/91999d509e52905eaff16fc8928fbe5316f1eaeb/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh#L15-L20)。
 
 クラスタの作成は以下のツール群で行っています。
   - kubeadm, kubectl, kubelet v1.27.8
