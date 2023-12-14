@@ -28,6 +28,7 @@ spec:
         ipv6:
           enabled: false
         ipam:
+          mode: cluster-pool
           operator:
             # -- IPv4 CIDR list range to delegate to individual nodes for IPAM.
             clusterPoolIPv4PodCIDRList: ["10.96.128.0/18"]
