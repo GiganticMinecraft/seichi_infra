@@ -28,6 +28,7 @@ spec:
           masquerade: true
         ipv4:
           enabled: true
+        ipv4NativeRoutingCIDR: "10.96.128.0/18"
         ipv6:
           enabled: false
         ipam:
