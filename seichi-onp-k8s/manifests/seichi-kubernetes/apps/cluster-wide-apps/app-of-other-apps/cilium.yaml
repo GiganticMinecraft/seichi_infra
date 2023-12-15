@@ -12,85 +12,62 @@ spec:
     helm:
       releaseName: cilium
       values: |
-        kubeProxyReplacement: strict
+        kubeProxyReplacement: true
         k8sServiceHost: 192.168.32.100 # modify it if necessary
         k8sServicePort: 8443
+        rollOutCiliumPods: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        securityContext:
+          privileged: false
+          capabilities:
+            ciliumAgent:
+              - CHOWN
+              - KILL
+              - NET_ADMIN
+              - NET_RAW
+              - IPC_LOCK
+              - SYS_MODULE
+              - SYS_RESOURCE
+              - PERFMON
+              - BPF
+              - DAC_OVERRIDE
+              - FOWNER
+              - SETGID
+              - SETUID
+            mountCgroup:
+              - SYS_ADMIN
+              - SYS_CHROOT
+              - SYS_PTRACE
+            applySysctlOverwrites:
+              - SYS_ADMIN
+              - SYS_CHROOT
+              - SYS_PTRACE
+            cleanCiliumState:
+              - NET_ADMIN
+              # Used in iptables. Consider removing once we are iptables-free
+              - SYS_MODULE
+              - SYS_RESOURCE
+              - PERFMON
+              - BPF
         bgpControlPlane:
           enabled: true
         pprof:
           enabled: true
         loadBalancer:
           algorithm: maglev
-        encryption:
-          nodeEncryption: false
         routingMode: native
         bpf:
           masquerade: true
-        ipv4:
-          enabled: true
         ipv4NativeRoutingCIDR: "10.96.128.0/18" # modify it if necessary
-        ipv6:
-          enabled: false
         ipam:
-          mode: cluster-pool
           operator:
             # -- IPv4 CIDR list range to delegate to individual nodes for IPAM.
             clusterPoolIPv4PodCIDRList: ["10.96.128.0/18"] # modify it if necessary
             # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
             clusterPoolIPv4MaskSize: 24
-        hubble:
-          enabled: false # disable for now
-          # tls:
-          #   enabled: false # todo: eventually enable tls as it's not a good manner
-          #   # auto:
-          #   #   enabled: true
-          #   #   method: certmanager
-          #   #   certManagerIssuerRef:
-          #   #     group: cert-manager.io
-          #   #     kind: ClusterIssuer
-          #   #     name: ca-issuer
-          # relay:
-          #   enabled: true
-          #   rollOutPods: true
-          #   podDisruptionBudget:
-          #     enabled: true
-          #   pprof:
-          #     enabled: true
-          #   prometheus:
-          #     serviceMonitor:
-          #       enabled: true
-          #       labels:
-          #         release: prometheus
-          #   tls:
-          #     server:
-          #       enabled: false
-          # ui:
-          #   enabled: true
-          #   rollOutPods: true
-          # metrics:
-          #   enabled:
-          #     - dns:query;ignoreAAAA
-          #     - drop
-          #     - tcp
-          #     - flow
-          #     - icmp
-          #     - http
-          #     - port-distribution
-          #     # - httpV2:exemplars=true;labelsContext=source_ip
-          #     - source_namespace
-          #     - source_workload
-          #     - destination_ip
-          #     - destination_namespace
-          #     - destination_workload
-          #     - traffic_direction
-          #   enableOpenMetrics: true
-          #   serviceMonitor:
-          #     enabled: true
-          #     labels:
-          #       release: prometheus
-          #   dashboards:
-          #     enabled: true
-          #     namespace: monitoring
         operator:
           prometheus:
             enabled: true
