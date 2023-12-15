@@ -20,38 +20,6 @@ spec:
           requests:
             cpu: 100m
             memory: 512Mi
-        securityContext:
-          privileged: false
-          capabilities:
-            ciliumAgent:
-              - CHOWN
-              - KILL
-              - NET_ADMIN
-              - NET_RAW
-              - IPC_LOCK
-              - SYS_MODULE
-              - SYS_RESOURCE
-              - PERFMON
-              - BPF
-              - DAC_OVERRIDE
-              - FOWNER
-              - SETGID
-              - SETUID
-            mountCgroup:
-              - SYS_ADMIN
-              - SYS_CHROOT
-              - SYS_PTRACE
-            applySysctlOverwrites:
-              - SYS_ADMIN
-              - SYS_CHROOT
-              - SYS_PTRACE
-            cleanCiliumState:
-              - NET_ADMIN
-              # Used in iptables. Consider removing once we are iptables-free
-              - SYS_MODULE
-              - SYS_RESOURCE
-              - PERFMON
-              - BPF
         bgpControlPlane:
           enabled: true
         pprof:
