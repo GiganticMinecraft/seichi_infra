@@ -15,11 +15,6 @@ spec:
         kubeProxyReplacement: true
         k8sServiceHost: 192.168.32.100 # modify it if necessary
         k8sServicePort: 8443
-        rollOutCiliumPods: true
-        resources:
-          requests:
-            cpu: 100m
-            memory: 512Mi
         bgpControlPlane:
           enabled: true
         pprof:
@@ -29,6 +24,8 @@ spec:
         routingMode: native
         bpf:
           masquerade: true
+        ipv4:
+          enabled: true
         ipv4NativeRoutingCIDR: "10.96.128.0/18" # modify it if necessary
         ipam:
           operator:
@@ -36,6 +33,8 @@ spec:
             clusterPoolIPv4PodCIDRList: ["10.96.128.0/18"] # modify it if necessary
             # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
             clusterPoolIPv4MaskSize: 24
+        hubble:
+          enabled: false # disable for now
         operator:
           prometheus:
             enabled: true
