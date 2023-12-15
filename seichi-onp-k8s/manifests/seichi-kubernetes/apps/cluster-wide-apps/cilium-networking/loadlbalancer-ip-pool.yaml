@@ -1,0 +1,8 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "lb-pool"
+spec:
+  cidrs:
+  # 10.96.0.0-10.96.3.255 をloadBalancerのIPに割当可能
+  - cidr: "10.96.0.0/22"
