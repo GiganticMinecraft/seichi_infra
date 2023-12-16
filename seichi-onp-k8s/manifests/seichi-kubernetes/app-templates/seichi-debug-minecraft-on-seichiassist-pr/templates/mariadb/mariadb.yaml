@@ -18,7 +18,7 @@ spec:
 
   env:
     - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
-      value: true
+      value: "true"
 
   port: 3306
 
