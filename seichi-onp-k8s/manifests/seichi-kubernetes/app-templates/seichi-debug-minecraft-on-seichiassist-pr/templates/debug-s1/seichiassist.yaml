@@ -117,7 +117,7 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "1054159676964622426"
 
-          image: itzg/minecraft-server:2023.12.2-java17-jdk
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
           ports:
             - containerPort: 25565
