@@ -7,8 +7,6 @@ resources:
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.2/deploy/kubernetes/v1.20/storage-class.yml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.2/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.2/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
-patchesStrategicMerge:
-  - ./storageclass.yaml
 
 images:
   - name: synology/synology-csi
@@ -25,3 +23,5 @@ images:
     newName: registry.k8s.io/sig-storage/csi-node-driver-registrar
   - name: k8s.gcr.io/sig-storage/csi-snapshotter
     newName: registry.k8s.io/sig-storage/csi-snapshotter
+patches:
+  - path: ./storageclass.yaml

@@ -11,12 +11,12 @@ transformers:
     unsetOnly: true
 
 resources:
-  - "../../../app-templates/minecraft-gateway-bungeecord"
-  - "./bungeecord-config.yaml"
-  - "./bungeesemaphore-redis.yaml"
-  - "./redisbungee-redis.yaml"
+  - ../../../app-templates/minecraft-gateway-bungeecord
+  - ./bungeecord-config.yaml
+  - ./bungeesemaphore-redis.yaml
+  - ./redisbungee-redis.yaml
 
-patchesStrategicMerge:
-  - "bungeecord-metrics-patch.yaml"
-  - "bungeecord-plugin-configs-patch.yaml"
-  - "service-bungeecord-loadbalancer.yaml"
+patches:
+  - path: bungeecord-metrics-patch.yaml
+  - path: bungeecord-plugin-configs-patch.yaml
+  - path: service-bungeecord-loadbalancer.yaml
