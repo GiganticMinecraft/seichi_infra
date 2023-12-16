@@ -136,7 +136,7 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
         - seichi-debug-minecraft-on-seichiassist-pr-*
       data:
         MINIO_ACCESS_KEY: ${base64encode(var.minio_debug_access_key)}
-        MINIO_DEBUG_ACCESS_SECRET: ${base64encode(var.minio_debug_access_secret)}
+        MINIO_ACCESS_SECRET: ${base64encode(var.minio_debug_access_secret)}
     EOS
     ]
   }
