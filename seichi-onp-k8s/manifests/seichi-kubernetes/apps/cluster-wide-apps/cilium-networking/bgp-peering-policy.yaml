@@ -17,6 +17,7 @@ spec:
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
+      peerPort: 179
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -45,6 +46,7 @@ spec:
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
+      peerPort: 179
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -72,6 +74,7 @@ spec:
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
+      peerPort: 179
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -99,6 +102,7 @@ spec:
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
+      peerPort: 179
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -126,6 +130,7 @@ spec:
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
+      peerPort: 179
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -153,6 +158,7 @@ spec:
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
+      peerPort: 179
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
