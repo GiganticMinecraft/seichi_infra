@@ -15,6 +15,7 @@ resources:
   - ./bungeecord-config.yaml
   - ./bungeesemaphore-redis.yaml
   - ./redisbungee-redis.yaml
+  - ./network-policy.yaml
 
 patches:
   - path: bungeecord-metrics-patch.yaml

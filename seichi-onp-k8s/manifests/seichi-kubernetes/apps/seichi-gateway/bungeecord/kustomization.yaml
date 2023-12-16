@@ -4,6 +4,7 @@ namespace: seichi-gateway
 resources:
   - ../../../app-templates/minecraft-gateway-bungeecord
   - ./bungeecord-config.yaml
+  - ./network-policy.yaml
 
 
 patches:
