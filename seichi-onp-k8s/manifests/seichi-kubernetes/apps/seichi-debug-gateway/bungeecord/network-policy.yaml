@@ -7,8 +7,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: allow--from-tcpshield--to-bungeecord-debug
-  namespace: seichi-debug-gateway
+  name: allow--from-tcpshield--to-bungeecord
 spec:
   endpointSelector:
     matchLabels:
@@ -239,3 +238,7 @@ spec:
       toPorts:
         - ports:
             - port: "25565"
+    - fromEndpoints:
+        - {}
+    - fromEntities:
+        - cluster
