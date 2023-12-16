@@ -175,6 +175,11 @@ spec:
               mountPath: /plugins/LunaChat/config.yml
               subPath: LunaChat-config.yml
 
+            # SeichiAssist プラグインの設定ファイル
+            - name: seichiassist-config
+              mountPath: /plugins/SeichiAssist/config.yml
+              subPath: config.yml
+
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
@@ -190,7 +195,10 @@ spec:
         - name: common-mcserver-plugin-configs
           configMap:
             name: common-mcserver-plugin-configs
-
+        - name: seichiassist-config
+          configMap:
+            name: seichiassist-config
+        
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
           emptyDir: {}

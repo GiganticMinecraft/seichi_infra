@@ -3,43 +3,10 @@ kind: MariaDB
 metadata:
   name: mariadb
 spec:
-  rootPasswordSecretKeyRef:
-    name: mariadb-pr-review-password
-    key: root-password
-
-  database: seichiassist
-  username: mcserver
-  passwordSecretKeyRef:
-    name: mariadb-pr-review-password
-    key: mcserver-password
-
   image: mariadb:10.11.6
   imagePullPolicy: IfNotPresent
 
   port: 3306
 
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: 20Gi
-    storageClassName: synology-iscsi-storage
-    accessModes:
-      - ReadWriteOnce
-
   service:
     type: ClusterIP
-
-  metrics:
-    exporter:
-      image: prom/mysqld-exporter:v0.14.0
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-        limits:
-          cpu: 300m
-          memory: 512Mi
-    serviceMonitor:
-      prometheusRelease: prometheus
-      interval: 10s
-      scrapeTimeout: 10s
