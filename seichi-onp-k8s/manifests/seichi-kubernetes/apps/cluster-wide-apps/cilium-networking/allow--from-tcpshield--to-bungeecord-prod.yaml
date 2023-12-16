@@ -1,0 +1,235 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-tcpshield--to-bungeecord-prod
+  namespace: seichi-gateway
+spec:
+  endpointSelector:
+    matchLabels:
+      app: bungeecord
+  ingress:
+    - fromCIDRSet:
+        - cidr: 198.178.119.0/24
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 104.234.6.0/24
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.161.19.224/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.161.99.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.161.99.32/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.161.99.64/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.161.38.224/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.222.93.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.222.93.32/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.222.92.224/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 135.148.217.96/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 135.148.217.192/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.178.221.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 217.182.27.224/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.77.31.32/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 178.33.198.192/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 149.202.13.32/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.89.81.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.89.81.32/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.195.87.96/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.195.87.128/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.195.52.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 141.95.23.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 141.95.62.224/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 146.59.66.0/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 146.59.66.32/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 146.59.65.224/27
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.81.4.128/29
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.222.55.28/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 149.56.152.184/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 158.69.58.208/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.79.61.228/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.178.244.40/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.178.108.172/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 178.32.145.164/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 5.196.219.36/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.89.127.36/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.89.50.132/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 54.36.236.48/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 54.38.216.200/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.75.85.108/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.38.153.44/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 51.83.245.80/30
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 135.125.217.68/32
+      toPorts:
+        - ports:
+            - port: "25565"
+    - fromCIDRSet:
+        - cidr: 143.244.56.249/32
+      toPorts:
+        - ports:
+            - port: "25565"

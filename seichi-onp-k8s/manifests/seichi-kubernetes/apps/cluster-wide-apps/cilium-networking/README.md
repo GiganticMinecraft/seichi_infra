@@ -1,0 +1,11 @@
+# tcpshield-condig-generator.sh について
+
+Minecarftの通信ポート(seichi_infraの場合はBungeeCord)はOrigin IP上で公開されており、悪意を持った第三者がポートスキャンなどで発見した場合、Origin IPへのDoS Attackの懸念がある。
+
+これらポートはDDoS対策基盤であるTCPShield以外からの通信に応答する必要はないため、TCPShield以外からの通信に応答しない様にBungeeCordのEndpointに対してCiliumNetworkingPolicyを書いている。
+
+TCPShieldが通信に使用するIPアドレスは以下URLにて公開されている。
+
+<https://tcpshield.com/v4/>
+
+もし何らかの理由でTCPShield側が使用するIPアドレスが変更となった場合は `tcpshield-condig-generator.sh` を使用して最新のIPListをもとにCiliumNetworkingPolicyを生成し、それを参考に各環境の既存のCiliumNetworkingPolicyを編集すること。
