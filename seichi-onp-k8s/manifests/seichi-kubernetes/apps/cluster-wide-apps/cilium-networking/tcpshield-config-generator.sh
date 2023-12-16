@@ -14,7 +14,7 @@ spec:
       app: bungeecord
 EOF
 
-for cidr in "$TCPSHIELD_IP_LIST"
+for cidr in $TCPSHIELD_IP_LIST
 do
   cat <<EOF >> _generated-config.yaml
     - fromCIDRSet:
