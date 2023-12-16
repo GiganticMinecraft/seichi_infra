@@ -32,7 +32,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
+            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}" && wget -O /plugins/SeichiAssist.jar https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar'
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-c0f7980
           env:
