@@ -5,11 +5,11 @@ ENV VERSION="1.18.2"
 
 # プラグインリスト
 #   このイメージでは基底のリスト (/extras/plugin-list.ini) に追記する
-COPY --link ./additional-plugin-list.ini /extras/additional-plugin-list.ini
+COPY --link --from=seichi_minecraft_server_base ./additional-plugin-list.ini /extras/additional-plugin-list.ini
 RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.ini"
 
 # プラグインの設定ファイル
-COPY --link ./additional-plugin-configs /plugins
+COPY --link --from=seichi_minecraft_server_base ./additional-plugin-configs /plugins
 
 COPY --link --from=chunk-search-provider /build/chunk-search-rs /usr/bin/chunk-search-rs
 
