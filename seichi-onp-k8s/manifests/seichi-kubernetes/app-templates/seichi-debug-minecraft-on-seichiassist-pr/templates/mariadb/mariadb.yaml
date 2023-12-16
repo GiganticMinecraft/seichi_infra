@@ -16,6 +16,10 @@ spec:
   image: mariadb:10.11.6
   imagePullPolicy: IfNotPresent
 
+  env:
+    - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+      value: true
+
   port: 3306
 
   volumeClaimTemplate:
