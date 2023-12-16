@@ -54,6 +54,9 @@ spec:
               value: deb-1-18-2
             - name: DOWNLOAD_TARGET_DIR_PATH
               value: /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /root/mod-downloader-volume
 
       containers:
         - resources:
@@ -188,6 +191,9 @@ spec:
               mountPath: /jmx-exporter/jmx-exporter-config.yaml
               subPath: jmx-exporter-config.yaml
 
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
       volumes:
         - name: common-mcserver-configs
           configMap:
@@ -205,3 +211,7 @@ spec:
         - name: common-jmx-exporter-config
           configMap:
             name: common-jmx-exporter-config
+
+        # mod-downloaderからプラグインをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
+        - name: mod-downloader-volume
+          emptyDir: {}
