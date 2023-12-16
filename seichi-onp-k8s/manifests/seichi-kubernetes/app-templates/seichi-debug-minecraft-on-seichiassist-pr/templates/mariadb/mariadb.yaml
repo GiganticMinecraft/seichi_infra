@@ -3,6 +3,16 @@ kind: MariaDB
 metadata:
   name: mariadb
 spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb
+    key: root-password
+
+  database: seichiassist
+  username: mcserver
+  passwordSecretKeyRef:
+    name: mariadb
+    key: mcserver-password
+
   image: mariadb:10.11.6
   imagePullPolicy: IfNotPresent
 
