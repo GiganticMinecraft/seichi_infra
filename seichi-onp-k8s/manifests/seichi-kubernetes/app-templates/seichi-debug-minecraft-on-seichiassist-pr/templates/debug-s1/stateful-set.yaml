@@ -32,7 +32,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}" && wget -O /plugins/SeichiAssist.jar https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar'
+            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-c0f7980
           env:
@@ -86,6 +86,7 @@ spec:
                 https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar,
                 https://github.com/ViaVersion/ViaBackwards/releases/download/4.4.2/ViaBackwards-4.4.2.jar,
                 https://github.com/ViaVersion/ViaVersion/releases/download/4.4.2/ViaVersion-4.4.2.jar,
+                https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar,
 
             - name: JVM_OPTS
               value: >-
