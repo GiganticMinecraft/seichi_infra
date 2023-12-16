@@ -36,7 +36,7 @@ spec:
               value: "959307225413845072"
             - name: TARGET_GUILD_ID
               value: "237758724121427969"
-            - name: DISCORD_TOKEN
+            - name: DISCORD_API_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: idea-reaction-discord-token
