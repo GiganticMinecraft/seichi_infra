@@ -34,7 +34,7 @@ spec:
             - "-c"
             - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-8326d06
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-c0f7980
           env:
             - name: MINIO_ENDPOINT
               value: seichi-private-plugin-blackhole-minio-console.minio:9001
@@ -65,7 +65,7 @@ spec:
             - name: TYPE
               value: PAPER
             - name: VERSION
-              value: "1.12.2"
+              value: "1.18.2"
             - name: EULA
               value: "TRUE"
 
@@ -113,7 +113,7 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "1054159676964622426"
 
-          image: itzg/minecraft-server:2023.12.2-java8-jdk
+          image: itzg/minecraft-server:2023.12.2-java17-jdk
           name: minecraft
           ports:
             - containerPort: 25565
