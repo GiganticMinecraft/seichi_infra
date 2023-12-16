@@ -1,10 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - ./storageclass.yaml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.3/deploy/kubernetes/v1.20/controller.yml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.3/deploy/kubernetes/v1.20/csi-driver.yml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.3/deploy/kubernetes/v1.20/node.yml
-  - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.3/deploy/kubernetes/v1.20/storage-class.yml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.3/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.1.3/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
-  - ./storageclass.yaml
