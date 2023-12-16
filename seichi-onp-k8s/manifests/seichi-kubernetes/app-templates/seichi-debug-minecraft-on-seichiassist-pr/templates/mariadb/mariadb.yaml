@@ -8,5 +8,13 @@ spec:
 
   port: 3306
 
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 5Gi
+    storageClassName: synology-iscsi-storage-temp
+    accessModes:
+      - ReadWriteOnce
+
   service:
     type: ClusterIP
