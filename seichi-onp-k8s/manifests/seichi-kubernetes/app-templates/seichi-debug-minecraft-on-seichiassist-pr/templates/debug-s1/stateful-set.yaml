@@ -37,7 +37,7 @@ spec:
           image: ghcr.io/giganticminecraft/mod-downloader:sha-c0f7980
           env:
             - name: MINIO_ENDPOINT
-              value: seichi-private-plugin-blackhole-minio-console.minio:9001
+              value: seichi-private-plugin-blackhole-minio-console.minio:9000
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
