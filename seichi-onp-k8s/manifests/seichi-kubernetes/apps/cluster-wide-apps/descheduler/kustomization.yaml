@@ -5,5 +5,5 @@ resources:
   # descheduler
   - github.com/kubernetes-sigs/descheduler/kubernetes/cronjob?ref=v0.28.1
 
-patchesStrategicMerge:
-  - ./patch-schedule.yaml
+patches:
+  - path: ./patch-schedule.yaml
