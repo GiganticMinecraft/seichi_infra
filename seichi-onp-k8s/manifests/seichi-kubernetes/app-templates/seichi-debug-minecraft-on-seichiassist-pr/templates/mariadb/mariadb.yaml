@@ -69,8 +69,6 @@ spec:
         - containerPort: 3306
           name: mariadb
           protocol: TCP
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /var/lib/mysql
           name: storage
