@@ -70,8 +70,6 @@ spec:
           name: mariadb
           protocol: TCP
         volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: storage
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
         - name: mariadb-config
@@ -100,10 +98,6 @@ spec:
           name: sqldump-volume
       restartPolicy: Always
       volumes:
-      - name: storage
-        emptyDir:
-          medium: Memory
-          sizeLimit: 6Gi
       - name: sqldump-volume
         emptyDir: {}
       - name: mariadb-config
