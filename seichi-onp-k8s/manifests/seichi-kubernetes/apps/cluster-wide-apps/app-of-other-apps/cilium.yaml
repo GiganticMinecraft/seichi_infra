@@ -34,7 +34,40 @@ spec:
             # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
             clusterPoolIPv4MaskSize: 24
         hubble:
-          enabled: false # disable for now
+          enabled: true
+          metrics:
+            enabled:
+              - dns:query;ignoreAAAA
+              - drop
+              - tcp
+              - flow
+              - icmp
+              - http
+              - port-distribution
+              - httpV2:exemplars=true;labelsContext=source_ip
+              - source_namespace
+              - source_workload
+              - destination_ip
+              - destination_namespace
+              - destination_workload
+              - traffic_direction
+            enableOpenMetrics: true
+            serviceMonitor:
+              enabled: true
+              labels:
+                release: prometheus
+          tls:
+            enabled: true
+            auto:
+              enabled: true
+              method: certmanager
+              # [Example]
+              certManagerIssuerRef:
+                group: cert-manager.io
+                kind: ClusterIssuer
+                name: ca-issuer
+          relay:
+            enabled: false
         operator:
           prometheus:
             enabled: true
