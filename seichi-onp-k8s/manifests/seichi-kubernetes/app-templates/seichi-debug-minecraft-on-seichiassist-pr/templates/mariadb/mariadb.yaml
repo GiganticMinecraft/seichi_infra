@@ -26,7 +26,7 @@ spec:
         resources:
           requests:
             cpu: 4
-            memory: 7Gi
+            memory: 9Gi
         env:
         - name: MYSQL_TCP_PORT
           value: "3306"
@@ -101,7 +101,7 @@ spec:
       - name: storage
         emptyDir:
           medium: Memory
-          sizeLimit: 5Gi
+          sizeLimit: 7Gi
       - name: sqldump-volume
       - name: mariadb-config
         configMap:
