@@ -3,6 +3,23 @@ kind: MariaDB
 metadata:
   name: mariadb
 spec:
+  initContainers:
+    - name: sqldump-exporter
+      image: busybox:1.36.1
+      env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-pr-review-password
+              key: prod-mariadb-password
+      volumeMounts:
+        - name: sqldump-volume
+          mountPath: /seichiassist.sql
+      command:
+        - "sh"
+        - "-c"
+        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist > seichiassist.sql'
+
   rootPasswordSecretKeyRef:
     name: mariadb-pr-review-password
     key: root-password
@@ -22,6 +39,14 @@ spec:
 
   port: 3306
 
+  lifecycle:
+    postStart:
+      exec:
+        command:
+          - "sh"
+          - "-c"
+          - 'mysql -uroot -p"${MARIADB_ROOT_PASSWORD}" < seichiassist.sql'
+
   volumeClaimTemplate:
     resources:
       requests:
@@ -30,5 +55,13 @@ spec:
     accessModes:
       - ReadWriteOnce
 
+  volumeMounts:
+    - name: sqldump-volume
+      mountPath: /
+
   service:
     type: ClusterIP
+
+  volumes:
+    - name: sqldump-volume
+      emptyDir: {}
