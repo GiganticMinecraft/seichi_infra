@@ -74,14 +74,16 @@ spec:
           name: storage
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
+        - name: mariadb-config
+          mountPath: /etc/mysql/conf.d
       initContainers:
       - name: init-0
         image: mariadb:10.11.6
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 4000m
-            memory: 4096Mi
+            cpu: 4
+            memory: 6Gi
         env:
         - name: DB_PASSWORD
           valueFrom:
@@ -101,6 +103,12 @@ spec:
       - name: storage
         emptyDir:
           medium: Memory
-          sizeLimit: 4Gi
+          sizeLimit: 6Gi
       - name: sqldump-volume
         emptyDir: {}
+      - name: mariadb-config
+        configMap:
+          name: mariadb-config
+          items:
+          - key: my.cnf
+            path: my.cnf

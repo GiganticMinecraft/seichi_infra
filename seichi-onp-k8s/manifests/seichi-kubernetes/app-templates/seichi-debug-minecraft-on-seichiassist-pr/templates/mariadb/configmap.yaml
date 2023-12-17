@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-config
+data:
+  my.cnf: |
+    [mysqld]
+    innodb_buffer_pool_size = 2G
+    innodb_log_file_size = 512M
+    innodb_flush_log_at_trx_commit = 2
+    innodb_write_io_threads = 8
