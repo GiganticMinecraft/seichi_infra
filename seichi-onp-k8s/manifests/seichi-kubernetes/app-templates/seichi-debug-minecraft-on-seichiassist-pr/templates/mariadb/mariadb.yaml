@@ -29,7 +29,6 @@ spec:
             memory: 4096Mi
           limits:
             cpu: 4000m
-            memory: 8192Mi
         env:
         - name: MYSQL_TCP_PORT
           value: "3306"
@@ -102,6 +101,8 @@ spec:
       restartPolicy: Always
       volumes:
       - name: storage
-        emptyDir: {}
+        emptyDir:
+          medium: Memory
+          sizeLimit: 4Gi
       - name: sqldump-volume
         emptyDir: {}
