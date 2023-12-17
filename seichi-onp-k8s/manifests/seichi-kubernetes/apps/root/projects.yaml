@@ -23,6 +23,8 @@ spec:
     #  - monitoring
     #  - synology-csi
     #  - seichi-gateway-operator
+    #  - argo-events
+    #  - argo-workflows
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: "kube-system"
@@ -42,6 +44,10 @@ spec:
     - namespace: "cert-manager"
       server: https://kubernetes.default.svc
     - namespace: "seichi-gateway-operator-system"
+      server: https://kubernetes.default.svc
+    - namespace: "argo-events"
+      server: https://kubernetes.default.svc
+    - namespace: "argo-workflows"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"
