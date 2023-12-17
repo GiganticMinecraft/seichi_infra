@@ -126,7 +126,7 @@ spec:
                 mv create world_SW_nether NETHER
                 mv create world_SW_the_end END
                 lp group default permission set multiverse.core.list.who true
-                lp group default permission set multiverse.teleport true
+                lp group default permission set multiverse.teleport.* true
                 lp group default permission set worldedit.wand true
                 lp group default permission set worldguard.region.claim true
                 lp group default permission set worldguard.region.select.own.* true
