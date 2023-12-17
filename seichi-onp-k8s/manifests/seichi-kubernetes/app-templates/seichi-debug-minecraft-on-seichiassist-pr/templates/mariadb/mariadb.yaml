@@ -14,7 +14,7 @@ spec:
               key: prod-mariadb-password
       volumeMounts:
         - name: sqldump-volume
-          mountPath: /seichiassist.sql
+          mountPath: /docker-entrypoint-initdb.d
       command:
         - "sh"
         - "-c"
@@ -39,14 +39,6 @@ spec:
 
   port: 3306
 
-  lifecycle:
-    postStart:
-      exec:
-        command:
-          - "sh"
-          - "-c"
-          - 'mysql -uroot -p"${MARIADB_ROOT_PASSWORD}" < seichiassist.sql'
-
   volumeClaimTemplate:
     resources:
       requests:
@@ -57,7 +49,7 @@ spec:
 
   volumeMounts:
     - name: sqldump-volume
-      mountPath: /
+      mountPath: /docker-entrypoint-initdb.d
 
   service:
     type: ClusterIP
