@@ -4,8 +4,7 @@ metadata:
   name: mariadb
 spec:
   initContainers:
-    - name: sqldump-exporter
-      image: busybox:1.36.1
+    - image: mariadb:10.11.6
       env:
         - name: DB_PASSWORD
           valueFrom:
@@ -15,10 +14,10 @@ spec:
       volumeMounts:
         - name: sqldump-volume
           mountPath: /docker-entrypoint-initdb.d
-      command:
+      args:
         - "sh"
         - "-c"
-        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema > seichiassist.sql'
+        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema > /docker-entrypoint-initdb.d/seichiassist.sql'
 
   rootPasswordSecretKeyRef:
     name: mariadb-pr-review-password
