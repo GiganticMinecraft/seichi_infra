@@ -140,6 +140,19 @@ spec:
             failureThreshold: 6
             periodSeconds: 20
 
+          readinessProbe:
+            exec:
+              command:
+                - mc-monitor 
+                - status 
+                - --host 
+                - localhost 
+                - --port
+                - "25565"
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+
           volumeMounts:
             # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
             # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
