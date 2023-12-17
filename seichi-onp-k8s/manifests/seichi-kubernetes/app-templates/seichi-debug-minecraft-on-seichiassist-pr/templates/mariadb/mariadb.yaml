@@ -25,10 +25,10 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 4000m
-            memory: 4096Mi
+            cpu: 4
+            memory: 6Gi
           limits:
-            cpu: 4000m
+            cpu: 4
         env:
         - name: MYSQL_TCP_PORT
           value: "3306"
@@ -83,7 +83,7 @@ spec:
         resources:
           requests:
             cpu: 4
-            memory: 6Gi
+            memory: 4Gi
         env:
         - name: DB_PASSWORD
           valueFrom:
