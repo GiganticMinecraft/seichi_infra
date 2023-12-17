@@ -159,6 +159,9 @@ spec:
             - name: common-mcserver-configs
               mountPath: /config/spigot.yml
               subPath: spigot.yml
+            - name: minecraft-ops-config
+              mountPath: /config/ops.json
+              subPath: ops.json
 
             # DiscordSRV プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
@@ -204,6 +207,9 @@ spec:
         - name: seichiassist-config
           configMap:
             name: seichiassist-config
+        - name: minecraft-ops-config
+          configMap:
+            name: minecraft-ops-config
         
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
