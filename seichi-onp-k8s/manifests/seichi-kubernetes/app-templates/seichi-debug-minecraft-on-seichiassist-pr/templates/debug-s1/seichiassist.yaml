@@ -117,6 +117,14 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "1054159676964622426"
 
+            - name: RCON_CMDS_STARTUP
+              value: |
+                gamerule keepInventory true
+                mv create world_SW NORMAL
+                mv create world_SW_2 NORMAL
+                mv create world_SW_nether NETHER
+                mv create world_SW_the_end END
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
           ports:
