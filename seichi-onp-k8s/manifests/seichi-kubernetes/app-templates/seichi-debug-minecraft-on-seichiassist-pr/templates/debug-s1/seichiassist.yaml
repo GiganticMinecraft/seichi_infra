@@ -142,9 +142,11 @@ spec:
                 lp group default permission set seichiassist.sethome true
                 lp group default permission set seichiassist.stickmenu true
                 lp group default permission set seichiassist.fd true
-                lp group default permission set seichiassist.head true
+                lp group default permission set seichiassist.hat true
                 lp group default permission set seichiassist.ec true
                 lp group default permission set seichiassist.minestack true
+                lp group default permission set seichiassist.map true
+                lp group default permission set seichiassist.ef true
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
