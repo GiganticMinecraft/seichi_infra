@@ -5,7 +5,7 @@ metadata:
 data:
   my.cnf: |
     [mysqld]
-    innodb_buffer_pool_size = 2G
-    innodb_log_file_size = 512M
+    innodb_buffer_pool_size = 1G
+    innodb_log_file_size = 256M
     innodb_flush_log_at_trx_commit = 2
     innodb_write_io_threads = 8
