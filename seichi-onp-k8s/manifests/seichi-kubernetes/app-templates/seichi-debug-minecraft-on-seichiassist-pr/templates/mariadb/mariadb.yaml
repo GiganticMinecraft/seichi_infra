@@ -1,58 +1,108 @@
-apiVersion: mariadb.mmontes.io/v1alpha1
-kind: MariaDB
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: mariadb
+  namespace: seichi-debug-minecraft-on-seichiassist-pr-2115
 spec:
-  initContainers:
-    - image: mariadb:10.11.6
-      env:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: mariadb
+      app.kubernetes.io/name: mariadb
+  serviceName: mariadb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: mariadb
+        app.kubernetes.io/name: mariadb
+      name: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:10.11.6
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 4000m
+            memory: 4096Mi
+          limits:
+            cpu: 4000m
+            memory: 8192Mi
+        env:
+        - name: MYSQL_TCP_PORT
+          value: "3306"
+        - name: MARIADB_ROOT_HOST
+          value: '%'
+        - name: MARIADB_USER
+          value: mcserver
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mcserver-password
+              name: mariadb-pr-review-password
+        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+          value: "true"
+        livenessProbe:
+          exec:
+            command:
+            - bash
+            - -c
+            - mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
+          failureThreshold: 3
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - bash
+            - -c
+            - mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
+          failureThreshold: 3
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3306
+          name: mariadb
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: storage
+        - mountPath: /docker-entrypoint-initdb.d
+          name: sqldump-volume
+      initContainers:
+      - name: init-0
+        image: mariadb:10.11.6
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 4000m
+            memory: 4096Mi
+        env:
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mariadb-pr-review-password
               key: prod-mariadb-password
-      volumeMounts:
-        - name: sqldump-volume
-          mountPath: /docker-entrypoint-initdb.d
-      args:
-        - "sh"
-        - "-c"
-        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema > /docker-entrypoint-initdb.d/seichiassist.sql'
-
-  rootPasswordSecretKeyRef:
-    name: mariadb-pr-review-password
-    key: root-password
-
-  database: seichiassist
-  username: mcserver
-  passwordSecretKeyRef:
-    name: mariadb-pr-review-password
-    key: mcserver-password
-
-  image: mariadb:10.11.6
-  imagePullPolicy: IfNotPresent
-
-  env:
-    - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
-      value: "true"
-
-  port: 3306
-
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: 5Gi
-    storageClassName: synology-iscsi-storage-temp
-    accessModes:
-      - ReadWriteOnce
-
-  volumeMounts:
-    - name: sqldump-volume
-      mountPath: /docker-entrypoint-initdb.d
-
-  service:
-    type: ClusterIP
-
-  volumes:
-    - name: sqldump-volume
-      emptyDir: {}
+              name: mariadb-pr-review-password
+        args:
+        - sh
+        - -c
+        - mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist
+          flyway_managed_schema > /docker-entrypoint-initdb.d/seichiassist.sql
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: sqldump-volume
+      restartPolicy: Always
+      volumes:
+      - name: storage
+        emptyDir: {}
+      - name: sqldump-volume
+        emptyDir: {}
