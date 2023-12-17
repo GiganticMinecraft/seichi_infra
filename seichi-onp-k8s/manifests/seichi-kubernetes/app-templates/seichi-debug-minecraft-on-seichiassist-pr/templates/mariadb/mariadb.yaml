@@ -3,6 +3,22 @@ kind: MariaDB
 metadata:
   name: mariadb
 spec:
+  initContainers:
+    - image: mariadb:10.11.6
+      env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-pr-review-password
+              key: prod-mariadb-password
+      volumeMounts:
+        - name: sqldump-volume
+          mountPath: /docker-entrypoint-initdb.d
+      args:
+        - "sh"
+        - "-c"
+        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema > /docker-entrypoint-initdb.d/seichiassist.sql'
+
   rootPasswordSecretKeyRef:
     name: mariadb-pr-review-password
     key: root-password
@@ -30,5 +46,13 @@ spec:
     accessModes:
       - ReadWriteOnce
 
+  volumeMounts:
+    - name: sqldump-volume
+      mountPath: /docker-entrypoint-initdb.d
+
   service:
     type: ClusterIP
+
+  volumes:
+    - name: sqldump-volume
+      emptyDir: {}

@@ -229,6 +229,7 @@ resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
       data:
         root-password: ""
         mcserver-password: ""
+        prod-mariadb-password: ${base64encode(var.minecraft__prod_game_db__password)}
     EOS
     ]
   }
