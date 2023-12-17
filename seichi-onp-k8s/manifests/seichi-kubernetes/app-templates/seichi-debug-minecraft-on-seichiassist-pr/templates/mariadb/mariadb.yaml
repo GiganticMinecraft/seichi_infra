@@ -99,7 +99,6 @@ spec:
       restartPolicy: Always
       volumes:
       - name: sqldump-volume
-        emptyDir: {}
       - name: mariadb-config
         configMap:
           name: mariadb-config
