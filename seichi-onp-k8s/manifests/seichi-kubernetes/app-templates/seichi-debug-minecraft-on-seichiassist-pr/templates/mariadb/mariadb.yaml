@@ -18,7 +18,7 @@ spec:
       command:
         - "sh"
         - "-c"
-        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist > seichiassist.sql'
+        - 'mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema > seichiassist.sql'
 
   rootPasswordSecretKeyRef:
     name: mariadb-pr-review-password
