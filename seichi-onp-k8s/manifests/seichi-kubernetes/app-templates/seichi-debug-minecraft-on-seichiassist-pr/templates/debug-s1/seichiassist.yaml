@@ -118,7 +118,7 @@ spec:
               value: "1054159676964622426"
 
             - name: RCON_CMDS_STARTUP
-              value: |
+              value: |-
                 gamerule keepInventory true
                 mv create world_SW NORMAL
                 mv create world_SW_2 NORMAL
