@@ -25,8 +25,8 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
+            cpu: 4
+            memory: 7Gi
         env:
         - name: MYSQL_TCP_PORT
           value: "3306"
@@ -68,6 +68,8 @@ spec:
           name: mariadb
           protocol: TCP
         volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: storage
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
         - name: mariadb-config
@@ -78,8 +80,8 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 1
-            memory: 1Gi
+            cpu: 2
+            memory: 4Gi
         env:
         - name: DB_PASSWORD
           valueFrom:
@@ -96,6 +98,10 @@ spec:
           name: sqldump-volume
       restartPolicy: Always
       volumes:
+      - name: storage
+        emptyDir:
+          medium: Memory
+          sizeLimit: 5Gi
       - name: sqldump-volume
       - name: mariadb-config
         configMap:
