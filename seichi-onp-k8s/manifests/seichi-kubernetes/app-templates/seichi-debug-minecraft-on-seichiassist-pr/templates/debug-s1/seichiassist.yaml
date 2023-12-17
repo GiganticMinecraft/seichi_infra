@@ -135,7 +135,17 @@ spec:
                 lp group default permission set worldguard.region.flag.regions.own.* true
                 lp group default permission set seichiassist.fly true
                 lp group default permission set fastcraft.command.craft.fastcraft true
-
+                lp group default permission set seichiassist.stick true
+                lp group default permission set seichiassist.shareinv true
+                lp group default permission set seichiassist.mebius true
+                lp group default permission set seichiassist.home true
+                lp group default permission set seichiassist.sethome true
+                lp group default permission set seichiassist.stickmenu true
+                lp group default permission set seichiassist.fd true
+                lp group default permission set seichiassist.head true
+                lp group default permission set seichiassist.ec true
+                lp group default permission set seichiassist.minestack true
+                
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
           ports:
