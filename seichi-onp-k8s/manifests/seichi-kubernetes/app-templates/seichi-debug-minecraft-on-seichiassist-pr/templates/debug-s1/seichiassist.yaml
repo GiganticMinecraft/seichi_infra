@@ -152,6 +152,11 @@ spec:
                 lp group default permission set seichiassist.minestack true
                 lp group default permission set seichiassist.map true
                 lp group default permission set seichiassist.ef true
+                lp group default permission set elytra.auto true
+                lp group default permission set elytra.const-flight true
+                lp group default permission set elytra.runup true
+                lp group default permission set elytra.shift-activation true
+                lp group default permission set elytra.speedup true
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
