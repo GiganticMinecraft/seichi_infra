@@ -121,15 +121,15 @@ spec:
 
             - name: RCON_CMDS_STARTUP
               value: |-
+                mv create world_SW NORMAL
+                mv create world_SW_2 NORMAL
+                mv create world_SW_nether NETHER
+                mv create world_SW_the_end END
                 gamerule keepInventory true
                 mv gamerule keepInventory true world_SW
                 mv gamerule keepInventory true world_SW_2
                 mv gamerule keepInventory true world_SW_nether
                 mv gamerule keepInventory true world_SW_the_end
-                mv create world_SW NORMAL
-                mv create world_SW_2 NORMAL
-                mv create world_SW_nether NETHER
-                mv create world_SW_the_end END
                 lp group default permission set multiverse.core.list.who true
                 lp group default permission set multiverse.teleport.* true
                 lp group default permission set worldedit.wand true
