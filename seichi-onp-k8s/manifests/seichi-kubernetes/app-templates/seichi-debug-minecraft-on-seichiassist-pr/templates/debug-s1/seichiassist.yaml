@@ -92,6 +92,7 @@ spec:
                 https://github.com/ViaVersion/ViaVersion/releases/download/4.4.2/ViaVersion-4.4.2.jar,
                 https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar,
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
+                https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
 
             - name: JVM_OPTS
               value: >-
@@ -234,6 +235,11 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/LunaChat/config.yml
               subPath: LunaChat-config.yml
+
+            # Elytra プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Elytra/config.yml
+              subPath: Elytra-config.yml
 
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
