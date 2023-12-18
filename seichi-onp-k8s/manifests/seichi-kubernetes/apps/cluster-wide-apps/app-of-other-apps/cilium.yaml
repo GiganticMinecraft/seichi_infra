@@ -38,12 +38,10 @@ spec:
           metrics:
             enabled:
               - dns:query;ignoreAAAA
-              - drop
+              - drop:sourceContext=identity;destinationContext=identity
               - tcp
               - flow
               - icmp
-              - http
-              - port-distribution
               - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
               - policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelsContext=source_namespace,destination_namespace
             enableOpenMetrics: true
