@@ -12,7 +12,7 @@ spec:
     helm:
       releaseName: argo-workflows
       values: |
-        controller
+        controller:
           workflowNamespaces:
             - argo
             - argo-events
