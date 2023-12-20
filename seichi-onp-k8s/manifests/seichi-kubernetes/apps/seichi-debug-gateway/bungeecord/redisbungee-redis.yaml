@@ -19,14 +19,10 @@ spec:
           notify-keyspace-events "Eg$x"
         master:
           service:
-            # loadBalancerIP has been deprecated in k8s v1.24
-            # ciliumのlb-ipamを使用しているので今後それに沿った記載に改める必要がある
-            # https://docs.cilium.io/en/stable/network/lb-ipam/#requesting-ips
-            # FIXME .spec.loadBalancerClass が未指定の場合、lb-ipamによるIPアサインしか行われない
-            # 負荷分散を実施するには .spec.loadBalancerClass を明示的に指定する必要がある
-            # https://docs.cilium.io/en/latest/network/lb-ipam/#loadbalancerclass
             type: LoadBalancer
-            loadBalancerIP: 10.96.0.134
+            loadBalancerClass: io.cilium/bgp-control-plane
+            annotations:
+              "io.cilium/lb-ipam-ips": "10.96.0.134"
           resources:
             requests:
               cpu: "250m"
