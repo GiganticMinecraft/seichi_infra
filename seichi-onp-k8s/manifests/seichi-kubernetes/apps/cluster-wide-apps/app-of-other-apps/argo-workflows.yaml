@@ -11,8 +11,11 @@ spec:
     targetRevision: 0.40.1
     helm:
       releaseName: argo-workflows
-      # values: |
-
+      values: |
+        controller
+          workflowNamespaces:
+            - argo
+            - argo-events
   destination:
     server: https://kubernetes.default.svc
     namespace: argo
