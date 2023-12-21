@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: mcserver
+    release: prometheus
+    mcserver: debug-lobby
+  name: mcserver-metrics--debug-lobby
+spec:
+  endpoints:
+    - interval: 30s
+      port: jmx-metrics
+  selector:
+    matchLabels:
+      app: mcserver
+      role: metrics
+      mcserver: debug-lobby
