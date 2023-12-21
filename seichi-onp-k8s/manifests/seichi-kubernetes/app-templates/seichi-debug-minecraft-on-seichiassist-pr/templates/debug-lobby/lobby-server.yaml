@@ -131,11 +131,14 @@ spec:
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keepInventory true
+                mvm set difficulty peaceful world
+                rg flag -w world __global__ build deny
+                lp group default permission set worldedit.selection.pos true
                 lp group default permission set worldedit.wand true
                 lp group default permission set worldguard.region.claim true
                 lp group default permission set worldguard.region.select.own.* true
                 lp group default permission set worldguard.region.list.own true
-                lp group default permission set worldguard.region.info.own.* true
+                lp group default permission set worldguard.region.info.* true
                 lp group default permission set worldguard.region.flag.regions.own.* true
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
