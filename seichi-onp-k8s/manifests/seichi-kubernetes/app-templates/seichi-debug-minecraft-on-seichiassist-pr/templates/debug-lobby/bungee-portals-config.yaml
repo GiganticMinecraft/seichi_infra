@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bungee-portals-config
+data:
+  portal.yml: |
+    world#-2#68#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-2#68#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-2#69#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-2#69#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-1#69#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-1#69#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-1#68#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-1#68#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-1#70#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-1#70#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-2#70#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
+    world#-2#70#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
