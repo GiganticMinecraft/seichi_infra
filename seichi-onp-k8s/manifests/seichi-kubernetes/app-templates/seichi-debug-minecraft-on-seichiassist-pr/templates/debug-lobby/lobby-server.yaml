@@ -221,6 +221,11 @@ spec:
               mountPath: /jmx-exporter/jmx-exporter-config.yaml
               subPath: jmx-exporter-config.yaml
 
+            # BungeePortals プラグインの設定ファイル
+            - name: bungee-portals-config
+              mountPath: /plugins/BungeePortals/portal.yml
+              subPath: portal.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
@@ -237,6 +242,9 @@ spec:
         - name: minecraft-ops-config
           configMap:
             name: minecraft-ops-config
+        - name: bungee-portals-config
+          configMap:
+            name: bungee-portals-config
         
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
