@@ -126,6 +126,7 @@ spec:
                 mv gamerule keepInventory true world_SW_nether
                 mv gamerule keepInventory true world_SW_the_end
                 mvm set difficulty peaceful world
+                rg flag -w world __global__ build deny
                 lp group default permission set multiverse.core.list.who true
                 lp group default permission set multiverse.teleport.* true
                 lp group default permission set worldedit.wand true
