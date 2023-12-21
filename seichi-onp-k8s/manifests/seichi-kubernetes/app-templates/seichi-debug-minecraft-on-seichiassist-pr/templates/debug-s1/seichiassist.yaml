@@ -264,7 +264,7 @@ spec:
               mountPath: /plugins
 
             - name: world-download-volume
-              mountPath: /data/world
+              mountPath: /data
 
       volumes:
         - name: common-mcserver-configs
