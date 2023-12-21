@@ -66,7 +66,7 @@ resource "kubernetes_secret" "onp_argo_workflows_sso" {
   }
 
   data = {
-    client-id = "argo-workflows-sso"
+    client-id     = "argo-workflows-sso"
     client-secret = var.onp_k8s_argo_workflows_sso_client_secret
   }
 
