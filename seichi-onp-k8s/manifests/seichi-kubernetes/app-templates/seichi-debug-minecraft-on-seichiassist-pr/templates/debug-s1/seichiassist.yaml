@@ -103,7 +103,6 @@ spec:
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
-                https://github.com/Multiverse/Multiverse-Portals/releases/download/4.2.3/multiverse-portals-4.2.3.jar,
 
             - name: JVM_OPTS
               value: >-
