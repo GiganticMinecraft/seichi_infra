@@ -17,6 +17,7 @@ spec:
             - argo
             - argo-events
         server:
+          secure: true
           extraArgs:
             - --auth-mode=sso
           sso:
