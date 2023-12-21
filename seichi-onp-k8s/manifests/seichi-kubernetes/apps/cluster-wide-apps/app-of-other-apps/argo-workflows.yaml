@@ -32,6 +32,8 @@ spec:
               name: argo-workflows-sso
               key: client-secret
             redirectUrl: https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
+            rbac: # <- add this block
+              enabled: true # <- add this block
   destination:
     server: https://kubernetes.default.svc
     namespace: argo
