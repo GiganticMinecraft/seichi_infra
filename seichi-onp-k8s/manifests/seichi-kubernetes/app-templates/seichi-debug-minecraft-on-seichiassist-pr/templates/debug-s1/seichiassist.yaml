@@ -153,6 +153,7 @@ spec:
                 lp group default permission set worldguard.region.list.own true
                 lp group default permission set worldguard.region.info.* true
                 lp group default permission set worldguard.region.flag.regions.own.* true
+                lp group default permission set worldguard.region.remove.own.* true
                 lp group default permission set fastcraft.command.craft.fastcraft true
                 lp group default permission set seichiassist.fly true
                 lp group default permission set seichiassist.stick true

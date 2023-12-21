@@ -920,9 +920,9 @@ data:
     # to move before being teleported
     Allow-player-to-move: false
 
-    Player-moved-before-tp: '&6The request was canceled because %player% moved!'
+    Player-moved-before-tp: '&6%player%が動いたため、テレポートがキャンセルされました。'
 
-    Player-sent-request: '&eYou have sent a request to &6%target%'
+    Player-sent-request: '&eプレイヤー&6%target%&eにtpaリクエストを送信しました。'
 
     Tpa-message:
       - ''
