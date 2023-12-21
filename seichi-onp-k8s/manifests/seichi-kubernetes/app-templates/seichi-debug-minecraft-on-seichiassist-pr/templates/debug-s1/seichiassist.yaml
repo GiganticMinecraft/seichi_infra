@@ -61,7 +61,7 @@ spec:
           image: busybox:1.36.1
           env:
             - name: WORLD_URL # S1からインポートしてきたワールドデータ
-              value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/word-data/s1/world.tar.gz"
+              value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/world-data/s1/world.tar.gz"
           volumeMounts:
             - name: world-download-volume
               mountPath: /data
