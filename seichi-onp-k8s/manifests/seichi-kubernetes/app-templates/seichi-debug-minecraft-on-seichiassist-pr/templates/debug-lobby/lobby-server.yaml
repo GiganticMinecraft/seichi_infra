@@ -5,20 +5,20 @@ metadata:
     reloader.stakater.com/auto: "true"
   labels:
     app: mcserver
-    mcserver: debug-s1
-  name: mcserver--debug-s1
+    mcserver: debug-lobby
+  name: mcserver--debug-lobby
 spec:
   replicas: 1
-  serviceName: "mcserver--debug-s1"
+  serviceName: "mcserver--debug-lobby"
   selector:
     matchLabels:
-      app: mcserver--debug-s1
-      mcserver: debug-s1
+      app: mcserver--debug-lobby
+      mcserver: debug-lobby
   template:
     metadata:
       labels:
-        app: mcserver--debug-s1
-        mcserver: debug-s1
+        app: mcserver--debug-lobby
+        mcserver: debug-lobby
     spec:
       initContainers:
         - name: jmx-exporter-downloader
@@ -61,7 +61,7 @@ spec:
           image: busybox:1.36.1
           env:
             - name: WORLD_URL # S1からインポートしてきたワールドデータ
-              value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/word-data/s1/world.tar.gz"
+              value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/world-data/lobby/world.tar.gz"
           volumeMounts:
             - name: world-download-volume
               mountPath: /data
@@ -73,14 +73,14 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: 4
-              memory: 8Gi
+              cpu: 2
+              memory: 4Gi
             limits:
-              cpu: 4
-              memory: 8Gi
+              cpu: 2
+              memory: 4Gi
           env:
             - name: MEMORY
-              value: 6144m
+              value: 2048m
             - name: TYPE
               value: PAPER
             - name: VERSION
@@ -99,9 +99,8 @@ spec:
               value: >-
                 https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar,
                 https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar,
-                https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar,
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
-                https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
+                https://github.com/DmitryRendov/BungeePortals/releases/download/1.2.3/BungeePortals-1.2.3.jar,
 
             - name: JVM_OPTS
               value: >-
@@ -131,42 +130,13 @@ spec:
 
             - name: RCON_CMDS_STARTUP
               value: |-
-                mv create world_SW NORMAL
-                mv create world_SW_2 NORMAL
-                mv create world_SW_nether NETHER
-                mv create world_SW_the_end END
                 gamerule keepInventory true
-                mv gamerule keepInventory true world_SW
-                mv gamerule keepInventory true world_SW_2
-                mv gamerule keepInventory true world_SW_nether
-                mv gamerule keepInventory true world_SW_the_end
-                lp group default permission set multiverse.core.list.who true
-                lp group default permission set multiverse.teleport.* true
                 lp group default permission set worldedit.wand true
                 lp group default permission set worldguard.region.claim true
                 lp group default permission set worldguard.region.select.own.* true
                 lp group default permission set worldguard.region.list.own true
                 lp group default permission set worldguard.region.info.own.* true
                 lp group default permission set worldguard.region.flag.regions.own.* true
-                lp group default permission set seichiassist.fly true
-                lp group default permission set fastcraft.command.craft.fastcraft true
-                lp group default permission set seichiassist.stick true
-                lp group default permission set seichiassist.shareinv true
-                lp group default permission set seichiassist.mebius true
-                lp group default permission set seichiassist.home true
-                lp group default permission set seichiassist.sethome true
-                lp group default permission set seichiassist.stickmenu true
-                lp group default permission set seichiassist.fd true
-                lp group default permission set seichiassist.hat true
-                lp group default permission set seichiassist.ec true
-                lp group default permission set seichiassist.minestack true
-                lp group default permission set seichiassist.map true
-                lp group default permission set seichiassist.ef true
-                lp group default permission set elytra.auto true
-                lp group default permission set elytra.const-flight true
-                lp group default permission set elytra.runup true
-                lp group default permission set elytra.shift-activation true
-                lp group default permission set elytra.speedup true
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
@@ -235,25 +205,10 @@ spec:
               mountPath: /plugins/DiscordSRV/messages.yml
               subPath: DiscordSRV-messages.yml
 
-            # MorningGlorySeeds プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/MorningGlorySeeds/config.yml
-              subPath: MorningGlorySeeds-config.yml
-
             # LunaChat プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/LunaChat/config.yml
               subPath: LunaChat-config.yml
-
-            # Elytra プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/Elytra/config.yml
-              subPath: Elytra-config.yml
-
-            # SeichiAssist プラグインの設定ファイル
-            - name: seichiassist-config
-              mountPath: /plugins/SeichiAssist/config.yml
-              subPath: config.yml
 
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
@@ -276,9 +231,6 @@ spec:
         - name: common-mcserver-plugin-configs
           configMap:
             name: common-mcserver-plugin-configs
-        - name: seichiassist-config
-          configMap:
-            name: seichiassist-config
         - name: minecraft-ops-config
           configMap:
             name: minecraft-ops-config

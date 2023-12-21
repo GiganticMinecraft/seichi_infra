@@ -8,7 +8,7 @@ spec:
       servers:
       {{- range . }}
         debug-pr-{{ . }}:
-          address: mcserver--debug-s1.seichi-debug-minecraft-on-seichiassist-pr-{{ . }}:25565
+          address: mcserver--debug-lobby.seichi-debug-minecraft-on-seichiassist-pr-{{ . }}:25565
           restricted: false
           motd: ''
       {{- end }}
