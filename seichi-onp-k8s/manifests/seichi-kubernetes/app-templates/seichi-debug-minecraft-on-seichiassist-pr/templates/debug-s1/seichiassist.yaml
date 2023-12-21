@@ -283,12 +283,14 @@ spec:
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
           emptyDir: {}
-        - name: world-download-volume
-          emptyDir: {}
         - name: common-jmx-exporter-config
           configMap:
             name: common-jmx-exporter-config
 
         # mod-downloaderからプラグインをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: mod-downloader-volume
+          emptyDir: {}
+
+        # S1から取ってきたワールドデータをぶちこむボリューム
+        - name: world-download-volume
           emptyDir: {}
