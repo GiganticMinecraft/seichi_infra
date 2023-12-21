@@ -103,6 +103,7 @@ spec:
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
+                https://www.spigotmc.org/resources/clicktpa.62596/download?version=511303,
 
             - name: JVM_OPTS
               value: >-
@@ -171,7 +172,13 @@ spec:
                 lp group default permission set elytra.const-flight true
                 lp group default permission set elytra.runup true
                 lp group default permission set elytra.shift-activation true
-                lp group default permission set elytra.speedup true  
+                lp group default permission set elytra.speedup true
+                lp group default permission set clicktpa.tpa true
+                lp group default permission set clicktpa.tpacancel true
+                lp group default permission set clicktpa.tpadeny true
+                lp group default permission set clicktpa.tpaccept true
+                lp group default permission set clicktpa.tpahere true
+                lp group default permission set clicktpa.tptoggle true
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
@@ -257,6 +264,11 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/Elytra/config.yml
               subPath: Elytra-config.yml
+
+            # ClickTpa プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ClickTpa/config.yml
+              subPath: ClickTpa-config.yml
 
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
