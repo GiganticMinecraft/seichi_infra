@@ -16,6 +16,20 @@ spec:
           workflowNamespaces:
             - argo
             - argo-events
+        server:
+          extraArgs:
+            - --auth-mode=sso
+          sso:
+            issuer: https://argocd.onp-k8s.admin.seichi.click/api/dex
+            # sessionExpiry defines how long your login is valid for in hours. (optional, default: 10h)
+            sessionExpiry: 240h
+            clientId:
+              name: argo-workflows-sso
+              key: client-id
+            clientSecret:
+              name: argo-workflows-sso
+              key: client-secret
+            redirectUrl: https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
   destination:
     server: https://kubernetes.default.svc
     namespace: argo
@@ -24,5 +38,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
       - ServerSideApply=true

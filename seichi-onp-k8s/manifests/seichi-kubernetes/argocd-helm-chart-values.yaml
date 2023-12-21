@@ -47,6 +47,12 @@ server:
             clientSecret: $argocd-github-oauth-app-secret:ARGOCD_GITHUB_OAUTH_APP_SECRET
             orgs:
             - name: GiganticMinecraft
+           staticClients:
+        - id: argo-workflows-sso
+          name: Argo Workflow
+          redirectURIs:
+            - https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
+          secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
     admin.enabled: "false"
 
   rbacConfig:
@@ -58,7 +64,6 @@ server:
     # See https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md for additional information.
     policy.csv: |
       g, GiganticMinecraft:admin-team, role:admin
-      g, GiganticMinecraft:infra-collaborator, role:admin
     # policy.default is the name of the default role which Argo CD will falls back to, when
     # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
     # but will see no apps, projects, etc...

@@ -12,7 +12,6 @@ spec:
     helm:
       releaseName: argo-events
       # values: |
-
   destination:
     server: https://kubernetes.default.svc
     namespace: argo-events

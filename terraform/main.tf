@@ -182,6 +182,12 @@ variable "onp_k8s_argocd_applicationset_controller_github_app_pem" {
   sensitive   = true
 }
 
+variable "onp_k8s_argo_workflows_sso_client_secret" {
+  description = "Client Secret of Argo Workflows SSO on ArgoCD dex"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise Grafana to GitHub integration
