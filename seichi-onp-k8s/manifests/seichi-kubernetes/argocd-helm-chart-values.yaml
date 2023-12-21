@@ -92,6 +92,12 @@ controller:
         release: prometheus
 
 dex:
+  env:
+    - name: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: argo-workflows-sso
+          key: client-secret
   resources:
     limits:
       cpu: 100m
