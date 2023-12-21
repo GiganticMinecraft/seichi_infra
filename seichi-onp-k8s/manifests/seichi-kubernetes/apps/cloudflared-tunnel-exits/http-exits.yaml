@@ -95,11 +95,6 @@ spec:
             external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
             internal-authority: "phpmyadmin.seichi-minecraft:80"
 
-          # Argo Eventsの管理画面。
-          # 今は特に何も表示してないのとSSOを入れるので認証は噛まさない。
-          - name: argo-workflows
-            external-hostname: argo-workflows.onp-k8s.admin.seichi.click
-            internal-authority: "argo-workflows-server.argo:2746"
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"

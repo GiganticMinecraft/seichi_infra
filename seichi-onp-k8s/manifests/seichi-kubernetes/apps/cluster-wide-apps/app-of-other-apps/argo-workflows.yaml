@@ -21,6 +21,7 @@ spec:
           extraArgs:
             - --auth-mode=sso
           sso:
+            enabled: true
             issuer: https://argocd.onp-k8s.admin.seichi.click/api/dex
             # sessionExpiry defines how long your login is valid for in hours. (optional, default: 10h)
             sessionExpiry: 240h

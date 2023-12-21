@@ -19,6 +19,12 @@ spec:
             external-hostname: argocd.onp-k8s.admin.seichi.click
             internal-authority: argocd-server.argocd:443
 
+          # Argo Eventsの管理画面。
+          # 今は特に何も表示してないのとSSOを入れるので認証は噛まさない。
+          - name: argo-workflows
+            external-hostname: argo-workflows.onp-k8s.admin.seichi.click
+            internal-authority: argo-workflows-server.argo:2746
+
           # 管理者からの直アクセスを想定するため、GitHub TeamsによるSSOを設定している
           # (terraform/cloudflare_network_admin_services.yaml 参照)
           #
