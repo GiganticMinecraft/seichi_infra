@@ -57,6 +57,18 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /plugins
+        - name: world-downloader
+          image: busybox:1.36.1
+          env:
+            - name: WORLD_URL # S1からインポートしてきたワールドデータ
+              value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/world.tar.gz"
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /data
+          command:
+            - "sh"
+            - "-c"
+            - 'wget -qO- "${WORLD_URL}" | tar -xz -C /data'
 
       containers:
         - resources:
@@ -244,6 +256,8 @@ spec:
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
               subPath: jmx-exporter-javaagent.jar
+            - name: world-download-volume
+              mountPath: /data/world
             - name: common-jmx-exporter-config
               mountPath: /jmx-exporter/jmx-exporter-config.yaml
               subPath: jmx-exporter-config.yaml
@@ -267,6 +281,8 @@ spec:
         
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
+          emptyDir: {}
+        - name: world-download-volume
           emptyDir: {}
         - name: common-jmx-exporter-config
           configMap:
