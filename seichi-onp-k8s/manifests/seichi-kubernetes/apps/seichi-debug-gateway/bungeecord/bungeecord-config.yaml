@@ -7,8 +7,12 @@ spec:
     config.yml: |
       servers:
       {{- range . }}
-        debug-pr-{{ . }}:
+        debug-pr-{{ . }}-lobby:
           address: mcserver--debug-lobby.seichi-debug-minecraft-on-seichiassist-pr-{{ . }}:25565
+          restricted: false
+          motd: ''
+        debug-pr-{{ . }}-s1:
+          address: mcserver--debug-s1.seichi-debug-minecraft-on-seichiassist-pr-{{ . }}:25565
           restricted: false
           motd: ''
       {{- end }}
@@ -16,9 +20,9 @@ spec:
       listeners:
         - priorities:
             # FIXME: PR が一個も出ていない時に壊れる。そもそもそのような状況で繋ぐサーバーを用意すべきかも
-            - debug-pr-{{ (index . 0) }}
+            - debug-pr-{{ (index . 0) }}-lobby
           forced_hosts:
-            play-debug.seichi.click: debug-pr-{{ (index . 0) }}
+            play-debug.seichi.click: debug-pr-{{ (index . 0) }}-lobby
 
           query_port: 25565
           motd: ''
