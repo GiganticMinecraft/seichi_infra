@@ -12,10 +12,6 @@ spec:
     helm:
       releaseName: argo-workflows
       values: |
-        controller:
-          workflowNamespaces:
-            - argo
-            - argo-events
         server:
           secure: true
           extraArgs:
