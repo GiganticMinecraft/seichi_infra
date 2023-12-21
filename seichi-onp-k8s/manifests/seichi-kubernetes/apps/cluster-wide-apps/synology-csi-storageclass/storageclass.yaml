@@ -12,18 +12,3 @@ parameters:
   formatOptions: '--nodiscard'
 reclaimPolicy: Retain
 allowVolumeExpansion: true
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: synology-iscsi-storage-temp
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "false"
-provisioner: csi.san.synology.com
-parameters:
-  dsm: '192.168.16.240'
-  location: '/volume1'
-  csi.storage.k8s.io/fstype: 'btrfs'
-  formatOptions: '--nodiscard'
-reclaimPolicy: Delete
-allowVolumeExpansion: true

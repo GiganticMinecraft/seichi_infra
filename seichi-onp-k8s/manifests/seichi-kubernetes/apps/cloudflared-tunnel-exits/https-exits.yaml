@@ -74,6 +74,8 @@ spec:
           prune: true
           selfHeal: true
           allowEmpty: true
+        syncOptions:
+          - ServerSideApply=true
         retry:
           limit: -1
           backoff:
