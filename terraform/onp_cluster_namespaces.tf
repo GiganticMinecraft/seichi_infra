@@ -28,6 +28,12 @@ resource "kubernetes_namespace" "onp_argocd" {
   }
 }
 
+resource "kubernetes_namespace" "onp_argo" {
+  metadata {
+    name = "argo"
+  }
+}
+
 resource "kubernetes_namespace" "onp_clustersecret" {
   metadata {
     name = "clustersecret"

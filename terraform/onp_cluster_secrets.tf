@@ -57,6 +57,21 @@ resource "kubernetes_secret" "onp_argocd_applicationset_controller_github_app_se
 
   type = "Opaque"
 }
+resource "kubernetes_secret" "onp_argo_workflows_sso" {
+  depends_on = [kubernetes_namespace.onp_argo]
+
+  metadata {
+    name      = "argo-workflows-sso"
+    namespace = "argo"
+  }
+
+  data = {
+    client-id = "argo-workflows-sso"
+    client-secret = var.onp_k8s_argo_workflows_sso_client_secret
+  }
+
+  type = "Opaque"
+}
 
 resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
   depends_on = [kubernetes_namespace.onp_monitoring]
