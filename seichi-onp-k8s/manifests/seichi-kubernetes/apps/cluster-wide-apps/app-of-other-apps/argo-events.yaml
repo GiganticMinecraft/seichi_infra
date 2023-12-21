@@ -4,7 +4,7 @@ metadata:
   name: argo-events
   namespace: argocd
 spec:
-  project: cluster-wide-apps
+  project: argocd-root
   source:
     chart: argo-events
     repoURL: https://argoproj.github.io/argo-helm
