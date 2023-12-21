@@ -256,14 +256,15 @@ spec:
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
               subPath: jmx-exporter-javaagent.jar
-            - name: world-download-volume
-              mountPath: /data/world
             - name: common-jmx-exporter-config
               mountPath: /jmx-exporter/jmx-exporter-config.yaml
               subPath: jmx-exporter-config.yaml
 
             - name: mod-downloader-volume
               mountPath: /plugins
+
+            - name: world-download-volume
+              mountPath: /data/world
 
       volumes:
         - name: common-mcserver-configs
