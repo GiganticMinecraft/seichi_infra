@@ -223,8 +223,8 @@ spec:
 
             # BungeePortals プラグインの設定ファイル
             - name: bungee-portals-config
-              mountPath: /plugins/BungeePortals/portal.yml
-              subPath: portal.yml
+              mountPath: /plugins/BungeePortals/portals.yml
+              subPath: portals.yml
 
             - name: mod-downloader-volume
               mountPath: /plugins

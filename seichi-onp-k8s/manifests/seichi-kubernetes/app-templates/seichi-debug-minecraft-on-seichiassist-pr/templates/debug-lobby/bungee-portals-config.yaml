@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: bungee-portals-config
 data:
-  portal.yml: |
+  portals.yml: |
     world#-2#68#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
     world#-2#68#1: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
     world#-2#69#0: debug-pr-{{ .Values.SeichiAssistPullRequestNumber }}-s1
