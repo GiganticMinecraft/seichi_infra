@@ -129,14 +129,16 @@ spec:
                 rg flag -w world __global__ build deny
                 lp group default permission set multiverse.core.list.who true
                 lp group default permission set multiverse.teleport.* true
+                lp group default permission set multiverse.core.spawn.self true
                 lp group default permission set worldedit.wand true
+                lp group default permission set worldedit.selection.pos true
                 lp group default permission set worldguard.region.claim true
                 lp group default permission set worldguard.region.select.own.* true
                 lp group default permission set worldguard.region.list.own true
                 lp group default permission set worldguard.region.info.* true
                 lp group default permission set worldguard.region.flag.regions.own.* true
-                lp group default permission set seichiassist.fly true
                 lp group default permission set fastcraft.command.craft.fastcraft true
+                lp group default permission set seichiassist.fly true
                 lp group default permission set seichiassist.stick true
                 lp group default permission set seichiassist.shareinv true
                 lp group default permission set seichiassist.mebius true
@@ -153,9 +155,7 @@ spec:
                 lp group default permission set elytra.const-flight true
                 lp group default permission set elytra.runup true
                 lp group default permission set elytra.shift-activation true
-                lp group default permission set elytra.speedup true
-                lp group default permission set worldedit.selection.pos true
-                lp group default permission set multiverse.core.spawn.self true
+                lp group default permission set elytra.speedup true  
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
