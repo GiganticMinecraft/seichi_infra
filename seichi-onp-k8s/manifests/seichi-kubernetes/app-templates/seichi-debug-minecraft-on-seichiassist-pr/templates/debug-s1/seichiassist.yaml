@@ -102,6 +102,7 @@ spec:
                 https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar,
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
+                https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
 
             - name: JVM_OPTS
               value: >-
@@ -140,16 +141,20 @@ spec:
                 mv gamerule keepInventory true world_SW_2
                 mv gamerule keepInventory true world_SW_nether
                 mv gamerule keepInventory true world_SW_the_end
+                mvm set difficulty peaceful world
+                rg flag -w world __global__ build deny
                 lp group default permission set multiverse.core.list.who true
                 lp group default permission set multiverse.teleport.* true
+                lp group default permission set multiverse.core.spawn.self true
                 lp group default permission set worldedit.wand true
+                lp group default permission set worldedit.selection.pos true
                 lp group default permission set worldguard.region.claim true
                 lp group default permission set worldguard.region.select.own.* true
                 lp group default permission set worldguard.region.list.own true
-                lp group default permission set worldguard.region.info.own.* true
+                lp group default permission set worldguard.region.info.* true
                 lp group default permission set worldguard.region.flag.regions.own.* true
-                lp group default permission set seichiassist.fly true
                 lp group default permission set fastcraft.command.craft.fastcraft true
+                lp group default permission set seichiassist.fly true
                 lp group default permission set seichiassist.stick true
                 lp group default permission set seichiassist.shareinv true
                 lp group default permission set seichiassist.mebius true
@@ -166,7 +171,7 @@ spec:
                 lp group default permission set elytra.const-flight true
                 lp group default permission set elytra.runup true
                 lp group default permission set elytra.shift-activation true
-                lp group default permission set elytra.speedup true
+                lp group default permission set elytra.speedup true  
                 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
@@ -223,6 +228,9 @@ spec:
             - name: common-mcserver-configs
               mountPath: /config/spigot.yml
               subPath: spigot.yml
+            - name: common-mcserver-configs
+              mountPath: /config/commands.yml
+              subPath: commands.yml
             - name: minecraft-ops-config
               mountPath: /config/ops.json
               subPath: ops.json
