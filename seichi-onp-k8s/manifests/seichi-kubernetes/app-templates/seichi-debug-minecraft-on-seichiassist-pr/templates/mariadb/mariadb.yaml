@@ -71,7 +71,7 @@ spec:
           name: mariadb
           protocol: TCP
         volumeMounts:
-        - mountPath: /var/lib/mysql
+        - mountPath: /var/lib/mysql/seichiassist
           name: storage
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
@@ -107,6 +107,9 @@ spec:
       restartPolicy: Always
       volumes:
       - name: storage
+        emptyDir:
+          medium: Memory
+          sizeLimit: 3Gi
       - name: sqldump-volume
       - name: mariadb-config
         configMap:
