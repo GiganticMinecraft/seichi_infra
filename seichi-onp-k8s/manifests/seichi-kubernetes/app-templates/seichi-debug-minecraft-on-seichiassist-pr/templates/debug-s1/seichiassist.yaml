@@ -196,12 +196,12 @@ spec:
             - containerPort: 18321
               name: jmx-metrics
 
-          startupProbe:
-            tcpSocket:
-              port: 25565
-            # 最大180秒待つ
-            failureThreshold: 10
-            periodSeconds: 30
+          # startupProbe:
+          #   tcpSocket:
+          #     port: 25565
+          #   # 最大180秒待つ
+          #   failureThreshold: 10
+          #   periodSeconds: 30
 
           readinessProbe:
             exec:
