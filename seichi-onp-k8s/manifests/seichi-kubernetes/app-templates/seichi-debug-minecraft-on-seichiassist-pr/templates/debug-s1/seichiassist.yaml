@@ -20,6 +20,15 @@ spec:
         app: mcserver--debug-s1
         mcserver: debug-s1
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - seichi-onp-k8s-wk-1 # CPUの多いwk-1だけにスケジュールする
       initContainers:
         - name: jmx-exporter-downloader
           image: busybox:1.36.1
@@ -72,9 +81,10 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: 4
+              cpu: 8
               memory: 8Gi
-            limits: # chunk-search-rsでめちゃめちゃCPUを使うのでCPU Limitは要検討
+            limits:
+              cpu: 8
               memory: 8Gi
           env:
             - name: MEMORY
