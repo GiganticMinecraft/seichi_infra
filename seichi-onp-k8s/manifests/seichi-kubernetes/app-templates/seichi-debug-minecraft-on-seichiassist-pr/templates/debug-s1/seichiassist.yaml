@@ -68,8 +68,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - 'wget -qO- "${WORLD_URL}" | tar -xz -C /data'
-
+            - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && echo "successfully imported world data"'
       containers:
         - resources:
             requests:
