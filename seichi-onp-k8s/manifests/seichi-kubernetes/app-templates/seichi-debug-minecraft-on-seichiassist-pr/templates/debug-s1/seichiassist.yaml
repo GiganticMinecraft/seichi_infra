@@ -74,8 +74,7 @@ spec:
             requests:
               cpu: 4
               memory: 8Gi
-            limits:
-              cpu: 6 # chunk-search-rsでめちゃめちゃCPUを使う
+            limits: # chunk-search-rsでめちゃめちゃCPUを使うのでCPU Limitは要検討
               memory: 8Gi
           env:
             - name: MEMORY
