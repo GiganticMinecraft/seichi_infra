@@ -92,9 +92,9 @@ spec:
         - sh
         - -c
         - |
-          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema --ignore-table=seichiassist.playerdata --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
-          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist --tables playerdata --where 'lastquit > "2022-01-01 00:00:00"' >> /docker-entrypoint-initdb.d/seichiassist.sql
-          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist --tables mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
+          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist flyway_managed_schema --ignore-table=seichiassist.playerdata --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/00_seichiassist-without-playerdaya.sql
+          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist playerdata --where 'lastquit > "2022-01-01 00:00:00"' > /docker-entrypoint-initdb.d/01_playerdata.sql
+          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist mine_stack --where 'amount != 0' > /docker-entrypoint-initdb.d/02_mine_stack.sql
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
