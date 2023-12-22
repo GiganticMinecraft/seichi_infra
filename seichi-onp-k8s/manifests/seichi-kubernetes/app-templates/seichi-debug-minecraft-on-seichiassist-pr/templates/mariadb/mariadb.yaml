@@ -25,11 +25,8 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: 2
-            memory: 2Gi
-          limits:
-            cpu: 2
-            memory: 4Gi
+            cpu: 4
+            memory: 9Gi
         env:
         - name: MYSQL_TCP_PORT
           value: "3306"
@@ -71,7 +68,7 @@ spec:
           name: mariadb
           protocol: TCP
         volumeMounts:
-        - mountPath: /var/lib/mysql/seichiassist
+        - mountPath: /var/lib/mysql
           name: storage
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
@@ -84,9 +81,6 @@ spec:
         resources:
           requests:
             cpu: 2
-            memory: 2Gi
-          limits:
-            cpu: 2
             memory: 4Gi
         env:
         - name: DB_PASSWORD
@@ -97,15 +91,17 @@ spec:
         args:
         - sh
         - -c
-        - |
-          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases flyway_managed_schema seichiassist --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
-          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
+        - mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases seichiassist
+          flyway_managed_schema > /docker-entrypoint-initdb.d/seichiassist.sql
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
       restartPolicy: Always
       volumes:
       - name: storage
+        emptyDir:
+          medium: Memory
+          sizeLimit: 7Gi
       - name: sqldump-volume
       - name: mariadb-config
         configMap:
