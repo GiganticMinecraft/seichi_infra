@@ -82,13 +82,13 @@ spec:
         - resources:
             requests:
               cpu: 8
-              memory: 8Gi
+              memory: 18Gi
             limits:
               cpu: 8
-              memory: 8Gi
+              memory: 18Gi
           env:
             - name: MEMORY
-              value: 6144m
+              value: 14G
             - name: TYPE
               value: PAPER
             - name: VERSION
@@ -200,7 +200,7 @@ spec:
             tcpSocket:
               port: 25565
             # 最大180秒待つ
-            failureThreshold: 6
+            failureThreshold: 10
             periodSeconds: 30
 
           readinessProbe:
