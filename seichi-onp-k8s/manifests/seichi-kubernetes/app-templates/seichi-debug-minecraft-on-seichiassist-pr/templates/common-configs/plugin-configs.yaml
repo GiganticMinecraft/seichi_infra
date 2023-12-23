@@ -1143,3 +1143,10 @@ data:
           enable: false
           path: worldguard/logs/%Y-%m-%d.log
           open-files: 10
+
+  StreamClock-config.yml: |
+    stopped-world:
+      - "world_SW"
+      - "world_SW_2"
+      - "world_SW_nether"
+      - "world_SW_the_end"
