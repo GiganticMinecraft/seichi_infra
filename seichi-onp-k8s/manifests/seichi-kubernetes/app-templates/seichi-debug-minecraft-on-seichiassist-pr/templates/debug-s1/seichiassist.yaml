@@ -112,6 +112,7 @@ spec:
                 https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/StreamClock/releases/download/sha-dd1905c/StreamClock-1.0-SNAPSHOT.jdk17.jar,
+                https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
 
             - name: JVM_OPTS
               value: >-
@@ -289,6 +290,11 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/StreamClock/config.yml
               subPath: StreamClock-config.yml
+
+            # ByeByeWither プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ByeByeWither/config.yml
+              subPath: ByeByeWither-config.yml
 
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config

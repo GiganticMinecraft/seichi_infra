@@ -1150,3 +1150,11 @@ data:
       - "world_SW_2"
       - "world_SW_nether"
       - "world_SW_the_end"
+
+  ByeByeWither-config.yml: |
+    wither:
+      is-enabled: true
+      ignored-worlds: []
+    ender-dragon:
+      is-enabled: true
+      ignored-worlds: []
