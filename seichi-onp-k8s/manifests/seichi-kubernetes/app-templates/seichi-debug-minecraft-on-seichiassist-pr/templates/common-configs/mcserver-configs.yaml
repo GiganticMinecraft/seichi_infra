@@ -526,7 +526,7 @@ data:
         thunder-chance: 100000
         end-portal-sound-radius: 0
         verbose: true
-        hopper-amount: 1
+        hopper-amount: 8
         dragon-death-sound-radius: 0
         seed-village: 10387312
         seed-desert: 14357617
@@ -606,8 +606,8 @@ data:
           misc: 32
           other: 64
         ticks-per:
-          hopper-transfer: 8
-          hopper-check: 1
+          hopper-transfer: 64
+          hopper-check: 20
         hunger:
           jump-walk-exhaustion: 0.05
           jump-sprint-exhaustion: 0.2
