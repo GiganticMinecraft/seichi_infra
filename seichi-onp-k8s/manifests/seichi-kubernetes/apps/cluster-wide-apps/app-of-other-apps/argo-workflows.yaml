@@ -29,6 +29,8 @@ spec:
             redirectUrl: https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
             scopes:
               - groups
+            rbac:
+              enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: argo
