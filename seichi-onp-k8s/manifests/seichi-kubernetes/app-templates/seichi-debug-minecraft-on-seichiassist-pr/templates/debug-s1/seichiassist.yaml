@@ -278,6 +278,11 @@ spec:
               mountPath: /plugins/ClickTpa/config.yml
               subPath: ClickTpa-config.yml
 
+            # WorldGuard プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/WorldGuard/config.yml
+              subPath: WorldGuard-config.yml
+
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
               mountPath: /plugins/SeichiAssist/config.yml
@@ -295,11 +300,6 @@ spec:
             - name: multiverse-portals-config
               mountPath: /plugins/Multiverse-Portals/portals.yml
               subPath: portals.yml
-
-            # WorldGuard プラグインの設定ファイル
-            - name: worldguard-config
-              mountPath: /plugins/WorldGuard/config.yml
-              subPath: WorldGuard-config.yml
 
             - name: mod-downloader-volume
               mountPath: /plugins
