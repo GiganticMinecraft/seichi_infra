@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: common-worldguard-configs
 data:
-  # メイン、Towny、建築専用
+  # メイン
   main-Blacklist.txt: |
     #
     # WorldGuard blacklist
@@ -88,7 +88,7 @@ data:
     ignore-groups=admin
     on-place=deny,log,tell
 
-  # 第1～4整地
+  # 第1、2整地
   world_SW-Blacklist.txt: |
     #
     # WorldGuard blacklist
@@ -279,7 +279,7 @@ data:
         default: 5
         observer: 5
       max-claim-volume: 14745600
-  # 第1、3整地
+  # 第1整地
   world_SW-config.yml: |
     #
     # WorldGuard's world configuration file
@@ -316,28 +316,7 @@ data:
     fire:
       disable-lava-fire-spread: false
       disable-all-fire-spread: false
-  # 第4整地
-  world_SW_4-config.yml: |
-    #
-    # WorldGuard's world configuration file
-    #
-    # This is a world configuration file. Anything placed into here will only
-    # affect this world. If you don't put anything in this file, then the
-    # settings will be inherited from the main configuration file.
-    #
-    # If you see {} below, that means that there are NO entries in this file.
-    # Remove the {} and add your own entries.
-    #
-
-    regions:
-      max-region-count-per-player:
-        default: 2
-        observer: 2
-      max-claim-volume: 296064000
-    fire:
-      disable-lava-fire-spread: false
-      disable-all-fire-spread: false
-  # エンド整地、ネザー整地、Towny
+  # エンド整地、ネザー整地
   world_SW_the_end-config.yml: |
     #
     # WorldGuard's world configuration file
@@ -351,20 +330,3 @@ data:
     #
 
     {}
-  # 建築専用
-  world_build-config.yml: |
-    #
-    # WorldGuard's world configuration file
-    #
-    # This is a world configuration file. Anything placed into here will only
-    # affect this world. If you don't put anything in this file, then the
-    # settings will be inherited from the main configuration file.
-    #
-    # If you see {} below, that means that there are NO entries in this file.
-    # Remove the {} and add your own entries.
-    #
-
-    regions:
-      max-region-count-per-player:
-        default: 20
-      max-claim-volume: 14745600

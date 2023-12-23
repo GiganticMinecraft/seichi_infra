@@ -301,18 +301,6 @@ spec:
               mountPath: /plugins/WorldGuard/worlds/world_SW_2/config.yml
               subPath: world_SW_2-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_3/Blacklist.txt
-              subPath: world_SW-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_3/config.yml
-              subPath: world_SW-config.yml
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_4/Blacklist.txt
-              subPath: world_SW-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_4/config.yml
-              subPath: world_SW_4-config.yml
-            - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW_nether/Blacklist.txt
               subPath: world_SW_the_end-Blacklist.txt
             - name: common-worldguard-configs
