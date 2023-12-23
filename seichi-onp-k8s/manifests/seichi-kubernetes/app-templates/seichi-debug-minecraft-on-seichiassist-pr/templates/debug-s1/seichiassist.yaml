@@ -296,6 +296,11 @@ spec:
               mountPath: /plugins/Multiverse-Portals/portals.yml
               subPath: portals.yml
 
+            # WorldGuard プラグインの設定ファイル
+            - name: worldguard-config
+              mountPath: /plugins/WorldGuard/config.yml
+              subPath: WorldGuard-config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
