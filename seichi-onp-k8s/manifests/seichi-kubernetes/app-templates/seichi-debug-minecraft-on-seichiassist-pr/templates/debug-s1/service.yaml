@@ -17,9 +17,9 @@ spec:
       port: 18321
       protocol: TCP
       targetPort: jmx-metrics
-    - name: prometheus
+    - name: minecraft-metrics
       port: 9225
       protocol: TCP
-      targetPort: prometheus
+      targetPort: minecraft-metrics
   selector:
     mcserver: debug-s1

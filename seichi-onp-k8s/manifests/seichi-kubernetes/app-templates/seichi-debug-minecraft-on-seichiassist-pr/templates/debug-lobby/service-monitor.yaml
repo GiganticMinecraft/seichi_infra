@@ -11,7 +11,7 @@ spec:
     - interval: 30s
       port: jmx-metrics
     - interval: 30s
-      port: prometheus
+      port: minecraft-metrics
   selector:
     matchLabels:
       app: mcserver
