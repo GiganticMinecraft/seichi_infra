@@ -1158,3 +1158,24 @@ data:
     ender-dragon:
       is-enabled: true
       ignored-worlds: []
+
+  PrometheusExporter-config.yml: |
+    host: 0.0.0.0
+    port: 9225
+    enable_metrics:
+      entities_total: true
+      villagers_total: true
+      loaded_chunks_total: true
+      jvm_memory: true
+      players_online_total: true
+      players_total: true
+      tps: true
+      world_size: true
+      jvm_threads: true
+      jvm_gc: true
+      tick_duration_median: true
+      tick_duration_average: true
+      tick_duration_min: false
+      tick_duration_max: true
+      player_online: true
+      player_statistic: true

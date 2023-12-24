@@ -297,6 +297,11 @@ spec:
               mountPath: /plugins/ByeByeWither/config.yml
               subPath: ByeByeWither-config.yml
 
+            # PrometheusExporter プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/PrometheusExporter/config.yml
+              subPath: PrometheusExporter-config.yml
+
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
               mountPath: /plugins/SeichiAssist/config.yml

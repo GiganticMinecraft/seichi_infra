@@ -17,5 +17,9 @@ spec:
       port: 18321
       protocol: TCP
       targetPort: jmx-metrics
+    - name: prometheus
+      port: 9225
+      protocol: TCP
+      targetPort: prometheus
   selector:
     mcserver: debug-s1
