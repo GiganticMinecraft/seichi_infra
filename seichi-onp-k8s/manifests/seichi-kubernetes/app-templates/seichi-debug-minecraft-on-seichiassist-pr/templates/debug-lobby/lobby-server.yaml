@@ -25,7 +25,7 @@ spec:
           image: busybox:1.36.1
           env:
             - name: JMX_EXPORTER_URL
-              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar"
+              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar"
           volumeMounts:
             - name: jmx-exporter-download-volume
               mountPath: /root/jmx-exporter-download
@@ -100,6 +100,7 @@ spec:
                 https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar,
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/DmitryRendov/BungeePortals/releases/download/1.2.3/BungeePortals-1.2.3.jar,
+                https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
 
             - name: JVM_OPTS
               value: >-
@@ -211,6 +212,11 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/LunaChat/config.yml
               subPath: LunaChat-config.yml
+
+            # PrometheusExporter プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/PrometheusExporter/config.yml
+              subPath: PrometheusExporter-config.yml
 
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume

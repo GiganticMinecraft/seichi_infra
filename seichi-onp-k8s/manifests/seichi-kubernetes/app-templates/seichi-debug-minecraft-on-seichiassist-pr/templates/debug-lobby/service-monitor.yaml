@@ -10,6 +10,8 @@ spec:
   endpoints:
     - interval: 30s
       port: jmx-metrics
+    - interval: 30s
+      port: prometheus
   selector:
     matchLabels:
       app: mcserver
