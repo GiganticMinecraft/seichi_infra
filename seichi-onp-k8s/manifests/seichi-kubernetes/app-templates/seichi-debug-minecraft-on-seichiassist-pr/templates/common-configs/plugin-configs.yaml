@@ -1177,5 +1177,5 @@ data:
       tick_duration_average: true
       tick_duration_min: false
       tick_duration_max: true
-      player_online: true
-      player_statistic: true
+      player_online: false
+      player_statistic: false
