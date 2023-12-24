@@ -148,6 +148,8 @@ spec:
               name: minecraft
             - containerPort: 18321
               name: jmx-metrics
+            - containerPort: 9225
+              name: mc-metrics
 
           startupProbe:
             tcpSocket:
