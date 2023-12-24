@@ -17,9 +17,9 @@ spec:
       port: 18321
       protocol: TCP
       targetPort: jmx-metrics
-    - name: minecraft-metrics
+    - name: mc-metrics
       port: 9225
       protocol: TCP
-      targetPort: minecraft-metrics
+      targetPort: mc-metrics
   selector:
     mcserver: debug-s1
