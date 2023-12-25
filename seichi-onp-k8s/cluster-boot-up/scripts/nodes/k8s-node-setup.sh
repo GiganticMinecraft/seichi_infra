@@ -86,10 +86,10 @@ sudo apt-get update && sudo apt-get install -y containerd apt-transport-https cu
 sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
 sudo sed -i 's#sandbox_image = "registry.k8s.io/pause:3.8"#sandbox_image = "registry.k8s.io/pause:3.9"#g' /etc/containerd/config.toml
-if grep -q "systemd_cgroup = true" "/etc/containerd/config.toml"; then
+if grep -q "SystemdCgroup = true" "/etc/containerd/config.toml"; then
 echo "Config found, skip rewriting..."
 else
-sed -i -e "s/systemd_cgroup \= false/systemd_cgroup \= true/g" /etc/containerd/config.toml
+sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml  
 fi
 
 sudo systemctl restart containerd
