@@ -10,3 +10,6 @@ data:
     innodb_flush_log_at_trx_commit = 2
     innodb_write_io_threads = 8
     max_allowed_packet = 256M
+    slow_query_log = true
+    slow_query_log-file = /var/log/mysql/mysql-slow.log
+    long_query_time = 0.5
