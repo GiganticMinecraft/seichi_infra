@@ -285,6 +285,11 @@ spec:
               mountPath: /plugins/ClickTpa/config.yml
               subPath: ClickTpa-config.yml
 
+            # RandomTeleport プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/RandomTeleport/config.yml
+              subPath: RandomTeleport-config.yml
+
             # WorldGuard プラグイン周りの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/WorldGuard/config.yml
