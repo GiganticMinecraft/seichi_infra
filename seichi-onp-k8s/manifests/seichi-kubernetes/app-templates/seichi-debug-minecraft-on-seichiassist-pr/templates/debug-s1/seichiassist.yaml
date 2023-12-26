@@ -362,6 +362,9 @@ spec:
         - name: common-mcserver-configs
           configMap:
             name: common-mcserver-configs
+        - name: common-worldguard-configs
+          configMap:
+            name: common-worldguard-configs
         - name: common-mcserver-plugin-configs
           configMap:
             name: common-mcserver-plugin-configs
