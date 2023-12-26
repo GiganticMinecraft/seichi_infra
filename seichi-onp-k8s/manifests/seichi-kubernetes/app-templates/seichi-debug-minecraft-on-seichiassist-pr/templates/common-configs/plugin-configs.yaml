@@ -1179,3 +1179,20 @@ data:
       tick_duration_max: true
       player_online: false
       player_statistic: false
+
+  RandomTeleport-config.yml: |
+    Radius: 5000
+    RadiusPerWorld:
+      world_SW: 1500
+      world_SW_2: 8000
+      world_SW_3: 8000
+      world_SW_4: 8000
+      world_SW_nether: 1500
+      world_SW_the_end: 3000
+    EnableWorlds:
+    - "world_SW"
+    - "world_SW_2"
+    - "world_SW_3"
+    - "world_SW_4"
+    - "world_SW_nether"
+    - "world_SW_the_end"
