@@ -114,6 +114,7 @@ spec:
                 https://github.com/GiganticMinecraft/StreamClock/releases/download/sha-dd1905c/StreamClock-1.0-SNAPSHOT.jdk17.jar,
                 https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
                 https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
+                https://github.com/GiganticMinecraft/RandomTeleport/releases/download/for-1.18/RandomTeleport-1.0-SNAPSHOT.jar,
 
             - name: JVM_OPTS
               value: >-
