@@ -66,6 +66,59 @@ resource "cloudflare_access_policy" "onp_admin_proxmox" {
   }
 }
 
+
+resource "cloudflare_access_application" "onp_admin_proxmox_mon" {
+  zone_id          = local.cloudflare_zone_id
+  name             = "Proxmox-mon administration"
+  domain           = "proxmox-mon.onp.admin.${local.root_domain}"
+  type             = "self_hosted"
+  session_duration = "24h"
+
+  http_only_cookie_attribute = true
+}
+
+resource "cloudflare_access_policy" "onp_admin_proxmox_mon" {
+  application_id = cloudflare_access_application.onp_admin_proxmox_mon.id
+  zone_id        = local.cloudflare_zone_id
+  name           = "Require to be in a GitHub team to access"
+  precedence     = "1"
+  decision       = "allow"
+
+  include {
+    github {
+      name                 = local.github_org_name
+      teams                = [github_team.onp_admin_proxmox_mon.slug]
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+    }
+  }
+}
+
+resource "cloudflare_access_application" "onp_admin_zabbix" {
+  zone_id          = local.cloudflare_zone_id
+  name             = "Zabbix administration"
+  domain           = "zabbix.onp.admin.${local.root_domain}"
+  type             = "self_hosted"
+  session_duration = "24h"
+
+  http_only_cookie_attribute = true
+}
+
+resource "cloudflare_access_policy" "onp_admin_zabbix" {
+  application_id = cloudflare_access_application.onp_admin_zabbix.id
+  zone_id        = local.cloudflare_zone_id
+  name           = "Require to be in a GitHub team to access"
+  precedence     = "1"
+  decision       = "allow"
+
+  include {
+    github {
+      name                 = local.github_org_name
+      teams                = [github_team.onp_admin_zabbix.slug]
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+    }
+  }
+}
+
 resource "cloudflare_access_application" "onp_admin_raritan" {
   zone_id          = local.cloudflare_zone_id
   name             = "raritan(PDU) administration"

@@ -31,7 +31,19 @@ resource "github_team" "onp_admin_grafana_team" {
 
 resource "github_team" "onp_admin_proxmox" {
   name        = "onp-admin-proxmox"
-  description = "オンプレミス環境のproxmoxに接続できるTeam"
+  description = "オンプレミス環境のproxmox(本番クラスタ)に接続できるTeam"
+  privacy     = "closed"
+}
+
+resource "github_team" "onp_admin_proxmox_mon" {
+  name        = "onp-admin-proxmox-mon"
+  description = "オンプレミス環境のproxmox(監視専用ホスト)に接続できるTeam"
+  privacy     = "closed"
+}
+
+resource "github_team" "onp_admin_zabbix" {
+  name        = "onp-admin-zabbix"
+  description = "オンプレミス環境のzabbixに接続できるTeam"
   privacy     = "closed"
 }
 

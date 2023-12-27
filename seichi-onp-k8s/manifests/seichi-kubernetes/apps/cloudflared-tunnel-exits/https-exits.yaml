@@ -31,9 +31,15 @@ spec:
           # 現時点(2022/04/25)ではproxmoxはHTTPS**しか**サポートしないらしく、
           # (https://forum.proxmox.com/threads/disabling-ssl-on-latest-proxmox-ve.42889/post-205902)
           # 自己署名証明書で保護されているため、 noTLSVerify で無視する。
+
+          # 本番クラスタ向け
           - name: proxmox
             external-hostname: proxmox.onp.admin.seichi.click
-            internal-authority: 192.168.1.154:8006
+            internal-authority: 10.123.0.154:8006
+          # 監視専用ホスト向け
+          - name: proxmox-mon
+            external-hostname: proxmox-mon.onp.admin.seichi.click
+            internal-authority: 10.123.0.181:8006
 
           # Redmine
           - name: redmine
