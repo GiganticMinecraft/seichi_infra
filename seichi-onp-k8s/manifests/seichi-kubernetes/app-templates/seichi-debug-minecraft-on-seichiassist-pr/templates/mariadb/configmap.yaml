@@ -12,4 +12,4 @@ data:
     max_allowed_packet = 256M
     slow_query_log = true
     slow_query_log-file = /var/log/mysql/mysql-slow.log
-    long_query_time = 0.5
+    long_query_time = 0
