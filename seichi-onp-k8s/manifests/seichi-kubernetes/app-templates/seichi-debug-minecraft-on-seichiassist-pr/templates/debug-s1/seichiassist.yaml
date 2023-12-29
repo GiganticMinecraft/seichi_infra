@@ -106,7 +106,7 @@ spec:
               #   https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar
               value: >-
                 https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar,
-                https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar,
+                https://github.com/GiganticMinecraft/LunaChat/releases/download/for-1.18.2-lunachat-3.0.17/LunaChat.jar,
                 https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar,
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
