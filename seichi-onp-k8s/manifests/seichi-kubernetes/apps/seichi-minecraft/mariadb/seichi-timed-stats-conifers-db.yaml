@@ -34,8 +34,8 @@ metadata:
 spec:
   mariaDbRef:
     name: mariadb
-  characterSet: utf8
-  collate: utf8_general_ci
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
 
 ---
 apiVersion: mariadb.mmontes.io/v1alpha1
