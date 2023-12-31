@@ -68,7 +68,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && echo "successfully imported world data"'
+            - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && mv /data/world /data/world_2 && echo "successfully imported world data"'
       containers:
         - resources:
             requests:
@@ -132,7 +132,7 @@ spec:
               value: |-
                 gamerule keepInventory true
                 mvm set difficulty peaceful world
-                rg flag -w world __global__ build deny
+                rg flag -w world_2 __global__ build deny
                 lp group default permission set worldedit.selection.pos true
                 lp group default permission set worldedit.wand true
                 lp group default permission set worldguard.region.claim true
