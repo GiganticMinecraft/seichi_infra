@@ -76,9 +76,3 @@ resource "github_team" "onp_phpmyadmin" {
   description = "オンプレ環境のphpMyAdminに接続できるTeam"
   privacy     = "closed"
 }
-
-resource "github_team" "springer" {
-  name        = "Springer"
-  description = "整地鯖(春)のデベロッパー"
-  privacy     = "closed"
-}
