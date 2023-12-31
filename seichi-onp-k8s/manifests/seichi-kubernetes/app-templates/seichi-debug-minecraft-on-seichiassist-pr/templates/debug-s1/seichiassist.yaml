@@ -24,11 +24,11 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                - seichi-onp-k8s-wk-1 # CPUの多いwk-1だけにスケジュールする
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - seichi-onp-k8s-wk-1 # CPUの多いwk-1だけにスケジュールする
       initContainers:
         - name: jmx-exporter-downloader
           image: busybox:1.36.1
@@ -77,7 +77,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && echo "successfully imported world data"'
+            - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && mv /data/world /data/world_2 && echo "successfully imported world data"'
       containers:
         - resources:
             requests:
@@ -213,10 +213,10 @@ spec:
           readinessProbe:
             exec:
               command:
-                - mc-monitor 
-                - status 
-                - --host 
-                - localhost 
+                - mc-monitor
+                - status
+                - --host
+                - localhost
                 - --port
                 - "25565"
             initialDelaySeconds: 30
@@ -383,7 +383,7 @@ spec:
         - name: multiverse-portals-config
           configMap:
             name: multiverse-portals-config
-        
+
         # JMX exporterをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: jmx-exporter-download-volume
           emptyDir: {}

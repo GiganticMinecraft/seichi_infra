@@ -402,7 +402,7 @@ data:
     gamemode=survival
     enable-query=false
     generator-settings=
-    level-name=world
+    level-name=world_2
     motd=A Minecraft Server
     query.port=25565
     pvp=false
