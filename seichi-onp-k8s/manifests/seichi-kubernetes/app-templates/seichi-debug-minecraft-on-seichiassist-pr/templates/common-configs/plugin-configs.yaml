@@ -1408,3 +1408,7 @@ data:
     # ノンジャパナイズマーカー。
     # これが発言の頭に入っている場合は、一時的にJapanize変換を実行しない。
     noneJapanizeMarker: '#'
+
+  LunaChat-dictionary.yml: |
+    seichi: 整地
+    seiti: 整地
