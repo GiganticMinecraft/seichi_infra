@@ -22,10 +22,9 @@ spec:
 
           # オンプレにもともとあった Grafana。
           # grafana側でGitHub-SSO認証が掛かっているため、Cloudflare のレイヤではアクセス制御はしていない。
-          # TODO 新VMに乗り換え(sc-monitoring-01(10.123.0.193:3000) on sc-proxmox-mon-01)
           - name: grafana-onp
             external-hostname: grafana.onp.admin.seichi.click
-            internal-authority: "192.168.3.20:3000"
+            internal-authority: "10.123.0.193:3000"
 
           # zabbix
           - name: zabbix
