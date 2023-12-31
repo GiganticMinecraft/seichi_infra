@@ -274,6 +274,9 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/LunaChat/config.yml
               subPath: LunaChat-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LunaChat/dictionary.yml
+              subPath: LunaChat-dictionary.yml
 
             # Elytra プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
