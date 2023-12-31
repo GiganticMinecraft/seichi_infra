@@ -103,7 +103,7 @@ spec:
               # DiscordSRV:
               #   https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar
               # LunaChat:
-              #   https://github.com/ucchyocean/LunaChat/releases/download/v3.0.16/LunaChat.jar
+              #   https://github.com/GiganticMinecraft/LunaChat/releases/download/for-1.18.2-lunachat-3.0.17/LunaChat.jar
               value: >-
                 https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar,
                 https://github.com/GiganticMinecraft/LunaChat/releases/download/for-1.18.2-lunachat-3.0.17/LunaChat.jar,
