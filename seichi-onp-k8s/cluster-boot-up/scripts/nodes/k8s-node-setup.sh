@@ -95,6 +95,7 @@ fi
 sudo systemctl restart containerd
 
 # Modify kernel parameters for Kubernetes
+# inotify instance number is very limited in Ubuntu 22.04 and it has to be at least more than pod number * 2
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -105,6 +106,9 @@ kernel.panic_on_oops = 1
 kernel.keys.root_maxkeys = 1000000
 kernel.keys.root_maxbytes = 25000000
 net.ipv4.conf.*.rp_filter = 0
+net.ipv4.tcp_fastopen=3
+fs.inotify.max_user_watches=65536
+fs.inotify.max_user_instances=8192
 EOF
 sysctl --system
 
