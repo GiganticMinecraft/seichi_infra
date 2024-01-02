@@ -13,10 +13,6 @@ spec:
       releaseName: descheduler
       values: |
         schedule: "30 19 * * Tue"
-        serviceMonitor:
-          enabled: true
-          additionalLabels:
-            release: prometheus
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
