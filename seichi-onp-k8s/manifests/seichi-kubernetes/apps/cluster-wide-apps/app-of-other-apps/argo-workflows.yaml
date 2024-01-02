@@ -12,6 +12,13 @@ spec:
     helm:
       releaseName: argo-workflows
       values: |
+        controller:
+          metricsConfig:
+            enabled: true
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
         server:
           secure: true
           extraArgs:

@@ -11,7 +11,14 @@ spec:
     targetRevision: 2.4.1
     helm:
       releaseName: argo-events
-      # values: |
+      values: |
+        controller:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              additionalLabels:
+                release: prometheus
   destination:
     server: https://kubernetes.default.svc
     namespace: argo-events
