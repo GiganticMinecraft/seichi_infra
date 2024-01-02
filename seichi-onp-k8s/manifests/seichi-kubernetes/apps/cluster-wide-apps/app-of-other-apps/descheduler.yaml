@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: descheduler
+  namespace: argocd
+spec:
+  project: argocd-root
+  source:
+    chart: descheduler
+    repoURL: https://kubernetes-sigs.github.io/descheduler/
+    targetRevision: 0.28.1
+    helm:
+      releaseName: descheduler
+      values: |
+        schedule: "30 19 * * Tue"
+        serviceMonitor:
+          enabled: true
+          additionalLabels:
+            release: prometheus
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
