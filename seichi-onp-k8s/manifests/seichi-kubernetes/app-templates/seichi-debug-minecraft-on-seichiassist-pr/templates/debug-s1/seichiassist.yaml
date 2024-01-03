@@ -66,18 +66,18 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /plugins
-        - name: world-downloader
-          image: busybox:1.36.1
-          env:
-            - name: WORLD_URL # S1からインポートしてきたワールドデータ
-              value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/world-data/s1/world.tar.gz"
-          volumeMounts:
-            - name: world-download-volume
-              mountPath: /data
-          command:
-            - "sh"
-            - "-c"
-            - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && mv /data/world /data/world_2 && echo "successfully imported world data"'
+        # - name: world-downloader
+        #   image: busybox:1.36.1
+        #   env:
+        #     - name: WORLD_URL # S1からインポートしてきたワールドデータ
+        #       value: "http://seichi-private-plugin-blackhole-minio.minio:9000/seichi-plugins/world-data/s1/world.tar.gz"
+        #   volumeMounts:
+        #     - name: world-download-volume
+        #       mountPath: /data
+        #   command:
+        #     - "sh"
+        #     - "-c"
+        #     - 'echo "start downloading world data" && wget -qO- "${WORLD_URL}" | tar -xz -C /data && mv /data/world /data/world_2 && echo "successfully imported world data"'
       containers:
         - resources:
             requests:
@@ -364,8 +364,8 @@ spec:
             - name: mod-downloader-volume
               mountPath: /plugins
 
-            - name: world-download-volume
-              mountPath: /data
+            # - name: world-download-volume
+            #   mountPath: /data
 
       volumes:
         - name: common-mcserver-configs
@@ -399,5 +399,5 @@ spec:
           emptyDir: {}
 
         # # S1から取ってきたワールドデータをぶちこむボリューム
-        - name: world-download-volume
-          emptyDir: {}
+        # - name: world-download-volume
+        #   emptyDir: {}
