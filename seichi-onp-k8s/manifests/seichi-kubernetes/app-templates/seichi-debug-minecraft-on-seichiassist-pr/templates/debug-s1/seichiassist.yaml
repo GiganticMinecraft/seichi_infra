@@ -385,6 +385,9 @@ spec:
         - name: multiverse-portals-config
           configMap:
             name: multiverse-portals-config
+        - name: s1-config
+          configMap:
+            name: s1-config
 
         # JMX exporterをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: jmx-exporter-download-volume
