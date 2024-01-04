@@ -355,6 +355,11 @@ spec:
               mountPath: /plugins/Multiverse-Portals/portals.yml
               subPath: portals.yml
 
+            # OriginSpawn プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/OriginSpawn/config.yml
+              subPath: config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
