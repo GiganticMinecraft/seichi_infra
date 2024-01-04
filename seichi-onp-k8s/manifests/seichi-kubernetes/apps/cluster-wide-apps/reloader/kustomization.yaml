@@ -1,6 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: cluster-wide-apps
 resources:
-  # reloader
-  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.0.60&submodules=false
+  # local-path-provisioner
+  - github.com/rancher/local-path-provisioner/deploy?ref=v0.0.26
