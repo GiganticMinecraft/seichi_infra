@@ -237,6 +237,11 @@ spec:
               mountPath: /plugins/BungeePortals/portals.yml
               subPath: portals.yml
 
+            # OriginSpawn プラグインの設定ファイル
+            - name: origin-spawn-config
+              mountPath: /plugins/OriginSpawn/config.yml
+              subPath: config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
@@ -256,6 +261,9 @@ spec:
         - name: bungee-portals-config
           configMap:
             name: bungee-portals-config
+        - name: origin-spawn-config
+          configMap:
+            name: origin-spawn-config
 
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
