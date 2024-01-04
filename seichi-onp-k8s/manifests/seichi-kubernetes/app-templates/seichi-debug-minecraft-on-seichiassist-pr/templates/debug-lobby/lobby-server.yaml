@@ -101,6 +101,7 @@ spec:
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/DmitryRendov/BungeePortals/releases/download/1.2.3/BungeePortals-1.2.3.jar,
                 https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
+                https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
 
             - name: JVM_OPTS
               value: >-
@@ -140,7 +141,7 @@ spec:
                 lp group default permission set worldguard.region.list.own true
                 lp group default permission set worldguard.region.info.* true
                 lp group default permission set worldguard.region.flag.regions.own.* true
-                
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-1267b49
           name: minecraft
           ports:
@@ -161,10 +162,10 @@ spec:
           readinessProbe:
             exec:
               command:
-                - mc-monitor 
-                - status 
-                - --host 
-                - localhost 
+                - mc-monitor
+                - status
+                - --host
+                - localhost
                 - --port
                 - "25565"
             initialDelaySeconds: 30
@@ -236,6 +237,11 @@ spec:
               mountPath: /plugins/BungeePortals/portals.yml
               subPath: portals.yml
 
+            # OriginSpawn プラグインの設定ファイル
+            - name: origin-spawn-config
+              mountPath: /plugins/OriginSpawn/config.yml
+              subPath: config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
@@ -255,7 +261,10 @@ spec:
         - name: bungee-portals-config
           configMap:
             name: bungee-portals-config
-        
+        - name: origin-spawn-config
+          configMap:
+            name: origin-spawn-config
+
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
           emptyDir: {}
