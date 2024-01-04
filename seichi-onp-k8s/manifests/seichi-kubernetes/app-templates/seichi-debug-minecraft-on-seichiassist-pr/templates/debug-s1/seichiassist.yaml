@@ -298,31 +298,31 @@ spec:
               mountPath: /plugins/WorldGuard/config.yml
               subPath: WorldGuard-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world/Blacklist.txt
+              mountPath: /plugins/WorldGuard/worlds/world/blacklist.txt
               subPath: main-Blacklist.txt
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world/config.yml
               subPath: main-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW/Blacklist.txt
+              mountPath: /plugins/WorldGuard/worlds/world_SW/blacklist.txt
               subPath: world_SW-Blacklist.txt
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW/config.yml
               subPath: world_SW-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_2/Blacklist.txt
+              mountPath: /plugins/WorldGuard/worlds/world_SW_2/blacklist.txt
               subPath: world_SW-Blacklist.txt
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW_2/config.yml
               subPath: world_SW_2-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_nether/Blacklist.txt
+              mountPath: /plugins/WorldGuard/worlds/world_SW_nether/blacklist.txt
               subPath: world_SW_the_end-Blacklist.txt
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW_nether/config.yml
               subPath: world_SW_the_end-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/Blacklist.txt
+              mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/blacklist.txt
               subPath: world_SW_the_end-Blacklist.txt
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/config.yml
