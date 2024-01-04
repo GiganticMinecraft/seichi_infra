@@ -297,10 +297,10 @@ spec:
               mountPath: /plugins/WorldGuard/config.yml
               subPath: WorldGuard-config.yml
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world/blacklist.txt
+              mountPath: /plugins/WorldGuard/worlds/world_2/blacklist.txt
               subPath: main-Blacklist.txt
             - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world/config.yml
+              mountPath: /plugins/WorldGuard/worlds/world_2/config.yml
               subPath: main-config.yml
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW/blacklist.txt
