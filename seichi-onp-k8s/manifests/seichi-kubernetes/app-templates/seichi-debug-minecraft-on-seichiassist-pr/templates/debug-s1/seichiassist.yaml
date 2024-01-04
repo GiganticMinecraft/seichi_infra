@@ -111,7 +111,6 @@ spec:
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
                 https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
-                https://github.com/GiganticMinecraft/StreamClock/releases/download/sha-dd1905c/StreamClock-1.0-SNAPSHOT.jdk17.jar,
                 https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
                 https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
                 https://github.com/GiganticMinecraft/RandomTeleport/releases/download/for-1.18/RandomTeleport-1.0-SNAPSHOT.jar,
@@ -327,11 +326,6 @@ spec:
             - name: common-worldguard-configs
               mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/config.yml
               subPath: world_SW_the_end-config.yml
-
-            # StreamClock プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/StreamClock/config.yml
-              subPath: StreamClock-config.yml
 
             # ByeByeWither プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
