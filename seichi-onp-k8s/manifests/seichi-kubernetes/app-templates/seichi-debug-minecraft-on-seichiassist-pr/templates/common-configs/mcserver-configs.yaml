@@ -421,7 +421,7 @@ data:
     max-build-height=256
     server-ip=
     resource-pack-prompt=
-    allow-nether=true
+    allow-nether=false
     server-port=25565
     enable-rcon=false
     sync-chunk-writes=true
