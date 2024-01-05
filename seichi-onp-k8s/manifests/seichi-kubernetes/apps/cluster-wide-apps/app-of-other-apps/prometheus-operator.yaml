@@ -40,11 +40,26 @@ spec:
       releaseName: prometheus
       skipCrds: true
       values: |
+        crds:
+          enabled: false
         defaultRules:
           create: true
           rules:
             kubeProxy: false
             alertmanager: false
+            windows: false
+        prometheus-windows-exporter:
+          prometheus:
+            monitor:
+              enabled: false
+        kubelet:
+          serviceMonitor:
+            attachMetadata:
+              node: true
+        nodeExporter:
+          operatingSystems:
+            darwin:
+              enabled: false
         loki:
           isDefault: false
         grafana:
