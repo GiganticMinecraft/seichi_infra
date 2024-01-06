@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
+
+func init() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, nil)))
+}
 
 func main() {
 	downloadTargetDirPath := os.Getenv("DOWNLOAD_TARGET_DIR_PATH")
@@ -48,25 +52,25 @@ func main() {
 	})
 	for object := range objectCh {
 		if object.Err != nil {
-			fmt.Println(object.Err)
+			slog.Error("Error:", "error", object.Err)
 			return
 		}
 		// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
 		filePathToSave := downloadTargetDirPath + strings.TrimPrefix(object.Key, prefixName)
-		fmt.Println("Downloading object:", object.Key)
+		slog.Info("Downloading object:", "objectKey", object.Key)
 		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, filePathToSave, minio.GetObjectOptions{})
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("Error downloading object:", "objectKey", object.Key, "error", err)
 			return
 		}
 		// 保存したファイルの所有権をitzg/minecraftに渡す ref. https://github.com/itzg/docker-minecraft-server/issues/1583
 		err := os.Chown(filePathToSave, 1000, 1000)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("Error changing file ownership:", "filePath", filePathToSave, "error", err)
 		} else {
-			fmt.Println("File ownership changed successfully")
+			slog.Info("File ownership changed successfully", "filePath", filePathToSave)
 		}
 	}
 
-	fmt.Println("Downloaded all visible objects.")
+	slog.Info("Downloaded all visible objects.")
 }
