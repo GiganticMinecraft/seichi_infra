@@ -81,7 +81,7 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: 8
+              cpu: 6
               memory: 8Gi
             limits:
               cpu: 8
