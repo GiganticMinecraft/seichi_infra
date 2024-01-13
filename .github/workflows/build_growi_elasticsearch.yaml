@@ -1,0 +1,53 @@
+name: CI
+on: 
+  push:
+    paths:
+      - ".github/workflows/build_growi_elasticsearch.yaml"
+      - "docker-images/growi/elasticsearch/**"
+
+env:
+  IMAGE: ghcr.io/giganticminecraft/growi-elasticsearch
+
+jobs:
+  build-image:
+    name: Build docker image (and publish on master)
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: docker-images/mod-downloader
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,prefix=sha-,suffix=,format=short
+            type=schedule,pattern={{date 'YYYYMMDD'}}
+
+      - name: Build (and push if on main)
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker-images/growi/elasticsearch
+          builder: ${{ steps.buildx.outputs.name }}
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
+          cache-to: type=gha,mode=max
