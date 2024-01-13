@@ -17,11 +17,35 @@ spec:
       containers:
         - name: hackmd
           image: ghcr.io/giganticminecraft/growi-hackmd:sha-a6d1213
+          resources:
+            requests:
+              cpu: 1
+              memory: 1Gi
+            limits:
+              cpu: 1
+              memory: 1Gi
           env:
             - name: CMD_CSP_ENABLE
               value: "false"
             - name: GROWI_URI
               value: https://wiki.onp-k8s.admin.seichi.click
+            # - name: CMD_DB_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: hackmd-mariadb-url
+            #       key: db-url
           ports:
             - name: http
               containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5

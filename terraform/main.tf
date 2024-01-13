@@ -315,3 +315,17 @@ variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
 }
 
 #endregion
+
+#region env variables for Growi
+
+variable "growi_github_sso_client_id" {
+  description = "GitHub SSO client id for Growi"
+  type        = string
+  sensitive   = true
+}
+
+variable "growi_github_sso_client_secret" {
+  description = "GitHub SSO client id for Growi"
+  type        = string
+  sensitive   = true
+}
