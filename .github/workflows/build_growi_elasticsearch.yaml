@@ -9,16 +9,8 @@ env:
   IMAGE: ghcr.io/giganticminecraft/growi-elasticsearch
 
 jobs:
-  lint-and-test:
-    name: Lint and test application
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
   build-image:
     name: Build docker image (and publish on master)
-    needs: [lint-and-test]
     runs-on: ubuntu-22.04
     defaults:
       run:
