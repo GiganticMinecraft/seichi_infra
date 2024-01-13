@@ -25,6 +25,8 @@ spec:
           env:
             - name: APP_SITE_URL
               value: "https://wiki.onp-k8s.admin.seichi.click"
+            - name: AUDIT_LOG_ENABLED
+              value: "true"
             - name: MONGO_URI
               value: "mongodb://mongodb:27017/growi"
             - name: ELASTICSEARCH_URI
