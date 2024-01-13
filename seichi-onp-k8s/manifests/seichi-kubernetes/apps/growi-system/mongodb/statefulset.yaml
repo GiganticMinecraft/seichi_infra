@@ -39,7 +39,9 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: mongo-data
       spec:
         accessModes: 

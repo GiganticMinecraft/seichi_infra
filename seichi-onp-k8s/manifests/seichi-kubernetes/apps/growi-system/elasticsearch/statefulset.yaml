@@ -70,7 +70,9 @@ spec:
           configMap:
             name: elasticsearch-config
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: data-volume
       spec:
         accessModes: [ "ReadWriteOnce" ]
