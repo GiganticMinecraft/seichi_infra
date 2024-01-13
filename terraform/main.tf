@@ -330,4 +330,22 @@ variable "growi_github_sso_client_secret" {
   sensitive   = true
 }
 
+variable "hackmd_mariadb_root_password" {
+  description = "HackMD MariaDB root password for Growi"
+  type        = string
+  sensitive   = true
+}
+
+variable "hackmd_mariadb_hackmd_password" {
+  description = "HackMD MariaDB hackmd password for Growi"
+  type        = string
+  sensitive   = true
+}
+
+variable "hackmd_mariadb_hackmd_db_url" {
+  description = "HackMD MariaDB hackmd DB URL for Growi"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
