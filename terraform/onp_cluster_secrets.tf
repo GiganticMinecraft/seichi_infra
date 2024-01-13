@@ -289,8 +289,25 @@ resource "kubernetes_secret" "growi_github_sso" {
   }
 
   data = {
-    "OAUTH_GITHUB_CLIENT_ID"    = var.growi_github_sso_client_id
+    "OAUTH_GITHUB_CLIENT_ID"     = var.growi_github_sso_client_id
     "OAUTH_GITHUB_CLIENT_SECRET" = var.growi_github_sso_client_secret
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "hackmd_mariadb" {
+  depends_on = [kubernetes_namespace.growi_system]
+
+  metadata {
+    name      = "hackmd-mariadb"
+    namespace = "growi-system"
+  }
+
+  data = {
+    root-password   = var.hackmd_mariadb_root_password
+    hackmd-password = var.hackmd_mariadb_hackmd_password
+    db-url          = var.hackmd_mariadb_hackmd_db_url
   }
 
   type = "Opaque"
