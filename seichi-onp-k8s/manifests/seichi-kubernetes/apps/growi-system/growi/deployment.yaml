@@ -53,7 +53,8 @@ spec:
                   name: growi-github-sso
                   key: OAUTH_GITHUB_CLIENT_SECRET
           ports:
-            - containerPort: 3000
+            - name: http
+              containerPort: 3000
           livenessProbe:
             httpGet:
               path: /
