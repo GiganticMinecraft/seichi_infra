@@ -36,7 +36,7 @@ spec:
             - name: MATHJAX
               value: "1"
             - name: HACKMD_URI
-              value: "http://hackmd.onp-k8s.admin.seichi.click"
+              value: "https://hackmd.onp-k8s.admin.seichi.click"
             - name: HACKMD_URI_FOR_SERVER
               value: "http://hackmd:3000"
             - name: PASSWORD_SEED
