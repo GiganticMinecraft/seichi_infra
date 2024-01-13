@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: growi-system
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  serviceName: "elasticsearch"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: ghcr.io/giganticminecraft/growi-elasticsearch:sha-a6d1213
+          resources:
+            requests:
+              cpu: 1
+              memory: 1Gi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: http.cors.enabled
+              value: "true"
+            - name: http.cors.allow-origin
+              value: "*"
+            - name: http.host
+              value: "0.0.0.0"
+            - name: ES_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: xpack.security.enabled
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 9200
