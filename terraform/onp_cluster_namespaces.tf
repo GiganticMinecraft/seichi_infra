@@ -64,7 +64,7 @@ resource "kubernetes_namespace" "minio" {
   }
 }
 
-resource "kubernetes_namespace" "growi-system" {
+resource "kubernetes_namespace" "growi_system" {
   metadata {
     name = "growi-system"
   }
