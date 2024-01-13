@@ -27,12 +27,14 @@ spec:
             - name: CMD_CSP_ENABLE
               value: "false"
             - name: GROWI_URI
-              value: https://wiki.onp-k8s.admin.seichi.click
+              value: "https://wiki.onp-k8s.admin.seichi.click"
             - name: CMD_DB_URL
               valueFrom:
                 secretKeyRef:
                   name: hackmd-mariadb
                   key: db-url
+            - name: CMD_DOMAIN
+              value: "https://hackmd.onp-k8s.admin.seichi.click"
           ports:
             - name: http
               containerPort: 3000
