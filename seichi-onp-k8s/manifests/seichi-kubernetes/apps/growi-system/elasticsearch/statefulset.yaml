@@ -29,16 +29,18 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: http.cors.enabled
-              value: "true"
-            - name: http.cors.allow-origin
-              value: "*"
-            - name: http.host
-              value: "0.0.0.0"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
-            - name: xpack.security.enabled
-              value: "false"
+            - name: bootstrap.memory_lock
+              value: "true"
           ports:
             - name: http
               containerPort: 9200
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+            subPath: elasticsearch.yml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: elasticsearch-config
