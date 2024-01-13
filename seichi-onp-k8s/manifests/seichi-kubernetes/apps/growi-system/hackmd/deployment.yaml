@@ -33,8 +33,8 @@ spec:
                 secretKeyRef:
                   name: hackmd-mariadb
                   key: db-url
-            - name: CMD_DOMAIN
-              value: "https://hackmd.onp-k8s.admin.seichi.click"
+            # - name: CMD_DOMAIN
+            #   value: "https://hackmd.onp-k8s.admin.seichi.click"
             - name: CMD_ALLOW_ORIGIN
               value: "hackmd.onp-k8s.admin.seichi.click, hackmd"
             - name: CMD_URL_ADDPORT
