@@ -109,7 +109,7 @@ spec:
                 https://github.com/GiganticMinecraft/LunaChat/releases/download/for-1.18.2-lunachat-3.0.17/LunaChat.jar,
                 https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-{{ .Values.SeichiAssistPullRequestNumber }}-{{ .Values.PullRequestBranchHeadSHA }}/SeichiAssist.jar,
                 https://download.luckperms.net/1526/bukkit/loader/LuckPerms-Bukkit-5.4.113.jar,
-                https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2/Elytra-1.0-SNAPSHOT.jar,
+                https://github.com/GiganticMinecraft/Elytra/releases/download/1.18.2-2/Elytra-1.0-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
                 https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
                 https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
