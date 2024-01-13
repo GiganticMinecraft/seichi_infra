@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hackmd
+  namespace: growi-system
+spec:
+  selector:
+    matchLabels:
+      app: hackmd
+  serviceName: "hackmd"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hackmd
+    spec:
+      containers:
+        - name: hackmd
+          image: ghcr.io/giganticminecraft/growi-hackmd:sha-a6d1213
+          env:
+            - name: CMD_CSP_ENABLE
+              value: "false"
+            - name: GROWI_URI
+              value: https://wiki.onp-k8s.admin.seichi.click
+          ports:
+            - name: http
+              containerPort: 3000

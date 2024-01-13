@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: growi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: growi
+  template:
+    metadata:
+      labels:
+        app: growi
+    spec:
+      containers:
+        - name: growi
+          image: weseek/growi:6
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongodb:27017/growi"
+            - name: ELASTICSEARCH_URI
+              value: "http://elasticsearch:9200/growi"
+            - name: FILE_UPLOAD
+              value: "mongodb"
+            - name: MATHJAX
+              value: "1"
+            - name: HACKMD_URI
+              value: "http://hackmd.onp-k8s.admin.seichi.click"
+            - name: HACKMD_URI_FOR_SERVER
+              value: "http://hackmd:3000"
+            - name: PASSWORD_SEED
+              valueFrom:
+                secretKeyRef:
+                  name: growi-secrets
+                  key: passwordSeed
