@@ -46,13 +46,13 @@ spec:
               containerPort: 3000
           livenessProbe:
             httpGet:
-              path: /
+              path: /status
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /status
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
