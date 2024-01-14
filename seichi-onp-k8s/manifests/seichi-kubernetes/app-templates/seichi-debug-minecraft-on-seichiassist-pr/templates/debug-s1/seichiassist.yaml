@@ -357,6 +357,11 @@ spec:
               mountPath: /plugins/Multiverse-Portals/portals.yml
               subPath: portals.yml
 
+            # CustomEnchantments プラグインの設定ファイル
+            - name: custom-enchantments-config
+              mountPath: /plugins/CustomEnchantments/config.yml
+              subPath: custom-enchantments-config.yml
+
             # OriginSpawn プラグインの設定ファイル
             - name: s1-config
               mountPath: /plugins/OriginSpawn/config.yml
@@ -387,6 +392,9 @@ spec:
         - name: multiverse-portals-config
           configMap:
             name: multiverse-portals-config
+        - name: custom-enchantments-config
+          configMap:
+            name: custom-enchantments-config
         - name: s1-config
           configMap:
             name: s1-config
