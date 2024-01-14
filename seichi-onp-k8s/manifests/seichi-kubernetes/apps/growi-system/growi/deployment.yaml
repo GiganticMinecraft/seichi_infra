@@ -59,13 +59,13 @@ spec:
               containerPort: 3000
           livenessProbe:
             httpGet:
-              path: /_api/v3/healthcheck?connectToMiddlewares
+              path: /_api/v3/healthcheck
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /_api/v3/healthcheck?connectToMiddlewares
+              path: /_api/v3/healthcheck
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
