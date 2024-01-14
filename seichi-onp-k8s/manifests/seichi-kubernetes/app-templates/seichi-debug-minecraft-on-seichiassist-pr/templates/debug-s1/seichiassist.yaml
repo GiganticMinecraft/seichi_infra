@@ -152,6 +152,16 @@ spec:
                 mv gamerule keepInventory true world_SW_2
                 mv gamerule keepInventory true world_SW_nether
                 mv gamerule keepInventory true world_SW_the_end
+                mv gamerule disableRaids true world_2
+                mv gamerule disableRaids true world_SW
+                mv gamerule disableRaids true world_SW_2
+                mv gamerule disableRaids true world_SW_nether
+                mv gamerule disableRaids true world_SW_the_end
+                mv gamerule doInsomnia false world_2
+                mv gamerule doInsomnia false world_SW
+                mv gamerule doInsomnia false world_SW_2
+                mv gamerule doInsomnia false world_SW_nether
+                mv gamerule doInsomnia false world_SW_the_end
                 mvm set difficulty peaceful world_2
                 rg flag -w world_2 __global__ build -g members allow
                 rg flag -w world_SW_2 __global__ build -g members allow
