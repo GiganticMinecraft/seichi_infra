@@ -88,8 +88,8 @@ spec:
               enabled: true
               allow_sign_up: true
               auto_login: true
-              client_id: "$(GF_AUTH_GITHUB_CLIENT_ID)"
-              client_secret: "$(GF_AUTH_GITHUB_CLIENT_SECRET)"
+              client_id: $__env{GF_AUTH_GITHUB_CLIENT_ID}
+              client_secret: $__env{GF_AUTH_GITHUB_CLIENT_SECRET}
               scopes: user:email,read:org
               auth_url: https://github.com/login/oauth/authorize
               token_url: https://github.com/login/oauth/access_token
