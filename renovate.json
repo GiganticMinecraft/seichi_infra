@@ -4,6 +4,13 @@
   ],
   "timezone": "Asia/Tokyo",
   "reviewers": ["outductor"],
+  "packageRules": [
+    {
+      "managers": ["gomod"],
+      "packageNames": ["go"],
+      "supportPolicy": ["active"]
+    }
+  ],
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths"
