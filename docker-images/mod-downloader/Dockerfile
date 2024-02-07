@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.6
-FROM golang:1.21-bookworm as builder
+FROM golang:1.22-bookworm as builder
 # Build
 ARG GOOS=linux
 ARG GOARCH=amd64
