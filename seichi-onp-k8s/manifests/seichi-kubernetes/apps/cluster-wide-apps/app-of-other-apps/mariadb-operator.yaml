@@ -8,7 +8,7 @@ spec:
   source:
     chart: mariadb-operator
     repoURL: https://mariadb-operator.github.io/mariadb-operator
-    targetRevision: 0.24.0
+    targetRevision: 0.25.0
     helm:
       releaseName: mariadb-operator
       values: |
