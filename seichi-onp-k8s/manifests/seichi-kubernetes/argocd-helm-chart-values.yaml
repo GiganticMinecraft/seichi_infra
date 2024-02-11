@@ -27,10 +27,16 @@ server:
     enabled: true
     minAvailable: 1
     maxUnavailable: 0
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus
 
-  configEnabled: true
-  # -- [General Argo CD configuration]
-  config:
+configs:
+  cm:
+    create: true
     # Argo CD instance label key
     application.instanceLabelKey: argocd.argoproj.io/instance
     kustomize.buildOptions: --load-restrictor LoadRestrictionsNone
@@ -53,9 +59,9 @@ server:
           redirectURIs:
             - https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
           secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
-    admin.enabled: "false"
-
-  rbacConfig:
+    admin.enabled: false
+  rbac:
+    create: true
     # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
     # Policy rules are in the form:
     #   p, subject, resource, action, object, effect
@@ -68,13 +74,6 @@ server:
     # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
     # but will see no apps, projects, etc...
     policy.default: role:readonly
-
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      additionalLabels:
-        release: prometheus
 
 controller:
   resources:
