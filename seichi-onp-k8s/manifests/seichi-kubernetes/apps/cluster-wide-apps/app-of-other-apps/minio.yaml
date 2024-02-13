@@ -27,6 +27,10 @@ spec:
             enabled: true
             additionalLabels:
               release: prometheus
+        service:
+          type: LoadBalancer
+        consoleService:
+          type: LoadBalancer
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
