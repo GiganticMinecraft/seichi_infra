@@ -380,8 +380,8 @@ spec:
             - name: mod-downloader-volume
               mountPath: /plugins
 
-            # - name: world-download-volume
-            #   mountPath: /data
+            - name: world-download-volume
+              mountPath: /data
 
       volumes:
         - name: common-mcserver-configs
@@ -420,6 +420,6 @@ spec:
         - name: mod-downloader-volume
           emptyDir: {}
 
-        # # S1から取ってきたワールドデータをぶちこむボリューム
-        # - name: world-download-volume
-        #   emptyDir: {}
+        # S1から取ってきたワールドデータをぶちこむボリューム
+        - name: world-download-volume
+          emptyDir: {}
