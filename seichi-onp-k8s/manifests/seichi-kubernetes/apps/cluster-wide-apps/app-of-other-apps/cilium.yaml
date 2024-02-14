@@ -58,24 +58,6 @@ spec:
                 group: cert-manager.io
                 kind: ClusterIssuer
                 name: ca-issuer
-          relay:
-            enabled: true
-            rollOutPods: true
-            replicas: 2
-            podDisruptionBudget:
-              enabled: true
-              maxUnavailable: 1
-            tls:
-              server:
-                enabled: true
-                mtls: true
-            prometheus:
-              enabled: true
-              port: 9966
-              serviceMonitor:
-                enabled: true
-                labels:
-                  release: prometheus
           ui:
             enabled: true
             standalone:
