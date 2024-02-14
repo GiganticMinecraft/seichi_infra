@@ -15,8 +15,9 @@ spec:
         metrics:
           enabled: true
         webhook:
-          certificate:
-            certManager: true
+          cert:
+            certManager:
+              enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: mariadb-operator
