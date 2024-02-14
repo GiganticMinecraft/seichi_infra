@@ -58,17 +58,6 @@ spec:
                 group: cert-manager.io
                 kind: ClusterIssuer
                 name: ca-issuer
-          ui:
-            enabled: true
-            standalone:
-              enabled: false
-            rollOutPods: true
-            frontend:
-              server:
-                ipv6:
-                  enabled: false
-            podDisruptionBudget:
-              enabled: true
         operator:
           prometheus:
             enabled: true
