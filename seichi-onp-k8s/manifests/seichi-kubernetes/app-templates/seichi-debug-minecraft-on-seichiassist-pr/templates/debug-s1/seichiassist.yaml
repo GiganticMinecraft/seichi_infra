@@ -82,13 +82,13 @@ spec:
         - resources:
             requests:
               cpu: 6
-              memory: 8Gi
+              memory: 12Gi
             limits:
               cpu: 8
-              memory: 8Gi
+              memory: 12Gi
           env:
             - name: MEMORY
-              value: 6G
+              value: 10G
             - name: TYPE
               value: PAPER
             - name: VERSION
