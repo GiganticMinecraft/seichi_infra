@@ -36,12 +36,12 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-secrets
+                  name: minio-access-secret
                   key: MINIO_ACCESS_KEY
             - name: MINIO_ACCESS_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: minio-secrets
+                  name: minio-access-secret
                   key: MINIO_ACCESS_SECRET
             - name: BUCKET_NAME
               value: seichi-plugins
