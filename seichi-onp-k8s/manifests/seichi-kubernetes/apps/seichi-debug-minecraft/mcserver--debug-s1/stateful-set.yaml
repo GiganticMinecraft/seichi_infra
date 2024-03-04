@@ -123,6 +123,12 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "1054159676964622426"
 
+            - name: CFG_SEICHIASSIST_MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: root-password
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL

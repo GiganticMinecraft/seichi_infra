@@ -12,7 +12,7 @@ data:
     port: '3306'
     db: 'seichiassist'
     id: 'root'
-    pw: ''
+    pw: '${CFG_SEICHIASSIST_MYSQL_ROOT_PASSWORD}'
 
     # サーバ識別設定
     # 複数サーバ構成にする場合はこの値をサーバごとに変更します
