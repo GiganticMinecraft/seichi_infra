@@ -28,6 +28,15 @@ spec:
             - "sh"
             - "-c"
             - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
+        - name: delete-jars
+          image: busybox:1.36.1
+          volumeMounts:
+            - name: minecraft-server-data
+              mountPath: /data
+          command:
+            - "sh"
+            - "-c"
+            - "rm -rf /data/plugins/*.jar"
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-ac8ba5c
           env:
