@@ -6,3 +6,7 @@ resources:
   - "./service-monitor.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"
+  - "./plugin-config.yaml"
+  - "./ops-config.yaml"
+  - "./multiverse-portals-config.yaml"
+  - "./seichiassist-config.yaml"

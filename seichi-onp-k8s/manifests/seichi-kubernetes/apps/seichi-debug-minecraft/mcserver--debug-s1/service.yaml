@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mcserver--debug-s1
+  name: mcserver--s1
   labels:
     app: mcserver
     role: metrics
-    mcserver: debug-s1
+    mcserver: s1
 spec:
   type: ClusterIP
   ports:
@@ -17,5 +17,9 @@ spec:
       port: 18321
       protocol: TCP
       targetPort: jmx-metrics
+    - name: mc-metrics
+      port: 9225
+      protocol: TCP
+      targetPort: mc-metrics
   selector:
-    mcserver: debug-s1
+    mcserver: s1
