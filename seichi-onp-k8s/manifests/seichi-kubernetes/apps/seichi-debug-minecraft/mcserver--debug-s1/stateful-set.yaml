@@ -362,7 +362,8 @@ spec:
             - name: mod-downloader-volume
               mountPath: /plugins
 
-            - name: world-download-volume
+            # サーバーデータが格納されているディレクトリのマウント設定
+            - name: minecraft-server-data
               mountPath: /data
 
       volumes:
@@ -401,3 +402,12 @@ spec:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
           emptyDir: {}
+
+  volumeClaimTemplates:
+  - metadata:
+      name: minecraft-server-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
