@@ -6,3 +6,5 @@ resources:
   - "./jmx-exporter-config.yaml"
   - "./mcserver-configs.yaml"
   - "./plugin-configs.yaml"
+  - "./custom-enchantments-config.yaml"
+  - "./worldguard-config.yaml"

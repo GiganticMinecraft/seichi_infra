@@ -745,3 +745,663 @@ data:
 
   MorningGlorySeeds-config.yml: |
     webhook: "${CFG_MORNING_GLORY_SEEDS_WEBHOOK_URL}"
+
+  Elytra-config.yml: |
+    # Auto-glide
+    # If this feature is enabled player will not require
+    # to press "space" to start gliding.
+    auto-glide:
+      enable: false
+      required-air-under-player: 3
+      auto-equip: false
+    constant-flight:
+      enable: false
+      velocity: 1.1
+    shift-speed-up:
+      enable: true
+      max-activation-speed: 1.2
+      velocity-multiplier: 1.5
+      cooldown:
+        enable: true
+        time: 0.2s
+    speed-up:
+      enable: true
+      cooldown:
+        enable: false
+        time: 3s
+      activation:
+        angle-min: 30
+        angle-max: 90
+        speed-min: 0.5
+        speed-max: 1.5
+        multiplier: 1.3
+    run-up:
+      enable: true
+      activation:
+        angle-min: 10
+        angle-max: 70
+      boost: 1.5
+      cooldown:
+        enable: true
+        time: 1s
+    g-force:
+      damage-elytra: 0
+      damage-player: 0.0
+    particles:
+      enable: true
+      type: SPELL_WITCH
+      radius: 0.3
+      amount: 15
+      extra-param: 0.0
+      play-repeat: 3
+    sound:
+      enable: true
+      activation:
+        type: ENTITY_BAT_TAKEOFF
+        pitch: 0.8
+        volume: 0.5
+        play-repeat: 3
+        play-delay-ticks: 3
+      cooldown-fail:
+        type: UI_BUTTON_CLICK
+        pitch: 0.8
+        volume: 0.5
+
+  ClickTpa-config.yml: |
+    # Config for ClickTpa
+    # Version v1.7.3
+    # Author: jklmao
+
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+    #                                               #
+    #                ClickTpa Config                #
+    #                                               #
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+
+    #           Be aware of all warnings!           #
+
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+    #                                               #
+    #                 Place Holders                 #
+    #                                               #
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+
+    # Use '%player%' for the player who sent the request.
+    # Use '%accept%' for the 'Click-to-accept' message.
+    # Use '%deny%' for the 'Click-to-deny' message.
+    # Use '%target%' for the player who they wanted to teleport to, and for the 'Player-sent-request' message.
+    # Example: /tpa <player>, where <player> is '%target%'.
+
+    Player-only-command: '&cOnly players can use this command!'
+
+    Insufficient-permission: '&cこのコマンドを実行する権限がありません！ (&cYou do not have sufficient permission!)'
+
+    Player-deny-tpa-message: '&cテレポート申請を拒否されました。 (&cTeleportation request has been denied.)'
+
+    Target-deny-tpa-message: '&cテレポート申請は拒否されました。 (&cTeleportation request has been denied.)'
+
+    Target-teleportion-canceled: '&cテレポート申請をキャンセルしました。 (&cTeleportation canceled...)'
+
+    Player-got-accepted-tpa: '&bテレポート申請が許可されました。 (&bTeleportation request has been accepted.)'
+
+    Countdown-until-tpa: '&e3秒後にテレポートします... (&eTeleporting in 3 seconds...)'
+
+    Player-no-pendingtpa-message: '&cテレポート申請は受け取っていません。 (&cYou do not have a pending request!)'
+
+    Target-accepted-tpa-request: '&eテレポート申請を許可しました。 (&eRequest for teleportation is accepted.)'
+
+    No-player-found: '&cそのプレイヤーは存在しません。 (&cThis player does not exist!)'
+
+    Target-is-offline: '&cそのプレイヤーは現在オフラインです。 (&cThat player is currently offline.)'
+
+    Player-teleporting-self: '&c自分自身にはテレポートできません！ (&cYou can not teleport yourself!)'
+
+    Player-already-requested: '&cすでにテレポート申請済みです。 (&cYou already requested, please wait..)'
+
+    Player-teleportation-request-expire: '&cテレポート申請が時間切れになりました。 (&cTeleportation request has expired.)'
+
+    Target-teleportation-request-expire: '&cテレポート申請が時間切れになりました。 (&cTeleportation request has expired.)'
+
+    Player-currently-teleporting: '&bテレポート中... (&bTeleporting...)'
+
+    Target-currently-teleporting: '&bテレポート中... (&bTeleporting...)'
+
+    Player-TpToggle-Off: '&eテレポート申請を受け付けるようにしました。 (&eTeleportation canceller is now &6OFF)'
+
+    Player-TpToggle-On: '&eテレポート申請を受け付けないようにしました。 (&eTeleportation canceller is now&6ON)'
+
+    Target-Is-TpToggled: '&6%target% &eはテレポート申請を受け付けていません。 &6%target% &ehas teleportation off'
+
+    Player-Is-TpToggled: '&cテレポート申請を受け付けない設定になっています。 (&cYou are tptoggled!)'
+
+    Tpacancel-message: '&6テレポート申請がキャンセルされました。 (&6Tpa request has been canceled.)'
+
+    # TPA request expires in seconds
+    Request-expire-time: 120
+
+
+    # Seconds until tpa
+    # Please use whole numbers
+
+    Seconds-until-tpa: 3
+
+    # Becareful in this part!
+    # This is when a player uses not enough args
+    # For example, when a player does '/tpa', it will say 'Usage: /tpa <player>'
+    # So please fit the correct command under the correct message!
+    # P.S '/tpohere' is also '/s' (essentials-type command).
+
+    Tpa-usage: '&cUse: /tpa <player>'
+
+    Tpahere-usage: '&cUse: /tpahere <player>'
+
+    Tpaccept-usage: '&cUse: /tpaccept <player>'
+
+    Tpdeny-usage: '&cUse: /tpadeny <player>'
+
+    Tpo-usage: '&cUse: /tpo <player>'
+
+    Tpohere-usage: '&cUse: /tpohere <player> or /s <player>'
+
+
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+    #                                               #
+    #                  Please Read!                 #
+    #                                               #
+    # # # # # # # # # # # # # # # # # # # # # # # # #
+
+    # This section is when a player gets a tpa request
+    # Since the code used is broken into many parts, there will be many messages.
+    # Whatever you do to the "Click-to-x" messages, will be the same in the 'Tpa-message'
+    # Be careful!
+
+
+    # Lets you choose if you want players to be able
+    # to move before being teleported
+    Allow-player-to-move: false
+
+    Player-moved-before-tp: '&6%player%が動いたため、テレポートがキャンセルされました。'
+
+    Player-sent-request: '&eプレイヤー&6%target%&eにtpaリクエストを送信しました。'
+
+    Tpa-message:
+      - ''
+      - '&6%player% &eさんがあなたのところにテレポート申請しました。'
+      - '&e%accept% &eをクリックで許可、または、 &e %deny% &eをクリックで拒否します。'
+      - '&e何もしない場合、120秒後に自動でキャンセルされます。'
+      - ''
+
+    Tpahere-message:
+      - ''
+      - '&6%player% &eさんがあなたを相手の地点にテレポート申請しています。'
+      - '&e%accept% &eをクリックで許可、または、 &e %deny% &eをクリックで拒否します。'
+      - '&e何もしない場合、120秒後に自動でキャンセルされます。'
+      - ''
+
+
+    # This will center the accept/deny messages
+    Center-accept-deny-msg: true
+
+    Click-to-accept: '&a&l&n[許可]&r'
+    Click-to-deny: '&c&l&n[拒否]&r'
+
+    Hover-message-on-accept: '&aクリックで許可'
+    Hover-message-on-deny: '&cクリックで拒否'
+
+    #
+    # On-Screen Messages
+    # Pops up in the middle of the player's screen
+    #
+
+    Send-on-screen-message: true
+
+    # When  a player accepts a tp
+    On-screen-teleporting:
+      - '&6テレポート中...'
+      - '&e動かないでください!'
+
+    # When a player has successfully tp'd
+    On-screen-teleported: '&aテレポートしました!'
+
+    # If a player moves while they are being tp'd
+    On-screen-canceled-tp: '&cテレポートをキャンセルしました!'
+
+    #~~~~~~~~~~~~~~~~~~#
+    # More Coming Soon!#
+    #~~~~~~~~~~~~~~~~~~#
+
+  WorldGuard-config.yml: |
+    #
+    # WorldGuard's main configuration file
+    #
+    # This is the global configuration file. Anything placed into here will
+    # be applied to all worlds. However, each world has its own configuration
+    # file to allow you to replace most settings in here for that world only.
+    #
+    # About editing this file:
+    # - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If
+    #   you use an editor like Notepad++ (recommended for Windows users), you
+    #   must configure it to "replace tabs with spaces." In Notepad++, this can
+    #   be changed in Settings > Preferences > Language Menu.
+    # - Don't get rid of the indents. They are indented so some entries are
+    #   in categories (like "enforce-single-session" is in the "protection"
+    #   category.
+    # - If you want to check the format of this file before putting it
+    #   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/
+    #   and see if it gives "ERROR:".
+    # - Lines starting with # are comments and so they are ignored.
+    #
+
+    regions:
+      uuid-migration:
+        perform-on-next-start: false
+        keep-names-that-lack-uuids: true
+      use-creature-spawn-event: true
+      sql:
+        use: false
+        dsn: jdbc:mysql://localhost/worldguard
+        username: worldguard
+        password: worldguard
+        table-prefix: ''
+      enable: true
+      invincibility-removes-mobs: false
+      fake-player-build-override: true
+      explosion-flags-block-entity-damage: true
+      high-frequency-flags: false
+      protect-against-liquid-flow: true
+      wand: 334
+      max-claim-volume: 67108864
+      claim-only-inside-existing-regions: false
+      max-region-count-per-player:
+        default: 10
+        # 2023-03-18 SeichiAssist-ExternalLib#128
+        # observer: 10
+    auto-invincible: false
+    auto-invincible-group: false
+    auto-no-drowning-group: false
+    use-player-move-event: true
+    use-player-teleports: true
+    security:
+      deop-everyone-on-join: false
+      block-in-game-op-command: false
+    host-keys: {}
+    summary-on-start: true
+    op-permissions: false
+    build-permission-nodes:
+      enable: false
+      deny-message: '&eSorry, but you are not permitted to do that here.'
+    event-handling:
+      block-entity-spawns-with-untraceable-cause: false
+      interaction-whitelist: []
+      emit-block-use-at-feet: []
+    protection:
+      item-durability: true
+      remove-infinite-stacks: false
+      disable-xp-orb-drops: false
+      disable-obsidian-generators: false
+    gameplay:
+      block-potions: [INVISIBILITY]
+      block-potions-overly-reliably: false
+    simulation:
+      sponge:
+        enable: false
+        radius: 3
+        redstone: false
+    default:
+      pumpkin-scuba: false
+      disable-health-regain: false
+    physics:
+      no-physics-gravel: false
+      no-physics-sand: false
+      vine-like-rope-ladders: false
+      allow-portal-anywhere: false
+      disable-water-damage-blocks: []
+    ignition:
+      block-tnt: false
+      block-tnt-block-damage: true
+      block-lighter: false
+    fire:
+      disable-lava-fire-spread: true
+      disable-all-fire-spread: true
+      disable-fire-spread-blocks: []
+      lava-spread-blocks: []
+    mobs:
+      block-creeper-explosions: false
+      block-creeper-block-damage: true
+      block-wither-explosions: false
+      block-wither-block-damage: true
+      block-wither-skull-explosions: false
+      block-wither-skull-block-damage: true
+      block-enderdragon-block-damage: true
+      block-enderdragon-portal-creation: false
+      block-fireball-explosions: false
+      block-fireball-block-damage: true
+      anti-wolf-dumbness: false
+      allow-tamed-spawns: true
+      disable-enderman-griefing: true
+      disable-snowman-trails: false
+      block-painting-destroy: true
+      block-item-frame-destroy: true
+      block-plugin-spawning: true
+      block-above-ground-slimes: false
+      block-other-explosions: false
+      block-zombie-door-destruction: false
+      block-creature-spawn: []
+    player-damage:
+      disable-fall-damage: false
+      disable-lava-damage: false
+      disable-fire-damage: false
+      disable-lightning-damage: false
+      disable-drowning-damage: false
+      disable-suffocation-damage: false
+      disable-contact-damage: false
+      teleport-on-suffocation: false
+      disable-void-damage: false
+      teleport-on-void-falling: false
+      disable-explosion-damage: false
+      disable-mob-damage: false
+      disable-death-messages: false
+    chest-protection:
+      enable: false
+      disable-off-check: false
+    crops:
+      disable-creature-trampling: false
+      disable-player-trampling: false
+    weather:
+      prevent-lightning-strike-blocks: []
+      disable-lightning-strike-fire: false
+      disable-thunderstorm: false
+      disable-weather: false
+      disable-pig-zombification: false
+      disable-powered-creepers: false
+      always-raining: false
+      always-thundering: false
+    dynamics:
+      disable-mushroom-spread: false
+      disable-ice-melting: false
+      disable-snow-melting: false
+      disable-snow-formation: false
+      disable-ice-formation: false
+      disable-leaf-decay: false
+      disable-grass-growth: false
+      disable-mycelium-spread: false
+      disable-vine-growth: false
+      disable-soil-dehydration: false
+      snow-fall-blocks: []
+    blacklist:
+      use-as-whitelist: false
+      logging:
+        console:
+          enable: true
+        database:
+          enable: false
+          dsn: jdbc:mysql://localhost:3306/minecraft
+          user: root
+          pass: ''
+          table: blacklist_events
+        file:
+          enable: false
+          path: worldguard/logs/%Y-%m-%d.log
+          open-files: 10
+
+  ByeByeWither-config.yml: |
+    wither:
+      is-enabled: true
+      ignored-worlds: []
+    ender-dragon:
+      is-enabled: true
+      ignored-worlds: []
+
+  PrometheusExporter-config.yml: |
+    host: 0.0.0.0
+    port: 9225
+    enable_metrics:
+      entities_total: true
+      villagers_total: true
+      loaded_chunks_total: true
+      jvm_memory: true
+      players_online_total: true
+      players_total: true
+      tps: true
+      world_size: true
+      jvm_threads: true
+      jvm_gc: true
+      tick_duration_median: true
+      tick_duration_average: true
+      tick_duration_min: false
+      tick_duration_max: true
+      player_online: false
+      player_statistic: false
+
+  RandomTeleport-config.yml: |
+    Radius: 5000
+    RadiusPerWorld:
+      world_SW: 1500
+      world_SW_2: 8000
+      world_SW_nether: 1500
+      world_SW_the_end: 3000
+    EnableWorlds:
+    - "world_SW"
+    - "world_SW_2"
+    - "world_SW_nether"
+    - "world_SW_the_end"
+
+  LunaChat-config.yml: |
+    # LunaChat v2.8.3
+    # @author     ucchy
+    # @license    LGPLv3
+    # @copyright  Copyright ucchy 2013
+
+
+    # -------------------- 全般設定 --------------------
+
+    # チャンネルチャット機能を利用可能にするかどうか
+    # Japanize機能のみを利用したい場合は、falseにしてください。
+    enableChannelChat: true
+
+    # イベント処理の優先度を設定できます。
+    # 他のプラグインとの組み合わせでうまく動かないときに使用してください。
+    # LOWEST, LOW, NORMAL, HIGH, HIGHEST のどれかを指定できます。
+    # よくわからない場合は、デフォルトのHIGHのままにしてください。
+    playerChatEventListenerPriority: 'HIGH'
+
+
+    # -------------------- チャンネルチャット設定 --------------------
+
+    # チャンネルチャットに入っていない人の発言を、グローバルとして扱うかどうか
+    noJoinAsGlobal: true
+
+    # チャンネルチャットの発言内容を、ログに残すかどうか
+    loggingChat: true
+
+    # チャンネルチャットの発言内容を、HawkEyeに記録するかどうか
+    # この設定を利用する場合は、HawkEyeのconfig.ymlで、log: セクションの chat の設定を true にしてください。
+    loggingChatToHawkEye: true
+
+    # チャンネルチャットの発言内容を、サーバーコンソールに表示するかどうか
+    displayChatOnConsole: true
+
+    # グローバルマーカー。
+    # これが発言の頭に入っている場合は、一時的にグローバル発言になる。
+    globalMarker: '!'
+
+    # 全てのメンバーが退出したときに、チャンネルを削除するかどうか
+    zeroMemberRemove: true
+
+    # ログイン時に、参加中チャンネルを表示するかどうか
+    showListOnJoin: true
+
+    # /ch join コマンドで存在しないチャンネルを指定したときに、
+    # チャンネルを新規作成して入室するかどうか
+    createChannelOnJoinCommand: false
+
+    # 通常のチャットの代わりに、既定として使用するグローバルチャンネル。
+    # グローバルチャンネルを作らず通常のチャットを使用する場合は、
+    # から文字列 「''」 を指定すること。
+    globalChannel: ''
+
+    # サーバーに参加したユーザーに必ず参加させるチャンネル。
+    # グローバルチャンネルとは別で指定できる。
+    # 複数のチャンネルを設定可能。例）forceJoinChannels: ['L', 'M', 'N']
+    forceJoinChannels: []
+
+    # formatコマンド実行時に、必ず含まれる必要があるキーワード。
+    formatConstraint: ['%username', '%msg']
+
+    # チャンネルを作成したときに、デフォルトで設定されるフォーマット設定。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %ch       : チャンネル名
+    # %color    : チャンネルカラー
+    # %username : 発言者表示名
+    # %player   : 発言者ID
+    # %world    : 発言したワールド名
+    # %prefix   : プレフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %suffix   : サフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %date     : 日付
+    # %time     : 時刻
+    # %msg      : 発言内容（Japanize変換された場合は、Japanize結果を含みます。）
+    defaultFormat: '&f[%color%ch&f]%prefix%username%suffix&a:&f %msg'
+
+    # OPの画面に、全チャンネルの発言内容を表示する設定。
+    opListenAllChannel: false
+
+    # チャンネルを新規作成するときに、チャンネル名が満たさなければならない、最低文字列長。
+    # 指定されたチャンネル名がこの文字数を下回る場合は、エラーになってチャンネルを作成できません。
+    minChannelNameLength: 4
+
+    # チャンネルを新規作成するときに、チャンネル名が満たさなければならない、最大文字列長。
+    # 指定されたチャンネル名がこの文字数を上回る場合は、エラーになってチャンネルを作成できません。
+    maxChannelNameLength: 20
+
+    # クイックチャンネルチャット機能を有効化するかどうか。
+    # クイックチャンネルチャットは、「(チャンネル名 or エイリアス) + (専用の記号) + (発言内容) 」を発言すると使用できます。
+    # 例えば、mainチャンネルにエイリアスmを設定しておくと、mainチャンネルを発言先にしなくても、
+    # m:こんにちは！
+    # と発言することで、mainチャンネルに発言を行うことができます。
+    enableQuickChannelChat: false
+
+    # クイックチャンネルチャット機能に使用する記号。
+    quickChannelChatSeparator: ':'
+
+
+    # -------------------- プライベートメッセージ設定 --------------------
+
+    # /tell や /msg や /r コマンドでプライベートメッセージを送信するときに、
+    # 適用されるフォーマット設定。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %ch       : チャンネル名（「%player>%to」と同一です。）
+    # %username : 発言者表示名
+    # %player   : 発言者ID
+    # %to       : 発言の相手（受信者）のID
+    # %world    : 発言したワールド名
+    # %prefix   : プレフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %suffix   : サフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %date     : 日付
+    # %time     : 時刻
+    # %msg      : 発言内容（Japanize変換された場合は、Japanize結果を含みます。）
+    defaultFormatForPrivateMessage: '&7[%player -> %to]&f %msg'
+
+
+    # -------------------- dynmap連携設定 --------------------
+
+    # ブロードキャストチャンネルの発言内容を、dynmapに送信するかどうか。
+    # dynmapがロードされていない場合は、この設定は無視される（false扱い）。
+    sendBroadcastChannelChatToDynmap: true
+
+    # dynmapへ送信するときに、チャンネルのフォーマットを反映して送信するかどうか。
+    # trueにするとチャンネルフォーマットを反映したメッセージをdynmapに表示します。
+    # falseにするとメッセージのみをdynmapに表示します。
+    # 参考：https://github.com/ucchyocean/LunaChat/issues/68
+    sendFormattedMessageToDynmap: false
+
+    # dynmapのWebUIから発言された発言内容を表示するチャンネル。
+    # dynmapChannelが無指定で、globalChannelが指定されているなら、グローバルチャンネルに、
+    # dynmapChannelが無指定で、globalChannelも無指定なら、通常チャットに発言される。
+    dynmapChannel: ''
+
+
+
+    # -------------------- NGワード設定 --------------------
+
+    # NGワード設定。正規表現が指定可能です。
+    # ここに設定されたワードを発言したプレイヤーは、NGワード部分がマスクされます。
+    ngword: ['ちん(こ|ぽ|ちん)']
+
+    # NGワード発言時の動作設定。mask、mute、kick、ban の4つのいずれかが設定可能。
+    # mask : NGワードをマスクする
+    # mute : NGワードをマスクしたのち、発言したプレイヤーをチャンネルからMuteする
+    # kick : NGワードをマスクしたのち、発言したプレイヤーをチャンネルからキックする
+    # ban  : NGワードをマスクしたのち、発言したプレイヤーをチャンネルからBANする
+    # ※ 通常チャット（非チャンネルチャット）の場合は、
+    #    kickやbanを設定しても、マスクのみが実行されます。
+    ngwordAction: mask
+
+
+
+    # -------------------- チャット装飾設定 --------------------
+
+    # チャンネルチャット機能を利用しないユーザーのための設定です。
+
+    # 通常チャット（非チャンネルチャット）の装飾を、LunaChatから行うかどうか。
+    # Vault がロードされていない場合は、この設定は無視される（false扱い）。
+    enableNormalChatMessageFormat: true
+
+    # チャット装飾のフォーマット設定。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %username : 発言者表示名
+    # %world    : 発言したワールド名
+    # %prefix   : プレフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %suffix   : サフィックス（VaultとPermissionsExが導入されている場合に置き換えられます）
+    # %date     : 日付
+    # %time     : 時刻
+    # %msg      : 発言内容（Japanize変換された場合は、Japanize結果を含みます。）
+    normalChatMessageFormat: '&f%prefix%username%suffix&a:&f %msg'
+
+    # 通常チャット（非チャンネルチャット）で、カラーコード（&aや&bなど）を
+    # 使用可能にするかどうか。falseに設定すると、カラーコードは変換されません。
+    enableNormalChatColorCode: false
+
+
+
+    # -------------------- Japanize変換設定 --------------------
+
+    # ローマ字をかな文字や漢字に変換する設定。
+    # none/kana/GoogleIME/SocialIME の4つのいずれかが設定可能。
+    # none      : 変換なし。
+    # kana      : かな変換のみ。
+    # GoogleIME : かな変換したのち、GoogleIMEを使って漢字変換する。
+    # SocialIME : かな変換したのち、SocialIMEを使って漢字変換する。
+    japanizeType: GoogleIME
+
+    # かな変換や漢字変換時に、
+    # 変換結果を元の発言内容と合わせて1行で表示するか、
+    # 変換結果のみを2行目に表示するかを、設定する。
+    # 1行表示の例：
+    #     <ucchy> aiueo (あいうえお)
+    # 2行表示の例：
+    #     <ucchy> aiueo
+    #     [JP] あいうえお
+    japanizeDisplayLine: 1
+
+    # japanizeDisplayLine が 1 のときの、表示フォーマットを設定する。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %msg      : 元の発言内容
+    # %japanize : Japanize変換された発言内容
+    japanizeLine1Format: '%msg &6(%japanize)'
+
+    # japanizeDisplayLine が 2 のときの、2行目の表示フォーマットを設定する。
+    # フォーマット設定には、下記のキーワードが使用できます。
+    # %msg      : 元の発言内容
+    # %japanize : Japanize変換された発言内容
+    japanizeLine2Format: '&6[JP] %japanize'
+
+    # 発言に含まれているプレイヤー名を、Japanize変換から除外するかどうかを設定する。
+    japanizeIgnorePlayerName: true
+
+    # ノンジャパナイズマーカー。
+    # これが発言の頭に入っている場合は、一時的にJapanize変換を実行しない。
+    noneJapanizeMarker: '#'
+
+  LunaChat-dictionary.yml: |
+    seichi: 整地
+    seiti: 整地

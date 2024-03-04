@@ -1,0 +1,1046 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-enchantments-config
+data:
+  custom-enchantments-config.yml: |
+    Global:
+      CreateExplosions: true
+      Updates:
+        ShowPercentageOnUpdate: true
+        CheckOnStartup: true
+        CheckDelay: 300
+      Logging:
+        Enabled: false
+        MinimumMsForLog: 1000
+        LogEvents: true
+        LogItems: true
+        LogEnchantments: true
+      Runecrafting:
+        Enabled: true
+        Disenchanting: true
+        CanStackEnchantments: true
+        TransformationEffect: true
+      Books:
+        Name: '&d&kedk&5 Magic Book &d&kedk'
+      Enchantments:
+        CEnchantmentColor: DARK_RED;ITALIC
+        CEnchantmentTable: false
+        CEnchantingProbability: 10
+        GlowEnchantmentID: 100
+        MaximumCustomEnchantments: 1000
+        UseCustomEnchantmentProbability: false
+        RequirePermissions: false
+        RepeatPotionEffects: true
+        RepeatDelay: 1000
+    Enchantments:
+      Gooey:
+        Enabled: 'true'
+        DisplayName: Gooey
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        HeightMultiplier: '3'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Smelting:
+        Enabled: 'false'
+        DisplayName: Smelting
+        EnchantmentProbability: '50'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        RunecraftingCost:
+        - 0LVL&0$
+      Gears:
+        Enabled: 'false'
+        DisplayName: Gears
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        SpeedBoost: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Bombardment:
+        Enabled: 'false'
+        DisplayName: Bombardment
+        EnchantmentProbability: '10'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        BaseTNTAmount: '3'
+        Volume: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Shielded:
+        Enabled: 'true'
+        DisplayName: Shielded
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        BaseStrength: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        StrengthPerLevel: 2
+        Cooldown: 30
+      Poison:
+        Enabled: 'true'
+        DisplayName: Poison
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Ice Aspect:
+        Enabled: 'false'
+        DisplayName: Ice Aspect
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        SlowStrength: '5'
+        SlowDuration: '40'
+        ChanceFreeze: '60'
+        SpecialFreeze: 'true'
+        SpecialFreezeDuration: '60'
+        ChanceSpecialFreeze: '10'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Thunderingblow:
+        Enabled: 'true'
+        DisplayName: Thunderingblow
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        LightningChance: '20'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Deathbringer:
+        Enabled: 'false'
+        DisplayName: Deathbringer
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        TrueDamagePerHit: '2'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Obsidian Shield:
+        Enabled: 'true'
+        DisplayName: Obsidian Shield
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Explosive:
+        Enabled: 'false'
+        DisplayName: Explosive
+        EnchantmentProbability: '50'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Radius: '3'
+        LargerRadius: 'true'
+        DropItems: 'true'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Firework:
+        Enabled: 'false'
+        DisplayName: Firework
+        EnchantmentProbability: '20'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '10'
+        Cost: '0'
+        FireworkAmount: '1'
+        Delay: '2'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Frozen:
+        Enabled: 'false'
+        DisplayName: Frozen
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Crippling Strike:
+        Enabled: 'false'
+        DisplayName: Crippling Strike
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '100'
+        Strength: '1'
+      Autorepair:
+        Enabled: 'false'
+        DisplayName: Autorepair
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        HealAmount: '1'
+        HealFully: 'false'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Molten:
+        Enabled: 'false'
+        DisplayName: Molten
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '20'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Shockwave:
+        Enabled: 'true'
+        DisplayName: Shockwave
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Cooldown: '200'
+        ForbiddenMaterials: BEDROCK, WATER, STATIONARY_WATER, LAVA, STATIONARY_LAVA, CACTUS,
+          CAKE_BLOCK, CROPS, TORCH, ENDER_PORTAL, PISTON_MOVING_PIECE, MELON_STEM, NETHER_WARTS,
+          MOB_SPAWNER, CHEST, SIGN, WALL_SIGN, SIGN_POST, ITEM_FRAME
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Blind:
+        Enabled: 'false'
+        DisplayName: Blind
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '100'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Deep Wounds:
+        Enabled: 'false'
+        DisplayName: Deep Wounds
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '20'
+        BleedChance: '20'
+      Enlighted:
+        Enabled: 'false'
+        DisplayName: Enlighted
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Poisoned:
+        Enabled: 'false'
+        DisplayName: Poisoned
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '20'
+        Strength: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Lightning:
+        Enabled: 'true'
+        DisplayName: Lightning
+        EnchantmentProbability: '10'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        LightningChance: '75'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Lifesteal:
+        Enabled: 'true'
+        DisplayName: Lifesteal
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Heal: '2'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Springs:
+        Enabled: 'true'
+        DisplayName: Springs
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Strength: '4'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Stomp:
+        Enabled: 'false'
+        DisplayName: Stomp
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        DamageReductionFraction: '4'
+        DamageApplicationFraction: '2'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Hardened:
+        Enabled: 'false'
+        DisplayName: Hardened
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '1'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Implants:
+        Enabled: 'true'
+        DisplayName: Implants
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        FoodBurstDelay: '20'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Glowing:
+        Enabled: 'true'
+        DisplayName: Glowing
+        EnchantmentProbability: '4'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        RunecraftingCost:
+        - 0LVL&0$
+      Vampire:
+        Enabled: 'true'
+        DisplayName: Vampire
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        DamageHealFraction: '2'
+        Cooldown: '100'
+        RunecraftingCost:
+        - 0LVL&0$
+      Block:
+        Enabled: 'false'
+        DisplayName: Block
+        EnchantmentProbability: '5'
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Strength: '1'
+        Cooldown: '600'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Energizing:
+        Enabled: 'false'
+        DisplayName: Energizing
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Strength: '1'
+        Duration: '20'
+        EnchantmentProbability: '25.0'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Self Destruct:
+        Enabled: 'false'
+        DisplayName: Self Destruct
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        ExplosionDelay: '40'
+        EnchantmentProbability: '9.090909090909092'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Volley:
+        Enabled: 'true'
+        DisplayName: Volley
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Revulsion:
+        Enabled: 'false'
+        DisplayName: Revulsion
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '20'
+        EnchantmentProbability: '9.090909090909092'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Shuffle:
+        Enabled: 'true'
+        DisplayName: Shuffle
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+      Molotov:
+        Enabled: 'false'
+        DisplayName: Molotov
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Healing:
+        Enabled: 'true'
+        DisplayName: Healing
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Deepwounds:
+        Enabled: 'false'
+        DisplayName: Deepwounds
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '20'
+        BleedChance: '20'
+        EnchantmentProbability: '5.882352941176471'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Aerial:
+        Enabled: 'false'
+        DisplayName: Aerial
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        DamageIncreasePercentagePerLevel: '10'
+        EnchantmentProbability: '5.882352941176471'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Cursed:
+        Enabled: 'false'
+        DisplayName: Cursed
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '1'
+        EnchantmentProbability: '9.090909090909092'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Endershift:
+        Enabled: 'false'
+        DisplayName: Endershift
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '200'
+        Strength: '5'
+        HpToTrigger: '4'
+        Cooldown: '6000'
+        EnchantmentProbability: '9.090909090909092'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Paralyze:
+        Enabled: 'true'
+        DisplayName: Paralyze
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '5'
+        Cooldown: '200'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Wither:
+        Enabled: 'true'
+        DisplayName: Wither
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '60'
+        Strength: '1'
+        EnchantmentProbability: '5.882352941176471'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Cripple:
+        Enabled: 'false'
+        DisplayName: Cripple
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Duration: '100'
+        Strength: '1'
+        EnchantmentProbability: '5.882352941176471'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Charge:
+        Enabled: 'false'
+        DisplayName: Charge
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        DamageIncreasePercentagePerLevel: '10'
+        EnchantmentProbability: '5.882352941176471'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Headless:
+        Enabled: 'false'
+        DisplayName: Headless
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        EnchantmentProbability: '5.882352941176471'
+        RunecraftingCost:
+        - 0LVL&0$
+      Bounty Hunter:
+        Enabled: 'false'
+        DisplayName: Bounty Hunter
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        MaximumBounty: '8'
+        Cooldown: '600'
+        ChanceEmerald: '2.5'
+        ChanceDiamond: '5'
+        ChanceGold: '15'
+        ChanceIron: '27.5'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Quickening:
+        Enabled: 'false'
+        DisplayName: Quickening
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        Strength: '3'
+        Duration: '40'
+        EnchantmentProbability: '25.0'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Piercing:
+        Enabled: 'true'
+        DisplayName: Piercing
+        EnchantmentMaxLevel: '5'
+        OccurrenceChance: '100'
+        Cost: '0'
+        EnchantmentProbability: '7.142857142857143'
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+      Cloaking:
+        Enabled: true
+        DisplayName: Cloaking
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DurationPerLevel: 60
+        Cooldown: 200
+        EnchantmentProbability: 7.142857142857143
+      Blaze:
+        Enabled: false
+        DisplayName: Blaze
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        EnchantmentProbability: 6.666666666666667
+      Disarming:
+        Enabled: false
+        DisplayName: Disarming
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 5.555555555555555
+      Drunk:
+        Enabled: false
+        DisplayName: Drunk
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DurationPerLevel: 60
+        BaseStrength: 1
+        EnchantmentProbability: 7.142857142857143
+      Berserker:
+        Enabled: false
+        DisplayName: Berserker
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DurationPerLevel: 200
+        BaseStrength: 5
+        HpToTrigger: 4
+        Cooldown: 6000
+        EnchantmentProbability: 7.142857142857143
+    Items:
+      Pyroaxe:
+        Enabled: 'false'
+        DisplayName: Pyroaxe
+        Color: DARK_RED
+        Description: Are your enemies burning?;Do you want to make their situation worse?;Then
+          this is just perfect for you!
+        Cooldown: '0'
+        Cost: '0'
+        DamageMultiplier: '2'
+      Livefire Boots:
+        Enabled: 'false'
+        DisplayName: Livefire Boots
+        Color: DARK_RED
+        Description: Leave a burning trail...;Because it's fun!
+        Cooldown: '0'
+        Cost: '0'
+        FlameDuration: '200'
+        FireResistanceLevel: '5'
+      Minigun:
+        Enabled: 'true'
+        DisplayName: Minigun
+        Color: AQUA
+        Description: ?発打てる弓
+        Cooldown: '0'
+        Cost: '20'
+        ArrowCountPerVolley: '20'
+        ShotsPerSecond: '20'
+      Rocket Boots:
+        Enabled: 'false'
+        DisplayName: Rocket Boots
+        Color: AQUA
+        Description: 'Up we go!; ;WARNING: May cause dismemberment,;            death;            and
+          explosions'
+        Cooldown: '0'
+        Cost: '0'
+      Bandage:
+        Enabled: 'false'
+        DisplayName: Bandage
+        Color: GREEN
+        Description: It has little hearts on it,;so you know it's good
+        Cooldown: '1000'
+        Cost: '0'
+        TotalHealAmount: '10'
+        TotalHealTime: '200'
+        StopAtFullHealth: 'true'
+      Poison Ivy:
+        Enabled: 'false'
+        DisplayName: Poison Ivy
+        Color: DARK_GREEN
+        Description: If you're too cheap to afford ladders,;just take this, it'll work
+          just fine!
+        Cooldown: '0'
+        Cost: '0'
+        PoisonDuration: '100'
+        PoisonLevel: '2'
+      Necromancer's Staff of Destruction:
+        Enabled: 'false'
+        DisplayName: Necromancer's Staff of Destruction
+        Color: AQUA
+        Description: Wreak chaos everywhere,;Because why not?
+        Cooldown: '0'
+        Cost: '0'
+        Fuel: '377'
+        WitherCost: '10'
+        WitherCooldown: '100'
+        FireballCost: '35'
+        FireballCooldown: '60'
+        LightningCost: '20'
+        LightningCooldown: '240'
+      Landmine:
+        Enabled: 'false'
+        DisplayName: Landmine
+        Color: GRAY
+        Description: Just don't trigger it yourself, please.
+        Cooldown: '0'
+        Cost: '0'
+        ExplosionStrength: '5'
+      Flamethrower:
+        Enabled: 'false'
+        DisplayName: Flamethrower
+        Color: DARK_RED
+        Description: Burn, baby, burn!
+        Cooldown: '0'
+        Cost: '0'
+        IsReloadable: 'true'
+        BurnDuration: '100'
+        FireBlocksPerBurst: '10'
+      Hermes Boots:
+        Enabled: 'false'
+        DisplayName: Hermes Boots
+        Color: GOLD
+        Description: These boots are made for walkin'
+        Cooldown: '100'
+        Cost: '0'
+        SpeedLevel: '5'
+      Bear Trap:
+        Enabled: 'false'
+        DisplayName: Bear Trap
+        Color: GRAY
+        Description: Just hope that it does not contain bears...
+        Cooldown: '0'
+        Cost: '0'
+        BleedDuration: '100'
+        SlowLevel: '2'
+        SlowDuration: '100'
+        WeaknessLevel: '4'
+        WeaknessDuration: '100'
+      Beastmaster's Bow:
+        Enabled: 'false'
+        DisplayName: Beastmaster's Bow
+        Color: AQUA
+        Description: Tame the wilderness;and turn nature against your foes!
+        Cooldown: '0'
+        Cost: '0'
+        MaximumMobs: '5'
+        MobAppearanceChance: '90'
+        DamageMultiplication: '5'
+      Healing Shovel:
+        Enabled: 'false'
+        DisplayName: Healing Shovel
+        Color: GREEN
+        Description: Smacking other people in the face;has never been healthier!
+        Cooldown: '600'
+        Cost: '0'
+        Heal: '4'
+      Piranha Trap:
+        Enabled: 'false'
+        DisplayName: Piranha Trap
+        Color: GRAY
+        Description: Who came up with this?
+        Cooldown: '0'
+        Cost: '0'
+        BleedDuration: '120'
+        FishAmount: '20'
+        FishDuration: '200'
+      Deathscythe:
+        Enabled: 'false'
+        DisplayName: Deathscythe
+        Color: DARK_GRAY
+        Description: An ancient evil lies within...
+        Cooldown: '400'
+        Cost: '0'
+        Range: '10'
+        MaximumHookTime: '240'
+      Firework-Battery:
+        Enabled: 'false'
+        DisplayName: Firework-Battery
+        Color: DARK_RED
+        Description: Make the sky shine bright with colors!
+        Cooldown: '0'
+        Cost: '0'
+      Assassin's Blade:
+        Enabled: 'false'
+        DisplayName: Assassin's Blade
+        Color: AQUA
+        Description: Sneak up on your enemies and hit them hard!; ;(High chance of failure
+          against Hacked Clients)
+        Cooldown: '200'
+        Cost: '0'
+        InvisibilityDuration: '400'
+        AmbushDmgMultiplier: '2'
+        WeaknessLevel: '4'
+        WeaknessLength: '100'
+      Prickly Block:
+        Enabled: 'false'
+        DisplayName: Prickly Block
+        Color: LIGHT_PURPLE
+        Description: Just build a labyrinth out of these,;people will love you for it!
+        Cooldown: '0'
+        Cost: '0'
+        Damage: '3'
+        NauseaLevel: '2'
+        NauseaDuration: '200'
+      Potion Launcher:
+        Enabled: 'false'
+        DisplayName: Potion Launcher
+        Color: DARK_GRAY
+        Description: 'Instructions: Put potion into the righthand slot;                of
+          the potion launcher,;                aim and fire!; ;Manufactured by §kTaiterio'
+        Cooldown: '20'
+        Cost: '0'
+        ProjectileSpeedMultiplier: '4'
+      Druid Boots:
+        Enabled: 'false'
+        DisplayName: Druid Boots
+        Color: DARK_GREEN
+        Description: Let the nature rejuvenate you!
+        Cooldown: '0'
+        Cost: '0'
+        SpeedDuration: '100'
+        SpeedLevel: '5'
+        RegenerationDuration: '100'
+        RegenerationLevel: '5'
+      Firecracker:
+        Enabled: 'false'
+        DisplayName: Firecracker
+        Color: DARK_RED
+        Description: Makes every situation a good situation!
+        Cooldown: '0'
+        Cost: '0'
+      Thor's Axe:
+        Enabled: 'false'
+        DisplayName: Thor's Axe
+        Color: GOLD
+        Description: 'Smite your enemies down with mighty thunder!;Note: Batteries not
+          included.'
+        Cooldown: '0'
+        Cost: '0'
+        FireDuration: '200'
+      Medikit:
+        Enabled: 'false'
+        DisplayName: Medikit
+        Color: GREEN
+        Description: Treats most of your ailments,;it even has a box of juice!
+        Cooldown: '2000'
+        Cost: '0'
+        HealAmount: '10'
+      Hookshot Bow:
+        Enabled: 'false'
+        DisplayName: Hookshot Bow
+        Color: AQUA
+        Description: Everyone is just one hook away
+        Cooldown: '0'
+        Cost: '0'
+      Powergloves:
+        Enabled: 'false'
+        DisplayName: Powergloves
+        Color: AQUA
+        Description: Throw all your problems away!
+        Cooldown: '500'
+        Cost: '0'
+        ThrowSpeedMultiplier: '60'
+        ThrowDelayAfterGrab: '20'
+        MaxGrabtime: '10'
