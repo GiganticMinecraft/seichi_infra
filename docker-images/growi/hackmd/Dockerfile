@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.6
+# syntax=docker/dockerfile:1.7
 FROM hackmdio/hackmd:1.3.0-alpine
 LABEL org.opencontainers.image.authors="outductor <inductor.kela+seichi@gmail.com>"
 LABEL org.opencontainers.image.url="https://github.com/GiganticMinecraft/seichi_infra"

@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.6
+# syntax=docker/dockerfile:1.7
 ARG version=8.7.0
 FROM docker.elastic.co/elasticsearch/elasticsearch:${version}
 LABEL org.opencontainers.image.authors="outductor <inductor.kela+seichi@gmail.com>"
