@@ -161,7 +161,9 @@ spec:
                 mv gamerule doInsomnia false world_SW_the_end
                 mvm set difficulty peaceful world_2
                 rg flag -w world_2 __global__ build -g members allow
+                rg addmember -w world_2 __global__ unchama
                 rg flag -w world_SW_2 __global__ build -g members allow
+                rg addmember -w world_SW_2 __global__ unchama
                 rg flag -w world_2_the_end __global__ deny-spawn ENDER_DRAGON
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
                 lp group default permission set multiverse.core.list.who true
