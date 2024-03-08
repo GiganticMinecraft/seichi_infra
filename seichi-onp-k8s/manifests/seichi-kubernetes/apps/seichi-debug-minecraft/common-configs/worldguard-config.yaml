@@ -170,7 +170,7 @@ data:
     # エンドクリスタルの設置無効化
     [end_crystal]
     ignore-groups=admin
-    on-use=deny,log,tell
+    on-place=deny,log,tell
 
   # エンド整地、ネザー整地
   world_SW_the_end-Blacklist.txt: |
@@ -249,7 +249,7 @@ data:
     # ベッドの設置無効化
     [bed]
     ignore-groups=admin
-    on-use=deny,log,tell
+    on-place=deny,log,tell
 
     # オブザーバーの設置無効化
     [observer]
@@ -259,7 +259,7 @@ data:
     # エンドクリスタルの設置無効化
     [end_crystal]
     ignore-groups=admin
-    on-use=deny,log,tell
+    on-place=deny,log,tell
 
   # メイン
   main-config.yml: |
