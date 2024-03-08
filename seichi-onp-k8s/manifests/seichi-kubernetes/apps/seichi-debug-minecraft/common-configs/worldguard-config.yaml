@@ -172,6 +172,11 @@ data:
     ignore-groups=admin
     on-place=deny,log,tell
 
+    # リスポーンアンカーの設置無効化
+    [respawn_anchor]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
   # エンド整地、ネザー整地
   world_SW_the_end-Blacklist.txt: |
     #
@@ -258,6 +263,11 @@ data:
 
     # エンドクリスタルの設置無効化
     [end_crystal]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
+    # リスポーンアンカーの設置無効化
+    [respawn_anchor]
     ignore-groups=admin
     on-place=deny,log,tell
 
