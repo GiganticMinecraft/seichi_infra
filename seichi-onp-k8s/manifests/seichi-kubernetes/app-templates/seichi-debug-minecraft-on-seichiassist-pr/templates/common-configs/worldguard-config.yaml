@@ -170,7 +170,7 @@ data:
     # エンドクリスタル設置無効化
     [end_crystal]
     ignore-groups=admin
-    on-use=deny,log,tell
+    on-place=deny,log,tell
 
     # リスポーンアンカーの設置無効化
     [respawn_anchor]
@@ -254,7 +254,7 @@ data:
     # ベッド設置無効化
     [white_bed, orange_bed, magenta_bed, light_blue_bed, yellow_bed, lime_bed, pink_bed, gray_bed, light_gray_bed, cyan_bed, purple_bed, blue_bed, brown_bed, green_bed, red_bed, black_bed]
     ignore-groups=admin
-    on-use=deny,log,tell
+    on-place=deny,log,tell
 
     # オブザーバーブロック設置無効化
     [observer]
@@ -264,7 +264,7 @@ data:
     # エンドクリスタル設置無効化
     [end_crystal]
     ignore-groups=admin
-    on-use=deny,log,tell
+    on-place=deny,log,tell
 
     # リスポーンアンカーの設置無効化
     [respawn_anchor]
