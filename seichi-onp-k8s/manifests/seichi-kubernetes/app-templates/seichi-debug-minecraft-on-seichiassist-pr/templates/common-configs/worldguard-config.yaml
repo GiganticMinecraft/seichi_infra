@@ -71,19 +71,19 @@ data:
     #ignore-groups=admins,mods
     #on-break=notify,deny,log
 
-    # 岩盤設置無効化
+    # 岩盤の設置・破壊無効化
     [bedrock]
     ignore-groups=admin
     on-place=deny,log,tell
     on-break=deny,log,tell
 
-    # コーラスフルーツ無効化
+    # コーラスフルーツの使用・インタラクト無効化
     [chorus_fruit]
     ignore-groups=admin
     on-use=deny,log,tell
     on-interact=deny,log,tell
 
-    # オブザーバーブロック設置無効化
+    # オブザーバーの設置無効化
     [observer]
     ignore-groups=admin
     on-place=deny,log,tell
@@ -156,18 +156,18 @@ data:
     #ignore-groups=admins,mods
     #on-break=notify,deny,log
 
-    # 岩盤設置無効化
+    # 岩盤の設置・破壊無効化
     [bedrock]
     ignore-groups=admin
     on-place=deny,log,tell
     on-break=deny,log,tell
 
-    # オブザーバーブロック設置無効化
+    # オブザーバーの設置無効化
     [observer]
     ignore-groups=admin
     on-place=deny,log,tell
 
-    # エンドクリスタル設置無効化
+    # エンドクリスタルの設置無効化
     [end_crystal]
     ignore-groups=admin
     on-place=deny,log,tell
@@ -245,23 +245,23 @@ data:
     #ignore-groups=admins,mods
     #on-break=notify,deny,log
 
-    # 岩盤設置無効化
+    # 岩盤の設置・破壊無効化
     [bedrock]
     ignore-groups=admin
     on-place=deny,log,tell
     on-break=deny,log,tell
 
-    # ベッド設置無効化
+    # ベッドの設置無効化
     [white_bed, orange_bed, magenta_bed, light_blue_bed, yellow_bed, lime_bed, pink_bed, gray_bed, light_gray_bed, cyan_bed, purple_bed, blue_bed, brown_bed, green_bed, red_bed, black_bed]
     ignore-groups=admin
     on-place=deny,log,tell
 
-    # オブザーバーブロック設置無効化
+    # オブザーバーの設置無効化
     [observer]
     ignore-groups=admin
     on-place=deny,log,tell
 
-    # エンドクリスタル設置無効化
+    # エンドクリスタルの設置無効化
     [end_crystal]
     ignore-groups=admin
     on-place=deny,log,tell
