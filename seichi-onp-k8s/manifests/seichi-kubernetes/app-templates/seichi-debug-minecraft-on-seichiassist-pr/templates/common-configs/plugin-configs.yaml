@@ -1084,7 +1084,7 @@ data:
       block-item-frame-destroy: true
       block-plugin-spawning: true
       block-above-ground-slimes: false
-      block-other-explosions: true
+      block-other-explosions: false
       block-zombie-door-destruction: false
       block-creature-spawn: []
     player-damage:
