@@ -427,3 +427,4 @@ spec:
             iqn: iqn.2000-01.com.synology:seichi-cloud.k8s-static-pv--minecraft-server-data-mcserver--debug-s1-0
             lun: 0
             readOnly: false
+            fsType: ext4
