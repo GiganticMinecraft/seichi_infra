@@ -423,8 +423,10 @@ spec:
         # このボリュームに保存されたデータのライフサイクルに関する管理(バックアップリストアほか)はkubernetes上で管理されずNASに一任される
         - name: minecraft-server-data
           iscsi:
-            targetPortal: 192.168.16.240:3260
+            targetPortal: 192.168.16.240
             iqn: iqn.2000-01.com.synology:seichi-cloud.k8s-static-pv--minecraft-server-data-mcserver--debug-s1-0
             lun: 0
             readOnly: false
             fsType: ext4
+            chapAuthDiscovery: false
+            chapAuthSession: false
