@@ -425,7 +425,7 @@ spec:
           iscsi:
             targetPortal: 192.168.16.240
             iqn: iqn.2000-01.com.synology:seichi-cloud.k8s-static-pv--minecraft-server-data-mcserver--debug-s1-0
-            lun: 0
+            lun: 1
             readOnly: false
             fsType: ext4
             chapAuthDiscovery: false
