@@ -11,7 +11,7 @@ data:
 
     RELEASES=$(curl -s "https://api.github.com/repos/$owner/$repo/releases")
 
-    LATEST=$(echo $RELEASES | jq -r '.[] | select(.tag_name | startswith("v")) | .tag_name' | tail -n 1)
+    LATEST=$(echo $RELEASES | jq -r '.[] | select(.tag_name | startswith("v")) | .tag_name' | sort -V | tail -n 1)
 
     DOWNLOAD_URL=$(echo $RELEASES | jq -r --arg LATEST "$LATEST" '.[] | select(.tag_name == $LATEST) | .assets[0].browser_download_url')
 
