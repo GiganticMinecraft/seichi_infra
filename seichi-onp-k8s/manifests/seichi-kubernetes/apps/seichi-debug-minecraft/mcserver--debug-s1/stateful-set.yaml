@@ -65,7 +65,7 @@ spec:
           image: busybox:1.36.1
           volumeMounts:
             - name: seichiassist-downloader-volume
-              mountPath: /plugins
+              mountPath: /data/plugins
           command:
             - "chmod"
             - "+x"
