@@ -67,12 +67,8 @@ spec:
             - name: seichiassist-downloader-volume
               mountPath: /data/plugins
           command:
-            - "chmod"
-            - "+x"
-            - "/plugins/seichiassist-downloader.sh"
-            - "&&"
             - "sh"
-            - "/plugins/seichiassist-downloader.sh"
+            - "/data/plugins/seichiassist-downloader.sh"
 
       containers:
         - resources:
