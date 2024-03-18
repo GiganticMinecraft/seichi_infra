@@ -389,7 +389,7 @@ spec:
               mountPath: /plugins
 
             - name: seichiassist-downloader-volume
-              mountPath: /plugins
+              mountPath: /data/plugins
 
             # サーバーデータが格納されているディレクトリのマウント設定
             - name: minecraft-server-data
