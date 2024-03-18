@@ -65,8 +65,14 @@ spec:
           image: busybox:1.36.1
           volumeMounts:
             - name: seichiassist-downloader-volume
-              mountPath: /plugins
-          command: "chmod +x /plugins/seichiassist-downloader.sh && /plugins/seichiassist-downloader.sh"
+              mountPath: /data/plugins
+          command:
+            - "chmod"
+            - "+x"
+            - "/plugins/seichiassist-downloader.sh"
+            - "&&"
+            - "sh"
+            - "/plugins/seichiassist-downloader.sh"
 
       containers:
         - resources:
@@ -383,7 +389,7 @@ spec:
               mountPath: /plugins
 
             - name: seichiassist-downloader-volume
-              mountPath: /plugins
+              mountPath: /data/plugins
 
             # サーバーデータが格納されているディレクトリのマウント設定
             - name: minecraft-server-data
