@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
         - name: growi
-          image: weseek/growi:6
+          image: weseek/growi:7
           resources:
             requests:
-              cpu: 1
+              cpu: "1"
               memory: 1Gi
             limits:
-              cpu: 1
+              cpu: "1"
               memory: 1Gi
           env:
             - name: APP_SITE_URL
@@ -35,10 +35,6 @@ spec:
               value: "mongodb"
             - name: MATHJAX
               value: "1"
-            - name: HACKMD_URI
-              value: "https://hackmd.onp-k8s.admin.seichi.click"
-            - name: HACKMD_URI_FOR_SERVER
-              value: "http://hackmd:3000"
             - name: PASSWORD_SEED
               valueFrom:
                 secretKeyRef:
