@@ -280,6 +280,19 @@ resource "kubernetes_secret" "idea_reaction_discord_token" {
   }
 }
 
+resource "kubernetes_secret" "seichiassist_downloader_token" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichiassist-downloader-token"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    SEICHIASSIST_DOWNLOADER_TOKEN = var.seichiassist_downloader_token
+  }
+}
+
 resource "kubernetes_secret" "growi_github_sso" {
   depends_on = [kubernetes_namespace.growi_system]
 

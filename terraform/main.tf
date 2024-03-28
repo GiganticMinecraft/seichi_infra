@@ -349,3 +349,13 @@ variable "hackmd_mariadb_hackmd_db_url" {
 }
 
 #endregion
+
+#region env variables for seichiassist-downloader
+
+variable "seichiassist_downloader_token" {
+  description = "Publish endpoint token for seichiassist-downloader"
+  type        = string
+  sensitive   = true
+}
+
+#endregion

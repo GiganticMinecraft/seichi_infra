@@ -90,6 +90,11 @@ spec:
             external-hostname: gachadata.public-gigantic-api.seichi.click
             internal-authority: "gachadata-server.seichi-minecraft:80"
 
+          # seichiassist-downloaderにアクセスするためのエンドポイント。
+          - name: seichiassist-downloader
+            external-hostname: seichiassist-downloader.public-gigantic-api.seichi.click
+            internal-authority: "seichiassist-downloader.seichi-minecraft:80"
+
           # phpMyAdmin
           - name: phpmyadmin
             external-hostname: phpmyadmin.onp-k8s.admin.seichi.click

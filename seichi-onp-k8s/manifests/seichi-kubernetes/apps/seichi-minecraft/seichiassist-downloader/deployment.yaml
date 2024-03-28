@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seichiassist-downloader
+  namespace: seichi-minecraft
+  labels:
+    app: seichiassist-downloader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seichiassist-downloader
+  template:
+    metadata:
+      labels:
+        app: seichiassist-downloader
+    spec:
+      containers:
+        - name: seichiassist-downloader
+          image: ghcr.io/giganticminecraft/seichiassist-downloader:sha-7d9becf
+          resources:
+            # seichiassist-downloaderはSeichiAssistをビルドするのでメモリが多めにほしい
+            requests:
+              cpu: 1
+              memory: 4Gi
+            limits:
+              cpu: 1
+              memory: 4Gi
+          env:
+            - name: HTTP_PORT
+              value: "80"
+            # STABLE_BRANCHとDEVELOP_BRANCHは本来別のブランチにするべきだが、
+            # seichiassist-builderは1.18のビルド用に設計されているため、
+            # 一時的に1_18ブランチで固定する
+            # TODO: あとでブランチ名を直す
+            - name: STABLE_BRANCH
+              value: "1_18"
+            - name: DEVELOP_BRANCH
+              value: "1_18"
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: seichiassist-downloader-token
+                  key: SEICHIASSIST_DOWNLOADER_TOKEN
