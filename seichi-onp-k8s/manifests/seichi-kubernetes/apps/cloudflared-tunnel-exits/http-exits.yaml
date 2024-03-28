@@ -100,11 +100,6 @@ spec:
             external-hostname: wiki.onp-k8s.admin.seichi.click
             internal-authority: "growi.growi-system:3000"
 
-          # HackMD for Growi
-          - name: hackmd
-            external-hostname: hackmd.onp-k8s.admin.seichi.click
-            internal-authority: "hackmd.growi-system:3000"
-
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
