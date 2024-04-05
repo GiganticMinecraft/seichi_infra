@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: idea-reaction
-          image: ghcr.io/giganticminecraft/idea-reaction:5cde4585b95a74d65af850c59e74bb860e99ba72
+          image: ghcr.io/giganticminecraft/idea-reaction:v0.2.0
           resources:
             requests:
               cpu: 250m
