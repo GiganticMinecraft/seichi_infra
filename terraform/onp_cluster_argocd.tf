@@ -4,7 +4,7 @@ resource "helm_release" "onp_cluster_argocd" {
   chart      = "argo-cd"
   name       = "argocd"
   namespace  = "argocd"
-  version    = "6.7.2"
+  version    = "6.7.11"
 
   reset_values    = true
   recreate_pods   = true
