@@ -1,0 +1,133 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: seichiassist-downloader
+  namespace: seichi-minecraft
+spec:
+  dependencies:
+    - name: from-seichiassist-downloader
+      eventSourceName: seichiassist-downloader
+      eventName: SeichiAssistCreateReleaseEventSource
+      filters:
+        data:
+          - path: headers.X-Github-Event
+            type: string
+            value:
+              - release
+          - path: body.action
+            type: string
+            value:
+              - created
+          - path: body.release.target_commitish
+            type: string
+            # ここは本来masterブランチとdevelopブランチが指定されるべきだが、どちらのブランチも1.12用ビルドのため、
+            # 1.18のリリースになるまで1_18ブランチも追加する
+            # TODO: 1_18ブランチがマージされたら削除する
+            value:
+              - master
+              - develop
+              - 1_18
+  triggers:
+    - template:
+        name: seichiassist-release-trigger
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: github-
+              spec:
+                entrypoint: download-seichiassist
+                volumeClaimTemplates:
+                  - metadata:
+                      name: work
+                    spec:
+                      accessModes: ["ReadWriteOnce"]
+                      resources:
+                        requests:
+                          storage: 1Gi
+                arguments:
+                  parameters:
+                    - name: target-branch
+                    - name: seichiassist-download-url
+                templates:
+                  - name: main
+                    steps:
+                      - - name: download-seichiassist
+                          template: download-seichiassist
+                      - - name: upload-seichiassist
+                          template: upload-seichiassist
+                  - name: download-seichiassist
+                    inputs:
+                      parameters:
+                        - name: target-branch
+                        - name: seichiassist-download-url
+                    container:
+                      image: debian:bookworm-slim
+                      volumeMounts:
+                        - name: work
+                          mountPath: /work
+                      command:
+                        - "apt-get"
+                        - "update"
+                        - "&&"
+                        - "apt-get"
+                        - "install"
+                        - "-y"
+                        - "wget"
+                        - "&&"
+                        - "wget"
+                        - "{{ inputs.parameters.seichiassist-download-url }}"
+                  - name: upload-seichiassist
+                    inputs:
+                      parameters:
+                        - name: target-branch
+                        - name: seichiassist-download-url
+                        - name: minio-access-key
+                          valueFrom:
+                            secretKeyRef:
+                              name: minio-secrets
+                              key: MINIO_ACCESS_KEY
+                        - name: minio-access-secret
+                          valueFrom:
+                            secretKeyRef:
+                              name: minio-secrets
+                              key: MINIO_ACCESS_SECRET
+                    container:
+                      image: minio/mc:latest
+                      volumeMounts:
+                        - name: work
+                          mountPath: /work
+                      entrypoint: ["/bin/sh", "-c"]
+                      command:
+                        - "mc"
+                        - "alias"
+                        - "set"
+                        - "myminio"
+                        - "seichi-private-plugin-blackhole-minio.minio:9000"
+                        - "{{ inputs.parameters.minio-access-key }}"
+                        - "{{ inputs.parameters.minio-access-secret }}"
+                        - "&&"
+                        - "mc"
+                        - "cp"
+                        - "SeichiAssist.jar"
+                        - "myminio/seichiassist/{{ inputs.parameters.target-branch }}/SeichiAssist.jar"
+
+          parameters:
+            - src:
+                dependencyName: from-seichiassist-downloader
+                dataKey: body.release.target_commitish
+              dest: spec.arguments.parameters.0.value
+            - src:
+                dependencyName: from-seichiassist-downloader
+                dataKey: body.release.assets.browser_download_url
+              dest: spec.arguments.parameters.1.value
+            - src:
+                dependencyName: from-seichiassist-downloader
+                dataKey: body.tag_name
+              dest: metadata.name
+              operation: append
+      retryStrategy:
+        steps: 3

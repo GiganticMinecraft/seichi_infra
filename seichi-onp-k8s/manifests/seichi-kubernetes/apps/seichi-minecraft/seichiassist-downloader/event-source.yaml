@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: seichiassist-downloader
+  namespace: seichi-minecraft
+spec:
+  github:
+    SeichiAssistReleaseEventSource:
+      repositories:
+        - owner: GiganticMinecraft
+          names:
+            - SeichiAssist
+      webhook:
+        endpoint: /create-seichiassist-release
+        port: "12000"
+      events:
+        - "release"
