@@ -24,9 +24,9 @@ spec:
             # 1.18のリリースになるまで1_18ブランチも追加する
             # TODO: 1_18ブランチがマージされたら削除する
             value:
-              - master
-              - develop
-              - 1_18
+              - "master"
+              - "develop"
+              - "1_18"
   triggers:
     - template:
         name: seichiassist-release-trigger
