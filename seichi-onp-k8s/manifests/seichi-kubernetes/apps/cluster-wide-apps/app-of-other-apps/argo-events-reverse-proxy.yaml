@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: argo-events-reverse-proxy
+  namespace: argocd
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.26.0
+      volumeMounts:
+        - name: conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+  volumes:
+    - name: conf
+      configMap:
+        name: argo-events-reverse-proxy-config-map
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-events-reverse-proxy-config-map
+  namespace: argocd
+data:
+  nginx.conf: |
+    events {
+    }
+    http {
+      server {
+        listen 80;
+        location / {
+          if ($request_method !~ ^(POST)$ ) {
+            return 405;
+          }
+          proxy_pass http://argo-workflows-server.argo:2746;
+        }
+      }
+    }
