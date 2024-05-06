@@ -16,6 +16,10 @@ spec:
           restricted: false
           motd: ''
       {{- end }}
+        debug-s1:
+          address: mcserver--debug-s1.seichi-debug-minecraft:25565
+          restricted: false
+          motd: ''
 
       listeners:
         - priorities:
