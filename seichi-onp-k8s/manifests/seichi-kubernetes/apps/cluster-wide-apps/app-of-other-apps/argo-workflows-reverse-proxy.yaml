@@ -7,6 +7,9 @@ metadata:
   namespace: argocd
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: argo-workflows-reverse-proxy
   template:
     metadata:
       labels:
