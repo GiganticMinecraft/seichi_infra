@@ -34,6 +34,8 @@ metadata:
   namespace: argocd
 data:
   proxy.conf: |
+    server_names_hash_bucket_size 128;
+
     server {
       listen 80;
       server_name argo-workflows-webhook.onp-k8s.admin.seichi.click;
