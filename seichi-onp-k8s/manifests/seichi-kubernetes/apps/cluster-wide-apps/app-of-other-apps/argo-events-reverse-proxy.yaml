@@ -1,0 +1,39 @@
+# 外部から Argo Workflows を発火するためには Cloudflared を使えば機能的には問題がないが、
+# 任意のクライアントから GET を受け付けると面倒なので、POST だけに限定するためのリバースプロキシを挟む。
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: argo-workflows-reverse-proxy
+  namespace: argocd
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.26.0
+      volumeMounts:
+        - name: conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+  volumes:
+    - name: conf
+      configMap:
+        name: argo-workflows-reverse-proxy-config-map
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-workflows-reverse-proxy-config-map
+  namespace: argocd
+data:
+  nginx.conf: |
+    http {
+      server {
+        listen 80;
+        server_name argo-workflows-webhook.onp-k8s.admin.seichi.click;
+        location / {
+          if ($request_method !~ ^(POST)$ ) {
+            return 405;
+          }
+          proxy_pass http://argo-workflows-server.argo:2746;
+        }
+      }
+    }

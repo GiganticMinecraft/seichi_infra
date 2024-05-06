@@ -100,6 +100,11 @@ spec:
             external-hostname: wiki.onp-k8s.admin.seichi.click
             internal-authority: "growi.growi-system:3000"
 
+          # Argo Workflows に対する POST リクエストのみを受け付けるためのリバースプロキシ。
+          - name: argo-workflows-reverse-proxy
+            external-hostname: argo-workflows-webhook.onp-k8s.admin.seichi.click
+            internal-authority: "argo-workflows-reverse-proxy.argocd:80"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
