@@ -20,8 +20,8 @@ spec:
           image: nginx:1.26.0
           volumeMounts:
             - name: conf
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
+              mountPath: /etc/nginx/conf.d/proxy.conf
+              subPath: proxy.conf
       volumes:
         - name: conf
           configMap:
@@ -33,7 +33,7 @@ metadata:
   name: argo-workflows-reverse-proxy-config-map
   namespace: argocd
 data:
-  nginx.conf: |
+  proxy.conf: |
     http {
       server {
         listen 80;
