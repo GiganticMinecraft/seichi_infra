@@ -6,7 +6,7 @@ metadata:
   labels:
     app: mcserver--debug-s1
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: mcserver--debug-s1
