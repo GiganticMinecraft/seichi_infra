@@ -100,6 +100,11 @@ spec:
             external-hostname: wiki.onp-k8s.admin.seichi.click
             internal-authority: "growi.growi-system:3000"
 
+          # Argo Eventsのリバースプロキシ。
+          - name: argo-events-reverse-proxy
+            external-hostname: argo-workflows-reverse-proxy.onp-k8s.admin.seichi.click
+            internal-authority: "argo-events-reverse-proxy.argocd:80"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
