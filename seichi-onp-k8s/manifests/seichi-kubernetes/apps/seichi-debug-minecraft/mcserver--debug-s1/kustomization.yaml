@@ -10,4 +10,3 @@ resources:
   - "./ops-config.yaml"
   - "./multiverse-portals-config.yaml"
   - "./seichiassist-config.yaml"
-  - "./seichiassist-downloader.yaml"
