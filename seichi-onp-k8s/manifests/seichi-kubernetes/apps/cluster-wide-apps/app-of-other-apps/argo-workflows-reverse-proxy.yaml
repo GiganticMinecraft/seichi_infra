@@ -34,15 +34,13 @@ metadata:
   namespace: argocd
 data:
   proxy.conf: |
-    http {
-      server {
-        listen 80;
-        server_name argo-workflows-webhook.onp-k8s.admin.seichi.click;
-        location / {
-          if ($request_method !~ ^(POST)$ ) {
-            return 405;
-          }
-          proxy_pass http://argo-workflows-server.argo:2746;
+    server {
+      listen 80;
+      server_name argo-workflows-webhook.onp-k8s.admin.seichi.click;
+      location / {
+        limit_except POST {
+          deny all;
         }
+        proxy_pass http://argo-workflows-server.argo:2746;
       }
     }
