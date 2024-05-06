@@ -93,6 +93,7 @@ spec:
                 https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
                 https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
                 https://github.com/GiganticMinecraft/RandomTeleport/releases/download/for-1.18/RandomTeleport-1.0-SNAPSHOT.jar,
+                https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-2115-b65407b888913245342739ee07e2c5858c503ef9/SeichiAssist.jar,
 
             - name: JVM_OPTS
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
