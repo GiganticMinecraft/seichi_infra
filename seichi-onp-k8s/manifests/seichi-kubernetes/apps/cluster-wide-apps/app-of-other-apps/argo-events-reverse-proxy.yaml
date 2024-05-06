@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: Deployment
 metadata:
-  name: argo-events-reverse-proxy
+  name: argo-workflows-reverse-proxy
   namespace: argocd
 spec:
   containers:
@@ -16,12 +16,12 @@ spec:
   volumes:
     - name: conf
       configMap:
-        name: argo-events-reverse-proxy-config-map
+        name: argo-workflows-reverse-proxy-config-map
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: argo-events-reverse-proxy-config-map
+  name: argo-workflows-reverse-proxy-config-map
   namespace: argocd
 data:
   nginx.conf: |
