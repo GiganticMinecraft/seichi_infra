@@ -60,6 +60,6 @@ data:
         limit_except POST {
           deny all;
         }
-        proxy_pass http://argo-workflows-server.argo:2746;
+        proxy_pass http://argo-workflows-server.argo:12000;
       }
     }
