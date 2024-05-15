@@ -3,17 +3,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: argo-workflows-reverse-proxy
+  # 本来は argo-workflow-reverse-proxy という名前にしたいが、
+  # そうすると53文字を超えてしまい、エラーが発生するのでやむを得ず短縮している。
+  name: argo-wf-proxy
   namespace: argocd
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: argo-workflows-reverse-proxy
+      app: argo-wf-proxy
   template:
     metadata:
       labels:
-        app: argo-workflows-reverse-proxy
+        app: argo-wf-proxy
     spec:
       containers:
         - name: nginx
@@ -25,12 +27,12 @@ spec:
       volumes:
         - name: conf
           configMap:
-            name: argo-workflows-reverse-proxy-config-map
+            name: argo-wf-proxy-config-map
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: argo-workflows-reverse-proxy-config-map
+  name: argo-wf-proxy-config-map
   namespace: argocd
 data:
   proxy.conf: |
