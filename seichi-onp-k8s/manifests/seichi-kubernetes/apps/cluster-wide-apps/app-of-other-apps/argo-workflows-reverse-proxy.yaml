@@ -40,7 +40,7 @@ data:
 
     server {
       listen 80;
-      server_name argo-workflows-webhook.onp-k8s.admin.seichi.click;
+      server_name argo-wf-webhook.onp-k8s.admin.seichi.click;
       location / {
         limit_except POST {
           deny all;
