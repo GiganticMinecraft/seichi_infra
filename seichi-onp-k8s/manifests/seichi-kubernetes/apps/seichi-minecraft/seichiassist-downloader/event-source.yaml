@@ -12,6 +12,6 @@ spec:
             - SeichiAssist
       webhook:
         endpoint: /create-seichiassist-release
-        port: "80"
+        port: "12000"
       events:
         - "release"
