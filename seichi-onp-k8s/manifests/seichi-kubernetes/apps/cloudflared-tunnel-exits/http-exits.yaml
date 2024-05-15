@@ -101,9 +101,9 @@ spec:
             internal-authority: "growi.growi-system:3000"
 
           # Argo Workflows に対する POST リクエストのみを受け付けるためのリバースプロキシ。
-          - name: argo-workflows-reverse-proxy
-            external-hostname: argo-workflows-webhook.onp-k8s.admin.seichi.click
-            internal-authority: "argo-workflows-reverse-proxy.argocd:80"
+          - name: argo-wf-proxy
+            external-hostname: argo-wf-webhook.onp-k8s.admin.seichi.click
+            internal-authority: "argo-wf-proxy.argocd:80"
 
   template:
     metadata:
