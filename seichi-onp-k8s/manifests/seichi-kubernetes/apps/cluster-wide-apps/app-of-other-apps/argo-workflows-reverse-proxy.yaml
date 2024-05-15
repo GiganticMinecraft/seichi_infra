@@ -1,5 +1,20 @@
 # 外部から Argo Workflows を発火するためには Cloudflared を使えば機能的には問題がないが、
 # 任意のクライアントから GET を受け付けると面倒なので、POST だけに限定するためのリバースプロキシを挟む。
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-wf-proxy
+  namespace: argocd
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: argo-wf-proxy
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
