@@ -30,6 +30,21 @@ spec:
             name: argo-wf-proxy-config-map
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: argo-wf-proxy
+  namespace: argocd
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: argo-wf-proxy
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argo-wf-proxy-config-map
