@@ -349,3 +349,13 @@ variable "hackmd_mariadb_hackmd_db_url" {
 }
 
 #endregion
+
+# region env variables for ArgoEvents
+
+variable "argo_events_github_access_token" {
+  description = "ArgoEvents GitHub access token"
+  type        = string
+  sensitive   = true
+}
+
+# endregion

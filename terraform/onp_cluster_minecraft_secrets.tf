@@ -59,6 +59,22 @@ resource "kubernetes_secret" "onp_minecraft_prod_kagawa_secrets" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "argo_events_github_access_token" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "argo-events-github-access-token"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    # ref: https://github.com/argoproj/argo-events/blob/4636435578ae2396fa637e4ed44c2d2edbbec58b/examples/event-sources/github.yaml#L54
+    ARGO_EVENTS_GITHUB_ACCESS_TOKEN = base64encode(var.argo_events_github_access_token)
+  }
+
+  type = "Opaque"
+}
+
 resource "random_password" "minecraft__prod_mariadb_root_password" {
   length           = 16
   special          = true

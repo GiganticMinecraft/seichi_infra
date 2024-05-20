@@ -13,5 +13,10 @@ spec:
       webhook:
         endpoint: /create-seichiassist-release
         port: "12000"
+        method: POST
+        url: https://argo-wf-webhook.onp-k8s.admin.seichi.click
       events:
         - "release"
+      apiToken:
+        name: argo-events-github-access-token
+        key: ARGO_EVENTS_GITHUB_ACCESS_TOKEN
