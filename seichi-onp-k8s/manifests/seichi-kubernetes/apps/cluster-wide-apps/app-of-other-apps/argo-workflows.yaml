@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-workflows
+  namespace: argocd
+spec:
+  selector:
+    app: argo-workflows
+  ports:
+    - name: http
+      protocol: TCP
+      port: 12000
+      targetPort: 12000
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
