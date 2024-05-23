@@ -7,7 +7,7 @@ spec:
   selector:
     app: argo-workflows
   ports:
-    - name: http
+    - name: argo-workflows-webhook
       protocol: TCP
       port: 12000
       targetPort: 12000
