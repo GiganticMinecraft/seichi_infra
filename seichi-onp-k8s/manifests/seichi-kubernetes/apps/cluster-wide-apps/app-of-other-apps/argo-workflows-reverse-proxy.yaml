@@ -60,7 +60,7 @@ data:
         limit_except POST {
           deny all;
         }
-        proxy_pass http://argo-workflows.argo:12000;
+        proxy_pass http://argo-workflows-webhook-service:12000;
         proxy_request_buffering off;
       }
     }
