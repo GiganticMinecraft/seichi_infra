@@ -36,14 +36,6 @@
       "depNameTemplate": "itzg/minecraft-server",
       "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
       "datasourceTemplate": "docker"
-    },
-    {
-      "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/reloader/kustomization.yaml$"],
-      "matchStrings": [
-        "github\\.com/stakater/Reloader/deployments/kubernetes\\?ref=(?<currentValue>v[^&]+)&submodules=false"
-      ],
-      "depNameTemplate": "stakater/Reloader",
-      "datasourceTemplate": "github-tags"
     }
   ]
 }
