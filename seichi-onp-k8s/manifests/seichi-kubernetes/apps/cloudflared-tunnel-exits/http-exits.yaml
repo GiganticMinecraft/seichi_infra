@@ -103,7 +103,7 @@ spec:
           # Argo Workflows に対する POST リクエストのみを受け付けるためのリバースプロキシ。
           - name: argo-wf-proxy
             external-hostname: argo-wf-webhook.onp-k8s.admin.seichi.click
-            internal-authority: "argo-wf-proxy.argocd:80"
+            internal-authority: "argo-wf-proxy.argo:80"
 
   template:
     metadata:
