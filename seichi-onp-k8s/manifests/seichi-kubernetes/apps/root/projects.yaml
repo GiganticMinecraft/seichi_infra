@@ -26,6 +26,7 @@ spec:
     #  - argo-events
     #  - argo-workflows
     #  - local-path-storage
+    #  - argo
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: "kube-system"
@@ -47,6 +48,8 @@ spec:
     - namespace: "seichi-gateway-operator-system"
       server: https://kubernetes.default.svc
     - namespace: "local-path-storage"
+      server: https://kubernetes.default.svc
+    - namespace: "argo"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"
