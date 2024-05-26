@@ -1,3 +1,4 @@
+# ref: https://docs.cilium.io/en/latest/network/bgp-control-plane/
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumBGPPeeringPolicy
 metadata:
@@ -18,10 +19,10 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
-      eBGPMultihopTTL: 10
+      eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
+      holdTimeSeconds: 9
+      keepAliveTimeSeconds: 3
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -47,10 +48,10 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
-      eBGPMultihopTTL: 10
+      eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
+      holdTimeSeconds: 9
+      keepAliveTimeSeconds: 3
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -75,10 +76,10 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
-      eBGPMultihopTTL: 10
+      eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
+      holdTimeSeconds: 9
+      keepAliveTimeSeconds: 3
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -103,10 +104,10 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
-      eBGPMultihopTTL: 10
+      eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
+      holdTimeSeconds: 9
+      keepAliveTimeSeconds: 3
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -131,10 +132,10 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
-      eBGPMultihopTTL: 10
+      eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
+      holdTimeSeconds: 9
+      keepAliveTimeSeconds: 3
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -159,10 +160,10 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
-      eBGPMultihopTTL: 10
+      eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
+      holdTimeSeconds: 9
+      keepAliveTimeSeconds: 3
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
