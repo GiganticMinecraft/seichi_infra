@@ -21,8 +21,8 @@ spec:
       peerPort: 179
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 9
-      keepAliveTimeSeconds: 3
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -50,8 +50,8 @@ spec:
       peerPort: 179
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 9
-      keepAliveTimeSeconds: 3
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -78,8 +78,8 @@ spec:
       peerPort: 179
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 9
-      keepAliveTimeSeconds: 3
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -106,8 +106,8 @@ spec:
       peerPort: 179
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 9
-      keepAliveTimeSeconds: 3
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -134,8 +134,8 @@ spec:
       peerPort: 179
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 9
-      keepAliveTimeSeconds: 3
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
@@ -162,8 +162,8 @@ spec:
       peerPort: 179
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
-      holdTimeSeconds: 9
-      keepAliveTimeSeconds: 3
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
