@@ -2,7 +2,7 @@
 # For default values, see
 # https://raw.githubusercontent.com/argoproj/argo-helm/798c8107c3d0015b8cb93d565cf714c16848b3e8/charts/argocd-apps/values.yaml
 applications:
-  - name: argocd-root-app-of-apps
+  argocd-root-app-of-apps:
     namespace: argocd
     project: argocd-root
     source:
@@ -31,7 +31,7 @@ applications:
           maxDuration: 2m
 
 projects:
-  - name: argocd-root
+  argocd-root:
     namespace: argocd
     finalizers:
     - resources-finalizer.argocd.argoproj.io
