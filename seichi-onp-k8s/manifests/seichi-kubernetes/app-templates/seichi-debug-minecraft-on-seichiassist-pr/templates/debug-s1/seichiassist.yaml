@@ -43,7 +43,7 @@ spec:
             - "-c"
             - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-ac8ba5c
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-1c475f6
           env:
             - name: MINIO_ENDPOINT
               value: seichi-private-plugin-blackhole-minio.minio:9000
