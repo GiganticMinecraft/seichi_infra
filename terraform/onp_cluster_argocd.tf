@@ -1,10 +1,10 @@
 resource "helm_release" "onp_cluster_argocd" {
-  # https://github.com/argoproj/argo-helm/releases/tag/argo-cd-5.0.0
+  # https://github.com/argoproj/argo-helm/releases/tag/argo-cd-7.2.1
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
   name       = "argocd"
   namespace  = "argocd"
-  version    = "6.7.13"
+  version    = "7.2.1"
 
   reset_values    = true
   recreate_pods   = true
@@ -17,12 +17,12 @@ resource "helm_release" "onp_cluster_argocd" {
 }
 
 resource "helm_release" "onp_cluster_argo_apps" {
-  # https://github.com/argoproj/argo-helm/releases/tag/argo-apps-0.0.5
+  # https://github.com/argoproj/argo-helm/releases/tag/argocd-apps-2.0.0
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argocd-apps"
   name       = "argocd-apps"
   namespace  = "argocd"
-  version    = "1.6.2"
+  version    = "2.0.0"
 
   reset_values    = true
   recreate_pods   = true
