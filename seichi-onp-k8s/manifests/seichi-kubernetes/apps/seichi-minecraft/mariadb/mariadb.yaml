@@ -14,7 +14,7 @@ spec:
     name: mariadb
     key: mcserver-password
 
-  image: mariadb:10.11.7
+  image: mariadb:10.11.8
   imagePullPolicy: IfNotPresent
 
   port: 3306
