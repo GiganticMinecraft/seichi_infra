@@ -20,9 +20,6 @@ server:
     requests:
       cpu: 100m
       memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 192Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -77,9 +74,6 @@ configs:
 
 controller:
   resources:
-    limits:
-      cpu: 500m
-      memory: 1024Mi
     requests:
       cpu: 250m
       memory: 768Mi
@@ -98,9 +92,6 @@ dex:
           name: argo-workflows-sso
           key: client-secret
   resources:
-    limits:
-      cpu: 100m
-      memory: 192Mi
     requests:
       cpu: 50m
       memory: 128Mi
@@ -113,9 +104,6 @@ dex:
 
 redis:
   resources:
-    limits:
-      cpu: 200m
-      memory: 256Mi
     requests:
       cpu: 100m
       memory: 128Mi
@@ -154,9 +142,6 @@ applicationSet:
 
 notifications:
   resources:
-    limits:
-      cpu: 100m
-      memory: 64Mi
     requests:
       cpu: 100m
       memory: 64Mi
