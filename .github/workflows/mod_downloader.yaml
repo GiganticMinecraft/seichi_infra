@@ -21,7 +21,7 @@ jobs:
           go-version-file: 'docker-images/mod-downloader/go.mod'
           cache-dependency-path: 'docker-images/mod-downloader/go.sum'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
           version: v1.55
           working-directory: docker-images/mod-downloader
