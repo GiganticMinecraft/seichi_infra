@@ -83,7 +83,7 @@ jobs:
       - if: steps.should_build.outputs.should_build == 'true'
         name: Build (and push if on main)
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.build_context }}
           builder: ${{ steps.buildx.outputs.name }}
