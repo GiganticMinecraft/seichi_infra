@@ -6,12 +6,14 @@ metadata:
 spec:
   rootPasswordSecretKeyRef:
     name: mariadb
+    generate: false
     key: root-password
 
   database: seichiassist
   username: mcserver
   passwordSecretKeyRef:
     name: mariadb
+    generate: false
     key: mcserver-password
 
   image: mariadb:10.11.8
