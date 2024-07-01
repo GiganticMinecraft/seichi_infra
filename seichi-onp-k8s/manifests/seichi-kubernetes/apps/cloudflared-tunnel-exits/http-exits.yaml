@@ -95,11 +95,6 @@ spec:
             external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
             internal-authority: "phpmyadmin.seichi-minecraft:80"
 
-          # Growi
-          - name: growi
-            external-hostname: wiki.onp-k8s.admin.seichi.click
-            internal-authority: "growi.growi-system:3000"
-
           # Argo Workflows に対する POST リクエストのみを受け付けるためのリバースプロキシ。
           - name: argo-wf-proxy
             external-hostname: argo-wf-webhook.onp-k8s.admin.seichi.click
