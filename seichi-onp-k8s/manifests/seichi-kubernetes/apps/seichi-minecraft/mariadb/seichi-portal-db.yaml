@@ -19,6 +19,7 @@ metadata:
 spec:
   mariaDbRef:
     name: mariadb
+    waitForIt: true
   passwordSecretKeyRef:
     name: seichi-portal-db-credentials
     key: password
