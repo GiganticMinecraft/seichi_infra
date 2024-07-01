@@ -1,31 +1,31 @@
-# apiVersion: mariadb.mmontes.io/v1alpha1
-# kind: User
-# metadata:
-#   namespace: seichi-minecraft
-#   name: monitoring
-# spec:
-#   mariaDbRef:
-#     name: mariadb
-#   passwordSecretKeyRef:
-#     name: mariadb-monitoring-password
-#     key: monitoring-password
-#   # This field is immutable and defaults to 10
-#   maxUserConnections: 5
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-minecraft
+  name: monitoring
+spec:
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: mariadb-monitoring-password
+    key: monitoring-password
+  # This field is immutable and defaults to 10
+  maxUserConnections: 5
 
-# ---
-# apiVersion: mariadb.mmontes.io/v1alpha1
-# kind: Grant
-# metadata:
-#   namespace: seichi-minecraft
-#   name: monitoring
-# spec:
-#   mariaDbRef:
-#     name: mariadb
-#   privileges:
-#     - "SELECT"
-#     - "SHOW DATABASES"
-#     - "SHOW VIEW"
-#   database: "*"
-#   table: "*"
-#   username: "monitoring"
-#   grantOption: false
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: monitoring
+spec:
+  mariaDbRef:
+    name: mariadb
+  privileges:
+    - "SELECT"
+    - "SHOW DATABASES"
+    - "SHOW VIEW"
+  database: "*"
+  table: "*"
+  username: "monitoring"
+  grantOption: false
