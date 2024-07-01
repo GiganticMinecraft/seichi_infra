@@ -6,6 +6,7 @@ metadata:
 spec:
   mariaDbRef:
     name: mariadb
+    waitForIt: true
   passwordSecretKeyRef:
     name: mariadb-monitoring-password
     key: monitoring-password
