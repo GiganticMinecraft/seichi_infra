@@ -8,12 +8,17 @@ spec:
   source:
     chart: mariadb-operator
     repoURL: https://mariadb-operator.github.io/mariadb-operator
-    targetRevision: 0.25.0
+    targetRevision: 0.29.0
     helm:
       releaseName: mariadb-operator
       values: |
+        ha:
+          enabled: true
+          replicas: 3
         metrics:
           enabled: true
+          additionalLabels:
+            release: prometheus
         webhook:
           cert:
             certManager:
