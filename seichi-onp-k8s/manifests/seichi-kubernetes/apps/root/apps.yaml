@@ -38,6 +38,12 @@ spec:
             duration: 5s
             factor: 2
             maxDuration: 2m
+      # CSI DriverのリソースとArgoCDが競合するので暫定対応 ref. https://github.com/argoproj/argo-cd/issues/13585
+      ignoreDifferences:
+        - group: storage.k8s.io
+          kind: CSIDriver
+          jqPathExpressions:
+            - .spec.seLinuxMount
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
