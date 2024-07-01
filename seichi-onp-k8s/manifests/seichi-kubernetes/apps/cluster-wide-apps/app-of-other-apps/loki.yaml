@@ -75,3 +75,10 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: loki
+      namespace: monitoring
+      jsonPointers:
+        - /spec/volumeClaimTemplates
