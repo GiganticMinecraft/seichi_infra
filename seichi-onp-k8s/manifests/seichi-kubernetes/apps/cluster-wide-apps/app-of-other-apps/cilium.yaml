@@ -83,3 +83,16 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+  ignoreDifferences:
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: cilium-agent
+      namespace: kube-system
+      jsonPointers:
+        - /spec/endpoints/0/relabelings
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: hubble
+      namespace: kube-system
+      jsonPointers:
+        - /spec/endpoints/0/relabelings
