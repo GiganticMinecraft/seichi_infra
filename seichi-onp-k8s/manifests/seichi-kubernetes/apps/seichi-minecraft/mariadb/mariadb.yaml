@@ -1,74 +1,81 @@
-# apiVersion: mariadb.mmontes.io/v1alpha1
-# kind: MariaDB
-# metadata:
-#   namespace: seichi-minecraft
-#   name: mariadb
-# spec:
-#   rootPasswordSecretKeyRef:
-#     name: mariadb
-#     key: root-password
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  namespace: seichi-minecraft
+  name: mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb
+    key: root-password
 
-#   database: seichiassist
-#   username: mcserver
-#   passwordSecretKeyRef:
-#     name: mariadb
-#     key: mcserver-password
+  database: seichiassist
+  username: mcserver
+  passwordSecretKeyRef:
+    name: mariadb
+    key: mcserver-password
 
-#   image: mariadb:10.11.7
-#   imagePullPolicy: IfNotPresent
+  image: mariadb:10.11.8
+  imagePullPolicy: IfNotPresent
 
-#   port: 3306
+  port: 3306
 
-#   volumeClaimTemplate:
-#     resources:
-#       requests:
-#         storage: 100Gi
-#     storageClassName: synology-iscsi-storage
-#     accessModes:
-#       - ReadWriteOnce
+  storage:
+    size: 100Gi
+    storageClassName: synology-iscsi-storage
+    resizeInUseVolumes: true
+    waitForVolumeResize: true
 
-#   myCnf: |
-#     [mariadb]
-#     innodb_buffer_pool_size = 1G
-#     innodb_log_file_size = 256M
-#     innodb_flush_log_at_trx_commit = 2
-#     innodb_write_io_threads = 8
-#     innodb_io_capacity = 1000
-#     innodb_io_capacity_max = 3000
-#     max_allowed_packet = 256M
+  myCnf: |
+    [mariadb]
+    innodb_buffer_pool_size = 1G
+    innodb_log_file_size = 256M
+    innodb_flush_log_at_trx_commit = 2
+    innodb_write_io_threads = 8
+    innodb_io_capacity = 1000
+    innodb_io_capacity_max = 3000
+    max_allowed_packet = 256M
 
-#   livenessProbe:
-#     exec:
-#       command:
-#         - bash
-#         - -c
-#         - mysql -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
-#     initialDelaySeconds: 20
-#     periodSeconds: 10
-#     timeoutSeconds: 5
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+  #   limits:
+  #     memory: 1Gi
 
-#   readinessProbe:
-#     exec:
-#       command:
-#         - bash
-#         - -c
-#         - mysql -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
-#     initialDelaySeconds: 20
-#     periodSeconds: 10
-#     timeoutSeconds: 5
+  env:
+    - name: TZ
+      value: SYSTEM
 
-#   metrics:
-#     enabled: true
-#     exporter:
-#       image: prom/mysqld-exporter:v0.15.1
-#       resources:
-#         requests:
-#           cpu: 300m
-#           memory: 512Mi
-#         limits:
-#           cpu: 300m
-#           memory: 512Mi
-#     serviceMonitor:
-#       prometheusRelease: prometheus
-#       interval: 10s
-#       scrapeTimeout: 10s
+  podSecurityContext:
+    runAsUser: 0
+
+  securityContext:
+    allowPrivilegeEscalation: false
+
+  livenessProbe:
+    exec:
+      command:
+        - bash
+        - -c
+        - mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 5
+
+  readinessProbe:
+    exec:
+      command:
+        - bash
+        - -c
+        - mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 5
+
+  updateStrategy:
+    type: ReplicasFirstPrimaryLast
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      prometheusRelease: prometheus

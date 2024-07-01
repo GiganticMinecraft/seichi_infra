@@ -10,43 +10,43 @@ spec:
       encoding: "hex"
       length: "32"
 
-# ---
-# apiVersion: mariadb.mmontes.io/v1alpha1
-# kind: User
-# metadata:
-#   namespace: seichi-minecraft
-#   name: seichi-portal
-# spec:
-#   mariaDbRef:
-#     name: mariadb
-#   passwordSecretKeyRef:
-#     name: seichi-portal-db-credentials
-#     key: password
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal
+spec:
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: seichi-portal-db-credentials
+    key: password
 
-# ---
-# apiVersion: mariadb.mmontes.io/v1alpha1
-# kind: Database
-# metadata:
-#   namespace: seichi-minecraft
-#   name: seichi-portal
-# spec:
-#   mariaDbRef:
-#     name: mariadb
-#   characterSet: utf8mb4
-#   collate: utf8mb4_general_ci
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal
+spec:
+  mariaDbRef:
+    name: mariadb
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
 
-# ---
-# apiVersion: mariadb.mmontes.io/v1alpha1
-# kind: Grant
-# metadata:
-#   namespace: seichi-minecraft
-#   name: seichi-portal
-# spec:
-#   mariaDbRef:
-#     name: mariadb
-#   privileges:
-#     - "ALL"
-#   database: "seichi-portal"
-#   table: "*"
-#   username: "seichi-portal"
-#   grantOption: false
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: seichi-portal
+spec:
+  mariaDbRef:
+    name: mariadb
+  privileges:
+    - "ALL"
+  database: "seichi-portal"
+  table: "*"
+  username: "seichi-portal"
+  grantOption: false
