@@ -19,10 +19,6 @@ spec:
           enabled: true
           additionalLabels:
             release: prometheus
-        webhook:
-          cert:
-            certManager:
-              enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: mariadb-operator
