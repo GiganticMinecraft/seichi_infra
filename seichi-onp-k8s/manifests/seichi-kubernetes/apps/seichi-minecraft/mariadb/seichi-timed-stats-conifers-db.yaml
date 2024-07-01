@@ -34,6 +34,7 @@ metadata:
 spec:
   mariaDbRef:
     name: mariadb
+    waitForIt: true
   characterSet: utf8mb4
   collate: utf8mb4_general_ci
 
@@ -46,6 +47,7 @@ metadata:
 spec:
   mariaDbRef:
     name: mariadb
+    waitForIt: true
   privileges:
     - "ALL"
   database: "seichi-timed-stats-conifers"

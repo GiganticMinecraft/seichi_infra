@@ -21,6 +21,7 @@ metadata:
 spec:
   mariaDbRef:
     name: mariadb
+    waitForIt: true
   privileges:
     - "SELECT"
     - "SHOW DATABASES"
