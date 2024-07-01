@@ -10,45 +10,45 @@ spec:
       encoding: "hex"
       length: "32"
 
----
-apiVersion: mariadb.mmontes.io/v1alpha1
-kind: User
-metadata:
-  namespace: seichi-minecraft
-  name: seichi-timed-stats-conifers
-spec:
-  mariaDbRef:
-    name: mariadb
-  passwordSecretKeyRef:
-    name: seichi-timed-stats-conifers-db-credentials
-    key: password
-  # This field is immutable and defaults to 10
-  maxUserConnections: 20
+# ---
+# apiVersion: mariadb.mmontes.io/v1alpha1
+# kind: User
+# metadata:
+#   namespace: seichi-minecraft
+#   name: seichi-timed-stats-conifers
+# spec:
+#   mariaDbRef:
+#     name: mariadb
+#   passwordSecretKeyRef:
+#     name: seichi-timed-stats-conifers-db-credentials
+#     key: password
+#   # This field is immutable and defaults to 10
+#   maxUserConnections: 20
 
----
-apiVersion: mariadb.mmontes.io/v1alpha1
-kind: Database
-metadata:
-  namespace: seichi-minecraft
-  name: seichi-timed-stats-conifers
-spec:
-  mariaDbRef:
-    name: mariadb
-  characterSet: utf8mb4
-  collate: utf8mb4_general_ci
+# ---
+# apiVersion: mariadb.mmontes.io/v1alpha1
+# kind: Database
+# metadata:
+#   namespace: seichi-minecraft
+#   name: seichi-timed-stats-conifers
+# spec:
+#   mariaDbRef:
+#     name: mariadb
+#   characterSet: utf8mb4
+#   collate: utf8mb4_general_ci
 
----
-apiVersion: mariadb.mmontes.io/v1alpha1
-kind: Grant
-metadata:
-  namespace: seichi-minecraft
-  name: seichi-timed-stats-conifers
-spec:
-  mariaDbRef:
-    name: mariadb
-  privileges:
-    - "ALL"
-  database: "seichi-timed-stats-conifers"
-  table: "*"
-  username: "seichi-timed-stats-conifers"
-  grantOption: false
+# ---
+# apiVersion: mariadb.mmontes.io/v1alpha1
+# kind: Grant
+# metadata:
+#   namespace: seichi-minecraft
+#   name: seichi-timed-stats-conifers
+# spec:
+#   mariaDbRef:
+#     name: mariadb
+#   privileges:
+#     - "ALL"
+#   database: "seichi-timed-stats-conifers"
+#   table: "*"
+#   username: "seichi-timed-stats-conifers"
+#   grantOption: false
