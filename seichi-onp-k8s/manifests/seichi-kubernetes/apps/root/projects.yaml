@@ -178,24 +178,3 @@ spec:
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
----
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: growi-system
-  namespace: argocd
-spec:
-  description: The project of Growi
-  sourceRepos:
-    - "*"
-  destinations:
-    - namespace: growi-system
-      server: https://kubernetes.default.svc
-    # Application 及び ApplicationSet リソースは
-    # argocd namespace に置かないとArgoCDに認識されないため、
-    # argocd namespace へのデプロイも許可する。
-    - namespace: argocd
-      server: https://kubernetes.default.svc
-  clusterResourceWhitelist:
-    - group: "*"
-      kind: "*"

@@ -316,40 +316,6 @@ variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
 
 #endregion
 
-#region env variables for Growi
-
-variable "growi_github_sso_client_id" {
-  description = "GitHub SSO client id for Growi"
-  type        = string
-  sensitive   = true
-}
-
-variable "growi_github_sso_client_secret" {
-  description = "GitHub SSO client id for Growi"
-  type        = string
-  sensitive   = true
-}
-
-variable "hackmd_mariadb_root_password" {
-  description = "HackMD MariaDB root password for Growi"
-  type        = string
-  sensitive   = true
-}
-
-variable "hackmd_mariadb_hackmd_password" {
-  description = "HackMD MariaDB hackmd password for Growi"
-  type        = string
-  sensitive   = true
-}
-
-variable "hackmd_mariadb_hackmd_db_url" {
-  description = "HackMD MariaDB hackmd DB URL for Growi"
-  type        = string
-  sensitive   = true
-}
-
-#endregion
-
 # region env variables for ArgoEvents
 
 variable "argo_events_github_access_token" {

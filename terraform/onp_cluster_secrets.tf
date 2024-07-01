@@ -279,36 +279,3 @@ resource "kubernetes_secret" "idea_reaction_discord_token" {
     IDEA_REACTION_DISCORD_TOKEN = var.minecraft__idea_reaction_discord_token
   }
 }
-
-resource "kubernetes_secret" "growi_github_sso" {
-  depends_on = [kubernetes_namespace.growi_system]
-
-  metadata {
-    name      = "growi-github-sso"
-    namespace = "growi-system"
-  }
-
-  data = {
-    "OAUTH_GITHUB_CLIENT_ID"     = var.growi_github_sso_client_id
-    "OAUTH_GITHUB_CLIENT_SECRET" = var.growi_github_sso_client_secret
-  }
-
-  type = "Opaque"
-}
-
-resource "kubernetes_secret" "hackmd_mariadb" {
-  depends_on = [kubernetes_namespace.growi_system]
-
-  metadata {
-    name      = "hackmd-mariadb"
-    namespace = "growi-system"
-  }
-
-  data = {
-    root-password   = var.hackmd_mariadb_root_password
-    hackmd-password = var.hackmd_mariadb_hackmd_password
-    db-url          = var.hackmd_mariadb_hackmd_db_url
-  }
-
-  type = "Opaque"
-}
