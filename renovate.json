@@ -9,6 +9,13 @@
       "managers": ["gomod"],
       "packageNames": ["go"],
       "supportPolicy": ["active"]
+    },
+    {
+      "managers": ["terraform"],
+      "matchPackagePatterns": ["*"],
+      "groupName": "terraform packages",
+      "enabled": true,
+      "schedule": ["at any time"]
     }
   ],
   "postUpdateOptions": [
@@ -37,5 +44,11 @@
       "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
       "datasourceTemplate": "docker"
     }
-  ]
+  ],
+  "terraform": {
+    "enabled": true,
+    "fileMatch": [
+      "^terraform/.*\\.tf$"
+    ]
+  }
 }
