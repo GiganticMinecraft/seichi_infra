@@ -46,6 +46,9 @@
     }
   ],
   "terraform": {
-    "enabled": true
+    "enabled": true,
+    "fileMatch": [
+      "^terraform/.*\\.tf$"
+    ]
   }
 }
