@@ -16,8 +16,9 @@ spec:
         app: idea-reaction
     spec:
       containers:
+        # https://github.com/GiganticMinecraft/idea-reaction/releases/tag/v0.2.3
         - name: idea-reaction
-          image: ghcr.io/giganticminecraft/idea-reaction:v0.2.1
+          image: ghcr.io/giganticminecraft/idea-reaction:v0.2.3
           resources:
             requests:
               cpu: 250m
@@ -25,9 +26,6 @@ spec:
             limits:
               cpu: 500m
               memory: 32Mi
-          volumeMounts:
-            - name: idea-reaction-config-volume
-              mountPath: /home/idea-reaction/assets/config.yaml
           env:
             - name: TARGET_CHANNEL_ID
               value: "959292335177486367"
@@ -41,7 +39,3 @@ spec:
                 secretKeyRef:
                   name: idea-reaction-discord-token
                   key: IDEA_REACTION_DISCORD_TOKEN
-      volumes:
-        - name: idea-reaction-config-volume
-          configMap:
-            name: idea-reaction-config
