@@ -6,4 +6,3 @@ resources:
   - "./jmx-exporter-config.yaml"
   - "./mcserver-configs.yaml"
   - "./plugin-configs.yaml"
-  - "./idea-reaction-config.yaml"
