@@ -34,5 +34,11 @@ data:
         "name": "rito_5289",
         "level": 4,
         "bypassesPlayerLimit": false
+      },
+      {
+        "uuid": "bb991c6b-aafb-405c-b2af-57cd5828962d",
+        "name": "m1sk9",
+        "level": 4,
+        "bypassesPlayerLimit": false
       }
     ]
