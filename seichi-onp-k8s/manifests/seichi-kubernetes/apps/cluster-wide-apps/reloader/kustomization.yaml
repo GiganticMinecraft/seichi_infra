@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: cluster-wide-apps
 resources:
   # reloader
-  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.0.118
+  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.0.119
