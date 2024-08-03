@@ -4,6 +4,7 @@ metadata:
   name: seichiassist-downloader
   namespace: seichi-minecraft
 spec:
+  eventBusName: seichiassist-downloader
   github:
     SeichiAssistReleaseEventSource:
       repositories:
