@@ -18,6 +18,23 @@ spec:
             # Backstageのバージョン自体はHelmで管理されてないので自分で更新する必要がある
             tag: 1.29.2
             pullPolicy: IfNotPresent
+          appConfig:
+            app:
+              baseUrl: https://backstage.onp-k8s.admin.seichi.click
+            organization:
+              name: GiganticMinecraft
+            auth:
+              environment: development
+              providers:
+                github:
+                  development:
+                    clientId: ${AUTH_GITHUB_CLIENT_ID}
+                    clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+                    signIn:
+                      resolvers:
+                        # Matches the GitHub username with the Backstage user entity name.
+                        # See https://backstage.io/docs/auth/github/provider#resolvers for more resolvers.
+                        - resolver: usernameMatchingUserEntityName
         # -- PostgreSQL [chart configuration](https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml)
         # @default -- See below
         postgresql:
