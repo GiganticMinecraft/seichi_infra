@@ -21,6 +21,8 @@ spec:
           appConfig:
             app:
               baseUrl: https://backstage.onp-k8s.admin.seichi.click
+            backend:
+              baseUrl: https://backstage.onp-k8s.admin.seichi.click
             organization:
               name: GiganticMinecraft
             auth:
