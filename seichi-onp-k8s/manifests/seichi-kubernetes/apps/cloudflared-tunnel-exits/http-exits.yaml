@@ -100,6 +100,11 @@ spec:
             external-hostname: argo-wf-webhook.onp-k8s.admin.seichi.click
             internal-authority: "argo-wf-proxy.argo:80"
 
+          # k8s 上の Backstage
+          - name: backstage
+            external-hostname: backstage.onp-k8s.admin.seichi.click
+            internal-authority: "backstage.backstage:7007"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"

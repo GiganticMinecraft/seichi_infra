@@ -131,6 +131,41 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   type = "Opaque"
 }
 
+resource "random_password" "backstage_admin_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "random_password" "backstage_user_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "random_password" "backstage_replication_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "kubernetes_secret" "backstage_postgres_password" {
+  depends_on = [kubernetes_namespace.backstage]
+
+  metadata {
+    name      = "postgres-password"
+    namespace = "backstage"
+  }
+
+  data = {
+    "admin-password"     = random_password.backstage_admin_password.result
+    "user-password" = random_password.backstage_user_password.result
+    "replication-password" = random_password.backstage_replication_password.result
+  }
+
+  type = "Opaque"
+}
+
 resource "helm_release" "onp_minecraft_debug_minio_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
 
