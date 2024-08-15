@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backstage
+  namespace: argocd
+spec:
+  project: backstage
+  source:
+    chart: backstage
+    repoURL: https://backstage.github.io/charts
+    targetRevision: 1.9.5
+    helm:
+      releaseName: backstage
+      values: |
+        backstage:
+          replicas: 1
+          image:
+            # Backstageのバージョン自体はHelmで管理されてないので自分で更新する必要がある
+            tag: 1.29.2
+            pullPolicy: IfNotPresent
+        # -- PostgreSQL [chart configuration](https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml)
+        # @default -- See below
+        postgresql:
+          enabled: true
+          existingSecret: postgres-password
+          auth:
+            username: bn_backstage
+            secretKeys:
+              adminPasswordKey: admin-password
+              userPasswordKey: user-password
+              replicationPasswordKey: replication-password
+          architecture: replication
+        metrics:
+          serviceMonitor:
+            enabled: true
+            labels:
+              release: prometheus
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backstage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

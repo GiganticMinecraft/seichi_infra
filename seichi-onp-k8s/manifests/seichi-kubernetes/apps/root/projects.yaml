@@ -178,3 +178,24 @@ spec:
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: backstage
+  namespace: argocd
+spec:
+  description: The project of production minecraft system for the seichi-network
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: backstage
+      server: https://kubernetes.default.svc
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
