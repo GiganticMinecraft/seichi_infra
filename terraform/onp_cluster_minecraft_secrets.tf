@@ -158,8 +158,8 @@ resource "kubernetes_secret" "backstage_postgres_password" {
   }
 
   data = {
-    "admin-password"     = random_password.backstage_admin_password.result
-    "user-password" = random_password.backstage_user_password.result
+    "admin-password"       = random_password.backstage_admin_password.result
+    "user-password"        = random_password.backstage_user_password.result
     "replication-password" = random_password.backstage_replication_password.result
   }
 
