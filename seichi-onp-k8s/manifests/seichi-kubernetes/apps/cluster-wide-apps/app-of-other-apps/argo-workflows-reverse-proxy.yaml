@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:1.27.0
+          image: nginx:1.27.1
           volumeMounts:
             - name: conf
               mountPath: /etc/nginx/conf.d/proxy.conf
