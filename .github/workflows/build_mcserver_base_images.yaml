@@ -17,7 +17,7 @@ jobs:
       matrix:
         include:
           # mcserver_base_image_tag / mcserver_base_image_digest:
-          #   itzg/minecraft-server のタグと digest 値。
+          #   itzg/minecraft-server のタグと digest 値。（digest 値は、linux/amd64 の Manifest Digest を記載する。Index Digest ではない）
           #   これらの値は renovate によって更新したいため、
           #     mcserver_base_image_tag / mcserver_base_image_digest そのものをリネームする必要があれば、
           #     renovate.json も見直すこと。
