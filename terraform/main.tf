@@ -298,6 +298,12 @@ variable "minecraft__idea_reaction_discord_token" {
   sensitive   = true
 }
 
+variable "minecraft__idea_reaction_redmine_api_key" {
+  description = "Redmine API Key set to the production idea-reaction"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region env variables for Cloudflare Pages projects

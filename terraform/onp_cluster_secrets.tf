@@ -279,3 +279,16 @@ resource "kubernetes_secret" "idea_reaction_discord_token" {
     IDEA_REACTION_DISCORD_TOKEN = var.minecraft__idea_reaction_discord_token
   }
 }
+
+resource "kubernetes_secret" "idea_reaction_redmine_api_key" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "idea-reaction-redmine-api-key"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    IDEA_REACTION_REDMINE_API_KEY = var.minecraft__idea_reaction_redmine_api_key
+  }
+}
