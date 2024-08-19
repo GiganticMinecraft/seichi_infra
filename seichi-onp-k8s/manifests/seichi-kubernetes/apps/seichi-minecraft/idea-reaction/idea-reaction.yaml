@@ -18,7 +18,7 @@ spec:
       containers:
         # https://github.com/GiganticMinecraft/idea-reaction/releases/tag/v0.3.0
         - name: idea-reaction
-          image: ghcr.io/giganticminecraft/idea-reaction:v0.3.0
+          image: ghcr.io/giganticminecraft/idea-reaction:v0.3.1
           resources:
             requests:
               cpu: 250m
