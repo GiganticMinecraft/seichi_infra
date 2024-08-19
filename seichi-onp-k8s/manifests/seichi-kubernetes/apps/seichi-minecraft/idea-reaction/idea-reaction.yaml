@@ -16,9 +16,9 @@ spec:
         app: idea-reaction
     spec:
       containers:
-        # https://github.com/GiganticMinecraft/idea-reaction/releases/tag/v0.2.3
+        # https://github.com/GiganticMinecraft/idea-reaction/releases/tag/v0.3.0
         - name: idea-reaction
-          image: ghcr.io/giganticminecraft/idea-reaction:v0.2.3
+          image: ghcr.io/giganticminecraft/idea-reaction:v0.3.0
           resources:
             requests:
               cpu: 250m
@@ -34,8 +34,15 @@ spec:
               value: "959307225413845072"
             - name: TARGET_GUILD_ID
               value: "237758724121427969"
+            - name: REDMINE_URL
+              value: "https://redmine.seichi.click"
             - name: DISCORD_API_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: idea-reaction-discord-token
                   key: IDEA_REACTION_DISCORD_TOKEN
+            - name: REDMINE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: idea-reaction-redmine-api-key
+                  key: IDEA_REACTION_REDMINE_API_KEY
