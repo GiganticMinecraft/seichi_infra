@@ -8,7 +8,7 @@ spec:
   source:
     chart: backstage
     repoURL: https://backstage.github.io/charts
-    targetRevision: 1.9.5
+    targetRevision: 1.9.6
     helm:
       releaseName: backstage
       values: |
