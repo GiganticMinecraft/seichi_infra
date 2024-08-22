@@ -3,8 +3,6 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: "lb-pool"
 spec:
-  blocks:
+  cidrs:
   # 10.96.0.0-10.96.3.255 をloadBalancerのIPに割当可能
   - cidr: "10.96.0.0/22"
-  # allowFirstLastIPs デフォルトの挙動が no -> yes になったので注意
-  allowFirstLastIPs: yes
