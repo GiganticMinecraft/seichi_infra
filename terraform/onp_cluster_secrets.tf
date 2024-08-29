@@ -292,3 +292,16 @@ resource "kubernetes_secret" "idea_reaction_redmine_api_key" {
     IDEA_REACTION_REDMINE_API_KEY = var.minecraft__idea_reaction_redmine_api_key
   }
 }
+
+resource "kubernetes_secret" "babyrite_discord_token" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "babyrite-discord-token"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    BABYRITE_DISCORD_TOKEN = var.minecraft__babyrite_discord_token
+  }
+}
