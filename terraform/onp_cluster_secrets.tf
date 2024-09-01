@@ -302,6 +302,6 @@ resource "kubernetes_secret" "babyrite_discord_token" {
   }
 
   data = {
-    BABYRITE_DISCORD_TOKEN = var.minecraft__babyrite_discord_token
+    BABYRITE_DISCORD_TOKEN = var.discord_bot__babyrite_discord_token
   }
 }
