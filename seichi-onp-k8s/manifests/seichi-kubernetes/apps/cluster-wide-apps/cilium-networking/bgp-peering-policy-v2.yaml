@@ -111,8 +111,6 @@ kind: CiliumBGPPeerConfig
 metadata:
   name: common-peer-config
 spec:
-  peerPort: 179
-  eBGPMultihopTTL: 1
   timers:
     connectRetryTimeSeconds: 120
     holdTimeSeconds: 90
@@ -140,7 +138,7 @@ metadata:
     advertise: podcidr
 spec:
   advertisements:
-    - advertisementType: PodCIDR
+    - advertisementType: "PodCIDR"
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumBGPAdvertisement
@@ -150,8 +148,8 @@ metadata:
     advertise: service
 spec:
   advertisements:
-    - advertisementType: Service
+    - advertisementType: "Service"
       service:
         addresses:
-          - LoadBalancerIP
           - ClusterIP
+          - LoadBalancerIP
