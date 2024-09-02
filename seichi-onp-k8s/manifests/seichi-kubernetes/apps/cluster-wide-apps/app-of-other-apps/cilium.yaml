@@ -8,7 +8,7 @@ spec:
   source:
     chart: cilium
     repoURL: https://helm.cilium.io/
-    targetRevision: 1.16.1
+    targetRevision: 1.15.7
     helm:
       releaseName: cilium
       values: |
@@ -23,14 +23,9 @@ spec:
           algorithm: maglev
         routingMode: native
         bpf:
-          datapathMode: netkit
           masquerade: true
-        bandwidthManager:
-          enabled: true
-          bbr: true
         ipv4:
           enabled: true
-        enableIPv4BIGTCP: true
         ipv4NativeRoutingCIDR: "10.96.128.0/18" # modify it if necessary
         ipam:
           operator:
