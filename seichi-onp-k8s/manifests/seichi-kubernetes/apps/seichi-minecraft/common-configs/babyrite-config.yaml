@@ -1,0 +1,12 @@
+# babyrite Config
+# This file is used to configure babyrite.
+# You can change the settings here to customize babyrite's behavior.
+# For more information, see the babyrite documentation at https://babyrite.m1sk9.dev/configuration.html
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: babyrite-config
+data:
+  config.yaml: |
+    bypass_guilds: false

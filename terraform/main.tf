@@ -304,6 +304,12 @@ variable "minecraft__idea_reaction_redmine_api_key" {
   sensitive   = true
 }
 
+variable "discord_bot__babyrite_discord_token" {
+  description = "Token set to the production babyrite"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region env variables for Cloudflare Pages projects
