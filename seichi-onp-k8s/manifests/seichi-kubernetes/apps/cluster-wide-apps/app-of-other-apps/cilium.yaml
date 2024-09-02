@@ -38,6 +38,8 @@ spec:
             clusterPoolIPv4PodCIDRList: ["10.96.128.0/18"] # modify it if necessary
             # -- IPv4 CIDR mask size to delegate to individual nodes for IPAM.
             clusterPoolIPv4MaskSize: 24
+        envoy:
+          enabled: false
         hubble:
           enabled: true
           metrics:
@@ -64,6 +66,7 @@ spec:
                 kind: ClusterIssuer
                 name: ca-issuer
         operator:
+          rollOutPods: true
           prometheus:
             enabled: true
             serviceMonitor:
