@@ -16,7 +16,7 @@ spec:
       matchExpressions:
          - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
-    - peerAddress: "192.168.3.254/32"
+    - peerAddress: "192.168.3.254"
       peerASN: 65184
       peerPort: 179
       eBGPMultihopTTL: 1
@@ -45,7 +45,7 @@ spec:
       matchExpressions:
          - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
-    - peerAddress: "192.168.3.254/32"
+    - peerAddress: "192.168.3.254"
       peerASN: 65184
       peerPort: 179
       eBGPMultihopTTL: 1
@@ -73,7 +73,7 @@ spec:
       matchExpressions:
          - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
-    - peerAddress: "192.168.3.254/32"
+    - peerAddress: "192.168.3.254"
       peerASN: 65184
       peerPort: 179
       eBGPMultihopTTL: 1
@@ -101,7 +101,7 @@ spec:
       matchExpressions:
          - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
-    - peerAddress: "192.168.3.254/32"
+    - peerAddress: "192.168.3.254"
       peerASN: 65184
       peerPort: 179
       eBGPMultihopTTL: 1
@@ -129,7 +129,7 @@ spec:
       matchExpressions:
          - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
-    - peerAddress: "192.168.3.254/32"
+    - peerAddress: "192.168.3.254"
       peerASN: 65184
       peerPort: 179
       eBGPMultihopTTL: 1
@@ -157,7 +157,7 @@ spec:
       matchExpressions:
          - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
-    - peerAddress: "192.168.3.254/32"
+    - peerAddress: "192.168.3.254"
       peerASN: 65184
       peerPort: 179
       eBGPMultihopTTL: 1
