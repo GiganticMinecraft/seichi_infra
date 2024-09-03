@@ -15,29 +15,30 @@ spec:
       labels:
         app: babyrite
     spec:
-      - name: babyrite
-        image: ghcr.io/m1sk9/babyrite:v0.9.2
-        resources:
-          requests:
-            cpu: 250m
-            memory: 16Mi
-          limits:
-            cpu: 500m
-            memory: 32Mi
-        volumeMounts:
-          - name: babyrite-config-volume
-            mountPath: /home/babyrite/config/config.yaml
-        env:
-            # 相対パスを指定する
-          - name: CONFIG_FILE_PATH
-            value: "config/config.yaml"
-          - name: DISCORD_API_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: babyrite-discord-token
-                key: BABYRITE_DISCORD_TOKEN
-        volumes:
-          - name: babyrite-config-volume
-            configMap:
-              name: babyrite-config
+      containers:
+        - name: babyrite
+          image: ghcr.io/m1sk9/babyrite:v0.9.2
+          resources:
+            requests:
+              cpu: 250m
+              memory: 16Mi
+            limits:
+              cpu: 500m
+              memory: 32Mi
+          volumeMounts:
+            - name: babyrite-config-volume
+              mountPath: /home/babyrite/config/config.yaml
+          env:
+              # 相対パスを指定する
+            - name: CONFIG_FILE_PATH
+              value: "config/config.yaml"
+            - name: DISCORD_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: babyrite-discord-token
+                  key: BABYRITE_DISCORD_TOKEN
+      volumes:
+        - name: babyrite-config-volume
+          configMap:
+            name: babyrite-config
 
