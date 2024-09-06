@@ -43,6 +43,15 @@
       "depNameTemplate": "itzg/minecraft-server",
       "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
       "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"],
+      "matchStrings": [
+        "https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<version>[\\d.]+)/components.yaml"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes-sigs/metrics-server",
+      "versioningTemplate": "semver"
     }
   ],
   "terraform": {
