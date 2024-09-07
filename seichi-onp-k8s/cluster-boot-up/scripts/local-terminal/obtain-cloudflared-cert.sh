@@ -8,7 +8,7 @@
 cert_pem_downloaded_location="${HOME}/.cloudflared/cert.pem"
 
 # 利用する cloudflared のバージョン等
-cloudflared_release="2022.5.1"
+cloudflared_release="2024.8.3"
 cloudflared_binary="https://github.com/cloudflare/cloudflared/releases/download/${cloudflared_release}/cloudflared-linux-amd64"
 
 # endregion
