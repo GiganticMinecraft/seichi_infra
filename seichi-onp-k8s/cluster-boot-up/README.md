@@ -21,7 +21,7 @@
 
 ### VM 環境
 
-VM環境は `Proxmox Virtual Environment 8.1.3` を利用しています。
+VM環境は `Proxmox Virtual Environment 8.2.4` を利用しています。
 
  - ベアメタル3ノード
 
@@ -34,7 +34,7 @@ VM環境は `Proxmox Virtual Environment 8.1.3` を利用しています。
      参考: [Role of SSH in Proxmox VE Clusters - proxmox wiki](https://pve.proxmox.com/wiki/Cluster_Manager#_role_of_ssh_in_proxmox_ve_clusters)
 
 KubernetesノードのVMは cloudinit イメージで作成されています。
-この cloudinit イメージのベースには `Ubuntu 22.04 LTS` を利用しています。
+この cloudinit イメージのベースには `Ubuntu 24.04 LTS` を利用しています。
 
 ### ストレージ
 
@@ -64,7 +64,7 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
 2022/05/23現在、クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/91999d509e52905eaff16fc8928fbe5316f1eaeb/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh#L15-L20)。
 
 クラスタの作成は以下のツール群で行っています。
-  - kubeadm, kubectl, kubelet v1.28.5
+  - kubeadm, kubectl, kubelet v1.30.4
 
 CNI には Cilium を利用しています。
 

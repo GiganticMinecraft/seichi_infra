@@ -79,8 +79,21 @@ EOF
 # Apply sysctl params without reboot
 sudo sysctl --system
 
-## Install containerd
-sudo apt-get update && sudo apt-get install -y containerd apt-transport-https curl gnupg2
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl gnupg2
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install containerd.io
 
 # Configure containerd
 sudo mkdir -p /etc/containerd
@@ -95,7 +108,7 @@ fi
 sudo systemctl restart containerd
 
 # Modify kernel parameters for Kubernetes
-# inotify instance number is very limited in Ubuntu 22.04 and it has to be at least more than pod number * 2
+# inotify instance number is very limited in Ubuntu 24.04 and it has to be at least more than pod number * 2
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -113,9 +126,9 @@ EOF
 sysctl --system
 
 # Install kubeadm
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-apt-get install -y kubeadm=1.28.5-1.1 kubectl=1.28.5-1.1 kubelet=1.28.5-1.1
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+apt-get install -y kubeadm=1.30.4-1.1 kubectl=1.30.4-1.1 kubelet=1.30.4-1.1
 apt-mark hold kubelet kubectl
 
 # Disable swap
@@ -141,8 +154,8 @@ esac
 
 # Install HAProxy
 apt-get install -y --no-install-recommends software-properties-common
-add-apt-repository ppa:vbernat/haproxy-2.8 -y
-sudo apt-get install -y haproxy=2.8.\*
+add-apt-repository ppa:vbernat/haproxy-3.0 -y
+sudo apt-get install -y haproxy=3.0.\*
 
 cat > /etc/haproxy/haproxy.cfg <<EOF
 global
@@ -249,7 +262,7 @@ systemctl reload haproxy
 kubeadm config images pull
 
 # install k9s
-wget https://github.com/derailed/k9s/releases/download/v0.28.2/k9s_Linux_amd64.tar.gz -O - | tar -zxvf - k9s && sudo mv ./k9s /usr/local/bin/
+wget https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz -O - | tar -zxvf - k9s && sudo mv ./k9s /usr/local/bin/
 
 # Ends except first-control-plane
 case $1 in
@@ -294,7 +307,7 @@ etcd:
   local:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
-kubernetesVersion: "v1.28.5"
+kubernetesVersion: "v1.30.4"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:

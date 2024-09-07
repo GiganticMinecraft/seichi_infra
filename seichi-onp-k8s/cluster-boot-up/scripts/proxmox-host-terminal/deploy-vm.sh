@@ -26,12 +26,12 @@ VM_LIST=(
 
 #region create-template
 
-# download the image(ubuntu 22.04 LTS)
-wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+# download the image(ubuntu 24.04 LTS)
+wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 
 # install qemu-guest-agent to image using libguestfs-tools
 apt-get update && apt-get install libguestfs-tools -y
-virt-customize -a jammy-server-cloudimg-amd64.img --install liburing2 --install qemu-guest-agent
+virt-customize -a noble-server-cloudimg-amd64.img --install liburing2 --install qemu-guest-agent
 
 # create a new VM and attach Network Adaptor
 # vmbr0=Service Network Segment (192.168.0.0/20)
@@ -39,7 +39,7 @@ virt-customize -a jammy-server-cloudimg-amd64.img --install liburing2 --install 
 qm create $TEMPLATE_VMID --cores 2 --memory 4096 --net0 virtio,bridge=vmbr0 --net1 virtio,bridge=vmbr1 --net2 virtio,bridge=vmbr2 --agent enabled=1,fstrim_cloned_disks=1 --name seichi-onp-k8s-template
 
 # import the downloaded disk to $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME storage
-qm importdisk $TEMPLATE_VMID jammy-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
+qm importdisk $TEMPLATE_VMID noble-server-cloudimg-amd64.img $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME
 
 # finally attach the new disk to the VM as scsi drive
 qm set $TEMPLATE_VMID --scsihw virtio-scsi-pci --scsi0 $TEMPLATE_BOOT_IMAGE_TARGET_VOLUME:vm-$TEMPLATE_VMID-disk-0
@@ -57,7 +57,7 @@ qm set $TEMPLATE_VMID --serial0 socket --vga serial0
 qm template $TEMPLATE_VMID
 
 # cleanup
-rm jammy-server-cloudimg-amd64.img
+rm noble-server-cloudimg-amd64.img
 
 #endregion
 
