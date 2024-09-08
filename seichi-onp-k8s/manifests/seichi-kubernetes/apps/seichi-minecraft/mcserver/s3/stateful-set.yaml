@@ -335,11 +335,6 @@ spec:
               mountPath: /jmx-exporter/jmx-exporter-config.yaml
               subPath: jmx-exporter-config.yaml
 
-            # Multiverse-Portals プラグインの設定ファイル
-            - name: multiverse-portals-config
-              mountPath: /plugins/Multiverse-Portals/portals.yml
-              subPath: portals.yml
-
             # CustomEnchantments プラグインの設定ファイル
             - name: custom-enchantments-config
               mountPath: /plugins/CustomEnchantments/config.yml
@@ -370,9 +365,6 @@ spec:
         - name: minecraft-ops-config
           configMap:
             name: minecraft-ops-config
-        - name: multiverse-portals-config
-          configMap:
-            name: multiverse-portals-config
         - name: custom-enchantments-config
           configMap:
             name: custom-enchantments-config
