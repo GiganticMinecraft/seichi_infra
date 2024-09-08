@@ -77,7 +77,7 @@ EOF
         # END irregular indent because heredoc
         
         # download snippet for cloud-init(network)
-        curl -s "${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-up/snippets/${vmname}-network.yaml" > "${SNIPPET_TARGET_PATH}"/"${vmname}"-network.yaml
+        curl -s "${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-operation/snippets/${vmname}-network.yaml" > "${SNIPPET_TARGET_PATH}"/"${vmname}"-network.yaml
 
         # set snippet to vm
         ssh -n "${targetip}" qm set "${vmid}" --cicustom "user=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-user.yaml,network=${SNIPPET_TARGET_VOLUME}:snippets/${vmname}-network.yaml"
