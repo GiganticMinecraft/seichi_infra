@@ -1,0 +1,342 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-worldguard-configs
+data:
+  # メイン
+  main-Blacklist.txt: |
+    #
+    # WorldGuard blacklist
+    #
+    # The blacklist lets you block actions, blocks, and items from being used.
+    # You choose a set of "items to affect" and a list of "actions to perform."
+    #
+    ###############################################################################
+    #
+    # Example to block some ore mining and placement:
+    # [coalore,goldore,ironore]
+    # on-break=deny,log,kick
+    # on-place=deny,tell
+    #
+    # Events that you can detect:
+    # - on-break (when a block of this type is about to be broken)
+    # - on-destroy-with (the item/block held by the user while destroying)
+    # - on-place (a block is being placed)
+    # - on-use (an item like flint and steel or a bucket is being used)
+    # - on-interact (when a block in used (doors, chests, etc.))
+    # - on-drop (an item is being dropped from the player's inventory)
+    # - on-acquire (an item enters a player's inventory via some method)
+    # - on-dispense (a dispenser is about to dispense an item)
+    #
+    # Actions (for events):
+    # - deny (deny completely, used blacklist mode)
+    # - allow (used in whitelist mode)
+    # - notify (notify admins with the 'worldguard.notify' permission)
+    # - log (log to console/file/database)
+    # - tell (tell a player that that's not allowed)
+    # - kick (kick player)
+    # - ban (ban player)
+    #
+    # Options:
+    # - ignore-groups (comma-separated list of groups to not affect)
+    # - ignore-perms (comma-separated list of permissions to not affect - make up
+    #   your very own permissions!)
+    # - comment (message for yourself that is printed with 'log' and 'notify')
+    # - message (optional message to show the user instead; %s is the item name)
+    #
+    ###############################################################################
+    #
+    # For more information, see:
+    # http://wiki.sk89q.com/wiki/WorldGuard/Blacklist
+    #
+    ###############################################################################
+    #
+    # Some examples follow.
+    # REMEMBER: If a line has # in front, it will be ignored.
+    #
+
+    # Deny lava buckets
+    #[lavabucket]
+    #ignore-perms=my.own.madeup.permission
+    #ignore-groups=admins,mods
+    #on-use=deny,tell
+
+    # Deny some ore
+    #[coalore,goldore,ironore]
+    #ignore-groups=admins,mods
+    #on-break=notify,deny,log
+
+    # Some funky data value tests
+    #[wood:0;>=2]
+    #ignore-groups=admins,mods
+    #on-break=notify,deny,log
+
+    # 岩盤の設置・破壊無効化
+    [bedrock]
+    ignore-groups=admin
+    on-place=deny,log,tell
+    on-break=deny,log,tell
+
+    # コーラスフルーツの使用・インタラクト無効化
+    [chorus_fruit]
+    ignore-groups=admin
+    on-use=deny,log,tell
+    on-interact=deny,log,tell
+
+    # オブザーバーの設置無効化
+    [observer]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
+  # 第1、2整地
+  world_SW-Blacklist.txt: |
+    #
+    # WorldGuard blacklist
+    #
+    # The blacklist lets you block actions, blocks, and items from being used.
+    # You choose a set of "items to affect" and a list of "actions to perform."
+    #
+    ###############################################################################
+    #
+    # Example to block some ore mining and placement:
+    # [coalore,goldore,ironore]
+    # on-break=deny,log,kick
+    # on-place=deny,tell
+    #
+    # Events that you can detect:
+    # - on-break (when a block of this type is about to be broken)
+    # - on-destroy-with (the item/block held by the user while destroying)
+    # - on-place (a block is being placed)
+    # - on-use (an item like flint and steel or a bucket is being used)
+    # - on-interact (when a block in used (doors, chests, etc.))
+    # - on-drop (an item is being dropped from the player's inventory)
+    # - on-acquire (an item enters a player's inventory via some method)
+    # - on-dispense (a dispenser is about to dispense an item)
+    #
+    # Actions (for events):
+    # - deny (deny completely, used blacklist mode)
+    # - allow (used in whitelist mode)
+    # - notify (notify admins with the 'worldguard.notify' permission)
+    # - log (log to console/file/database)
+    # - tell (tell a player that that's not allowed)
+    # - kick (kick player)
+    # - ban (ban player)
+    #
+    # Options:
+    # - ignore-groups (comma-separated list of groups to not affect)
+    # - ignore-perms (comma-separated list of permissions to not affect - make up
+    #   your very own permissions!)
+    # - comment (message for yourself that is printed with 'log' and 'notify')
+    # - message (optional message to show the user instead; %s is the item name)
+    #
+    ###############################################################################
+    #
+    # For more information, see:
+    # http://wiki.sk89q.com/wiki/WorldGuard/Blacklist
+    #
+    ###############################################################################
+    #
+    # Some examples follow.
+    # REMEMBER: If a line has # in front, it will be ignored.
+    #
+
+    # Deny lava buckets
+    #[lavabucket]
+    #ignore-perms=my.own.madeup.permission
+    #ignore-groups=admins,mods
+    #on-use=deny,tell
+
+    # Deny some ore
+    #[coalore,goldore,ironore]
+    #ignore-groups=admins,mods
+    #on-break=notify,deny,log
+
+    # Some funky data value tests
+    #[wood:0;>=2]
+    #ignore-groups=admins,mods
+    #on-break=notify,deny,log
+
+    # 岩盤の設置・破壊無効化
+    [bedrock]
+    ignore-groups=admin
+    on-place=deny,log,tell
+    on-break=deny,log,tell
+
+    # オブザーバーの設置無効化
+    [observer]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
+    # エンドクリスタルの設置無効化
+    [end_crystal]
+    ignore-groups=admin
+    on-use=deny,log,tell
+
+    # リスポーンアンカーの設置無効化
+    [respawn_anchor]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
+  # エンド整地、ネザー整地
+  world_SW_the_end-Blacklist.txt: |
+    #
+    # WorldGuard blacklist
+    #
+    # The blacklist lets you block actions, blocks, and items from being used.
+    # You choose a set of "items to affect" and a list of "actions to perform."
+    #
+    ###############################################################################
+    #
+    # Example to block some ore mining and placement:
+    # [coalore,goldore,ironore]
+    # on-break=deny,log,kick
+    # on-place=deny,tell
+    #
+    # Events that you can detect:
+    # - on-break (when a block of this type is about to be broken)
+    # - on-destroy-with (the item/block held by the user while destroying)
+    # - on-place (a block is being placed)
+    # - on-use (an item like flint and steel or a bucket is being used)
+    # - on-interact (when a block in used (doors, chests, etc.))
+    # - on-drop (an item is being dropped from the player's inventory)
+    # - on-acquire (an item enters a player's inventory via some method)
+    # - on-dispense (a dispenser is about to dispense an item)
+    #
+    # Actions (for events):
+    # - deny (deny completely, used blacklist mode)
+    # - allow (used in whitelist mode)
+    # - notify (notify admins with the 'worldguard.notify' permission)
+    # - log (log to console/file/database)
+    # - tell (tell a player that that's not allowed)
+    # - kick (kick player)
+    # - ban (ban player)
+    #
+    # Options:
+    # - ignore-groups (comma-separated list of groups to not affect)
+    # - ignore-perms (comma-separated list of permissions to not affect - make up
+    #   your very own permissions!)
+    # - comment (message for yourself that is printed with 'log' and 'notify')
+    # - message (optional message to show the user instead; %s is the item name)
+    #
+    ###############################################################################
+    #
+    # For more information, see:
+    # http://wiki.sk89q.com/wiki/WorldGuard/Blacklist
+    #
+    ###############################################################################
+    #
+    # Some examples follow.
+    # REMEMBER: If a line has # in front, it will be ignored.
+    #
+
+    # Deny lava buckets
+    #[lavabucket]
+    #ignore-perms=my.own.madeup.permission
+    #ignore-groups=admins,mods
+    #on-use=deny,tell
+
+    # Deny some ore
+    #[coalore,goldore,ironore]
+    #ignore-groups=admins,mods
+    #on-break=notify,deny,log
+
+    # Some funky data value tests
+    #[wood:0;>=2]
+    #ignore-groups=admins,mods
+    #on-break=notify,deny,log
+
+    # 岩盤の設置・破壊無効化
+    [bedrock]
+    ignore-groups=admin
+    on-place=deny,log,tell
+    on-break=deny,log,tell
+
+    # ベッドの設置無効化
+    [white_bed, orange_bed, magenta_bed, light_blue_bed, yellow_bed, lime_bed, pink_bed, gray_bed, light_gray_bed, cyan_bed, purple_bed, blue_bed, brown_bed, green_bed, red_bed, black_bed]
+    ignore-groups=admin
+    on-use=deny,log,tell
+
+    # オブザーバーの設置無効化
+    [observer]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
+    # エンドクリスタルの設置無効化
+    [end_crystal]
+    ignore-groups=admin
+    on-use=deny,log,tell
+
+    # リスポーンアンカーの設置無効化
+    [respawn_anchor]
+    ignore-groups=admin
+    on-place=deny,log,tell
+
+  # メイン
+  main-config.yml: |
+    #
+    # WorldGuard's world configuration file
+    #
+    # This is a world configuration file. Anything placed into here will only
+    # affect this world. If you don't put anything in this file, then the
+    # settings will be inherited from the main configuration file.
+    #
+    # If you see {} below, that means that there are NO entries in this file.
+    # Remove the {} and add your own entries.
+    #
+
+    regions:
+      max-region-count-per-player:
+        default: 5
+        observer: 5
+      max-claim-volume: 14745600
+  # 第1整地
+  world_SW-config.yml: |
+    #
+    # WorldGuard's world configuration file
+    #
+    # This is a world configuration file. Anything placed into here will only
+    # affect this world. If you don't put anything in this file, then the
+    # settings will be inherited from the main configuration file.
+    #
+    # If you see {} below, that means that there are NO entries in this file.
+    # Remove the {} and add your own entries.
+    #
+
+    fire:
+        disable-lava-fire-spread: false
+        disable-all-fire-spread: false
+  # 第2整地
+  world_SW_2-config.yml: |
+    #
+    # WorldGuard's world configuration file
+    #
+    # This is a world configuration file. Anything placed into here will only
+    # affect this world. If you don't put anything in this file, then the
+    # settings will be inherited from the main configuration file.
+    #
+    # If you see {} below, that means that there are NO entries in this file.
+    # Remove the {} and add your own entries.
+    #
+
+    regions:
+      max-region-count-per-player:
+        default: 2
+        observer: 2
+      max-claim-volume: 14803200
+    fire:
+      disable-lava-fire-spread: false
+      disable-all-fire-spread: false
+  # エンド整地、ネザー整地
+  world_SW_the_end-config.yml: |
+    #
+    # WorldGuard's world configuration file
+    #
+    # This is a world configuration file. Anything placed into here will only
+    # affect this world. If you don't put anything in this file, then the
+    # settings will be inherited from the main configuration file.
+    #
+    # If you see {} below, that means that there are NO entries in this file.
+    # Remove the {} and add your own entries.
+    #
+
+    {}
