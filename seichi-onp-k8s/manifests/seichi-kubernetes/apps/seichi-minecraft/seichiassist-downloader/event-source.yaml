@@ -4,6 +4,10 @@ metadata:
   name: seichiassist-downloader
   namespace: seichi-minecraft
 spec:
+  service:
+    ports:
+      - port: 12000
+        targetPort: 12000
   eventBusName: seichiassist-downloader
   github:
     SeichiAssistReleaseEventSource:
