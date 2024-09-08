@@ -1,17 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: argo-workflows-webhook-service
-  namespace: argo
-spec:
-  selector:
-    app: argo-workflows
-  ports:
-    - name: argo-workflows-webhook
-      protocol: TCP
-      port: 12000
-      targetPort: 12000
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
