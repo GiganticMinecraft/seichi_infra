@@ -38,6 +38,8 @@ spec:
           volumeMounts:
             - name: jmx-exporter-download-volume
               mountPath: /root/jmx-exporter-download
+            - name: plugins-volume
+              mountPath: /plugins
           command:
             - "sh"
             - "-c"
@@ -356,3 +358,7 @@ spec:
         # seichiassit-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: seichiassist-downloader-volume
           emptyDir: {}
+
+        - name: plugins--pvc-volume
+          persistentVolumeClaim:
+            claimName: mcserver-s1-plugins-pv-claim

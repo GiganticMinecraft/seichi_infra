@@ -6,3 +6,4 @@ resources:
   - "./service-monitor.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"
+  - "./pvc.yaml"
