@@ -81,7 +81,7 @@ sudo sysctl --system
 
 # Add Docker's official GPG key:
 sudo apt-get update
-sudo apt-get install apt-transport-https ca-certificates curl gnupg2
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -93,7 +93,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 
-sudo apt-get install containerd.io
+sudo apt-get install -y containerd.io
 
 # Configure containerd
 sudo mkdir -p /etc/containerd
