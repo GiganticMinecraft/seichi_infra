@@ -107,6 +107,24 @@ spec:
         name: "common-peer-config"
 ---
 apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPClusterConfig
+metadata:
+  name: cilium-bgp-cluster-config-wk-mc1
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-wk-mc1
+  bgpInstances:
+  - name: "instance-65401"
+    localASN: 65401
+    peers:
+    - name: "peer-to-router"
+      peerASN: 65184
+      peerAddress: 192.168.3.254
+      peerConfigRef:
+        name: "common-peer-config"
+---
+apiVersion: cilium.io/v2alpha1
 kind: CiliumBGPPeerConfig
 metadata:
   name: common-peer-config
