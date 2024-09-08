@@ -60,7 +60,7 @@ data:
         limit_except POST {
           deny all;
         }
-        proxy_pass http://seichiassist-downloader-eventsource-svc:12000;
+        proxy_pass http://seichiassist-downloader-eventsource-svc.seichi-minecraft:12000;
         proxy_request_buffering off;
       }
     }
