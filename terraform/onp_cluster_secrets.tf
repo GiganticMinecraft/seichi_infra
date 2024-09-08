@@ -276,7 +276,7 @@ resource "kubernetes_secret" "idea_reaction_discord_token" {
   }
 
   data = {
-    IDEA_REACTION_DISCORD_TOKEN = var.discord_bot__idea_reaction_discord_token
+    IDEA_REACTION_DISCORD_TOKEN = var.discord_bot__idea_reaction__discord_token
   }
 }
 
@@ -289,7 +289,7 @@ resource "kubernetes_secret" "idea_reaction_redmine_api_key" {
   }
 
   data = {
-    IDEA_REACTION_REDMINE_API_KEY = var.discord_bot__idea_reaction_redmine_api_key
+    IDEA_REACTION_REDMINE_API_KEY = var.discord_bot__idea_reaction__redmine_api_key
   }
 }
 
@@ -302,6 +302,6 @@ resource "kubernetes_secret" "babyrite_discord_token" {
   }
 
   data = {
-    BABYRITE_DISCORD_TOKEN = var.discord_bot__babyrite_discord_token
+    BABYRITE_DISCORD_TOKEN = var.discord_bot__babyrite__discord_token
   }
 }

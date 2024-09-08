@@ -296,19 +296,19 @@ variable "minecraft__prod_game_db__password" {
 
 #region on-premise discord bot secrets
 
-variable "discord_bot__idea_reaction_discord_token" {
+variable "discord_bot__idea_reaction__discord_token" {
   description = "Token set to the production idea-reaction"
   type        = string
   sensitive   = true
 }
 
-variable "discord_bot__idea_reaction_redmine_api_key" {
+variable "discord_bot__idea_reaction__redmine_api_key" {
   description = "Redmine API Key set to the production idea-reaction"
   type        = string
   sensitive   = true
 }
 
-variable "discord_bot__babyrite_discord_token" {
+variable "discord_bot__babyrite__discord_token" {
   description = "Token set to the production babyrite"
   type        = string
   sensitive   = true
