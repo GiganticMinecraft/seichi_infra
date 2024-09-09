@@ -65,7 +65,6 @@ spec:
                   - name: download-seichiassist
                     inputs:
                       parameters:
-                        - name: target-branch
                         - name: tag-name
                     container:
                       image: debian:bookworm-slim
@@ -87,7 +86,6 @@ spec:
                     inputs:
                       parameters:
                         - name: target-branch
-                        - name: seichiassist-download-url
                         - name: minio-access-key
                           valueFrom:
                             secretKeyRef:
