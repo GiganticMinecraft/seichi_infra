@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: argo-wf-proxy
-  namespace: argo
+  namespace: seichi-minecraft
 spec:
   type: ClusterIP
   ports:
@@ -21,7 +21,7 @@ metadata:
   # 本来は argo-workflow-reverse-proxy という名前にしたいが、
   # そうすると53文字を超えてしまい、エラーが発生するのでやむを得ず短縮している。
   name: argo-wf-proxy
-  namespace: argo
+  namespace: seichi-minecraft
 spec:
   replicas: 1
   selector:
@@ -48,7 +48,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argo-wf-proxy-config-map
-  namespace: argo
+  namespace: seichi-minecraft
 data:
   proxy.conf: |
     server_names_hash_bucket_size 128;
@@ -60,7 +60,7 @@ data:
         limit_except POST {
           deny all;
         }
-        proxy_pass http://seichiassist-downloader-eventsource-svc.seichi-minecraft:12000;
+        proxy_pass http://seichiassist-downloader-eventsource-svc:12000;
         proxy_request_buffering off;
       }
     }

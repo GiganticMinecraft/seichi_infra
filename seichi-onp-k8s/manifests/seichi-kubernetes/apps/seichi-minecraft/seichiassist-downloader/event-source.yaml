@@ -19,7 +19,6 @@ spec:
         endpoint: /create-seichiassist-release
         port: "12000"
         method: POST
-        url: https://argo-wf-webhook.onp-k8s.admin.seichi.click
       events:
         - "release"
       apiToken:
