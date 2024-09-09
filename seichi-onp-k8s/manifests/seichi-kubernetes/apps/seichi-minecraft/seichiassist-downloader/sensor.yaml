@@ -52,7 +52,7 @@ spec:
                 arguments:
                   parameters:
                     - name: target-branch
-                    - name: seichiassist-download-url
+                    - name: tag-name
                 templates:
                   - name: main
                     steps:
@@ -64,7 +64,7 @@ spec:
                     inputs:
                       parameters:
                         - name: target-branch
-                        - name: seichiassist-download-url
+                        - name: tag-name
                     container:
                       image: debian:bookworm-slim
                       volumeMounts:
@@ -80,7 +80,7 @@ spec:
                         - "wget"
                         - "&&"
                         - "wget"
-                        - "{{ inputs.parameters.seichiassist-download-url }}"
+                        - "https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ inputs.parameters.seichiassist-download-url }}/SeichiAssist.jar"
                   - name: upload-seichiassist
                     inputs:
                       parameters:
@@ -123,7 +123,7 @@ spec:
               dest: spec.arguments.parameters.0.value
             - src:
                 dependencyName: from-seichiassist-downloader
-                dataKey: body.release.assets.browser_download_url
+                dataKey: body.release.tag_name
               dest: spec.arguments.parameters.1.value
             - src:
                 dependencyName: from-seichiassist-downloader
