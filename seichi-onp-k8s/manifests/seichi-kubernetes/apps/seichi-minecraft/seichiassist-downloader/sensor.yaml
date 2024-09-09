@@ -80,20 +80,19 @@ spec:
                         - "wget"
                         - "https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"
                   - name: upload-seichiassist
-                    inputs:
-                      parameters:
-                      - name: minio-access-key
-                        valueFrom:
-                          secretKeyRef:
-                            name: minio-secrets
-                            key: MINIO_ACCESS_KEY
-                      - name: minio-access-secret
-                        valueFrom:
-                          secretKeyRef:
-                            name: minio-secrets
-                            key: MINIO_ACCESS_SECRET
                     container:
                       image: minio/mc:latest
+                      env:
+                        - name: minio-access-key
+                          valueFrom:
+                            secretKeyRef:
+                              name: minio-secrets
+                              key: MINIO_ACCESS_KEY
+                        - name: minio-access-secret
+                          valueFrom:
+                            secretKeyRef:
+                              name: minio-secrets
+                              key: MINIO_ACCESS_SECRET
                       volumeMounts:
                         - name: work
                           mountPath: /work
@@ -104,8 +103,8 @@ spec:
                         - "set"
                         - "myminio"
                         - "seichi-private-plugin-blackhole-minio.minio:9000"
-                        - "{{ inputs.parameters.minio-access-key }}"
-                        - "{{ inputs.parameters.minio-access-secret }}"
+                        - "$minio-access-key"
+                        - "$minio-access-secret"
                         - "&&"
                         - "mc"
                         - "cp"
