@@ -63,10 +63,6 @@ spec:
                       - - name: upload-seichiassist
                           template: upload-seichiassist
                   - name: download-seichiassist
-                    inputs:
-                      parameters:
-                        - name: target-branch
-                        - name: tag-name
                     container:
                       image: debian:bookworm-slim
                       volumeMounts:
@@ -82,7 +78,7 @@ spec:
                         - "wget"
                         - "&&"
                         - "wget"
-                        - "https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ inputs.parameters.tag-name }}/SeichiAssist.jar"
+                        - "https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"
                   # - name: upload-seichiassist
                   #   inputs:
                   #     parameters:
