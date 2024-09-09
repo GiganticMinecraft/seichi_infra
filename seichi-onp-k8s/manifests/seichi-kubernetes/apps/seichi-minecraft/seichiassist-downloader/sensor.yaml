@@ -8,7 +8,7 @@ spec:
   dependencies:
     - name: from-seichiassist-downloader
       eventSourceName: seichiassist-downloader
-      eventName: SeichiAssistCreateReleaseEventSource
+      eventName: SeichiAssistReleaseEventSource
       filters:
         data:
           - path: headers.X-Github-Event
