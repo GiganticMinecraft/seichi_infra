@@ -4,6 +4,8 @@ metadata:
   name: seichiassist-downloader
   namespace: seichi-minecraft
 spec:
+  template:
+    serviceAccountName: seichiassist-downloader-workflow-sa
   eventBusName: seichiassist-downloader
   dependencies:
     - name: from-seichiassist-downloader
