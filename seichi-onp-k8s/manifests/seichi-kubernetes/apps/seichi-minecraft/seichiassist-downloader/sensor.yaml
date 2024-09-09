@@ -121,15 +121,15 @@ spec:
           parameters:
             - src:
                 dependencyName: from-seichiassist-downloader
-                dataKey: release.target_commitish
+                dataKey: body.release.target_commitish
               dest: spec.arguments.parameters.0.value
             - src:
                 dependencyName: from-seichiassist-downloader
-                dataKey: release.tag_name
+                dataKey: body.release.tag_name
               dest: spec.arguments.parameters.1.value
             - src:
                 dependencyName: from-seichiassist-downloader
-                dataKey: release.tag_name
+                dataKey: body.release.tag_name
               dest: metadata.name
               operation: append
       retryStrategy:
