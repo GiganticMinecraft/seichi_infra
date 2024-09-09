@@ -127,7 +127,7 @@ spec:
               dest: spec.arguments.parameters.1.value
             - src:
                 dependencyName: from-seichiassist-downloader
-                dataKey: body.tag_name
+                dataKey: body.release.tag_name
               dest: metadata.name
               operation: append
       retryStrategy:
