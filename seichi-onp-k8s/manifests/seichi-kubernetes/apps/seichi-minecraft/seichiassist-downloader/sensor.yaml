@@ -69,6 +69,7 @@ spec:
                       volumeMounts:
                         - name: work
                           mountPath: /work
+                      entrypoint: ["/bin/sh", "-c"]
                       command:
                         - "apt-get"
                         - "update"
