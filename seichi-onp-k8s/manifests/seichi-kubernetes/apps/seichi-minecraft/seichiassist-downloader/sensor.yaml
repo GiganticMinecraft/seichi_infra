@@ -5,7 +5,7 @@ metadata:
   namespace: seichi-minecraft
 spec:
   template:
-    serviceAccountName: seichiassist-downloader-workflow-sa
+    serviceAccountName: seichiassist-downloader-sensor-sa
   eventBusName: seichiassist-downloader
   dependencies:
     - name: from-seichiassist-downloader
@@ -42,6 +42,7 @@ spec:
               metadata:
                 generateName: github-
               spec:
+                serviceAccountName: seichiassist-downloader-workflow-sa
                 entrypoint: download-seichiassist
                 volumeClaimTemplates:
                   - metadata:
