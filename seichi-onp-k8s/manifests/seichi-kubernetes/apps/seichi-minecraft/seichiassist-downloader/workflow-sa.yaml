@@ -1,29 +1,29 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: seichiassist-downloader-sensor-sa
+  name: seichiassist-downloader-workflow-sa
   namespace: seichi-minecraft
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: seichiassist-downloader-sensor-role
+  name: seichiassist-downloader-workflow-role
   namespace: seichi-minecraft
 rules:
   - apiGroups: ["argoproj.io"]
-    resources: ["workflows"]
-    verbs: ["create", "get", "list", "watch", "update"]
+    resources: ["workflowtaskresults"]
+    verbs: ["create", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: seichiassist-downloader-sensor-binding
+  name: seichiassist-downloader-workflow-binding
   namespace: seichi-minecraft
 subjects:
   - kind: ServiceAccount
-    name: seichiassist-downloader-sensor-sa
+    name: seichiassist-downloader-workflow-sa
     namespace: seichi-minecraft
 roleRef:
   kind: Role
-  name: seichiassist-downloader-sensor-role
+  name: seichiassist-downloader-workflow-role
   apiGroup: rbac.authorization.k8s.io
