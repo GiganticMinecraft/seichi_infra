@@ -71,6 +71,7 @@ spec:
                           mountPath: /work
                       command:
                         - "apt-get"
+                        - "-y"
                         - "update"
                         - "&&"
                         - "apt-get"
