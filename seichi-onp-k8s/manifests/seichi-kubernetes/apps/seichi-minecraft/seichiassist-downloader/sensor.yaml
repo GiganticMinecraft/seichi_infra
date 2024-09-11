@@ -65,21 +65,13 @@ spec:
                           template: upload-seichiassist
                   - name: download-seichiassist
                     container:
-                      image: debian:bookworm-slim
+                      image: alpine:3.20
                       volumeMounts:
                         - name: work
                           mountPath: /work
+                      entrypoint: ["/bin/sh", "-c"]
                       command:
-                        - "apt-get"
-                        - "update"
-                        - "&&"
-                        - "apt-get"
-                        - "install"
-                        - "-y"
-                        - "wget"
-                        - "&&"
-                        - "wget"
-                        - "https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"
+                        - "wget https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"
                   - name: upload-seichiassist
                     container:
                       image: minio/mc:latest
@@ -99,19 +91,7 @@ spec:
                           mountPath: /work
                       entrypoint: ["/bin/sh", "-c"]
                       command:
-                        - "mc"
-                        - "alias"
-                        - "set"
-                        - "myminio"
-                        - "seichi-private-plugin-blackhole-minio.minio:9000"
-                        - "$minio-access-key"
-                        - "$minio-access-secret"
-                        - "&&"
-                        - "mc"
-                        - "cp"
-                        - "SeichiAssist.jar"
-                        - "myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar"
-
+                        - "mc alias set myminio seichi-private-plugin-blackhole-minio.minio:9000 $minio-access-key $minio-access-secret && mc cp SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar"
           parameters:
             - src:
                 dependencyName: from-seichiassist-downloader
