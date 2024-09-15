@@ -57,22 +57,21 @@ spec:
                     - name: target-branch
                     - name: tag-name
                 templates:
-                  - name: main
-                    steps:
-                      - - name: download-seichiassist
-                          template: download-seichiassist
-                      - - name: upload-seichiassist
-                          template: upload-seichiassist
                   - name: download-seichiassist
+                    steps:
+                      - - name: download
+                          template: download-release
+                      - - name: upload
+                          template: upload-artifact
+                  - name: download-release
                     container:
                       image: alpine:3.20
                       volumeMounts:
                         - name: work
                           mountPath: /work
-                      command:
-                        - "wget"
-                        - "https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"
-                  - name: upload-seichiassist
+                      command: [sh, -c]
+                      args: ["wget https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"]
+                  - name: upload-artifact
                     container:
                       image: minio/mc:latest
                       env:
@@ -89,19 +88,8 @@ spec:
                       volumeMounts:
                         - name: work
                           mountPath: /work
-                      command:
-                        - "mc"
-                        - "alias"
-                        - "set"
-                        - "myminio"
-                        - "seichi-private-plugin-blackhole-minio.minio:9000"
-                        - "$minio-access-key"
-                        - "$minio-access-secret"
-                        - "&&"
-                        - "mc"
-                        - "cp"
-                        - "SeichiAssist.jar"
-                        - "myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar"
+                      command: [sh, -c]
+                      args: ["mc alias set myminio seichi-private-plugin-blackhole-minio.minio:9000 $minio-access-key $minio-access-secret && mc cp SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar"]
           parameters:
             - src:
                 dependencyName: from-seichiassist-downloader
