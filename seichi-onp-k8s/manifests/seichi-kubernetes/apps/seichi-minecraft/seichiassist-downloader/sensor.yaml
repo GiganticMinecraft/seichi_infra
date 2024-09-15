@@ -78,12 +78,12 @@ spec:
                         - name: minio-access-key
                           valueFrom:
                             secretKeyRef:
-                              name: minio-secrets
+                              name: minio-access-secret
                               key: MINIO_ACCESS_KEY
                         - name: minio-access-secret
                           valueFrom:
                             secretKeyRef:
-                              name: minio-secrets
+                              name: minio-access-secret
                               key: MINIO_ACCESS_SECRET
                       volumeMounts:
                         - name: work
