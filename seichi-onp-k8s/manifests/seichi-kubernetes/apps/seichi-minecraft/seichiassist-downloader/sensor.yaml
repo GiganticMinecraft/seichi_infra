@@ -75,12 +75,12 @@ spec:
                     container:
                       image: minio/mc:latest
                       env:
-                        - name: minio-access-key
+                        - name: MINIO_ACCESS_KEY
                           valueFrom:
                             secretKeyRef:
                               name: minio-access-secret
                               key: MINIO_ACCESS_KEY
-                        - name: minio-access-secret
+                        - name: MINIO_ACCESS_SECRET
                           valueFrom:
                             secretKeyRef:
                               name: minio-access-secret
