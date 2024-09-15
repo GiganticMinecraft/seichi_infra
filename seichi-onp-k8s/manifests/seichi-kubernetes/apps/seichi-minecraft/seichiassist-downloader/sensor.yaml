@@ -20,7 +20,7 @@ spec:
           - path: body.action
             type: string
             value:
-              - created
+              - published
           - path: body.release.target_commitish
             type: string
             # ここは本来masterブランチとdevelopブランチが指定されるべきだが、どちらのブランチも1.12用ビルドのため、
