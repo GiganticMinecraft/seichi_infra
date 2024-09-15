@@ -70,7 +70,7 @@ spec:
                         - name: work
                           mountPath: /work
                       command: [sh, -c]
-                      args: ["wget https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"]
+                      args: ["wget -P /work https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"]
                   - name: upload-artifact
                     container:
                       image: minio/mc:latest
@@ -91,7 +91,7 @@ spec:
                       command: [sh, -c]
                       args: [
                         "mc alias set myminio http://seichi-private-plugin-blackhole-minio.minio:9000/ ${MINIO_ACCESS_KEY} ${MINIO_ACCESS_SECRET} && \
-                        mc cp SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}"
+                        mc cp /work/SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}"
                       ]
           parameters:
             - src:
