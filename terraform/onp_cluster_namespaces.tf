@@ -63,9 +63,3 @@ resource "kubernetes_namespace" "minio" {
     name = "minio"
   }
 }
-
-resource "kubernetes_namespace" "backstage" {
-  metadata {
-    name = "backstage"
-  }
-}
