@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: s1-config
 data:
-  config.yml: |
+  OriginSpawn-config.yml: |
     world-name: world_2
     loc-x: 41
     loc-y: 69

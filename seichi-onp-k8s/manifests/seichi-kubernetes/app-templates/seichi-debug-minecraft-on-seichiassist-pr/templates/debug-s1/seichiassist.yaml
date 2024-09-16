@@ -380,7 +380,7 @@ spec:
             # OriginSpawn プラグインの設定ファイル
             - name: s1-config
               mountPath: /plugins/OriginSpawn/config.yml
-              subPath: config.yml
+              subPath: OriginSpawn-config.yml
 
             - name: mod-downloader-volume
               mountPath: /plugins
