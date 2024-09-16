@@ -405,6 +405,11 @@ spec:
               mountPath: /plugins/AuctionHouse/config.yml
               subPath: AuctionHouse-config.yml
 
+            # BlocksHub プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/BlocksHub/config.yml
+              subPath: BlocksHub-config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
