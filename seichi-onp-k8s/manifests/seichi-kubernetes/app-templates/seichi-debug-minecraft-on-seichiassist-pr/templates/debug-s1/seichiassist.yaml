@@ -390,6 +390,11 @@ spec:
               mountPath: /plugins/AreaShop/default.yml
               subPath: AreaShop-default.yml
 
+            # AreaShop プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/AuctionHouse/config.yml
+              subPath: AuctionHouse-config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
