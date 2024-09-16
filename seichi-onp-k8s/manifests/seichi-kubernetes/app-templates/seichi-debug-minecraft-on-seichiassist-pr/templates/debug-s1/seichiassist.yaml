@@ -382,6 +382,14 @@ spec:
               mountPath: /plugins/OriginSpawn/config.yml
               subPath: OriginSpawn-config.yml
 
+            # AreaShop プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/AreaShop/config.yml
+              subPath: AreaShop-config.yml
+            - name: s1-config
+              mountPath: /plugins/AreaShop/default.yml
+              subPath: AreaShop-default.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 

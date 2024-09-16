@@ -11,3 +11,437 @@ data:
     loc-yaw: 0.0
     loc-pitch: 0.0
     always-force-players-spawn: true
+
+  AreaShop-config.yml: |
+    # ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    # ║ config.yml file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop. ║
+    # ║ This file contains options to change the working of the plugin, the profiles defined here can be used in default.yml.      ║
+    # ║ More information and tutorials can be found on the wiki: https://github.com/NLthijs48/AreaShop/wiki                        ║
+    # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ GENERAL: Options that influence the global state of the plugin                                                             │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # Chat prefix used for all messages in the chat, also changes the greeting messages.
+    chatPrefix:
+      - '[darkgreen][AreaShop][reset]'
+      - '  hover: AreaShop region management plugin'
+      - '  hover: %lang:action|Click to check the available commands|%'
+      - '  command: /areashop help'
+      - ' '
+    # The language file that should be used, check the 'lang' folder for build-in languages (use the filename without .yml here).
+    # More information can be found here: https://github.com/NLthijs48/AreaShop/wiki/Language-support.
+    language: EN
+    # The tags that need to be written on the first line of a sign to add it to AreaShop.
+    signTags:
+      # Add a rental region.
+      rent: '[asrent]'
+      # Add a buy region.
+      buy: '[asbuy]'
+      # Add a sign to an existing region.
+      add: '[as]'
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ ECONOMY: Options to change the display of prices.                                                                          │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # The characters displayed before a price.
+    moneyCharacter: '$'
+    # The characters displayed after a price.
+    moneyCharacterAfter: ''
+    # The character(s) to use as decimal mark.
+    decimalMark: '.'
+    # How many numbers behind the dot should be shown (2 will make numbers like '8.55', '9.01', '5.20').
+    fractionalNumbers: 2
+    # How many numbers behind the dot should be shown when using a metric symbol suffix.
+    fractionalNumbersShort: 3
+    # Set this to true if you want to hide '.0' for a number like '15.0' ('4.50' will still stay '4.50').
+    hideEmptyFractionalPart: true
+    # Use a suffix if the price is above a certain number (use 1.00M instead of 1000000.00 etc.)
+    metricSymbols:
+      #1000: "k"
+      1000000: "M"
+      1000000000: "G"
+      1000000000000: "T"
+      1000000000000000: "P"
+      1000000000000000000: "E"
+      1000000000000000000000: "Z"
+      1000000000000000000000000: "Y"
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ RENTING: Options that apply to all rent regions.                                                                           │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # Timeformat to use on the signs, default is like '30-06 14:52', US format: 'MM-dd KK:mm a'.
+    # Search for 'java SimpleDateFormat' for more options and documentation.
+    timeFormatSign: 'dd-MM HH:mm'
+    # Timeformat used in the chat, default is like '30 june 2014 14:52', US format: 'MMMMMMMMMMMMMMMMM dd yyyy KK:mm a'.
+    # Search for 'java SimpleDateFormat' for more options and documentation.
+    timeFormatChat: 'dd MMMMMMMMMMMMMMMMM yyyy HH:mm'
+    # Time indicators, used for specifing time periods (for example rent duration).
+    seconds: [s, sec, secs, second, seconds]
+    minutes: [m, min, mins, minute, minutes]
+    hours: [h, hour, hours]
+    days: [d, day, days]
+    weeks: [w, week, weeks]
+    months: [M,  month,  months]
+    years: [y, year, years]
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ PERMISSION GROUPS: Assigned by giving players certain permissions.                                                         │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # Configure the max total regions, max rent regions and max buy regions with different groups (-1 is unlimited).
+    # Assign a group to players by giving them the permission 'areashop.limits.<group>'.
+    # Every player already has the group 'default', OPs bypass the limits because of the 'areashop.limitbypass' permission.
+    # All the groups applied to the player will be checked and only if they all allow an extra region it will be allowed.
+    # More information like limits for regions of a certain group or in a certain word can be found here:
+    #   https://github.com/NLthijs48/AreaShop/wiki/Limitgroups-information-and-examples.
+    limitGroups:
+      default:
+        total: 1
+        rents: 1
+        buys: 1
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ ADVANCED AND DEBUG: Specific options to tweak the plugin precisely and check if it functions correctly.                    │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # Blacklist of region names that cannot be added to AreaShop for renting or buying. Regular expressions can be used, search
+    # for 'java regex pattern' to find documentation about how to use it.
+    # Example: Blocking all regions that have a name like 'house_1', 'house_2', etc. would be done with 'house_\d+'.
+    # The '\d' represents the numerical digits 0-9, the + symbol represents 1 or more times repeated.
+    # This means it would also block 'house_123' and 'house_000456'. It will not block 'ahouse_1' or 'house_'.
+    blacklist:
+      - '__global__'
+    # Minimum length of the numbers that are suffixed for region names generated by the '/as stack' command.
+    # When having this at 3 it will generate names like this: 'region-001', 'region-014', 'region-4567'.
+    stackRegionNumberLength: 3
+    # Allow/disallow adding players that did not visit the server yet as friend of a region.
+    addFriendNotExistingPlayers: false
+    # Enable sending stats to http://mcstats.org/ (Metrics plugin).
+    # This information will give me an indication about how much the plugin is used and encourages me to continue development.
+    sendStats: true
+    # If enabled it will check for updates when loading the plugin, it will never download files, it will only notify about it.
+    checkForUpdates: true
+    # Use colors when sending messages to console and log files.
+    useColorsInConsole: false
+    # Use tellraw style messages, which can be interacted with by players
+    useFancyMessages: true
+    # Update all region flags and signs after starting the plugin.
+    # This ensures that changes to the config are directly visible after restarting the server.
+    updateRegionsOnStartup: true
+    # Enables / disables debug messages in the console, could be useful to figure out where errors come from.
+    debug: false
+    # Version of the config, do not change!
+    version: 2.6.0
+    # Maximum number of blocks to save to or restore from a .schemetic file.
+    maximumBlocks: 1000000
+    # Maximum number of locations the teleport function should check to find a safe spot.
+    maximumTries: 50000
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ VARIABLES: Variables that can be used in messages and settings where a region is available.                                │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    # If a tag has no value (for example %player% when the region is not rented/bought) then the tag will not get replaced.
+    # %region%         The region name (with correct capitalization).
+    # %player%         The name of the player that rents/buys the region (with correct capitalization).
+    # %uuid%           The UUID of the player that rents/buys the region.
+    # %friends%        The names of friends added to this region separated by ', '.
+    # %friendsuuid%    The UUID's of friends added to this region separated by ', '.
+    # %landlord%       The name of the landlord.
+    # %landlorduuid%   The UUID of the landlord.
+    # %price%          The price of the region formatted with the configured characters before and after the number.
+    # %rawprice%       The price without formatting, like '10.0' or '7.77'.
+    # %duration%       The duration of a rent region, for example '1 d', '4 minutes' or '2 years'.
+    # %world%          The name of the world that the region is in.
+    # %type%           The type of the region, 'rent' or 'buy'.
+    # %until%          The end time of a rent formatted as configured with 'timeFormatChat'.
+    # %untilshort%     The end time of a rent formatted as configured with 'timeFormatSign'.
+    # %width%          The width of the region (number of blocks on the x-axis).
+    # %depth%          The depth of the region (number of blocks on the z-axis).
+    # %volume%         The number of blocks in a region (accounting for polygon shaped regions).
+    # %height%         The height of the region (number of blocks on the y-axis).
+    # %timeleft%       The time left on the rent (uses the unit of time that fits best, minutes used from 121 seconds till 120 minutes).
+    # %clicker%        The name of the player that clicked the sign (only to be used in the signProfiles section).
+    # %resellprice%    The price of a region when it is in resell mode.
+    # %rawresellprice% The resellprice without formatting.
+    # %moneyback%      The amount of money the player will get back when unrenting/selling the region (formatted with currency layout).
+    # %rawmoneyback%   The moneyback without formatting.
+    # %moneybackpercent% The percentage of the price the player will get back when unrenting the region.
+    # %timesExtended%  The number of times the region has been extended (zero when first rented)
+    # %maxextends%     The maximum number of extends a player can do on the region.
+    # %extendsleft%    The number of extends that are left (maxextends - timesextended).
+    # %maxrenttime%    The maximum time you can rent a region in advance (human readable).
+    # %inactivetime%   The maximum time a player may be inactive before unrent/sell (human readable).
+    # %year%           The current year.
+    # %month%          The current month in the year.
+    # %day%            The current day in the month.
+    # %hour%           The current hour in the day (0-23).
+    # %minute%         The current minute of the hour.
+    # %second%         The current second of the minute.
+    # %millisecond%    The current millisecond of the second.
+    # %epoch%          The number of milliseconds since January 1, 1970 (Unix Epoch).
+    # %tpx%            The exact x coordinate of the location that the teleport is set to
+    # %tpy%            The exact y coordinate of the location that the teleport is set to
+    # %tpz%            The exact z coordinate of the location that the teleport is set to
+    # %tpblockx%       The rounded x coordinate of the location that the teleport is set to
+    # %tpblocky%       The rounded y coordinate of the location that the teleport is set to
+    # %tpblockz%       The rounded z coordinate of the location that the teleport is set to
+    # %tppitch%        The exact pitch of the teleport location
+    # %tppitchround%   The rounded pitch of the teleport location
+    # %tpyaw%          The exact yaw of the teleport location
+    # %tpyawround%     The rounded yaw of the teleport location
+    # %tpworld%        The world name of the teleport location
+    # %lang:<languageKey>|Optional arguments|%  Insert a message from EN.yml, for example: '%lang:timeleft-ended%' or '%lang:timeleft-years|15|%'
+
+  AreaShop-default.yml: |
+    # ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+    # ║ default.yml file of the AreaShop plugin created by NLThijs48, Github can be found at https://github.com/NLthijs48/AreaShop.║
+    # ║ All settings below are default settings and can be overridden by group settings or individual region settings.             ║
+    # ║ More information and tutorials can be found on the wiki: https://github.com/NLthijs48/AreaShop/wiki                        ║
+    # ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ GENERAL: Settings that apply to all regions.                                                                               │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    general:
+      # The y location within the region to start searching for safe teleport locations (x and z are in the middle of the region).
+      # Possible values: 'bottom', 'middle', 'top' or a number indicating an exact y coordinate.
+      teleportLocationY: bottom
+      # If true the teleportation algorithm only allows teleportation to inside the region, otherwise it will expand
+      # a cube from the starting point to check for safe spots (then it could end outside of the region).
+      teleportIntoRegion: true
+      # Same as above, but then for when you teleport to the sign of a region instead of the region itself.
+      teleportToSignIntoRegion: false
+      # Allow teleporting to the region from another world with `/as tp`
+      teleportCrossWorld: true
+      # When teleporting to a sign, the number of blocks the player should get teleported away from the sign
+      teleportSignDistance: 1
+      # Should '/as find' find this region while the player is in another world? (prevents cross-world teleport if turned off)
+      findCrossWorld: true
+      # Set where the '/as find' command should teleport the player to, set to true for the first sign of the region and set to
+      # false to teleport to the location set by '/as settp' or the default location (if not set).
+      findTeleportToSign: true
+      # Restricts buying and renting of regions to the world of the region.
+      restrictedToWorld: false
+      # Restricts buying and renting of regions to the region itself (player needs to be inside the region).
+      restrictedToRegion: false
+      # The UUID of the landlord, this player will receive all money from rents/buys (but not reselling with '/as resell').
+      landlord: ''
+      # Name of the landlord, if the landlord UUID setting is not provided then the name will be used instead.
+      landlordName: ''
+      # Disable to prevent counting this region towards limits set by 'limitGroups' in config.yml.
+      countForLimits: true
+
+      ##### Set the layout and functions of the signs.
+      # The following sections can be added for performing certain commands when the sign is clicked:
+      #     rightClickPlayer, rightClickConsole, shiftRightClickPlayer, shiftRightClickConsole,
+      #     leftClickPlayer, leftClickConsole, shiftLeftClickPlayer, shiftLeftClickConsole.
+      # Sections with 'Player' at the end will be run by the player that clicks the sign and 'Console' ones from the console.
+      signProfile:
+        forrent:
+          line1: '&2&l[For Rent]'
+          line2: '%region%'
+          line3: '%duration%'
+          line4: '%price%'
+          rightClickPlayer:
+            - 'areashop rent %region%'
+          rightClickConsole:
+          #  - 'areashop message %clicker% %lang:confirm-rent|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
+          leftClickPlayer:
+            - 'areashop info region %region%'
+        rented:
+          line1: '&4&l[Rented]'
+          line2: '%region%'
+          line3: '%player%'
+          line4: '%untilshort%'
+          rightClickPlayer:
+            - 'areashop rent %region%'
+          rightClickConsole:
+          #  - 'areashop message %clicker% %lang:confirm-extend|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
+          leftClickPlayer:
+            - 'areashop info region %region%'
+          shiftRightClickConsole:
+            - 'areashop message %clicker% %lang:confirm-unrent|%region%|%'
+        forsale:
+          line1: '&2&l[For Sale]'
+          line2: '%region%'
+          line3: '%price%'
+          line4:
+          rightClickPlayer:
+            - 'areashop buy %region%'
+          rightClickConsole:
+          #  - 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
+          leftClickPlayer:
+            - 'areashop info region %region%'
+        resell:
+          line1: '&9&l[Resale]'
+          line2: '%region%'
+          line3: '%resellprice%'
+          line4: '&8%player%'
+          rightClickPlayer:
+            - 'areashop buy %region%'
+          rightClickConsole:
+          #  - 'areashop message %clicker% %lang:confirm-buy|%region%|%' # Alternative to first ask for confirmation (remove rightClickPlayer section)
+          leftClickPlayer:
+            - 'areashop info region %region%'
+          shiftRightClickPlayer:
+            - 'areashop stopresell %region%'
+        sold:
+          line1: '&4&l[Sold]'
+          line2: '%region%'
+          line3: '%player%'
+          line4:
+          rightClickPlayer:
+            - 'areashop buy %region%'
+          leftClickPlayer:
+            - 'areashop info region %region%'
+          shiftRightClickConsole:
+            - 'areashop message %clicker% %lang:confirm-sell|%region%|%'
+
+      ##### Set WorldGuard regions flags depending on the region state.
+      # All normal region flags as present in WorldGuard can be used, in addition to 'members', 'owners', 'priority' and 'parent'.
+      # The members and owners flag normally take a list of UUID's separated by a comma, adding by name is possible with 'n:<name>'.
+      # You can add groups by using 'g:<groupname>', so an example woul be: '%uuid%, %friendsuuid%, g:vip, n:coolGuy'.
+      # For allow/deny flags like 'entry' and 'exit' you can set the group setting by using 'g:<scope>', <scope> is one of the following:
+      #     members, non_members, owners, non_owners, all. Example, only members can enter the region:
+      #       entry: 'deny g:non_members'
+      # '' will remove the flag from the region.
+      flagProfile:
+        ALL: # Flags that should always be applied
+          priority: 10
+          owners: ''
+          members: ''
+          interact: 'deny g:non_members' # Only allow region members/owners to use things in the region (chests, furnace, animals, etc.)
+          use: 'deny g:non_members'
+          build: 'deny g:non_members'
+          block-break: 'deny g:non_members'
+          block-place: 'deny g:non_members'
+        forrent:
+          greeting: '%lang:prefix%%lang:greeting-forrent%'
+        rented:
+          members: '%uuid%, %friendsuuid%'
+          greeting: '%lang:prefix%%lang:greeting-rented%'
+        forsale:
+          greeting: '%lang:prefix%%lang:greeting-forsale%'
+        sold:
+          members: '%uuid%, %friendsuuid%'
+          greeting: '%lang:prefix%%lang:greeting-bought%'
+        resell:
+          members: '%uuid%, %friendsuuid%'
+          greeting: '%lang:prefix%%lang:greeting-resale%'
+
+      ##### Save and restore schematics to clean up regions.
+      # After 'save:' or 'restore:' you enter the name of the file to restore from/to (.schematic is added automatically).
+      # Set to true to enable saving/restoring for regions as specified in the profile below, which is specified in the config.
+      enableRestore: true
+      schematicProfile:
+        created:
+          save: '%type%-%region%'
+          restore: ''
+        deleted:
+          save: ''
+          restore: '%type%-%region%'
+        rented:
+          save: '%type%-%region%'
+          restore: ''
+        unrented:
+          save: ''
+          restore: '%type%-%region%'
+        bought:
+          save: '%type%-%region%'
+          restore: ''
+        sold:
+          save: ''
+          restore: '%type%-%region%'
+        resell:
+          save: ''
+          restore: ''
+
+      ##### Run commands when an event happens.
+      # Commands at a 'before' section will execute before the region details are changed in the AreaShop system
+      # and before any other actions occurred (setting the owner, saving/loading schematics, etc.),
+      # the 'after' commands will be run when all changes are done.
+      # You can add a list of commands to 'before' and 'after'.
+      eventCommandProfile:
+        created:
+          before:
+          after:
+        #  - "say An AreaShop region has been created: %region%"
+        deleted:
+          before:
+          after:
+        rented:
+          before:
+          after:
+        extended:
+          before:
+          after:
+        unrented:
+          before:
+          after:
+        bought:
+          before:
+          after:
+        sold:
+          before:
+          after:
+        resell:
+          before:
+          after:
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ RENT: Settings that apply to rent regions.                                                                                 │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    rent:
+      # The default price of a rental region (variables, mathematical expressions and JavaScript can be used).
+      price: 1
+      # The default duration of a rental region, you can find all time indicators in config.yml below the RENTING header.
+      duration: '1 day'
+      # Automatically extend the rental when it is running out (if the player meets the criteria)
+      autoExtend: false
+      # The percentage of the rent price you get back if you unrent the region (only the time that is unused is given back).
+      # (variables, mathematical expressions and JavaScript can be used)
+      moneyBack: 100
+      # Maximum number of extends a player can do (-1 for infinite, 0 for no extending), if they are at this number then
+      # they are force to let their rent run out (and can rent it again at that point).
+      maxExtends: 3
+      # The Maximum time they can have the region rented in advance (use times like '1 day' etc, or 'unlimited' for no limit).
+      # This can prevent players from renting their region for a year, and to ensure they periodically have to extend their rent.
+      maxRentTime: '14 day'
+      # Automatically unrent the region after the specified time between the last login time of the renter and the current time.
+      # Use times like '1 day' etc, or 'disabled' for never.
+      inactiveTimeUntilUnrent: 'disabled'
+      # If a region of a player has less then this time left when he joins the server he will get a notice about his region.
+      # Use '' to disable.
+      warningOnLoginTime: '1 day'
+      # If renting the region would go above 'maxRentTIme', then extend to the maximum instead of cancelling the rent.
+      extendToFullWhenAboveMaxRentTime: true
+      ##### Run commands a certain time before expiration of a region.
+      # Time identifiers specify how much time before the rent is over the commands should be executed.
+      # These commands are executed in a 'best effort' manner, if your server is offline when it should trigger then it won't run.
+      expirationWarningProfile:
+        '1 day':
+          - "areashop message %player% %lang:prefix%%lang:rent-expiringSoon|%region%|%timeleft%|%"
+        '1 hour':
+          - "areashop message %player% %lang:prefix%%lang:rent-expiringSoon|%region%|%timeleft%|%"
+        '5 minutes':
+          - "areashop message %player% %lang:prefix%%lang:rent-expiringSoon|%region%|%timeleft%|%"
+
+
+    # ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    # │ BUY: Settings that apply to buy regions.                                                                                   │
+    # └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    buy:
+      # The default price of a buy region (variables, mathematical expressions and JavaScript can be used).
+      price: 1000
+      # The percentage of the price you get back if you sell the region (variables, mathematical expressions and JavaScript can be used)
+      moneyBack: 100
+      # Automatically sell the region after the specified number of minutes between the last login time of the buyer and the current time
+      # Use times like '1 day' etc, or 'disabled' for never.
+      inactiveTimeUntilSell: 'disabled'
+      # Selling is disabled for the region owner (players with areashop.sellown without areashop.sell)
+      sellDisabled: false
+      # Reselling is disabled for the region owner (players with areashop.resell without areashop.resellall)
+      resellDisabled: false
