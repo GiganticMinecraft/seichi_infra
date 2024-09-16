@@ -242,6 +242,9 @@ spec:
               subPath: jmx-exporter-config.yaml
 
             # BungeePortals プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/BungeePortals/config.yml
+              subPath: BungeePortals-config.yml
             - name: bungee-portals-config
               mountPath: /plugins/BungeePortals/portals.yml
               subPath: portals.yml

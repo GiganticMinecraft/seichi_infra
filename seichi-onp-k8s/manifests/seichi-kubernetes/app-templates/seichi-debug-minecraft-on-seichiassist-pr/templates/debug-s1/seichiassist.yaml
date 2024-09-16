@@ -364,6 +364,11 @@ spec:
               mountPath: /plugins/BetterChairs/config.yml
               subPath: BetterChairs-config.yml
 
+            # BungeePortals プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/BungeePortals/config.yml
+              subPath: BungeePortals-config.yml
+
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
               mountPath: /plugins/SeichiAssist/config.yml
