@@ -140,6 +140,9 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "1054159676964622426"
 
+            - name: CFG_COREPROTECT_MYSQL_DATABASE_NAME
+              value: "coreprotect__mc_s1"
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
@@ -373,6 +376,11 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/ClearLag/config.yml
               subPath: ClearLag-config.yml
+
+            # CoreProtect プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/CoreProtect/config.yml
+              subPath: CoreProtect-config.yml
 
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
