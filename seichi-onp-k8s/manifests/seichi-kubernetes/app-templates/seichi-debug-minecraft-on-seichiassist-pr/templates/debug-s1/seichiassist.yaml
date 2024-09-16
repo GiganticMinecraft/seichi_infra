@@ -402,6 +402,9 @@ spec:
             - name: common-dynmap-config
               mountPath: /plugins/Dynmap-Towny/config.yml
               subPath: dynmap-Towny-config.yml
+            - name: common-dynmap-config
+              mountPath: /plugins/Dynmap-WorldGuard/config.yml
+              subPath: dynmap-WorldGuard-config.yml
 
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config

@@ -638,3 +638,39 @@ data:
       format: '&color;2[WEB] %playername%: &color;f%message%'
     # The language file you wish to use
     language: english.yml
+
+  dynmap-WorldGuard-config.yml: |
+    update:
+      # Seconds between checks for Residence updates
+      period: 120 # default: 300
+    layer:
+      name: WorldGuard保護範囲表示
+      # Make mobs layer hidden by default
+      hidebydefault: false
+      # ordering priority in layer menu (low goes before high - default is 0)
+      layerprio: 0
+      # (optional) set minimum zoom level before layer is visible (0 = defalt, always visible)
+      minzoom: 0
+    use3dregions: false
+    infowindow: <div class=\"infowindow\"><span style=\"font-size:20pt;"><b>%regionname%</b></span><br
+      />(%parent%) - %priority%<br /><br /><span style=\"font-size:16pt;">Owners(保護オーナー)</span><br
+      /><span style="font-weight:bold;">%playerowners%<br/>%groupowners%</span><br/><span
+      style=\"font-size:16pt;">Members(保護メンバー)</span><br /><span style="font-weight:bold;">%playermembers%<br/>%groupmembers%</span><br/><span
+      style=\"font-size:16pt;">Flags(フラグ設定一覧)</span><br /><span style="font-weight:bold;">%flags%</span></div>
+    regionstyle:
+      strokeColor: '#FF0000'
+      strokeOpacity: 0.5 # default: 0.8
+      strokeWeight: 3
+      fillColor: '#FF0000'
+      fillOpacity: 0.3 # default: 0.35
+      unownedStrokeColor: '#00FF00'
+    visibleregions: []
+    hiddenregions: []
+    custstyle:
+      customregion1:
+        strokeColor: '#00FF00'
+    ownerstyle:
+      kingoftheworld:
+        strokecolor: '#C0C0C0'
+    maxdepth: 16
+    updates-per-tick: 20
