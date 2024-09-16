@@ -143,6 +143,9 @@ spec:
             - name: CFG_COREPROTECT_MYSQL_DATABASE_NAME
               value: "coreprotect__mc_s1"
 
+            - name: CFG_DYNMAP_SERVER_NAME
+              value: "アルカディア"
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
@@ -389,6 +392,14 @@ spec:
               mountPath: /plugins/Join-Leave/config.yml
               subPath: CustomJoinLeftMessage-config.yml
 
+            # DynMap プラグインの設定ファイル
+            - name: common-dynmap-config
+              mountPath: /plugins/dynmap/configuration.txt
+              subPath: dynmap-configuration.txt
+            - name: dynmap-config--s1
+              mountPath: /plugins/dynmap/worlds.txt
+              subPath: worlds.txt
+
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
               mountPath: /plugins/SeichiAssist/config.yml
@@ -451,6 +462,12 @@ spec:
         - name: common-mcserver-plugin-configs
           configMap:
             name: common-mcserver-plugin-configs
+        - name: common-dynmap-config
+          configMap:
+            name: common-dynmap-config
+        - name: dynmap-config--s1
+          configMap:
+            name: dynmap-config--s1
         - name: seichiassist-config
           configMap:
             name: seichiassist-config
