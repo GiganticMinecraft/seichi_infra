@@ -129,7 +129,7 @@ spec:
               value: "1054159676964622426"
 
             - name: CFG_COREPROTECT_MYSQL_DATABASE_NAME
-              value: "coreprotect__mc_s1"
+              value: "coreprotect__mc_lobby"
 
             - name: RCON_CMDS_STARTUP
               value: |-
