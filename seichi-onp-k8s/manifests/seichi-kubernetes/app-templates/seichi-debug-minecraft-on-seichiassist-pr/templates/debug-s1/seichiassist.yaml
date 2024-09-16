@@ -349,6 +349,11 @@ spec:
               mountPath: /plugins/PrometheusExporter/config.yml
               subPath: PrometheusExporter-config.yml
 
+            # antiRedstoneClock プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/antiRedstoneClock/config.yml
+              subPath: antiRedstoneClock.yml
+
             # SeichiAssist プラグインの設定ファイル
             - name: seichiassist-config
               mountPath: /plugins/SeichiAssist/config.yml
