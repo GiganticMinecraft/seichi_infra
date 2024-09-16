@@ -233,6 +233,11 @@ spec:
               mountPath: /plugins/BetterChairs/config.yml
               subPath: BetterChairs-config.yml
 
+            # ClearLag プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ClearLag/config.yml
+              subPath: ClearLag-config.yml
+
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
