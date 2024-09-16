@@ -399,8 +399,8 @@ spec:
             - name: dynmap-config--s1
               mountPath: /plugins/dynmap/worlds.txt
               subPath: worlds.txt
-            - name: common-dynmap-config
-              mountPath: /plugins/Dynmap-Towny/config.yml
+            - name: dynmap-config--s1
+              mountPath: /plugins/Dynmap-WorldGuard/config.yml
               subPath: dynmap-Towny-config.yml
             - name: common-dynmap-config
               mountPath: /plugins/Dynmap-WorldGuard/config.yml
