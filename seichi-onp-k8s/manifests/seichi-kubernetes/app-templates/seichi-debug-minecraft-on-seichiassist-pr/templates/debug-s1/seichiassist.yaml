@@ -436,6 +436,11 @@ spec:
               mountPath: /plugins/ProtocolLib/config.yml
               subPath: ProtocolLib-config.yml
 
+            # Shopkeepers プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Shopkeepers/config.yml
+              subPath: Shopkeepers-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
