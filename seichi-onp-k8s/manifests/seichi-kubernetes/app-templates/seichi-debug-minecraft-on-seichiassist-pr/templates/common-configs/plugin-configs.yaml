@@ -3537,8 +3537,8 @@ data:
       database: luckperms
 
       # Credentials for the database.
-      username: root
-      password: ''
+      username: mcserver
+      password: "${CFG_MARIADB_PASSWORD}"
 
       # These settings apply to the MySQL connection pool.
       # - The default values will be suitable for the majority of users.

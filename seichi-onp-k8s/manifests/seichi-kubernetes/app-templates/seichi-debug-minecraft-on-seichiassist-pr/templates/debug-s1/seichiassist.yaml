@@ -152,6 +152,12 @@ spec:
             - name: CFG_LUCKPERMS_SERVER_NAME
               value: "s1"
 
+            - name: CFG_MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mcserver-password
+                  name: mariadb-pr-review-password
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
