@@ -479,7 +479,7 @@ spec:
               mountPath: /plugins/Vault/config.yml
               subPath: Vault-config.yml
 
-            # WeatherRestrictions プラグイン周りの設定ファイル
+            # WeatherRestrictions プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/WeatherRestrictions/config.yml
               subPath: WeatherRestrictions-config.yml

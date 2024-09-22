@@ -304,17 +304,17 @@ spec:
               mountPath: /plugins/SimpleTrading/i18n/ja_JP.yml
               subPath: SimpleTrading-ja_JP.yml
 
-            # SuperVanish プラグイン周りの設定ファイル
+            # SuperVanish プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/SuperVanish/config.yml
               subPath: SuperVanish-config.yml
 
-            # tce プラグイン周りの設定ファイル
+            # tce プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/tce/events.yml
               subPath: tce-events.yml
 
-            # WeatherRestrictions プラグイン周りの設定ファイル
+            # WeatherRestrictions プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/WeatherRestrictions/config.yml
               subPath: WeatherRestrictions-config.yml
