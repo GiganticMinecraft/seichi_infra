@@ -5538,3 +5538,6 @@ data:
     #    fadeout: 0.5
     # <------ Syntax
     # Color code is lowercase.
+
+  Vault-config.yml: |
+    update-check: true
