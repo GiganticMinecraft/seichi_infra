@@ -5918,7 +5918,7 @@ data:
     Settings:
       #SQLite MySQL MariaDB
       #MariaDB require DatabaseDrivers
-      storage-type: MariaDB
+      storage-type: MySQL
       #Use connection pool or not
       #Require 'slf4j' dependencies
       #At least java version 11 is required
