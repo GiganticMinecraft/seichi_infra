@@ -459,6 +459,11 @@ spec:
               mountPath: /plugins/SimpleTrading/i18n/ja_JP.yml
               subPath: SimpleTrading-ja_JP.yml
 
+            # SuperVanish プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SuperVanish/config.yml
+              subPath: SuperVanish-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
