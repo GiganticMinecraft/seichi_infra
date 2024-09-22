@@ -499,6 +499,11 @@ spec:
               mountPath: /plugins/BlocksHub/config.yml
               subPath: BlocksHub-config.yml
 
+            # ShopChest プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/ShopChest/config.yml
+              subPath: ShopChest-config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
