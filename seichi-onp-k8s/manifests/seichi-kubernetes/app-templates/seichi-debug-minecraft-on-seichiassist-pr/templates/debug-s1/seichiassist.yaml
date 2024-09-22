@@ -489,6 +489,14 @@ spec:
               mountPath: /plugins/WG-GUI/config.yml
               subPath: WG-GUI-config.yml
 
+            # XConomy プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/XConomy/config.yml
+              subPath: XConomy-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/XConomy/database.yml
+              subPath: XConomy-database.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
