@@ -469,6 +469,11 @@ spec:
               mountPath: /plugins/tce/events.yml
               subPath: tce-events.yml
 
+            # ThisWorld プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ThisWorld/config.yml
+              subPath: ThisWorld-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
