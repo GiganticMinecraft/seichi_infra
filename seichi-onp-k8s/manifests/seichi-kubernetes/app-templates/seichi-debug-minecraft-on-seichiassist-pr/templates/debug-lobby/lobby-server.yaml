@@ -296,6 +296,14 @@ spec:
               mountPath: /plugins/SimpleElevator/config.yml
               subPath: SimpleElevator-config.yml
 
+            # SimpleTrading プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SimpleTrading/config.yml
+              subPath: SimpleTrading-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SimpleTrading/i18n/ja_JP.yml
+              subPath: SimpleTrading-ja_JP.yml
+
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar

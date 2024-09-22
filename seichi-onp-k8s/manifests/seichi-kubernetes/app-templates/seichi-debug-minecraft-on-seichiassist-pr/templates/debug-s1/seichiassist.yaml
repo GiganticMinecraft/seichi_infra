@@ -451,6 +451,14 @@ spec:
               mountPath: /plugins/SimpleElevator/config.yml
               subPath: SimpleElevator-config.yml
 
+            # SimpleTrading プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SimpleTrading/config.yml
+              subPath: SimpleTrading-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SimpleTrading/i18n/ja_JP.yml
+              subPath: SimpleTrading-ja_JP.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
