@@ -421,6 +421,11 @@ spec:
               mountPath: /plugins/LuckPerms/config.yml
               subPath: LuckPerms-config.yml
 
+            # Multiverse-Core プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Multiverse-Core/config.yml
+              subPath: Multiverse-Core-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt

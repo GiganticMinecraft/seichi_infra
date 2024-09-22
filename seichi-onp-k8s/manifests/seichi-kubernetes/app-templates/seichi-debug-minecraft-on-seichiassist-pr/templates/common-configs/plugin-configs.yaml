@@ -4142,3 +4142,90 @@ data:
     # If LuckPerms should attempt to resolve Vanilla command target selectors for LP commands.
     # See here for more info: https://minecraft.wiki/w/Target_selectors
     resolve-command-selectors: false
+
+  Multiverse-Core-config.yml: |
+    # This is the base tag. DON'T TOUCH IT.
+    multiverse-configuration:
+
+      # This is used for more efficient config parsing. DON'T TOUCH IT.
+      ==: com.onarandombox.MultiverseCore.MultiverseCoreConfiguration
+
+      # If the value is set to false, Multiverse will NOT enforce
+      # world access permissions.
+      # Basically permissions to access all worlds.
+      enforceaccess: 'false'
+
+      # If this is set to true, we will prefix the chat with
+      # a colorful world alias if it's present. If not, we simply
+      # show the world's name in white. If this is false Multiverse
+      # won't touch your chat
+      prefixchat: 'true'
+
+      # The format of the chat prefix if true.
+      prefixchatformat: '[%world%]%chat%'
+
+      # A-sync chat toggle (improves chat performance when on)
+      useasyncchat: 'true'
+
+      # If this is set to true, Multiverse will enforce access permissions
+      # for all plugins, not just Multiverse.
+      teleportintercept: 'true'
+
+      # If true, Multiverse will use the firstspawnworld value as the world new players will join.
+      # Set to false if you use another spawn plugin.
+      firstspawnoverride: 'true'
+
+      # If this is set to true, users will be notified of what permission(s)
+      # they lack to perform an action in Multiverse. If this is false,
+      # they are denied silently.
+      displaypermerrors: 'true'
+
+      # If true, MV will attempt to enable Buscript. This may fail on more recent versions of Java.
+      enablebuscript: 'true'
+
+      # This is our debug flag. Its value can be 0-3. It can be used to determine permission issues and more.
+      # Otherwise, there's no need to touch this. If not instructed by a wiki page or developer.
+      # 0 - Off, no debug messages.
+      # 1 -
+      # 2 -
+      # 3 -
+      globaldebug: '0'
+
+      # If true, the startup console messages will no longer show.
+      silentstart: 'false'
+
+      # How long to leave in between sending a message to the player.
+      # In Milliseconds - Default is '5000' which is 5 Seconds.
+      messagecooldown: '5000'
+
+      # This just signifies the version number so we can see what version of config you have.
+      # NEVER TOUCH THIS VALUE
+      version: '2.9'
+
+      # This is the world you want players to spawn in. It does *NOT*
+      # have to be the world in server.properties!
+      firstspawnworld: world_2
+
+      # How fast are people allowed to use /MVTP
+      # In Milliseconds - Default is '1000' which is 1 Second.
+      # If you have 'teleportintercept' set to 'true', this will limit
+      # ANY plugin that uses the onTeleport method.
+      teleportcooldown: '1000'
+
+      # This config option defines whether or not Multiverse should 
+      # interfere with's Bukkit's default portal search radius.
+      # Setting it to true 'true' would mean you want to simply let
+      # Bukkit decides the search radius itself.
+      defaultportalsearch: 'false'
+
+      # This config option limits the area in which Bukkit will attempt
+      # to find portals to connect to when using Vanilla style portals.
+      # This only has an effect on Vanilla portals, including the ones
+      # offered by Multiverse-NetherPortals.
+      portalsearchradius: '128'
+
+      # If true, purge with be automatic.
+      autopurge: 'true'
+
+      # If true, the donation link shown in the console will no longer show on startup.
+      idonotwanttodonate: 'true'
