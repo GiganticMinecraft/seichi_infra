@@ -5078,3 +5078,12 @@ data:
     # Disable plugin functions for renamed Shulker Boxes with special formatting ONLY (ex. Colors, bold, italics, etc...)
     # This option is automatically disabled if the above is false
     use-formatted-renamed-boxes: true
+
+  SimpleElevator-config.yml: |
+    DebugMode: 'false'
+    Messages:
+      upMessage: Up
+      downMessage: Down
+    Sounds:
+      upSound: BLOCK_NOTE_BLOCK_HARP
+      downSound: BLOCK_NOTE_BLOCK_BASS
