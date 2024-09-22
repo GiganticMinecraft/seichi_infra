@@ -146,6 +146,9 @@ spec:
             - name: CFG_DYNMAP_SERVER_NAME
               value: "アルカディア"
 
+            - name: CFG_LITEBANS_SERVER_NAME
+              value: "s1"
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
@@ -404,6 +407,11 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/FastCraft/config.yml
               subPath: FastCraft-config.yml
+
+            # LiteBans プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LiteBans/config.yml
+              subPath: LiteBans-config.yml
 
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
