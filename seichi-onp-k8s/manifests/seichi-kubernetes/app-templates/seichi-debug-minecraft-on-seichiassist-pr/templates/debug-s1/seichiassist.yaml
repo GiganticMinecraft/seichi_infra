@@ -400,6 +400,11 @@ spec:
               mountPath: /plugins/FastAsyncWorldEdit/worldedit-config.yml
               subPath: worldedit-config.yml
 
+            # FastCraft プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/FastCraft/config.yml
+              subPath: FastCraft-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
