@@ -105,6 +105,9 @@ spec:
         - -c
         - |
           echo 'CREATE DATABASE IF NOT EXISTS luckperms;' > /docker-entrypoint-initdb.d/create-db.sql
+          echo 'CREATE DATABASE IF NOT EXISTS litebans;' >> /docker-entrypoint-initdb.d/create-db.sql
+          echo 'CREATE DATABASE IF NOT EXISTS coreprotect__mc_s1;' >> /docker-entrypoint-initdb.d/create-db.sql
+          echo 'CREATE DATABASE IF NOT EXISTS xconomy;' >> /docker-entrypoint-initdb.d/create-db.sql
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
