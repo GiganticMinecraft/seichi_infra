@@ -5674,3 +5674,19 @@ data:
         ThunderstormChancePercentage: 20
         SuperchargedThunderChance: 0.0
         SuperchargedExplosionRadius: 3.0
+
+
+  WG-GUI-config.yml: |
+    Items:
+      FlagItem: REDSTONE_TORCH
+      RegionItem: END_CRYSTAL
+      WorldItem: GRASS_BLOCK
+      OwnerMemberItem: TOTEM_OF_UNDYING
+      GUIItem:
+        Material: CLOCK
+        Name: '&3&lWG-GUI'
+    AllowedEditCommands:
+    - //pos1
+    - //pos2
+    - /gamemode 1
+    - /gamemode 3

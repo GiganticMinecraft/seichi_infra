@@ -484,6 +484,11 @@ spec:
               mountPath: /plugins/WeatherRestrictions/config.yml
               subPath: WeatherRestrictions-config.yml
 
+            # WG-GUI プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/WG-GUI/config.yml
+              subPath: WG-GUI-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
