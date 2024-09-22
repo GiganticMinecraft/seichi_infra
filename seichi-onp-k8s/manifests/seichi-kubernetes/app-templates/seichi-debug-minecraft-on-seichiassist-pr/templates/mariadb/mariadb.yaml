@@ -97,6 +97,17 @@ spec:
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
+      - name: create-db-for-plugins
+        image: busybox:1.36.1
+        imagePullPolicy: IfNotPresent
+        args:
+        - sh
+        - -c
+        - |
+          echo 'CREATE DATABASE IF NOT EXISTS luckperms;' > /docker-entrypoint-initdb.d/create-db.sql
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: sqldump-volume
       restartPolicy: Always
       volumes:
       - name: storage
