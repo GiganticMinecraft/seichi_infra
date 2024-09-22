@@ -505,7 +505,7 @@ spec:
               mountPath: /plugins/dynmap/worlds.txt
               subPath: worlds.txt
             - name: dynmap-config--s1
-              mountPath: /plugins/Dynmap-WorldGuard/config.yml
+              mountPath: /plugins/Dynmap-Towny/config.yml
               subPath: dynmap-Towny-config.yml
             - name: common-dynmap-config
               mountPath: /plugins/Dynmap-WorldGuard/config.yml
