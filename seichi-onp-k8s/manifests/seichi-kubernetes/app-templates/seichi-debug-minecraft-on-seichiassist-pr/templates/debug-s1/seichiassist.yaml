@@ -392,6 +392,14 @@ spec:
               mountPath: /plugins/Join-Leave/config.yml
               subPath: CustomJoinLeftMessage-config.yml
 
+            # FastAsyncWorldEdit プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/FastAsyncWorldEdit/config.yml
+              subPath: FastAsyncWorldEdit-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/FastAsyncWorldEdit/worldedit-config.yml
+              subPath: worldedit-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
@@ -458,6 +466,9 @@ spec:
             - name: world-download-volume
               mountPath: /data
 
+            - name: worldedit-schematica-volume
+              mountPath: /worldedit-schematica
+
       volumes:
         - name: common-mcserver-configs
           configMap:
@@ -503,4 +514,8 @@ spec:
 
         # S1から取ってきたワールドデータをぶちこむボリューム
         - name: world-download-volume
+          emptyDir: {}
+
+        # WorldEditがSchematicaを保存・読み取るするためのvolume
+        - name: worldedit-schematica-volume
           emptyDir: {}
