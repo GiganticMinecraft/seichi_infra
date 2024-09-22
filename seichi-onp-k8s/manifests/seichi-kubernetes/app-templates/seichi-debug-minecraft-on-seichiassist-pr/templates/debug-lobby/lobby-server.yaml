@@ -324,6 +324,11 @@ spec:
               mountPath: /plugins/WG-GUI/config.yml
               subPath: WG-GUI-config.yml
 
+            # WorldBorder プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/WorldBorder/config.yml
+              subPath: WorldBorder-config.yml
+
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
