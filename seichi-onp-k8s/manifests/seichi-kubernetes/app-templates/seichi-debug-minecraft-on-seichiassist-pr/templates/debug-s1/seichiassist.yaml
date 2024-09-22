@@ -464,6 +464,11 @@ spec:
               mountPath: /plugins/SuperVanish/config.yml
               subPath: SuperVanish-config.yml
 
+            # tce プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/tce/events.yml
+              subPath: tce-events.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt
