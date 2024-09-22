@@ -426,6 +426,11 @@ spec:
               mountPath: /plugins/Multiverse-Core/config.yml
               subPath: Multiverse-Core-config.yml
 
+            # PlugManX プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/PlugManX/config.yml
+              subPath: PlugManX-config.yml
+
             # DynMap プラグインの設定ファイル
             - name: common-dynmap-config
               mountPath: /plugins/dynmap/configuration.txt

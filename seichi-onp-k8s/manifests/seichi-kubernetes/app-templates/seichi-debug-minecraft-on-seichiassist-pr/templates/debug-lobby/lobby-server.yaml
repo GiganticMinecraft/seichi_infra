@@ -271,6 +271,11 @@ spec:
               mountPath: /plugins/Multiverse-Portals/config.yml
               subPath: Multiverse-Portals-config.yml
 
+            # PlugManX プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/PlugManX/config.yml
+              subPath: PlugManX-config.yml
+
             # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
             - name: jmx-exporter-download-volume
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar

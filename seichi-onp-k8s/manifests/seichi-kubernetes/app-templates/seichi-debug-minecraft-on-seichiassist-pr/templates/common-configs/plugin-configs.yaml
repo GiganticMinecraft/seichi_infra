@@ -4272,3 +4272,23 @@ data:
     # This just signifies the version number so we can see what version of config you have.
     # NEVER TOUCH THIS VALUE
     version: 2.7
+
+  PlugManX-config.yml: |
+    ###
+    # A list of plugins that we should ignore when doing enable, disable, restart, load, reload, and unload.
+    #
+    # This takes the form of a comma separated list enclosed within the brackets.
+    ###
+    ignored-plugins: [PlugMan, PlugManX, ViaVersion, ViaBackwards, ViaRewind, ProtocolSupport, ProtocolLib]
+    notify-on-broken-command-removal: true
+    auto-load:
+      enabled: false
+      check-every-seconds: 10
+    auto-unload:
+      enabled: false
+      check-every-seconds: 10
+    auto-reload:
+      enabled: false
+      check-every-seconds: 10
+    # Do not change this value
+    version: 2
