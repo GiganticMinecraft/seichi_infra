@@ -1018,21 +1018,22 @@ data:
         perform-on-next-start: false
         keep-names-that-lack-uuids: true
       use-creature-spawn-event: true
-      sql:
-        use: false
-        dsn: jdbc:mysql://localhost/worldguard
-        username: worldguard
-        password: worldguard
-        table-prefix: ''
+      disable-bypass-by-default: false
+      announce-bypass-status: false
+      use-paper-entity-origin: false
       enable: true
       invincibility-removes-mobs: false
+      cancel-chat-without-recipients: true
+      nether-portal-protection: true
       fake-player-build-override: true
       explosion-flags-block-entity-damage: true
       high-frequency-flags: false
       protect-against-liquid-flow: true
-      wand: 334
+      wand: minecraft:leather
       max-claim-volume: 67108864
       claim-only-inside-existing-regions: false
+      set-parent-on-claim: ''
+      location-flags-only-inside-regions: false
       max-region-count-per-player:
         default: 10
         # 2023-03-18 SeichiAssist-ExternalLib#128
@@ -1042,9 +1043,12 @@ data:
     auto-no-drowning-group: false
     use-player-move-event: true
     use-player-teleports: true
+    use-particle-effects: true
+    disable-permission-cache: false
     security:
       deop-everyone-on-join: false
       block-in-game-op-command: false
+      host-keys-allow-forge-clients: false
     host-keys: {}
     summary-on-start: true
     op-permissions: false
@@ -1055,19 +1059,17 @@ data:
       block-entity-spawns-with-untraceable-cause: false
       interaction-whitelist: []
       emit-block-use-at-feet: []
+      ignore-hopper-item-move-events: false
+      break-hoppers-on-denied-move: true
     protection:
       item-durability: true
       remove-infinite-stacks: false
       disable-xp-orb-drops: false
-      disable-obsidian-generators: false
+      use-max-priority-association: false
     gameplay:
       block-potions: [INVISIBILITY]
       block-potions-overly-reliably: false
-    simulation:
-      sponge:
-        enable: false
-        radius: 3
-        redstone: false
+      disable-conduit-effects: false
     default:
       pumpkin-scuba: false
       disable-health-regain: false
@@ -1103,10 +1105,12 @@ data:
       disable-snowman-trails: false
       block-painting-destroy: true
       block-item-frame-destroy: true
+      block-armor-stand-destroy: false
       block-plugin-spawning: true
       block-above-ground-slimes: false
       block-other-explosions: true
       block-zombie-door-destruction: false
+      block-vehicle-entry: false
       block-creature-spawn: []
     player-damage:
       disable-fall-damage: false
@@ -1119,13 +1123,14 @@ data:
       teleport-on-suffocation: false
       disable-void-damage: false
       teleport-on-void-falling: false
+      reset-fall-on-void-teleport: false
       disable-explosion-damage: false
       disable-mob-damage: false
       disable-death-messages: false
-    chest-protection:
-      enable: false
-      disable-off-check: false
     crops:
+      disable-creature-trampling: false
+      disable-player-trampling: false
+    turtle-egg:
       disable-creature-trampling: false
       disable-player-trampling: false
     weather:
@@ -1134,6 +1139,7 @@ data:
       disable-thunderstorm: false
       disable-weather: false
       disable-pig-zombification: false
+      disable-villager-witchification: false
       disable-powered-creepers: false
       always-raining: false
       always-thundering: false
@@ -1147,7 +1153,10 @@ data:
       disable-grass-growth: false
       disable-mycelium-spread: false
       disable-vine-growth: false
+      disable-rock-growth: false
+      disable-crop-growth: false
       disable-soil-dehydration: false
+      disable-coral-block-fade: false
       snow-fall-blocks: []
     blacklist:
       use-as-whitelist: false
@@ -1164,6 +1173,9 @@ data:
           enable: false
           path: worldguard/logs/%Y-%m-%d.log
           open-files: 10
+    custom-metrics-charts: true
+    extra-timings:
+      session-handlers: true
 
   ByeByeWither-config.yml: |
     wither:
