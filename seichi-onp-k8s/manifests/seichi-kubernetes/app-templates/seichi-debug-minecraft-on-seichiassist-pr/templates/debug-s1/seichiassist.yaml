@@ -542,6 +542,11 @@ spec:
               mountPath: /plugins/ShopChest/config.yml
               subPath: ShopChest-config.yml
 
+            # Towny プラグインの設定ファイル
+            - name: towny-config
+              mountPath: /plugins/Towny/settings/config.yml
+              subPath: config.yml
+
             - name: mod-downloader-volume
               mountPath: /plugins
 
@@ -582,6 +587,9 @@ spec:
         - name: s1-config
           configMap:
             name: s1-config
+        - name: towny-config
+          configMap:
+            name: towny-config
 
         # JMX exporterをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: jmx-exporter-download-volume
