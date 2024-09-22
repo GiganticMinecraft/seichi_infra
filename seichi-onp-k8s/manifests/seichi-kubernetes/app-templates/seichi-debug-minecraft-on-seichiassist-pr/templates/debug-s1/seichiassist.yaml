@@ -454,6 +454,9 @@ spec:
               subPath: jmx-exporter-config.yaml
 
             # Multiverse-Portals プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Multiverse-Portals/config.yml
+              subPath: Multiverse-Portals-config.yml
             - name: multiverse-portals-config
               mountPath: /plugins/Multiverse-Portals/portals.yml
               subPath: portals.yml
