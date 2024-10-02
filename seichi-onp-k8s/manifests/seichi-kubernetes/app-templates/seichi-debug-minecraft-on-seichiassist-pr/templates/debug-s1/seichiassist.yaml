@@ -31,7 +31,7 @@ spec:
                       - seichi-onp-k8s-wk-1 # CPUの多いwk-1だけにスケジュールする
       initContainers:
         - name: jmx-exporter-downloader
-          image: busybox:1.36.1
+          image: busybox:1.37.0
           env:
             - name: JMX_EXPORTER_URL
               value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar"
