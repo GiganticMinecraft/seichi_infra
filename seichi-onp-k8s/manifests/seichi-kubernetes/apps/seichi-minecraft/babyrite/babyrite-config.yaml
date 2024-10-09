@@ -8,18 +8,27 @@ kind: ConfigMap
 metadata:
   name: babyrite-config
 data:
-  config.yaml: |
+  config.toml: |
     ### babyrite configuration ###
+    # This file is used to configure babyrite.
+    # You can change the settings here to customize babyrite's behavior.
+    # For more information, see the babyrite documentation at https://babyrite.m1sk9.dev/configuration.html
 
-    # Sets whether the guild check process is bypassed when quoting.
-    # If the guild check process is bypassed, messages can be shared and quoted from all guilds in which babyrite is installed.
-    # However, the message will be shared to members who do not belong to that guild. This setting is recommended when babyrite is used by multiple private guilds.
-    bypass_guilds: false
-
-    # Whether to enable mentions in quoted messages.
-    citation_mention: false
+    ## == General settings == ##
 
     # Sets the format of babyrite log output.
     # * `compact`: output logs in normal format.
     # * `json`: Output logs in JSON format. This is the recommended setting if you are using Grafana Loki or similar.
-    logger_format: 'json'
+    logger_format='json'
+
+    ## == Preview settings == ##
+
+    [preview]
+
+    # Sets whether the guild check process is bypassed when quoting.
+    # If the guild check process is bypassed, messages can be shared and quoted from all guilds in which babyrite is installed.
+    # However, the message will be shared to members who do not belong to that guild. This setting is recommended when babyrite is used by multiple private guilds.
+    bypass_guild_check=false
+
+    # Whether to enable mentions in quoted messages.
+    is_mention=false
