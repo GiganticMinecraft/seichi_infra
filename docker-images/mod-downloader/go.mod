@@ -3,7 +3,7 @@ module github.com/GiganticMinecraft/mod-downloader
 go 1.23
 
 require (
-	github.com/getsentry/sentry-go v0.29.0
+	github.com/getsentry/sentry-go v0.29.1
 	github.com/minio/minio-go/v7 v7.0.78
 )
 
