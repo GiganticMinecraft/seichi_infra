@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mcserver-s1-plugins-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      # TODO: 2024/9/8 現在で本番環境の s1 の /plugins ディレクトリは 44G 使用しているため、60Gi で決め打ちしているが、今後は要検討
+      storage: 60Gi
