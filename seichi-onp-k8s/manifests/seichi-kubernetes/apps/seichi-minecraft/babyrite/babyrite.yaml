@@ -27,7 +27,7 @@ spec:
               memory: 32Mi
           volumeMounts:
             - name: babyrite-config-volume
-              mountPath: /home/babyrite/config
+              mountPath: /config
           env:
               # 相対パスを指定する
             - name: CONFIG_FILE_PATH
