@@ -19,6 +19,8 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
+      serviceAdvertisements:
+        - LoadBalancerIP
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -48,6 +50,8 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
+      serviceAdvertisements:
+        - LoadBalancerIP
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -76,6 +80,8 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
+      serviceAdvertisements:
+        - LoadBalancerIP
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -104,6 +110,8 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
+      serviceAdvertisements:
+        - LoadBalancerIP
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -132,6 +140,8 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
+      serviceAdvertisements:
+        - LoadBalancerIP
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
@@ -160,6 +170,8 @@ spec:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
       peerPort: 179
+      serviceAdvertisements:
+        - LoadBalancerIP
       eBGPMultihopTTL: 1
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
