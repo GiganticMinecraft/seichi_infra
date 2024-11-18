@@ -44,6 +44,10 @@ spec:
           kind: CSIDriver
           jqPathExpressions:
             - .spec.seLinuxMount
+        - group: ""
+          kind: Deployment
+          jqPathExpressions:
+            - .spec.template.spec.containers[].env[].valueFrom.resourceFieldRef.divisor
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
