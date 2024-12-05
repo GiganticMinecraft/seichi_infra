@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: babyrite
-          image: ghcr.io/m1sk9/babyrite:v0.13.11
+          image: ghcr.io/m1sk9/babyrite:v0.13.12
           resources:
             requests:
               cpu: 250m
