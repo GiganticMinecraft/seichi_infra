@@ -180,3 +180,30 @@ spec:
         enabled: true
         restartTimeSeconds: 120
 ---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: peerpolicy--seichi-onp-k8s-wk-mc1
+spec:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/hostname: seichi-onp-k8s-wk-mc1
+  virtualRouters:
+  - localASN: 65401
+    exportPodCIDR: true
+    # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
+    # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
+    serviceSelector:
+      matchExpressions:
+         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+    neighbors:
+    - peerAddress: "192.168.3.254/32"
+      peerASN: 65184
+      peerPort: 179
+      eBGPMultihopTTL: 1
+      connectRetryTimeSeconds: 120
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
+      gracefulRestart:
+        enabled: true
+        restartTimeSeconds: 120

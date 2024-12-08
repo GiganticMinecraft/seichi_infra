@@ -1,0 +1,27 @@
+version: 1
+config:
+  - type: physical
+    name: ens18
+    subnets:
+    - type: static
+      address: '192.168.0.31'
+      netmask: '255.255.252.0'
+      gateway: '192.168.3.254'
+  - type: physical
+    name: ens19
+    subnets:
+    - type: static
+      address: '192.168.18.31'
+      netmask: '255.255.252.0'
+  - type: physical
+    name: ens20
+    subnets:
+    - type: static
+      address: '192.168.32.31'
+      netmask: '255.255.255.0'
+  - type: nameserver
+    address:
+    - '10.255.0.1'
+    - '10.255.0.2'
+    search:
+    - 'local'
