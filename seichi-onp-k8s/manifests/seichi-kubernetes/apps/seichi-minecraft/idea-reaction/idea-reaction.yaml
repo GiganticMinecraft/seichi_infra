@@ -26,6 +26,9 @@ spec:
               cpu: 500m
               memory: 32Mi
           env:
+            # https://github.com/GiganticMinecraft/idea-reaction/blob/3a986d34ed87ab328dd6a6d2eed7f731523118a2/src/main.rs#L43-L56
+            - name: ENV_NAME
+              value: "production"
             - name: TARGET_CHANNEL_ID
               value: "959292335177486367"
             # Webhook ID は Webhook の UserId と同一のため, 公開情報になる.
