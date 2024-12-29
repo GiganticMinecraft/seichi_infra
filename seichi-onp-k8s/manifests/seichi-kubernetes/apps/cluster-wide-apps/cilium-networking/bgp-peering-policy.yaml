@@ -14,7 +14,7 @@ spec:
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
       matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -28,7 +28,6 @@ spec:
       gracefulRestart:
         enabled: true
         restartTimeSeconds: 120
-    
 ---
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumBGPPeeringPolicy
@@ -45,7 +44,7 @@ spec:
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
       matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -75,7 +74,7 @@ spec:
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
       matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -105,7 +104,7 @@ spec:
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
       matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -135,7 +134,7 @@ spec:
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
       matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -165,7 +164,7 @@ spec:
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
       matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
