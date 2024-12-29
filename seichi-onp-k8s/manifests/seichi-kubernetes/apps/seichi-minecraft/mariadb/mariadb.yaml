@@ -58,6 +58,8 @@ spec:
   securityContext:
     allowPrivilegeEscalation: false
 
+  serviceAccountName: mariadb
+
   livenessProbe:
     exec:
       command:
