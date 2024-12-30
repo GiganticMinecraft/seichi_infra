@@ -126,9 +126,9 @@ EOF
 sysctl --system
 
 # Install kubeadm
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-apt-get install -y kubeadm=1.30.4-1.1 kubectl=1.30.4-1.1 kubelet=1.30.4-1.1
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+apt-get install -y kubeadm=1.32.0-1.1 kubectl=1.32.0-1.1 kubelet=1.32.0-1.1
 apt-mark hold kubelet kubectl
 
 # Disable swap
@@ -154,8 +154,8 @@ esac
 
 # Install HAProxy
 apt-get install -y --no-install-recommends software-properties-common
-add-apt-repository ppa:vbernat/haproxy-3.0 -y
-sudo apt-get install -y haproxy=3.0.\*
+add-apt-repository ppa:vbernat/haproxy-3.1 -y
+sudo apt-get install -y haproxy=3.1.\*
 
 cat > /etc/haproxy/haproxy.cfg <<EOF
 global
@@ -207,10 +207,10 @@ apt-get -y install keepalived
 
 cat > /etc/keepalived/keepalived.conf <<EOF
 # Define the script used to check if haproxy is still working
-vrrp_script chk_haproxy { 
+vrrp_script chk_haproxy {
     script "sudo /usr/bin/killall -0 haproxy"
-    interval 2 
-    weight 2 
+    interval 2
+    weight 2
 }
 
 # Configuration for Virtual Interface
@@ -307,7 +307,7 @@ etcd:
   local:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
-kubernetesVersion: "v1.30.4"
+kubernetesVersion: "v1.32.0"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
   certSANs:
