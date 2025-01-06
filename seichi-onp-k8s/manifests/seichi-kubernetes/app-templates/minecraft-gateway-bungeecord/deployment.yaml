@@ -86,7 +86,7 @@ spec:
               value: >-
                 -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
 
-          image: itzg/bungeecord:java17-2024.6.0
+          image: itzg/mc-proxy:java21-2024.6.0
           name: bungeecord
           ports:
             - containerPort: 25577
@@ -102,7 +102,7 @@ spec:
             failureThreshold: 6
             periodSeconds: 20
           volumeMounts:
-            # itzg/bungeecord は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # itzg/mc-proxy は /config に設定ファイルをマウントしておけばコピーをしてくれる。
             # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
             # https://github.com/itzg/docker-bungeecord/tree/9113d93882d1945d5469141b77eb922233842be9#volumes
             - name: bungeecord-config
@@ -113,7 +113,7 @@ spec:
               subPath: server-icon.png
             # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
             # 提供するために symlink による一時ディレクトリがマウントされることになるが、
-            # itzg/bungeecord が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # itzg/mc-proxy が利用するファイル同期の仕組み (itzg/mc-image-helper) は
             # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
             #
             # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
