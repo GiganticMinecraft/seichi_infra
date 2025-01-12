@@ -30,8 +30,8 @@ jobs:
           #   renovate に各サーバーのイメージ更新 PR を出してもらえるように、
           #     各サーバーの基底イメージ指定は
           #     java_version_component_in_tag + digest pinning で行うこととしている。
-          - mcserver_base_image_tag: 2022.15.0-java8-jdk
-            mcserver_base_image_digest: "sha256:8f3ee6b8ea88e1ab00c7bb3794cb439a0111743b7ad7df93a7e2d90f387d9c37"
+          - mcserver_base_image_tag: 2025.1.0-java8-jdk
+            mcserver_base_image_digest: "sha256:6811c18a5852542a3f96054bd92e9042382b7c242d8fd483b657908b43f8ac7b"
             java_version_component_in_tag: java8-jdk
           - mcserver_base_image_tag: 2022.15.0-java17-jdk
             mcserver_base_image_digest: "sha256:70300d50a8dc7c57f04b531e69a5926581ca6d8476d7091d838577c0df030bde"
