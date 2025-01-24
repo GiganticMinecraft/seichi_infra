@@ -9,26 +9,27 @@ metadata:
   name: babyrite-config
 data:
   config.toml: |
-    ### babyrite configuration ###
-    # This file is used to configure babyrite.
-    # You can change the settings here to customize babyrite's behavior.
-    # For more information, see the babyrite documentation at https://babyrite.m1sk9.dev/configuration.html
+    ### babyrite configuration file ###
+    # This file is used for babyrite configuration.
+    # By changing this configuration, you can modify the behavior of babyrite. Please restart babyrite after changing the settings.
+    # The settings are written in TOML format. To use the configuration file, specify the recursive path to the configuration file in the environment variable "CONFIG_FILE_PATH" injected into the container.
+    # Note that babyrite will run with default settings if not configured.
 
-    ## == General settings == ##
+    # Startup settings (Feature Flags)
+    ## Flags to change the behavior of babyrite. Specify them separated by commas. The default is empty.
+    ## The valid flags are as follows:
+    ## - "json_logging": Outputs logs in JSON format (useful when integrating with log collection tools like Grafana Loki)
+    feature_flag = "json_logging"
 
-    # Sets the format of babyrite log output.
-    # * `compact`: output logs in normal format.
-    # * `json`: Output logs in JSON format. This is the recommended setting if you are using Grafana Loki or similar.
-    logger_format='json'
+    # Mention settings for preview generation (default is enabled)
+    ## Mentions the request sender when generating a preview.
+    is_mention = false
 
-    ## == Preview settings == ##
+    # Preview deletion feature (default is enabled)
+    ## Sets whether to enable the deletion of previews. If enabled, a trash can reaction is added to each preview, and pressing the reaction will delete it.
+    ## If disabled, the reaction is not added, and pressing the reaction will not delete the preview.
+    is_deletable = true
 
-    [preview]
-
-    # Sets whether the guild check process is bypassed when quoting.
-    # If the guild check process is bypassed, messages can be shared and quoted from all guilds in which babyrite is installed.
-    # However, the message will be shared to members who do not belong to that guild. This setting is recommended when babyrite is used by multiple private guilds.
-    bypass_guild_check=false
-
-    # Whether to enable mentions in quoted messages.
-    is_mention=false
+    # Allow NSFW (Not Safe For Work) content (default is disabled)
+    ## Sets whether to allow the generation of messages from channels marked as NSFW. It is strongly recommended to disable this setting on community servers.
+    is_allow_nsfw = false
