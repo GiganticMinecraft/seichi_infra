@@ -499,6 +499,11 @@ spec:
               mountPath: /plugins/XConomy/database.yml
               subPath: XConomy-database.yml
 
+            # DecentHolograms プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DecentHolograms/config.yml
+              subPath: DecentHolograms-config.yml
+
             # DynMap プラグインの設定ファイル
             # - name: common-dynmap-config
             #   mountPath: /plugins/dynmap/configuration.txt
