@@ -185,6 +185,7 @@ spec:
                 lp group default permission set worldedit.wand true
                 lp group default permission set worldedit.selection.pos true
                 lp group default permission set worldedit.selection.expand true
+                lp group default permission set worldedit.analysis.sel true
                 lp group default permission set worldguard.region.claim true
                 lp group default permission set worldguard.region.select.own.* true
                 lp group default permission set worldguard.region.list.own true
