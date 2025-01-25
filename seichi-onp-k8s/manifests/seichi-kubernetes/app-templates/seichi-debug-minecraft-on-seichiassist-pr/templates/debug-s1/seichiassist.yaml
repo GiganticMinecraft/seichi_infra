@@ -539,6 +539,11 @@ spec:
               mountPath: /plugins/Multiverse-Portals/portals.yml
               subPath: portals.yml
 
+            # SpectatorTheater プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SpectatorTheater/config.yml
+              subPath: SpectatorTheater-config.yml
+
             # CustomEnchantments プラグインの設定ファイル
             - name: custom-enchantments-config
               mountPath: /plugins/CustomEnchantments/config.yml
