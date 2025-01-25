@@ -39,7 +39,7 @@ spec:
             - "-c"
             - "rm -rf /data/plugins/*.jar"
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-9f933f7
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-caa6a66
           env:
             - name: MINIO_ENDPOINT
               value: seichi-private-plugin-blackhole-minio.minio:9000
