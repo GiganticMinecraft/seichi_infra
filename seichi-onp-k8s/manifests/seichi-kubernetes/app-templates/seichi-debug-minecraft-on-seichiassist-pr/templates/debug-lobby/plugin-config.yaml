@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: origin-spawn-config
+  name: lobby-config
 data:
-  config.yml: |
+  OriginSpawn-config.yml: |
     world-name: world_2
     loc-x: 41
     loc-y: 69
@@ -11,3 +11,16 @@ data:
     loc-yaw: 90.0
     loc-pitch: 0.0
     always-force-players-spawn: true
+  AutoMessage-config.yml: |
+    timer: 300 # default: 10
+    Random: false
+    UseTellRawMessages: false
+    # ロビーサーバーでは特に流すメッセージはない
+    Messages: []
+    TellRawMessages:
+    - '{"text":"[Get more info on TellRaws here: minecraft.tools/en/tellraw.php ]","color":"dark_purple"}'
+    - '{"text":"[This is a test message!] ","color":"aqua"}'
+    - '["",{"text":"Click me to open URL!","color":"red","bold":true,"underlined":false,"clickEvent":{"action":"open_url","value":"https://www.google.com"}}]'
+    - '{"text":"Hover over me for help text!","color":"yellow","bold":true,"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"I
+      am a hint!","color":"yellow","bold":true}]}}}'
+    - '{"text":"Click me to run help command!","color":"yellow","bold":true,"clickEvent":{"action":"run_command","value":"/help"}}'

@@ -346,9 +346,14 @@ spec:
               subPath: portals.yml
 
             # OriginSpawn プラグインの設定ファイル
-            - name: origin-spawn-config
+            - name: lobby-config
               mountPath: /plugins/OriginSpawn/config.yml
-              subPath: config.yml
+              subPath: OriginSpawn-config.yml
+
+            # AutoMessage プラグインの設定ファイル
+            - name: lobby-config
+              mountPath: /plugins/AutoMessage/config.yml
+              subPath: AutoMessage-config.yml
 
             - name: mod-downloader-volume
               mountPath: /plugins
@@ -372,9 +377,9 @@ spec:
         - name: bungee-portals-config
           configMap:
             name: bungee-portals-config
-        - name: origin-spawn-config
+        - name: lobby-config
           configMap:
-            name: origin-spawn-config
+            name: lobby-config
 
         # JMX exporterをinitContainerでダウンロードしてBugneeCordに受け渡すためのvolume
         - name: jmx-exporter-download-volume
