@@ -400,7 +400,7 @@ data:
     new_world_settings:
       # Do new worlds have Towny enabled by default?
       # You can adjust this setting for an existing world using /townyworld toggle usingtowny
-      using_towny: 'true'
+      using_towny: 'false'
       
       # Are new worlds claimable by default?
       # Setting this to false means that Towny will still be active but no land can be claimed by towns.
