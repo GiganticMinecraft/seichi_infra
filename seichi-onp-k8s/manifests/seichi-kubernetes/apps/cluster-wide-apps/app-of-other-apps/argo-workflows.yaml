@@ -19,6 +19,9 @@ spec:
             enabled: true
             additionalLabels:
               release: prometheus
+          workflowDefaults:
+            ttlStrategy:
+              secondsAfterCompletion: 592200
         server:
           secure: true
           extraArgs:
