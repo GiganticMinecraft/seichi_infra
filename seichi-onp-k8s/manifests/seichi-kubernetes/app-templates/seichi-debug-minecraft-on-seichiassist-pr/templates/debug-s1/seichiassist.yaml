@@ -551,6 +551,11 @@ spec:
               mountPath: /plugins/region-grid-fitter/config.yml
               subPath: region-grid-fitter-config.yml
 
+            # StreamClock プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/StreamClock/config.yml
+              subPath: StreamClock-config.yml
+
             # CustomEnchantments プラグインの設定ファイル
             - name: custom-enchantments-config
               mountPath: /plugins/CustomEnchantments/config.yml
