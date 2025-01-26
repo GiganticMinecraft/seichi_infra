@@ -8,7 +8,7 @@ data:
     already-connected-message: "You are already at the hub server!"
 
   BungeeKick-config.yml: |
-    ServerName: deb-s1
+    ServerName: debug-pr-2115-lobby
     KickMessage: '&6You have been kicked! Reason:&4 '
     ShowKickMessage: True
 
