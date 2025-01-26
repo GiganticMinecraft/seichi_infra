@@ -5492,9 +5492,6 @@ data:
     Command15: say ========================================
     Time16: .03:59:03
     Command16: say 数分～30分後に再接続をお願いいたします。
-    # 動作確認用
-    Time17: .17:00:00
-    Command17: say これはテストメッセージです。
 
   ThisWorld-config.yml: |
     Messages:
