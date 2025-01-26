@@ -4,7 +4,7 @@ metadata:
   name: bungeecord-plugin-configs
 data:
   BungeeHubCommand-config.yml: |
-    hub-server-name: deb-s1
+    hub-server-name: debug-pr-2115-lobby
     already-connected-message: "You are already at the hub server!"
 
   BungeeKick-config.yml: |
