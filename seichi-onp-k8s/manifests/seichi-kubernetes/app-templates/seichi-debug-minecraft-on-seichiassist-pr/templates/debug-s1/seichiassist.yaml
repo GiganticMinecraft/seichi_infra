@@ -152,6 +152,8 @@ spec:
             - name: CFG_LUCKPERMS_SERVER_NAME
               value: "s1"
 
+            # rg addmemberコマンドで、`__global__`保護に対してメンバーに追加しているプレイヤーはunchamaさん。
+            # MCIDで指定しても、当該プレイヤーがまだログインしたことがない判定だからか追加できないので、UUIDを指定している。
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
