@@ -7,12 +7,12 @@ spec:
   project: seichi-minecraft
   source:
     chart: redis
-    repoURL: https://charts.bitnami.com/bitnami
+    repoURL: oci://registry-1.docker.io/bitnamicharts/redis
     targetRevision: 20.6.3
     helm:
       releaseName: seichi-bungeesemaphore-redis
       values: |
-        architecture: standalone 
+        architecture: standalone
         auth:
           enabled: false
         commonConfiguration: |-
