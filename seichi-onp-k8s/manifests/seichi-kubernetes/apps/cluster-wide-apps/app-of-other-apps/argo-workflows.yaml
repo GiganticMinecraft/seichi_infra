@@ -20,8 +20,9 @@ spec:
             additionalLabels:
               release: prometheus
           workflowDefaults:
-            ttlStrategy:
-              secondsAfterCompletion: 592200
+            spec:
+              ttlStrategy:
+                secondsAfterCompletion: 592200
         server:
           secure: true
           extraArgs:
