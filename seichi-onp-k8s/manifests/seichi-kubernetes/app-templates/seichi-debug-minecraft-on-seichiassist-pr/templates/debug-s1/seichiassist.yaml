@@ -546,6 +546,11 @@ spec:
               mountPath: /plugins/SpectatorTheater/config.yml
               subPath: SpectatorTheater-config.yml
 
+            # region-grid-fitter プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/region-grid-fitter/config.yml
+              subPath: region-grid-fitter-config.yml
+
             # CustomEnchantments プラグインの設定ファイル
             - name: custom-enchantments-config
               mountPath: /plugins/CustomEnchantments/config.yml
