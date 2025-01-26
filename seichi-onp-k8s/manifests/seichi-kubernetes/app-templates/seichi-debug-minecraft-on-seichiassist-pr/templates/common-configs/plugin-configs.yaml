@@ -6134,3 +6134,8 @@ data:
     # 継続時間(秒)
     # default: 300 (5*60)
     duration-time: 300
+
+  region-grid-fitter-config.yml: |
+    default_grid_size: 16
+    grid_size:
+        world: 16
