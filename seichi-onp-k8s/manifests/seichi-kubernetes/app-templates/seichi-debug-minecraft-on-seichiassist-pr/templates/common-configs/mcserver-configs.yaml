@@ -644,3 +644,5 @@ data:
       - version $1-
       spawn:
       - originspawn
+      hub:
+      - server debug-pr-2115-lobby
