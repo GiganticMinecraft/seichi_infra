@@ -487,10 +487,10 @@ spec:
             # TODO: Add Translation
             - name: common-mcserver-plugin-configs
               # どうやら "Config.yml" (先頭大文字) で動いているらしい
-              monthPath: /plugins/TradeSystem/Config.yml
+              mountPath: /plugins/TradeSystem/Config.yml
               subPath: TradeSystem-config.yml
             - name: common-mcserver-plugin-configs
-              monthPath: /plugins/TradeSystem/Layouts.yml
+              mountPath: /plugins/TradeSystem/Layouts.yml
               subPath: TradeSystem-layouts.yml
 
             # Vault プラグインの設定ファイル
