@@ -396,6 +396,11 @@ spec:
               mountPath: /plugins/CoreProtect/config.yml
               subPath: CoreProtect-config.yml
 
+            # CustomEnchantments プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/CustomEnchantments/config.yml
+              subPath: CustomEnchantments-config.yml
+
             # CustomLJoinLeftMessage プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               # フォルダ名は Join-Leave（プラグイン名と一致しない）
@@ -477,6 +482,16 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/ThisWorld/config.yml
               subPath: ThisWorld-config.yml
+
+            # TradeSystem プラグインの設定ファイル
+            # TODO: Add Translation
+            - name: common-mcserver-plugin-configs
+              # どうやら "Config.yml" (先頭大文字) で動いているらしい
+              monthPath: /plugins/TradeSystem/Config.yml
+              subPath: TradeSystem-config.yml
+            - name: common-mcserver-plugin-configs
+              monthPath: /plugins/TradeSystem/Layouts.yml
+              subPath: TradeSystem-layouts.yml
 
             # Vault プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
