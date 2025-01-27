@@ -2421,6 +2421,1229 @@ data:
     # Logs changes made via the plugin "WorldEdit" if it's in use on your server.
     worldedit: true
 
+  CustomEnchantments-config.yml: |
+    Global:
+      CreateExplosions: true
+      Updates:
+        ShowPercentageOnUpdate: true
+        CheckOnStartup: true
+        CheckDelay: 300
+      Logging:
+        Enabled: false
+        MinimumMsForLog: 1000
+        LogEvents: true
+        LogItems: true
+        LogEnchantments: true
+      Runecrafting:
+        Enabled: true
+        Disenchanting: true
+        CanStackEnchantments: true
+        TransformationEffect: true
+      Books:
+        Name: '&d&kedk&5 Magic Book &d&kedk'
+      Enchantments:
+        CEnchantmentColor: GRAY
+        CEnchantmentTable: true
+        CEnchantingProbability: 10
+        GlowEnchantmentID: 100
+        MaximumCustomEnchantments: 1000
+        UseCustomEnchantmentProbability: false
+        RequirePermissions: true
+    Enchantments:
+      Paralyze:
+        Enabled: true
+        DisplayName: Paralyze
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 5
+        Cooldown: 200
+        EnchantmentProbability: 7.142857142857143
+      Bombardment:
+        Enabled: true
+        DisplayName: Bombardment
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        BaseTNTAmount: 3
+        Volume: 1
+        EnchantmentProbability: 7.142857142857143
+      Gears:
+        Enabled: true
+        DisplayName: Gears
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        SpeedBoost: 1
+        EnchantmentProbability: 6.25
+      Frozen:
+        Enabled: true
+        DisplayName: Frozen
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 7.6923076923076925
+      Hardened:
+        Enabled: true
+        DisplayName: Hardened
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 7.6923076923076925
+      Firework:
+        Enabled: true
+        DisplayName: Firework
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        FireworkAmount: 30
+        Delay: 5
+        EnchantmentProbability: 7.142857142857143
+      Implants:
+        Enabled: true
+        DisplayName: Implants
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        FoodBurstDelay: 20
+        EnchantmentProbability: 6.666666666666667
+      Cloaking:
+        Enabled: true
+        DisplayName: Cloaking
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DurationPerLevel: 60
+        Cooldown: 200
+        EnchantmentProbability: 7.6923076923076925
+      Energizing:
+        Enabled: true
+        DisplayName: Energizing
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Strength: 1
+        Duration: 20
+        EnchantmentProbability: 25.0
+      Stomp:
+        Enabled: true
+        DisplayName: Stomp
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DamageReductionFraction: 4
+        DamageApplicationFraction: 2
+        EnchantmentProbability: 6.25
+      Bounty Hunter:
+        Enabled: true
+        DisplayName: Bounty Hunter
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        MaximumBounty: 8
+        Cooldown: 600
+        ChanceEmerald: 2.5
+        ChanceDiamond: 5
+        ChanceGold: 15
+        ChanceIron: 27.5
+        EnchantmentProbability: 7.142857142857143
+      Block:
+        Enabled: true
+        DisplayName: Block
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Strength: 1
+        Cooldown: 600
+        EnchantmentProbability: 5.555555555555555
+      Healing:
+        Enabled: true
+        DisplayName: Healing
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 7.142857142857143
+      Disarming:
+        Enabled: true
+        DisplayName: Disarming
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 5.555555555555555
+      Gooey:
+        Enabled: true
+        DisplayName: Gooey
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        HeightMultiplier: 3
+        EnchantmentProbability: 5.555555555555555
+      Headless:
+        Enabled: true
+        DisplayName: Headless
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 5.555555555555555
+      Volley:
+        Enabled: true
+        DisplayName: Volley
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 7.142857142857143
+      Poisoned:
+        Enabled: true
+        DisplayName: Poisoned
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 7.6923076923076925
+      Blaze:
+        Enabled: true
+        DisplayName: Blaze
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 7.142857142857143
+      Drunk:
+        Enabled: true
+        DisplayName: Drunk
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DurationPerLevel: 60
+        BaseStrength: 1
+        EnchantmentProbability: 7.6923076923076925
+      Quickening:
+        Enabled: true
+        DisplayName: Quickening
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Strength: 3
+        Duration: 40
+        EnchantmentProbability: 25.0
+      Aerial:
+        Enabled: true
+        DisplayName: Aerial
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DamageIncreasePercentagePerLevel: 10
+        EnchantmentProbability: 5.555555555555555
+      Thunderingblow:
+        Enabled: true
+        DisplayName: Thunderingblow
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        LightningChance: 20
+        EnchantmentProbability: 5.555555555555555
+      Glowing:
+        Enabled: true
+        DisplayName: Glowing
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 6.666666666666667
+      Poison:
+        Enabled: true
+        DisplayName: Poison
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 5.555555555555555
+      Explosive:
+        Enabled: true
+        DisplayName: Explosive
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Radius: 3
+        LargerRadius: true
+        DropItems: true
+        EnchantmentProbability: 25.0
+      Molten:
+        Enabled: true
+        DisplayName: Molten
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        EnchantmentProbability: 7.6923076923076925
+      Revulsion:
+        Enabled: true
+        DisplayName: Revulsion
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 20
+        EnchantmentProbability: 7.6923076923076925
+      Springs:
+        Enabled: true
+        DisplayName: Springs
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Strength: 4
+        EnchantmentProbability: 6.25
+      Cripple:
+        Enabled: true
+        DisplayName: Cripple
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 100
+        Strength: 1
+        EnchantmentProbability: 5.555555555555555
+      Berserker:
+        Enabled: true
+        DisplayName: Berserker
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DurationPerLevel: 200
+        BaseStrength: 5
+        HpToTrigger: 4
+        Cooldown: 6000
+        EnchantmentProbability: 7.6923076923076925
+      Enlighted:
+        Enabled: true
+        DisplayName: Enlighted
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 7.6923076923076925
+      Ice Aspect:
+        Enabled: true
+        DisplayName: Ice Aspect
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        SlowStrength: 5
+        SlowDuration: 40
+        ChanceFreeze: 60
+        SpecialFreeze: true
+        SpecialFreezeDuration: 60
+        ChanceSpecialFreeze: 10
+        EnchantmentProbability: 5.555555555555555
+      Charge:
+        Enabled: true
+        DisplayName: Charge
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DamageIncreasePercentagePerLevel: 10
+        EnchantmentProbability: 5.555555555555555
+      Shockwave:
+        Enabled: true
+        DisplayName: Shockwave
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Cooldown: 200
+        ForbiddenMaterials: BEDROCK, WATER, STATIONARY_WATER, LAVA, STATIONARY_LAVA, CACTUS,
+          CAKE_BLOCK, CROPS, TORCH, ENDER_PORTAL, PISTON_MOVING_PIECE, MELON_STEM, NETHER_WARTS,
+          MOB_SPAWNER, CHEST, SIGN, WALL_SIGN, SIGN_POST, ITEM_FRAME
+        EnchantmentProbability: 5.555555555555555
+      Deathbringer:
+        Enabled: true
+        DisplayName: Deathbringer
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        TrueDamagePerHit: 2
+        EnchantmentProbability: 5.555555555555555
+      Blind:
+        Enabled: true
+        DisplayName: Blind
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 100
+        EnchantmentProbability: 5.555555555555555
+      Smelting:
+        Enabled: true
+        DisplayName: Smelting
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 25.0
+      Cursed:
+        Enabled: true
+        DisplayName: Cursed
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 7.6923076923076925
+      Wither:
+        Enabled: true
+        DisplayName: Wither
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 60
+        Strength: 1
+        EnchantmentProbability: 5.555555555555555
+      Molotov:
+        Enabled: true
+        DisplayName: Molotov
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 7.142857142857143
+      Vampire:
+        Enabled: true
+        DisplayName: Vampire
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        DamageHealFraction: 2
+        Cooldown: 100
+        EnchantmentProbability: 5.555555555555555
+      Obsidian Shield:
+        Enabled: true
+        DisplayName: Obsidian Shield
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 7.6923076923076925
+      Autorepair:
+        Enabled: true
+        DisplayName: Autorepair
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        HealAmount: 1
+        HealFully: false
+        EnchantmentProbability: 5.555555555555555
+      Piercing:
+        Enabled: true
+        DisplayName: Piercing
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        EnchantmentProbability: 7.142857142857143
+      Deepwounds:
+        Enabled: true
+        DisplayName: Deepwounds
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 20
+        BleedChance: 20
+        EnchantmentProbability: 5.555555555555555
+      Endershift:
+        Enabled: true
+        DisplayName: Endershift
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Duration: 200
+        Strength: 5
+        HpToTrigger: 4
+        Cooldown: 6000
+        EnchantmentProbability: 7.6923076923076925
+      Lifesteal:
+        Enabled: true
+        DisplayName: Lifesteal
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        Heal: 2
+        EnchantmentProbability: 5.555555555555555
+      Self Destruct:
+        Enabled: true
+        DisplayName: Self Destruct
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        ExplosionDelay: 40
+        EnchantmentProbability: 7.6923076923076925
+      Lightning:
+        Enabled: true
+        DisplayName: Lightning
+        EnchantmentMaxLevel: 5
+        OccurrenceChance: 100
+        Cost:
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        RunecraftingCost:
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        - 0LVL&0$
+        LightningChance: 75
+        EnchantmentProbability: 7.142857142857143
+    Items:
+      Piranha Trap:
+        Enabled: true
+        DisplayName: Piranha Trap
+        Color: GRAY
+        Description: Who came up with this?
+        Cooldown: 0
+        Cost: 0
+        BleedDuration: 120
+        FishAmount: 20
+        FishDuration: 200
+      Rocket Boots:
+        Enabled: true
+        DisplayName: Rocket Boots
+        Color: AQUA
+        Description: 'Up we go!; ;WARNING: May cause dismemberment,;            death;            and
+          explosions'
+        Cooldown: 0
+        Cost: 0
+      Bandage:
+        Enabled: true
+        DisplayName: Bandage
+        Color: GREEN
+        Description: It has little hearts on it,;so you know it's good
+        Cooldown: 1000
+        Cost: 0
+        TotalHealAmount: 10
+        TotalHealTime: 200
+        StopAtFullHealth: true
+      Powergloves:
+        Enabled: true
+        DisplayName: Powergloves
+        Color: AQUA
+        Description: Throw all your problems away!
+        Cooldown: 500
+        Cost: 0
+        ThrowSpeedMultiplier: 60
+        ThrowDelayAfterGrab: 20
+        MaxGrabtime: 10
+      Pyroaxe:
+        Enabled: true
+        DisplayName: Pyroaxe
+        Color: DARK_RED
+        Description: Are your enemies burning?;Do you want to make their situation worse?;Then
+          this is just perfect for you!
+        Cooldown: 0
+        Cost: 0
+        DamageMultiplier: 2
+      Healing Shovel:
+        Enabled: true
+        DisplayName: Healing Shovel
+        Color: GREEN
+        Description: Smacking other people in the face;has never been healthier!
+        Cooldown: 600
+        Cost: 0
+        Heal: 4
+      Landmine:
+        Enabled: true
+        DisplayName: Landmine
+        Color: GRAY
+        Description: Just don't trigger it yourself, please.
+        Cooldown: 0
+        Cost: 0
+        ExplosionStrength: 5
+      Assassin's Blade:
+        Enabled: true
+        DisplayName: Assassin's Blade
+        Color: AQUA
+        Description: Sneak up on your enemies and hit them hard!; ;(High chance of failure
+          against Hacked Clients)
+        Cooldown: 200
+        Cost: 0
+        InvisibilityDuration: 400
+        AmbushDmgMultiplier: 2
+        WeaknessLevel: 4
+        WeaknessLength: 100
+      Hermes Boots:
+        Enabled: true
+        DisplayName: Hermes Boots
+        Color: GOLD
+        Description: These boots are made for walkin'
+        Cooldown: 100
+        Cost: 0
+        SpeedLevel: 5
+      Beastmaster's Bow:
+        Enabled: true
+        DisplayName: Beastmaster's Bow
+        Color: AQUA
+        Description: Tame the wilderness;and turn nature against your foes!
+        Cooldown: 0
+        Cost: 0
+        MaximumMobs: 5
+        MobAppearanceChance: 90
+        DamageMultiplication: 5
+      Thor's Axe:
+        Enabled: true
+        DisplayName: Thor's Axe
+        Color: GOLD
+        Description: 'Smite your enemies down with mighty thunder!;Note: Batteries not
+          included.'
+        Cooldown: 0
+        Cost: 0
+        FireDuration: 200
+      Livefire Boots:
+        Enabled: true
+        DisplayName: Livefire Boots
+        Color: DARK_RED
+        Description: Leave a burning trail...;Because it's fun!
+        Cooldown: 0
+        Cost: 0
+        FlameDuration: 200
+        FireResistanceLevel: 5
+      Druid Boots:
+        Enabled: true
+        DisplayName: Druid Boots
+        Color: DARK_GREEN
+        Description: Let the nature rejuvenate you!
+        Cooldown: 0
+        Cost: 0
+        SpeedDuration: 100
+        SpeedLevel: 5
+        RegenerationDuration: 100
+        RegenerationLevel: 5
+      Flamethrower:
+        Enabled: true
+        DisplayName: Flamethrower
+        Color: DARK_RED
+        Description: Burn, baby, burn!
+        Cooldown: 0
+        Cost: 0
+        IsReloadable: true
+        BurnDuration: 100
+        FireBlocksPerBurst: 10
+      Firecracker:
+        Enabled: true
+        DisplayName: Firecracker
+        Color: DARK_RED
+        Description: Makes every situation a good situation!
+        Cooldown: 0
+        Cost: 0
+      Deathscythe:
+        Enabled: true
+        DisplayName: Deathscythe
+        Color: DARK_GRAY
+        Description: An ancient evil lies within...
+        Cooldown: 400
+        Cost: 0
+        Range: 10
+        MaximumHookTime: 240
+      Firework-Battery:
+        Enabled: true
+        DisplayName: Firework-Battery
+        Color: DARK_RED
+        Description: Make the sky shine bright with colors!
+        Cooldown: 0
+        Cost: 0
+      Potion Launcher:
+        Enabled: true
+        DisplayName: Potion Launcher
+        Color: DARK_GRAY
+        Description: 'Instructions: Put potion into the righthand slot;                of
+          the potion launcher,;                aim and fire!; ;Manufactured by §kTaiterio'
+        Cooldown: 20
+        Cost: 0
+        ProjectileSpeedMultiplier: 4
+      Minigun:
+        Enabled: true
+        DisplayName: Minigun
+        Color: AQUA
+        Description: Fires a Volley of Arrows
+        Cooldown: 0
+        Cost: 0
+        ArrowCountPerVolley: 20
+        ShotsPerSecond: 20
+      Hookshot Bow:
+        Enabled: true
+        DisplayName: Hookshot Bow
+        Color: AQUA
+        Description: Everyone is just one hook away
+        Cooldown: 0
+        Cost: 0
+      Bear Trap:
+        Enabled: true
+        DisplayName: Bear Trap
+        Color: GRAY
+        Description: Just hope that it does not contain bears...
+        Cooldown: 0
+        Cost: 0
+        BleedDuration: 100
+        SlowLevel: 2
+        SlowDuration: 100
+        WeaknessLevel: 4
+        WeaknessDuration: 100
+      Medikit:
+        Enabled: true
+        DisplayName: Medikit
+        Color: GREEN
+        Description: Treats most of your ailments,;it even has a box of juice!
+        Cooldown: 2000
+        Cost: 0
+        HealAmount: 10
+      Poison Ivy:
+        Enabled: true
+        DisplayName: Poison Ivy
+        Color: DARK_GREEN
+        Description: If you're too cheap to afford ladders,;just take this, it'll work
+          just fine!
+        Cooldown: 0
+        Cost: 0
+        PoisonDuration: 100
+        PoisonLevel: 2
+      Prickly Block:
+        Enabled: true
+        DisplayName: Prickly Block
+        Color: LIGHT_PURPLE
+        Description: Just build a labyrinth out of these,;people will love you for it!
+        Cooldown: 0
+        Cost: 0
+        Damage: 3
+        NauseaLevel: 2
+        NauseaDuration: 200
+      Necromancer's Staff of Destruction:
+        Enabled: true
+        DisplayName: Necromancer's Staff of Destruction
+        Color: AQUA
+        Description: Wreak chaos everywhere,;Because why not?
+        Cooldown: 0
+        Cost: 0
+        Fuel: 377
+        WitherCost: 10
+        WitherCooldown: 100
+        FireballCost: 35
+        FireballCooldown: 60
+        LightningCost: 20
+        LightningCooldown: 240
+
+
   CustomJoinLeftMessage-config.yml: |
      # JOIN-LEAVE V2.4.3 Config || Copyright (C) 2023 IdW0309
 
@@ -5550,6 +6773,604 @@ data:
     #    fadeout: 0.5
     # <------ Syntax
     # Color code is lowercase.
+
+  TradeSystem-config.yml: |
+    TradeSystem:
+      Prefix: '&8[&cTrade&8] &r'
+      Language: ENG
+      # Permissions:
+      #   "tradesystem.trade": Can accept/deny/toggle trade requests
+      #   "tradesystem.trade.initiate": Can invite players for trades
+      # If permissions are disabled, every player is able to accept/deny/toggle/initiate trades
+      Permissions: false
+      # Only set this to 'true' if you're using TradeProxy. Otherwise, you'll be vulnerable to dupes caused by custom payload attacks.
+      TradeProxy: false
+
+      # Both traders have to add an item/money to finish the trade
+      Trade_Both: true
+      # The GUI type which will be used to enter the money amount. Available options: SIGN, ANVIL
+      Input_GUI: ANVIL
+      Trade_Distance:
+        enabled: true
+        distance_in_blocks: 50
+
+      # This is highly recommended to be enabled. Otherwise, players can easily scam others. Only disable this setting if you know your users.
+      Revoke_Ready_State_on_Offer_Change: true
+
+      Allowed_GameModes:
+      - SURVIVAL
+      Blocked_Worlds:
+      - ExampleWorld-1
+      - ExampleWorld-2
+
+      Allowed_Regions:
+        # Valid modes: Blacklist, Whitelist
+        # Blacklist: All regions are allowed except the ones in the list
+        # Whitelist: Only the regions in the list are allowed
+        Mode: Blacklist
+        Regions: []
+
+      # Example:            (all variables are optional)
+      # - Material: STONE
+      #   Data: 0
+      #   DisplayName: 0
+      #   Lore: "Some text that will be searched in every line."
+      #   CustomModelData: 0
+      #   Compare: IGNORE_CASE      (Default=IGNORE_CASE; STRICT, IGNORE_CASE, CONTAINS, CONTAINS_IGNORE_CASE, REGEX_ANY, REGEX_ALL)
+      #
+      # Compare examples
+      #   STRICT: "FOO" = "FOO"
+      #   IGNORE_CASE: "FOO" = "foo"
+      #   CONTAINS: "F" is in "Foo"
+      #   CONTAINS_IGNORE_CASE: "f" is in "Foo"
+      #   REGEX_ANY: "." matches "Foo"
+      #   REGEX_ALL: ".*" matches "Foo"
+      Blacklist:
+      - Material: AIR
+        Compare: IGNORE_CASE
+      - DisplayName: '&cExample'
+        Material: AIR
+        Compare: IGNORE_CASE
+      - DisplayName: '&cExample, which blocks all items with this strange name!'
+        Compare: IGNORE_CASE
+
+      Trade_Countdown:
+        Enabled: true
+        # in ticks (20 ticks = 1 second)
+        Interval: 20
+        Repetitions: 3
+
+      # true: After finishing a trade all overflowing items will be dropped, if the inventory is full
+      # false: Prevent the trade partner to put too many items into the gui. Also prevents a trading player from picking up items.
+      Trade_Drop_Items: true
+
+      # In seconds (e.g. after <60> seconds the request will be expired)
+      Trade_Request_Expiration_Time: 60
+
+      # The report shows what was traded during a trade.
+      Trade_Finish_Report:
+        Items: true
+        # Whether to only display an item's name rather than item type and name
+        Display_Name_Only: false
+        Economy: true
+
+      Action_To_Cancel:
+        Player_get_damaged: true
+      Action_To_Request:
+        Shift_Rightclick: true
+
+      Money:
+        # This pattern will be used to enter money in the trade GUI and to display the current amount. More information about pattern can be found here: https://docs.oracle.com/javase/tutorial/i18n/format/decimalFormat.html
+        Pattern: '###,###.####'
+        Grouping_Separator: ','
+        Decimal_Separator: .
+
+        Easy_Selection:
+          Enabled: true
+          # Do NOT use special symbols (e.g. '$') here.
+          # Use characters only!
+          Shortcuts:
+          - Keys:
+            - k
+            Value: 1000
+          - Keys:
+            - m
+            - mio
+            Value: 1000000
+
+      # Warning: The aliases will not be validated. Make sure they are correct.
+      Commands:
+        Trade:
+        - trade
+        Accept:
+        - accept
+        Deny:
+        - deny
+        Toggle:
+        - toggle
+
+      Database:
+        # Values: SQLite, MySQL
+        Type: SQLite
+        MySQL:
+          Connection_URL: jdbc:mysql://localhost:3306/tradesystem?autoReconnect=true&useSSL=false
+          User: root
+          Password: password
+
+      TradeLog:
+        # The bukkit logger works additionally to the database logging.
+        Bukkit_logger: false
+
+      # Sound names can be found here: https://github.com/CodingAir/CodingAPI/tree/master/src/main/java/de/codingair/codingapi/server/sounds/Sound.java
+      Sounds:
+        Trade_Started:
+          Name: LEVEL_UP
+          Volume: 0.6
+          Pitch: 1.0
+        Trade_Finished:
+          Name: LEVEL_UP
+          Volume: 0.6
+          Pitch: 1.0
+        Trade_Blocked:
+          Name: NOTE_BASS
+          Volume: 0.8
+          Pitch: 0.6
+        Trade_Cancelled:
+          Name: ITEM_BREAK
+          Volume: 0.6
+          Pitch: 1.0
+        Trade_Request:
+          Name: ORB_PICKUP
+          Volume: 0.6
+          Pitch: 1.0
+        Countdown_Tick:
+          Name: ORB_PICKUP
+          Volume: 0.6
+          Pitch: 1.0
+        Countdown_Stop:
+          Name: ITEM_BREAK
+          Volume: 0.6
+          Pitch: 1.0
+        Change_during_Shulker_Peek:
+          Name: ITEM_BREAK
+          Volume: 0.6
+          Pitch: 1.0
+
+  TradeSystem-layouts.yml: |
+    Layouts:
+    - size: 54
+      name: Standard
+      icons:
+        0:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        1:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        2:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        3:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        4:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        5:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        6:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        7:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        8:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        9:
+          icon: TradeSlot
+        10:
+          icon: TradeSlot
+        11:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        12:
+          icon: StatusIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: LIGHT_GRAY_TERRACOTTA
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: RED_TERRACOTTA
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: LIME_TERRACOTTA
+        13:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        14:
+          icon: ShowStatusIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: RED_TERRACOTTA
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: LIME_TERRACOTTA
+        15:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        16:
+          icon: TradeSlotOther
+        17:
+          icon: TradeSlotOther
+        18:
+          icon: TradeSlot
+        19:
+          icon: TradeSlot
+        20:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        21:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        22:
+          icon: CancelIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BARRIER
+        23:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        24:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        25:
+          icon: TradeSlotOther
+        26:
+          icon: TradeSlotOther
+        27:
+          icon: TradeSlot
+        28:
+          icon: TradeSlot
+        29:
+          icon: TradeSlot
+        30:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        31:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        32:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        33:
+          icon: TradeSlotOther
+        34:
+          icon: TradeSlotOther
+        35:
+          icon: TradeSlotOther
+        36:
+          icon: TradeSlot
+        37:
+          icon: TradeSlot
+        38:
+          icon: TradeSlot
+        39:
+          icon: TradeSlot
+        40:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        41:
+          icon: TradeSlotOther
+        42:
+          icon: TradeSlotOther
+        43:
+          icon: TradeSlotOther
+        44:
+          icon: TradeSlotOther
+        45:
+          icon: TradeSlot
+        46:
+          icon: TradeSlot
+        47:
+          icon: TradeSlot
+        48:
+          icon: TradeSlot
+        49:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        50:
+          icon: TradeSlotOther
+        51:
+          icon: TradeSlotOther
+        52:
+          icon: TradeSlotOther
+        53:
+          icon: TradeSlotOther
+    - size: 54
+      name: Standard-Exp
+      icons:
+        0:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        1:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        2:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        3:
+          icon: ExpLevelIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GOLD_NUGGET
+        4:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        5:
+          icon: ShowExpLevelIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GOLD_NUGGET
+        6:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        7:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        8:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        9:
+          icon: TradeSlot
+        10:
+          icon: TradeSlot
+        11:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        12:
+          icon: StatusIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: LIGHT_GRAY_TERRACOTTA
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: RED_TERRACOTTA
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: LIME_TERRACOTTA
+        13:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        14:
+          icon: ShowStatusIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: RED_TERRACOTTA
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: LIME_TERRACOTTA
+        15:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        16:
+          icon: TradeSlotOther
+        17:
+          icon: TradeSlotOther
+        18:
+          icon: TradeSlot
+        19:
+          icon: TradeSlot
+        20:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        21:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        22:
+          icon: CancelIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BARRIER
+        23:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        24:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        25:
+          icon: TradeSlotOther
+        26:
+          icon: TradeSlotOther
+        27:
+          icon: TradeSlot
+        28:
+          icon: TradeSlot
+        29:
+          icon: TradeSlot
+        30:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        31:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        32:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: BLACK_STAINED_GLASS_PANE
+        33:
+          icon: TradeSlotOther
+        34:
+          icon: TradeSlotOther
+        35:
+          icon: TradeSlotOther
+        36:
+          icon: TradeSlot
+        37:
+          icon: TradeSlot
+        38:
+          icon: TradeSlot
+        39:
+          icon: TradeSlot
+        40:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        41:
+          icon: TradeSlotOther
+        42:
+          icon: TradeSlotOther
+        43:
+          icon: TradeSlotOther
+        44:
+          icon: TradeSlotOther
+        45:
+          icon: TradeSlot
+        46:
+          icon: TradeSlot
+        47:
+          icon: TradeSlot
+        48:
+          icon: TradeSlot
+        49:
+          icon: DecorationIcon
+          items:
+          - ==: org.bukkit.inventory.ItemStack
+            v: 2975
+            type: GRAY_STAINED_GLASS_PANE
+        50:
+          icon: TradeSlotOther
+        51:
+          icon: TradeSlotOther
+        52:
+          icon: TradeSlotOther
+        53:
+          icon: TradeSlotOther
+    Active: Standard
 
   Vault-config.yml: |
     update-check: true
