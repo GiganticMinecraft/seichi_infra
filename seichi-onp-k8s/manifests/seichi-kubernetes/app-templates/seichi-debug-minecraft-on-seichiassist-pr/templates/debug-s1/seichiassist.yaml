@@ -397,9 +397,9 @@ spec:
               subPath: CoreProtect-config.yml
 
             # CustomEnchantments プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
+            - name: custom-enchantments-config
               mountPath: /plugins/CustomEnchantments/config.yml
-              subPath: CustomEnchantments-config.yml
+              subPath: custom-enchantments-config.yml
 
             # CustomLJoinLeftMessage プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
