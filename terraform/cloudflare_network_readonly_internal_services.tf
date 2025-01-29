@@ -33,7 +33,7 @@ resource "cloudflare_access_policy" "game_data_server" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.prod_seichi_minecraft_readonly_services_access.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }

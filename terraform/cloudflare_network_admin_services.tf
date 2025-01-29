@@ -35,7 +35,7 @@ resource "cloudflare_access_policy" "debug_admin_jmx" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.debug_admin_jmx.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -61,7 +61,7 @@ resource "cloudflare_access_policy" "onp_admin_proxmox" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_proxmox.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -88,7 +88,7 @@ resource "cloudflare_access_policy" "onp_admin_proxmox_mon" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_proxmox_mon.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -114,7 +114,7 @@ resource "cloudflare_access_policy" "onp_admin_zabbix" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_zabbix.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -140,7 +140,7 @@ resource "cloudflare_access_policy" "onp_admin_raritan" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_raritan.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -166,7 +166,7 @@ resource "cloudflare_access_policy" "onp_admin_minio" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_minio.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -192,7 +192,7 @@ resource "cloudflare_access_policy" "onp_hubble_ui" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_hubble_ui.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }
@@ -218,7 +218,7 @@ resource "cloudflare_access_policy" "onp_phpmyadmin" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_phpmyadmin.slug]
-      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
     }
   }
 }

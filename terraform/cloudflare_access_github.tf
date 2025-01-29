@@ -1,5 +1,5 @@
-resource "cloudflare_access_identity_provider" "github_oauth" {
-  zone_id = local.cloudflare_zone_id
+resource "cloudflare_zero_trust_access_identity_provider" "github_oauth" {
+  account_id = local.cloudflare_account_id
   name    = "GitHub OAuth"
   type    = "github"
   config {
