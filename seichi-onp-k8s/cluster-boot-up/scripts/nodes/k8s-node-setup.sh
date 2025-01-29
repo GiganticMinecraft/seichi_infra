@@ -29,11 +29,17 @@ esac
 
 # Set global variables
 TARGET_BRANCH=$2
+
+# === (1) 1つ目VIP(既存)の設定 ===
 KUBE_API_SERVER_VIP=192.168.32.100
 VIP_INTERFACE=ens20
 NODE_IPS=( 192.168.32.11 192.168.32.12 192.168.32.13 )
 
-# set per-node variables
+# === (2) 2つ目VIP(LB_VIP2)の設定 ===
+KUBE_API_SERVER_VIP2=192.168.0.100
+VIP_INTERFACE2=ens18
+NODE_IPS_2=( 192.168.0.11 192.168.0.12 192.168.0.13 )
+
 case $1 in
     seichi-onp-k8s-cp-1)
         KEEPALIVED_STATE=MASTER
@@ -52,6 +58,32 @@ case $1 in
         KEEPALIVED_PRIORITY=97
         KEEPALIVED_UNICAST_SRC_IP=${NODE_IPS[2]}
         KEEPALIVED_UNICAST_PEERS=( "${NODE_IPS[0]}" "${NODE_IPS[1]}" )
+        ;;
+    seichi-onp-k8s-wk-*)
+        ;;
+    *)
+        exit 1
+        ;;
+esac
+
+case $1 in
+    seichi-onp-k8s-cp-1)
+        LB_VIP2_STATE=MASTER
+        LB_VIP2_PRIORITY=100
+        LB_VIP2_UNICAST_SRC_IP=${NODE_IPS_2[0]}
+        LB_VIP2_UNICAST_PEERS=( "${NODE_IPS_2[1]}" "${NODE_IPS_2[2]}" )
+        ;;
+    seichi-onp-k8s-cp-2)
+        LB_VIP2_STATE=BACKUP
+        LB_VIP2_PRIORITY=98
+        LB_VIP2_UNICAST_SRC_IP=${NODE_IPS_2[1]}
+        LB_VIP2_UNICAST_PEERS=( "${NODE_IPS_2[0]}" "${NODE_IPS_2[2]}" )
+        ;;
+    seichi-onp-k8s-cp-3)
+        LB_VIP2_STATE=BACKUP
+        LB_VIP2_PRIORITY=96
+        LB_VIP2_UNICAST_SRC_IP=${NODE_IPS_2[2]}
+        LB_VIP2_UNICAST_PEERS=( "${NODE_IPS_2[0]}" "${NODE_IPS_2[1]}" )
         ;;
     seichi-onp-k8s-wk-*)
         ;;
@@ -88,9 +120,9 @@ sudo chmod a+r /etc/apt/keyrings/docker.asc
 
 # Add the repository to Apt sources:
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    "deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    \$(. /etc/os-release && echo "\$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 
 sudo apt-get install -y containerd.io
@@ -98,17 +130,16 @@ sudo apt-get install -y containerd.io
 # Configure containerd
 sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
-sudo sed -i 's#sandbox_image = "registry.k8s.io/pause:3.8"#sandbox_image = "registry.k8s.io/pause:3.9"#g' /etc/containerd/config.toml
+sudo sed -i 's#sandbox_image = "registry.k8s.io/pause:3.8"#sandbox_image = "registry.k8s.io/pause:3.10"#g' /etc/containerd/config.toml
 if grep -q "SystemdCgroup = true" "/etc/containerd/config.toml"; then
-echo "Config found, skip rewriting..."
+    echo "Config found, skip rewriting..."
 else
-sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml  
+    sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 fi
 
 sudo systemctl restart containerd
 
 # Modify kernel parameters for Kubernetes
-# inotify instance number is very limited in Ubuntu 24.04 and it has to be at least more than pod number * 2
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -128,7 +159,7 @@ sysctl --system
 # Install kubeadm
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-apt-get install -y kubeadm=1.32.0-1.1 kubectl=1.32.0-1.1 kubelet=1.32.0-1.1
+apt-get install -y kubeadm=1.32.1-1.1 kubectl=1.32.1-1.1 kubelet=1.32.1-1.1
 apt-mark hold kubelet kubectl
 
 # Disable swap
@@ -187,7 +218,6 @@ frontend k8s-api
     mode tcp
     option tcplog
     default_backend k8s-api
-
 backend k8s-api
     mode tcp
     option tcplog
@@ -202,42 +232,80 @@ EOF
 # Install Keepalived
 echo "net.ipv4.ip_nonlocal_bind = 1" >> /etc/sysctl.conf
 sysctl -p
-
 apt-get -y install keepalived
 
+cat > /usr/local/bin/check_haproxy.sh <<'EOS'
+#!/bin/bash
+/usr/bin/nc -z -w1 127.0.0.1 8443
+if [ $? -eq 0 ]; then
+    exit 0
+else
+    exit 1
+fi
+EOS
+chmod +x /usr/local/bin/check_haproxy.sh
+
+# (CHANGED) keepalived.conf: 2つの vrrp_instance を定義 + ヘルスチェックをnc方式へ
 cat > /etc/keepalived/keepalived.conf <<EOF
-# Define the script used to check if haproxy is still working
 vrrp_script chk_haproxy {
-    script "sudo /usr/bin/killall -0 haproxy"
+    script "/usr/local/bin/check_haproxy.sh"
     interval 2
     weight 2
 }
 
-# Configuration for Virtual Interface
+#=== LB_VIP (VRID=51) ===
 vrrp_instance LB_VIP {
     interface ${VIP_INTERFACE}
     state ${KEEPALIVED_STATE}
     priority ${KEEPALIVED_PRIORITY}
     virtual_router_id 51
 
-    smtp_alert          # Enable Notifications Via Email
-
+    smtp_alert
     authentication {
         auth_type AH
-        auth_pass zaq12wsx	# Password for accessing vrrpd. Same on all devices
-    }
-    unicast_src_ip ${KEEPALIVED_UNICAST_SRC_IP} # Private IP address of master
-    unicast_peer {
-        ${KEEPALIVED_UNICAST_PEERS[0]}		# Private IP address of the backup haproxy
-        ${KEEPALIVED_UNICAST_PEERS[1]}		# Private IP address of the backup haproxy
+        auth_pass zaq12wsx
     }
 
-    # The virtual ip address shared between the two loadbalancers
+    unicast_src_ip ${KEEPALIVED_UNICAST_SRC_IP}
+    unicast_peer {
+$( for peer in "${KEEPALIVED_UNICAST_PEERS[@]}"; do
+    echo "        $peer"
+done )
+    }
+
     virtual_ipaddress {
         ${KUBE_API_SERVER_VIP}
     }
 
-    # Use the Defined Script to Check whether to initiate a fail over
+    track_script {
+        chk_haproxy
+    }
+}
+
+#=== LB_VIP2 (VRID=52) ===
+vrrp_instance LB_VIP2 {
+    interface ${VIP_INTERFACE2}
+    state ${LB_VIP2_STATE}
+    priority ${LB_VIP2_PRIORITY}
+    virtual_router_id 52
+
+    smtp_alert
+    authentication {
+        auth_type AH
+        auth_pass zaq12wsx
+    }
+
+    unicast_src_ip ${LB_VIP2_UNICAST_SRC_IP}
+    unicast_peer {
+$( for peer in "${LB_VIP2_UNICAST_PEERS[@]}"; do
+    echo "        $peer"
+done )
+    }
+
+    virtual_ipaddress {
+        ${KUBE_API_SERVER_VIP2}
+    }
+
     track_script {
         chk_haproxy
     }
@@ -245,8 +313,8 @@ vrrp_instance LB_VIP {
 EOF
 
 # Create keepalived user
-groupadd -r keepalived_script
-useradd -r -s /sbin/nologin -g keepalived_script -M keepalived_script
+groupadd -r keepalived_script || true
+useradd -r -s /sbin/nologin -g keepalived_script -M keepalived_script || true
 
 echo "keepalived_script ALL=(ALL) NOPASSWD: /usr/bin/killall" >> /etc/sudoers
 
@@ -262,7 +330,7 @@ systemctl reload haproxy
 kubeadm config images pull
 
 # install k9s
-wget https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz -O - | tar -zxvf - k9s && sudo mv ./k9s /usr/local/bin/
+wget https://github.com/derailed/k9s/releases/download/v0.32.7/k9s_Linux_amd64.tar.gz -O - | tar -zxvf - k9s && sudo mv ./k9s /usr/local/bin/
 
 # Ends except first-control-plane
 case $1 in
@@ -286,51 +354,39 @@ apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 bootstrapTokens:
 - token: "$KUBEADM_BOOTSTRAP_TOKEN"
-  description: "kubeadm bootstrap token"
-  ttl: "24h"
+    description: "kubeadm bootstrap token"
+    ttl: "24h"
 nodeRegistration:
-  criSocket: "unix:///var/run/containerd/containerd.sock"
-  kubeletExtraArgs:
+    criSocket: "unix:///var/run/containerd/containerd.sock"
+    kubeletExtraArgs:
     node-ip: "$KUBEADM_LOCAL_ENDPOINT"
 localAPIEndpoint:
-  advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
-  bindPort: 6443
+    advertiseAddress: "$KUBEADM_LOCAL_ENDPOINT"
+    bindPort: 6443
 skipPhases:
-  - addon/kube-proxy
+    - addon/kube-proxy
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 networking:
-  serviceSubnet: "10.96.64.0/18"
-  podSubnet: "10.96.128.0/18"
+    serviceSubnet: "10.96.64.0/18"
+    podSubnet: "10.96.128.0/18"
 etcd:
-  local:
+    local:
     extraArgs:
-      listen-metrics-urls: http://0.0.0.0:2381
-kubernetesVersion: "v1.32.0"
+        listen-metrics-urls: http://0.0.0.0:2381
+kubernetesVersion: "v1.32.1"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
-  certSANs:
-  # We are directing the A-record of
-  #   k8s-api.onp-k8s.admin.local-tunnels.seichi.click
-  # to 127.0.0.1 (see terraform/cloudflare_dns_records.tf for details).
-  #
-  # So a client accessing the API can establish a tunneled connection from
-  # their local machine to the API endpoint, which then becomes visible at 
-  #   https://k8s-api.onp-k8s.admin.local-tunnels.seichi.click:PORT
-  # where PORT is the port at which the local tunnel is running.
-  - k8s-api.onp-k8s.admin.local-tunnels.seichi.click
-
-# expose these components so that we can get metrics
-# https://prometheus-operator.dev/docs/kube-prometheus-on-kubeadm/#kubeadm-pre-requisites
+    certSANs:
+        - k8s-api.onp-k8s.admin.local-tunnels.seichi.click
 controllerManager:
-  extraArgs:
-    bind-address: "0.0.0.0"
+    extraArgs:
+        bind-address: "0.0.0.0"
 scheduler:
-  extraArgs:
-    bind-address: "0.0.0.0"
+    extraArgs:
+        bind-address: "0.0.0.0"
 clusterName: "unchama-cloud"
-
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
