@@ -3,7 +3,7 @@
 resource "cloudflare_record" "play" {
   zone_id = local.cloudflare_zone_id
   name    = "play"
-  content = "nrt.premium-aws.tcpshield.com"
+  value   = "nrt.premium-aws.tcpshield.com"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
@@ -11,7 +11,7 @@ resource "cloudflare_record" "play" {
 resource "cloudflare_record" "play_debug" {
   zone_id = local.cloudflare_zone_id
   name    = "play-debug"
-  content = "nrt.premium-aws.tcpshield.com"
+  value   = "nrt.premium-aws.tcpshield.com"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
@@ -19,7 +19,7 @@ resource "cloudflare_record" "play_debug" {
 resource "cloudflare_record" "github_pages" {
   zone_id = local.cloudflare_zone_id
   name    = "_github-pages-challenge-GiganticMinecraft"
-  content = "e6145d3fd4824da7133309fa2dd2c6"
+  value   = "e6145d3fd4824da7133309fa2dd2c6"
   type    = "TXT"
   ttl     = 1 # automatic
 }
@@ -27,7 +27,7 @@ resource "cloudflare_record" "github_pages" {
 resource "cloudflare_record" "github_pages_command_reference" {
   zone_id = local.cloudflare_zone_id
   name    = "cmd"
-  content = "giganticminecraft.github.io"
+  value   = "giganticminecraft.github.io"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
@@ -35,7 +35,7 @@ resource "cloudflare_record" "github_pages_command_reference" {
 resource "cloudflare_record" "portal" {
   zone_id = local.cloudflare_zone_id
   name    = "portal"
-  content = "${cloudflare_pages_project.seichi_portal.name}.pages.dev"
+  value   = "${cloudflare_pages_project.seichi_portal.name}.pages.dev"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
@@ -52,7 +52,7 @@ resource "cloudflare_record" "portal" {
 resource "cloudflare_record" "local_tunnels" {
   zone_id = local.cloudflare_zone_id
   name    = "*.local-tunnels.seichi.click"
-  content = "127.0.0.1"
+  value   = "127.0.0.1"
   type    = "A"
   ttl     = 1 # automatic
 }

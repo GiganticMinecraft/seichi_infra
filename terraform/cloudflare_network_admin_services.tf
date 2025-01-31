@@ -14,7 +14,7 @@ resource "cloudflare_certificate_pack" "advanced_cert_for_admin_network" {
   cloudflare_branding   = false
 }
 
-resource "cloudflare_zero_trust_access_application" "debug_admin_jmx" {
+resource "cloudflare_access_application" "debug_admin_jmx" {
   zone_id          = local.cloudflare_zone_id
   name             = "Debug server administration"
   domain           = "jmx.debug.admin.${local.root_domain}"
@@ -24,8 +24,8 @@ resource "cloudflare_zero_trust_access_application" "debug_admin_jmx" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "debug_admin_jmx" {
-  application_id = cloudflare_zero_trust_access_application.debug_admin_jmx.id
+resource "cloudflare_access_policy" "debug_admin_jmx" {
+  application_id = cloudflare_access_application.debug_admin_jmx.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -35,12 +35,12 @@ resource "cloudflare_zero_trust_access_policy" "debug_admin_jmx" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.debug_admin_jmx.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_admin_proxmox" {
+resource "cloudflare_access_application" "onp_admin_proxmox" {
   zone_id          = local.cloudflare_zone_id
   name             = "Proxmox administration"
   domain           = "proxmox.onp.admin.${local.root_domain}"
@@ -50,8 +50,8 @@ resource "cloudflare_zero_trust_access_application" "onp_admin_proxmox" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_admin_proxmox" {
-  application_id = cloudflare_zero_trust_access_application.onp_admin_proxmox.id
+resource "cloudflare_access_policy" "onp_admin_proxmox" {
+  application_id = cloudflare_access_application.onp_admin_proxmox.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -61,13 +61,13 @@ resource "cloudflare_zero_trust_access_policy" "onp_admin_proxmox" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_proxmox.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
 
-resource "cloudflare_zero_trust_access_application" "onp_admin_proxmox_mon" {
+resource "cloudflare_access_application" "onp_admin_proxmox_mon" {
   zone_id          = local.cloudflare_zone_id
   name             = "Proxmox-mon administration"
   domain           = "proxmox-mon.onp.admin.${local.root_domain}"
@@ -77,8 +77,8 @@ resource "cloudflare_zero_trust_access_application" "onp_admin_proxmox_mon" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_admin_proxmox_mon" {
-  application_id = cloudflare_zero_trust_access_application.onp_admin_proxmox_mon.id
+resource "cloudflare_access_policy" "onp_admin_proxmox_mon" {
+  application_id = cloudflare_access_application.onp_admin_proxmox_mon.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -88,12 +88,12 @@ resource "cloudflare_zero_trust_access_policy" "onp_admin_proxmox_mon" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_proxmox_mon.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_admin_zabbix" {
+resource "cloudflare_access_application" "onp_admin_zabbix" {
   zone_id          = local.cloudflare_zone_id
   name             = "Zabbix administration"
   domain           = "zabbix.onp.admin.${local.root_domain}"
@@ -103,8 +103,8 @@ resource "cloudflare_zero_trust_access_application" "onp_admin_zabbix" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_admin_zabbix" {
-  application_id = cloudflare_zero_trust_access_application.onp_admin_zabbix.id
+resource "cloudflare_access_policy" "onp_admin_zabbix" {
+  application_id = cloudflare_access_application.onp_admin_zabbix.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -114,12 +114,12 @@ resource "cloudflare_zero_trust_access_policy" "onp_admin_zabbix" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_zabbix.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_admin_raritan" {
+resource "cloudflare_access_application" "onp_admin_raritan" {
   zone_id          = local.cloudflare_zone_id
   name             = "raritan(PDU) administration"
   domain           = "raritan.onp.admin.${local.root_domain}"
@@ -129,8 +129,8 @@ resource "cloudflare_zero_trust_access_application" "onp_admin_raritan" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_admin_raritan" {
-  application_id = cloudflare_zero_trust_access_application.onp_admin_raritan.id
+resource "cloudflare_access_policy" "onp_admin_raritan" {
+  application_id = cloudflare_access_application.onp_admin_raritan.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -140,12 +140,12 @@ resource "cloudflare_zero_trust_access_policy" "onp_admin_raritan" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_raritan.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_admin_minio" {
+resource "cloudflare_access_application" "onp_admin_minio" {
   zone_id          = local.cloudflare_zone_id
   name             = "minio-console administration"
   domain           = "minio-console.onp-k8s.admin.${local.root_domain}"
@@ -155,8 +155,8 @@ resource "cloudflare_zero_trust_access_application" "onp_admin_minio" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_admin_minio" {
-  application_id = cloudflare_zero_trust_access_application.onp_admin_minio.id
+resource "cloudflare_access_policy" "onp_admin_minio" {
+  application_id = cloudflare_access_application.onp_admin_minio.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -166,12 +166,12 @@ resource "cloudflare_zero_trust_access_policy" "onp_admin_minio" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_admin_minio.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_hubble_ui" {
+resource "cloudflare_access_application" "onp_hubble_ui" {
   zone_id          = local.cloudflare_zone_id
   name             = "Cilium Hubble UI"
   domain           = "hubble-ui.onp-k8s.admin.${local.root_domain}"
@@ -181,8 +181,8 @@ resource "cloudflare_zero_trust_access_application" "onp_hubble_ui" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_hubble_ui" {
-  application_id = cloudflare_zero_trust_access_application.onp_hubble_ui.id
+resource "cloudflare_access_policy" "onp_hubble_ui" {
+  application_id = cloudflare_access_application.onp_hubble_ui.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -192,12 +192,12 @@ resource "cloudflare_zero_trust_access_policy" "onp_hubble_ui" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_hubble_ui.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_phpmyadmin" {
+resource "cloudflare_access_application" "onp_phpmyadmin" {
   zone_id          = local.cloudflare_zone_id
   name             = "phpMyAdmin"
   domain           = "phpmyadmin.onp-k8s.admin.${local.root_domain}"
@@ -207,8 +207,8 @@ resource "cloudflare_zero_trust_access_application" "onp_phpmyadmin" {
   http_only_cookie_attribute = true
 }
 
-resource "cloudflare_zero_trust_access_policy" "onp_phpmyadmin" {
-  application_id = cloudflare_zero_trust_access_application.onp_phpmyadmin.id
+resource "cloudflare_access_policy" "onp_phpmyadmin" {
+  application_id = cloudflare_access_application.onp_phpmyadmin.id
   zone_id        = local.cloudflare_zone_id
   name           = "Require to be in a GitHub team to access"
   precedence     = "1"
@@ -218,7 +218,7 @@ resource "cloudflare_zero_trust_access_policy" "onp_phpmyadmin" {
     github {
       name                 = local.github_org_name
       teams                = [github_team.onp_phpmyadmin.slug]
-      identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
+      identity_provider_id = cloudflare_access_identity_provider.github_oauth.id
     }
   }
 }
