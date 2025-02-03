@@ -828,6 +828,16 @@ data:
         pitch: 0.8            # Sound pitch
         volume: 0.5           # Sound volume
 
+  # TODO: Update this config to production
+  EatEgg-config.yml: |
+    enabled-worlds:
+      - world_2
+      - world_SW
+      - world_SW_2
+      - world_SW_the_end
+      - world_SW_nether
+
+
   ClickTpa-config.yml: |
     # Config for ClickTpa
     # Version v1.7.3
