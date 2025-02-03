@@ -108,4 +108,4 @@ spec:
     volumes:
       - name: backup-target-volume
         persistentVolumeClaim:
-          claimName: mcserver--debug-s1-0-minecraft-server-data
+          claimName: minecraft-server-data-mcserver--debug-s1-0
