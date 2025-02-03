@@ -158,3 +158,21 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
   }
 
 }
+
+resource "kubernetes_secret" "onp_minecraft_debug_pbs_credentials" {
+  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
+
+  metadata {
+    name      = "pbs-credentials"
+    namespace = "seichi-debug-minecraft"
+  }
+
+  data = {
+    user      = var.proxmox_backup_client__user
+    host      = var.proxmox_backup_client__host
+    datastore = var.proxmox_backup_client__datastore
+    password  = var.proxmox_backup_client__password
+  }
+
+  type = "Opaque"
+}
