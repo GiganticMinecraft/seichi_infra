@@ -36,7 +36,7 @@ spec:
           command: ["/bin/sh", "-c"]
           source: |
             echo "Waiting for StatefulSet to scale down..."
-            while [[ $(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.readyReplicas}') != "0" ]]; do
+            while [ "$(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')" != "0" ]; do
               echo "Still scaling down..."
               sleep 5
             done
@@ -99,7 +99,7 @@ spec:
           command: ["/bin/sh", "-c"]
           source: |
             echo "Waiting for StatefulSet to scale up..."
-            while [[ $(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.readyReplicas}') != "1" ]]; do
+            while [ "$(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
               echo "Still scaling up..."
               sleep 5
             done
