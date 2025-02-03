@@ -84,6 +84,11 @@ spec:
                 secretKeyRef:
                   name: pbs-credentials
                   key: password
+            - name: PBS_FINGERPRINT
+              valueFrom:
+                secretKeyRef:
+                  name: pbs-credentials
+                  key: fingerprint
           volumeMounts:
             - name: backup-target-volume
               mountPath: /data

@@ -368,4 +368,10 @@ variable "proxmox_backup_client__password" {
   sensitive   = true
 }
 
+variable "proxmox_backup_client__fingerprint" {
+  description = "proxmox-backup-client fingerprint at target server"
+  type        = string
+  sensitive   = true
+}
+
 # endregion
