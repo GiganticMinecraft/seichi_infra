@@ -58,7 +58,7 @@ spec:
             echo "Running backup for /data..."
             proxmox-backup-client backup "${BACKUP_NAME}" \
               --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
-              --password "${PBS_PASSWORD}"
+              --ns mcserver--debug-s1 # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるnamespaceを指定する
           env:
             - name: BACKUP_NAME
               value: "data.pxar:/data"
