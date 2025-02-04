@@ -5,6 +5,7 @@ metadata:
   namespace: seichi-debug-minecraft
 spec:
   schedule: "0 4 * * *"
+  timezone: Asia/Tokyo
   concurrencyPolicy: "Forbid"
   workflowSpec:
     serviceAccountName: mcserver--debug-s1-workflow-sa
