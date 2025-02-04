@@ -48,8 +48,10 @@ spec:
           image: debian:12
           command: ["/bin/sh", "-c"]
           source: |
-            set -e  # エラー時にスクリプトを停止する
+            set -e
+            echo "Updating package lists..."
             apt update
+            echo "Installing curl..."
             apt install -y curl
             echo "Adding Proxmox Backup Client repository..."
             echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
@@ -58,13 +60,16 @@ spec:
             apt update
             echo "Installing proxmox-backup-client version 3.3.2-1..."
             apt install -y proxmox-backup-client=3.3.2-1
-            echo "Running backup for /data..."
+            echo "Running backup..."
             proxmox-backup-client backup "${BACKUP_NAME}" \
               --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
-              --ns mcserver--debug-s1 # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるnamespaceを指定する。namespaceはあらかじめproxmox-backup-serverに作成しておく必要がある
+              --backup-id "${BACKUP_ID}"
           env:
             - name: BACKUP_NAME
               value: "data.pxar:/data"
+            # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるbackup-idを指定する
+            - name: BACKUP_ID
+              value: "mcserver--debug-s1"
             - name: PBS_USER
               valueFrom:
                 secretKeyRef:
