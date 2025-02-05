@@ -4,6 +4,8 @@ metadata:
   namespace: seichi-debug-minecraft
   name: mariadb
 spec:
+  tls:
+    enabled: false
   rootPasswordSecretKeyRef:
     name: mariadb
     generate: false
