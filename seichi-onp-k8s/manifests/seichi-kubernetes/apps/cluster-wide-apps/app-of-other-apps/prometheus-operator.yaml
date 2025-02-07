@@ -1,31 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prometheus-crd
-  namespace: argocd
-spec:
-  project: cluster-wide-apps
-  source:
-    repoURL: https://github.com/prometheus-community/helm-charts.git
-    path: charts/kube-prometheus-stack/charts/crds/
-    targetRevision: kube-prometheus-stack-68.1.0
-    directory:
-      recurse: true
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-      - Replace=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
   name: prometheus
   namespace: argocd
   finalizers:
@@ -41,7 +16,9 @@ spec:
       skipCrds: true
       values: |
         crds:
-          enabled: false
+          enabled: true
+          upgradeJob:
+            enabled: true
         defaultRules:
           create: true
           rules:
