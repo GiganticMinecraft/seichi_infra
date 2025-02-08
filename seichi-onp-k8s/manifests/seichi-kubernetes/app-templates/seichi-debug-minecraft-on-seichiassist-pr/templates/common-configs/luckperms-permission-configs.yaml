@@ -302,15 +302,15 @@ data:
   group-admin.yml: |
     name: admin
     permissions:
-    - mv.bypass.gamemode.*
-    - worldguard.region.bypass.*:
-        value: false
-    - seichiassist.present.*
-    - luckperms.*
-    - luckperms
     - minecraft.command.deop:
         value: false
     - minecraft.command.op:
+        value: false
+    - luckperms.*
+    - luckperms
+    - mv.bypass.gamemode.*
+    - seichiassist.present.*
+    - worldguard.region.bypass.*:
         value: false
     - weight.10
     meta:
