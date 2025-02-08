@@ -94,6 +94,18 @@ spec:
         - |
           mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases flyway_managed_schema seichiassist --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
           mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
+
+          echo 'CREATE DATABASE IF NOT EXISTS litebans;' > /docker-entrypoint-initdb.d/litebans.sql
+          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --no-create-db --databases litebans_gigantic_prod \
+            --ignore-table=litebans_gigantic_prod.litebans_config \
+            --ignore-table=litebans_gigantic_prod.litebans_servers \
+            --ignore-table=litebans_gigantic_prod.litebans_sync \
+            --ignore-table=litebans_gigantic_prod.litebans_warnings >> /docker-entrypoint-initdb.d/litebans.sql
+          sed -i 's/^USE `litebans_gigantic_prod`;/USE `litebans`;/' /docker-entrypoint-initdb.d/litebans.sql
+
+          echo 'CREATE DATABASE IF NOT EXISTS xconomy;' > /docker-entrypoint-initdb.d/xconomy.sql
+          mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --no-create-db --databases prod_seichi_xconomy >> /docker-entrypoint-initdb.d/xconomy.sql
+          sed -i 's/^USE `prod_seichi_xconomy`;/USE `xconomy`;/' /docker-entrypoint-initdb.d/xconomy.sql
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
