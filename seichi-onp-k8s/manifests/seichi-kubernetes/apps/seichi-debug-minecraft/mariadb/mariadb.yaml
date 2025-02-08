@@ -4,7 +4,7 @@ metadata:
   namespace: seichi-debug-minecraft
   name: mariadb
 spec:
-  initContainers:
+  initContainer:
   - name: init-0
     image: mariadb:10.11.11
     imagePullPolicy: IfNotPresent
