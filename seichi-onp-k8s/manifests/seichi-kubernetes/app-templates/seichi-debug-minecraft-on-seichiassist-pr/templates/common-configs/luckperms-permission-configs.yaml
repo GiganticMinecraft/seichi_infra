@@ -8,6 +8,71 @@ data:
   group-default.yml: |
     name: default
     permissions:
+    - bukkit.command.*:
+        value: false
+    - minecraft.command.*:
+        value: false
+    - minecraft.command.help:
+        value: false
+    - minecraft.command.list
+    - minecraft.command.me:
+        value: false
+    - clicktpa.tpa
+    - clicktpa.tpacancel
+    - clicktpa.tpaccept
+    - clicktpa.tpadeny
+    - clicktpa.tpahere
+    - clicktpa.tptoggle
+    - discordsrv.link
+    - discordsrv.linked
+    - discordsrv.unlink
+    - dynmap.hide.self:
+        value: false
+    - dynmap.show.self
+    - elevator.down
+    - elevator.up
+    - elytra.auto
+    - elytra.const-flight
+    - elytra.runup
+    - elytra.shift-activation
+    - elytra.speedup
+    - fastcraft.command.craft
+    - fastcraft.command.craft.fastcraft
+    - fastcraft.command.toggle
+    - fastcraft.use
+    - joinleave.silentleave
+    - litebans.notify.broadcast:
+        value: false
+    - luckperms:
+        value: false
+    - luckperms.*:
+        value: false
+    - lunachat.message
+    - lunachat.reply
+    - multiverse.help:
+        value: false
+    - multiverse.core.list.who
+    - multiverse.core.spawn.self
+    - multiverse.portal.access.*
+    - multiverse.access.*
+    - multiverse.access.work:
+        value: false
+    # TODO: デバッグサーバには各ワールドへのポータルがないので暫定措置
+    - multiverse.teleport.*
+    - seichiassist.ec
+    - seichiassist.ef
+    - seichiassist.fd
+    - seichiassist.fly
+    - seichiassist.hat
+    - seichiassist.home
+    - seichiassist.sethome
+    - seichiassist.map
+    - seichiassist.shareinv
+    - seichiassist.mebius
+    - seichiassist.minestack
+    - seichiassist.stick
+    - seichiassist.stickmenu
+    - seichiassist.x-transfer
     - shopchest.buy:
         value: true
         context:
@@ -20,6 +85,26 @@ data:
         value: true
         context:
           world: world_towny
+    - shopkeeper.player:
+        value: false
+    - shopkeeper.hire:
+        value: false
+    - shopkeeper.sign:
+        value: false
+    - shopkeeper.hanging-sign:
+        value: false
+    - shopkeeper.entity.*:
+        value: false
+    - towny.command.plot.set.shop
+    - tradesystem.trade.initiate
+    - tradesystem.trade
+    - wesv.toggle
+    - wesv.use
+    - worldedit.selection.contract
+    - worldedit.selection.expand
+    - worldedit.selection.pos
+    - worldedit.analysis.sel
+    - worldedit.wand
     - worldguard.region.claim:
         value: false
         context:
@@ -155,91 +240,6 @@ data:
     - worldguard.region.select.own.*
     - worldguard.region.list
     - worldguard.region.wand
-    - bukkit.command.*:
-        value: false
-    - minecraft.command.*:
-        value: false
-    - minecraft.command.help:
-        value: false
-    - minecraft.command.list
-    - minecraft.command.me:
-        value: false
-    - multiverse.portal.access.*
-    - multiverse.access.*
-    - multiverse.access.work:
-        value: false
-    - tradesystem.trade.initiate
-    - tradesystem.trade
-    - luckperms:
-        value: false
-    - luckperms.*:
-        value: false
-    - clicktpa.tpa
-    - clicktpa.tpacancel
-    - clicktpa.tpaccept
-    - clicktpa.tpadeny
-    - clicktpa.tpahere
-    - clicktpa.tptoggle
-    - discordsrv.link
-    - discordsrv.linked
-    - discordsrv.unlink
-    - dynmap.hide.self:
-        value: false
-    - dynmap.show.self
-    - elevator.down
-    - elevator.up
-    - elytra.auto
-    - elytra.const-flight
-    - elytra.runup
-    - elytra.shift-activation
-    - elytra.speedup
-    - fastcraft.command.craft
-    - fastcraft.command.craft.fastcraft
-    - fastcraft.command.toggle
-    - fastcraft.use
-    - litebans.notify.broadcast:
-        value: false
-    - lunachat.message
-    - lunachat.reply
-    - multiverse.core.spawn.self
-    - multiverse.help:
-        value: false
-    - multiverse.core.list.who
-    # TODO: デバッグサーバには各ワールドへのポータルがないので暫定措置
-    - multiverse.teleport.*
-    - seichiassist.ec
-    - seichiassist.ef
-    - seichiassist.fd
-    - seichiassist.fly
-    - seichiassist.hat
-    - seichiassist.home
-    - seichiassist.sethome
-    - seichiassist.map
-    - seichiassist.shareinv
-    - seichiassist.mebius
-    - seichiassist.minestack
-    - seichiassist.stick
-    - seichiassist.stickmenu
-    - seichiassist.x-transfer
-    - joinleave.silentleave
-    - shopkeeper.player:
-        value: false
-    - shopkeeper.hire:
-        value: false
-    - shopkeeper.sign:
-        value: false
-    - shopkeeper.hanging-sign:
-        value: false
-    - shopkeeper.entity.*:
-        value: false
-    - towny.command.plot.set.shop
-    - wesv.toggle
-    - wesv.use
-    - worldedit.selection.contract
-    - worldedit.selection.expand
-    - worldedit.selection.pos
-    - worldedit.analysis.sel
-    - worldedit.wand
     meta:
     - default:
         value: 'true'
