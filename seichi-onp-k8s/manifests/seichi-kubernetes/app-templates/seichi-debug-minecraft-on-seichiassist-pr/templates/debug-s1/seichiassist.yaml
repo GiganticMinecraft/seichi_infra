@@ -181,45 +181,6 @@ spec:
                 rg addmember -w world_SW_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
                 rg flag -w world_SW_2 __global__ build -g members allow
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
-                lp group default permission set multiverse.core.list.who true
-                lp group default permission set multiverse.teleport.* true
-                lp group default permission set multiverse.core.spawn.self true
-                lp group default permission set worldedit.wand true
-                lp group default permission set worldedit.selection.pos true
-                lp group default permission set worldedit.selection.expand true
-                lp group default permission set worldedit.analysis.sel true
-                lp group default permission set worldguard.region.claim true
-                lp group default permission set worldguard.region.select.own.* true
-                lp group default permission set worldguard.region.list.own true
-                lp group default permission set worldguard.region.info.* true
-                lp group default permission set worldguard.region.flag.regions.own.* true
-                lp group default permission set worldguard.region.remove.own.* true
-                lp group default permission set fastcraft.command.craft.fastcraft true
-                lp group default permission set seichiassist.fly true
-                lp group default permission set seichiassist.stick true
-                lp group default permission set seichiassist.shareinv true
-                lp group default permission set seichiassist.mebius true
-                lp group default permission set seichiassist.home true
-                lp group default permission set seichiassist.sethome true
-                lp group default permission set seichiassist.stickmenu true
-                lp group default permission set seichiassist.fd true
-                lp group default permission set seichiassist.hat true
-                lp group default permission set seichiassist.ec true
-                lp group default permission set seichiassist.minestack true
-                lp group default permission set seichiassist.map true
-                lp group default permission set seichiassist.ef true
-                lp group default permission set elytra.auto true
-                lp group default permission set elytra.const-flight true
-                lp group default permission set elytra.runup true
-                lp group default permission set elytra.shift-activation true
-                lp group default permission set elytra.speedup true
-                lp group default permission set clicktpa.tpa true
-                lp group default permission set clicktpa.tpacancel true
-                lp group default permission set clicktpa.tpadeny true
-                lp group default permission set clicktpa.tpaccept true
-                lp group default permission set clicktpa.tpahere true
-                lp group default permission set clicktpa.tptoggle true
-                lp group default permission set joinleave.silentleave true
 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-b6ee419
           name: minecraft
@@ -430,10 +391,63 @@ spec:
               mountPath: /plugins/LiteBans/config.yml
               subPath: LiteBans-config.yml
 
-            # LuckPerms プラグインの設定ファイル
+            # LuckPerms プラグイン周りの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/LuckPerms/config.yml
               subPath: LuckPerms-config.yml
+            # groups
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/default.yml
+              subPath: group-default.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/observer.yml
+              subPath: group-observer.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/observerplus.yml
+              subPath: group-observerplus.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/admin.yml
+              subPath: group-admin.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/worldguardbypass.yml
+              subPath: group-worldguardbypass.yml
+            # users
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/0a25e0f2-b952-4fe4-9843-3c5608aa2f0c.yml
+              subPath: user-shirotubu.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/0ea34656-b1c7-45c0-8b89-1ec55a70fe17.yml
+              subPath: user-lucky3028.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/4becf8bc-9a46-4f8b-b6e6-9193cf53b46f.yml
+              subPath: user-tyanimo.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/788bf7d5-f61a-4090-aec7-2e3a281eaf49.yml
+              subPath: user-ploptaw.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/9599901c-fa82-4943-b748-b46e183c53f4.yml
+              subPath: user-taaa150.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/b59f5861-f3f1-447f-945f-a40412ef7340.yml
+              subPath: user-igarasi_k.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/b66cc3f6-a045-42ad-b4b8-320f20caf140.yml
+              subPath: user-unchama.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/b7c16b91-57ca-4bbb-95f7-9e9144474799.yml
+              subPath: user-_megatron_.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/bb991c6b-aafb-405c-b2af-57cd5828962d.yml
+              subPath: user-m1sk9.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/d22fe904-d76a-4ec7-a0a8-48f0146d8549.yml
+              subPath: user-specialboywaka.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/e1ee55bb-c993-4896-88e9-9893a11df27a.yml
+              subPath: user-rito_5289.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/e9c3ac5f-7c6a-45f6-a251-4c24a4a3beea.yml
+              subPath: user-b_makkuro.yml
 
             # Multiverse-Core プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
@@ -607,6 +621,9 @@ spec:
         - name: common-mcserver-plugin-configs
           configMap:
             name: common-mcserver-plugin-configs
+        - name: common-luckperms-permission-configs
+          configMap:
+            name: common-luckperms-permission-configs
         - name: common-dynmap-config
           configMap:
             name: common-dynmap-config
