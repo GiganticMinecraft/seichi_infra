@@ -112,18 +112,6 @@ data:
         value: true
         context:
           world: world
-    - region.flagmenu.mob-spawning:
-        value: true
-        context:
-          world: world_the_end
-    - region.flagmenu.mob-spawning:
-        value: true
-        context:
-          world: world_nether
-    - region.flagmenu.mob-spawning:
-        value: true
-        context:
-          world: world
     - worldguard.region.flag.flags.farewell.*
     - worldguard.region.flag.flags.grass-grouth.*
     - worldguard.region.flag.flags.greeting.*
@@ -219,33 +207,6 @@ data:
     - multiverse.core.list.who
     # TODO: デバッグサーバには各ワールドへのポータルがないので暫定措置
     - multiverse.teleport.*
-    - region.flagmenu.chest-access
-    - region.flagmenu.farewell
-    - region.flagmenu.grass-grouth
-    - region.flagmenu.greeting
-    - region.flagmenu.ice-melt
-    - region.flagmenu.mushroom-grouth
-    - region.flagmenu.mycelium-spread
-    - region.flagmenu.pvp
-    - region.flagmenu.ride
-    - region.flagmenu.sleep
-    - region.flagmenu.snow-melt
-    - region.flagmenu.soil-dry
-    - region.flagmenu.time-lock
-    - region.flagmenu.use
-    - region.flagmenu.vine-grouth
-    - region.flagmenu.weather-lock
-    - region.manage.addmember
-    - region.manage.delmember
-    - region.manage.delregion
-    - region.manage.flagmenu
-    - region.manage.open
-    - region.open.world
-    - region.open.world_2
-    - region.open.world_SW_2
-    - region.open.world_SW_4
-    - region.open.world_build
-    - region.open.world_dot
     - seichiassist.ec
     - seichiassist.ef
     - seichiassist.fd
