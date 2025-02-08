@@ -8,10 +8,6 @@ data:
   group-default.yml: |
     name: default
     permissions:
-    - worldguard.region.claim:
-        value: false
-        context:
-          world: world_tt
     - shopchest.buy:
         value: true
         context:
@@ -27,29 +23,13 @@ data:
     - worldguard.region.claim:
         value: false
         context:
-          world: world_the_end_tt
+          world: world_tt
     - worldguard.region.claim:
         value: false
         context:
-          world: world_the_end
-    - worldguard.region.flag.flags.deny-spawn.*:
-        value: true
-        context:
-          world: world_the_end
-    - worldguard.region.flag.flags.enderpearl.*:
-        value: true
-        context:
-          world: world_the_end
-    - worldguard.region.flag.flags.mob-damage.*:
-        value: true
-        context:
-          world: world_the_end
-    - worldguard.region.flag.flags.mob-spawning.*:
-        value: true
-        context:
-          world: world_the_end
-    - region.flagmenu.mob-spawning:
-        value: true
+          world: world_the_end_tt
+    - worldguard.region.claim:
+        value: false
         context:
           world: world_the_end
     - worldguard.region.claim:
@@ -60,18 +40,10 @@ data:
         value: false
         context:
           world: world_sw_nether
-    - worldguard.region.flag.flags.fire-spread.*:
-        value: true
-        context:
-          world: world_sw_4
     - worldguard.region.claim:
         value: false
         context:
           world: world_sw_3
-    - worldguard.region.flag.flags.fire-spread.*:
-        value: true
-        context:
-          world: world_sw_2
     - worldguard.region.claim:
         value: false
         context:
@@ -83,6 +55,30 @@ data:
     - worldguard.region.flag.flags.deny-spawn.*:
         value: true
         context:
+          world: world_the_end
+    - worldguard.region.flag.flags.enderpearl.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.mob-damage.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.mob-spawning.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.fire-spread.*:
+        value: true
+        context:
+          world: world_sw_4
+    - worldguard.region.flag.flags.fire-spread.*:
+        value: true
+        context:
+          world: world_sw_2
+    - worldguard.region.flag.flags.deny-spawn.*:
+        value: true
+        context:
           world: world_nether
     - worldguard.region.flag.flags.enderpearl.*:
         value: true
@@ -96,18 +92,6 @@ data:
         value: true
         context:
           world: world_nether
-    - region.flagmenu.mob-spawning:
-        value: true
-        context:
-          world: world_nether
-    - worldguard.region.removeowner.own.*:
-        value: true
-        context:
-          world: world_dot
-    - worldguard.region.removemember.*:
-        value: true
-        context:
-          world: world_dot
     - worldguard.region.flag.flags.enderpearl.*:
         value: true
         context:
@@ -131,6 +115,14 @@ data:
     - region.flagmenu.mob-spawning:
         value: true
         context:
+          world: world_the_end
+    - region.flagmenu.mob-spawning:
+        value: true
+        context:
+          world: world_nether
+    - region.flagmenu.mob-spawning:
+        value: true
+        context:
           world: world
     - worldguard.region.flag.flags.farewell.*
     - worldguard.region.flag.flags.grass-grouth.*
@@ -148,17 +140,41 @@ data:
     - worldguard.region.flag.flags.use.*
     - worldguard.region.flag.flags.vine-grouth.*
     - worldguard.region.flag.flags.weather-lock.*
+    - worldguard.region.flag.flags.chest-access.allow:
+        value: false
+    - worldguard.region.flag.flags.chest-access.deny
+    - worldguard.region.flag.flags.chest-access.none
     - worldguard.region.flag.regions.own.*
-    - worldguard.region.addmember.own.*
     - worldguard.region.remove.own.*
+    - worldguard.region.removeowner.own.*:
+        value: true
+        context:
+          world: world_dot
+    - worldguard.region.addmember.own.*
     - worldguard.region.removemember.own.*
+    - worldguard.region.removemember.*:
+        value: true
+        context:
+          world: world_dot
     - worldguard.region.select.own.*
     - worldguard.region.info.*
     - worldguard.region.list.*
     - worldguard.region.teleport.*
+    - worldguard.region.claim
+    - worldguard.region.remove.own.*
+    - worldguard.region.list.own
+    - worldguard.region.info.*
+    - worldguard.region.select.own.*
+    - worldguard.region.list
+    - worldguard.region.wand
     - bukkit.command.*:
         value: false
     - minecraft.command.*:
+        value: false
+    - minecraft.command.help:
+        value: false
+    - minecraft.command.list
+    - minecraft.command.me:
         value: false
     - multiverse.portal.access.*
     - multiverse.access.*
@@ -197,11 +213,6 @@ data:
         value: false
     - lunachat.message
     - lunachat.reply
-    - minecraft.command.help:
-        value: false
-    - minecraft.command.list
-    - minecraft.command.me:
-        value: false
     - multiverse.core.spawn.self
     - multiverse.help:
         value: false
@@ -268,17 +279,6 @@ data:
     - worldedit.selection.pos
     - worldedit.analysis.sel
     - worldedit.wand
-    - worldguard.region.claim
-    - worldguard.region.remove.own.*
-    - worldguard.region.list.own
-    - worldguard.region.flag.flags.chest-access.allow:
-        value: false
-    - worldguard.region.flag.flags.chest-access.deny
-    - worldguard.region.flag.flags.chest-access.none
-    - worldguard.region.info.*
-    - worldguard.region.select.own.*
-    - worldguard.region.list
-    - worldguard.region.wand
     meta:
     - default:
         value: 'true'
