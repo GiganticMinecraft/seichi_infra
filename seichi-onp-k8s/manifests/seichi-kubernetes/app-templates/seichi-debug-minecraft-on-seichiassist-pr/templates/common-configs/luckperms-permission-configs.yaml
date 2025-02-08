@@ -254,6 +254,14 @@ data:
     - joinleave.silentleave
     - shopkeeper.player:
         value: false
+    - shopkeeper.hire:
+        value: false
+    - shopkeeper.sign:
+        value: false
+    - shopkeeper.hanging-sign:
+        value: false
+    - shopkeeper.entity.*:
+        value: false
     - towny.command.plot.set.shop
     - wesv.toggle
     - wesv.use
