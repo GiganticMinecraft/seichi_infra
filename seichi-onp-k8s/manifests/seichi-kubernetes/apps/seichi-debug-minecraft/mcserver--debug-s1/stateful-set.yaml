@@ -29,15 +29,15 @@ spec:
             - "sh"
             - "-c"
             - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
-        - name: delete-jars
-          image: busybox:1.37.0
-          volumeMounts:
-            - name: minecraft-server-data
-              mountPath: /data
-          command:
-            - "sh"
-            - "-c"
-            - "rm -rf /data/plugins/*.jar"
+        # - name: delete-jars
+        #   image: busybox:1.37.0
+        #   volumeMounts:
+        #     - name: minecraft-server-data
+        #       mountPath: /data
+        #   command:
+        #     - "sh"
+        #     - "-c"
+        #     - "rm -rf /data/plugins/*.jar"
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-caa6a66
           env:
@@ -378,8 +378,8 @@ spec:
               mountPath: /plugins
 
             # サーバーデータが格納されているディレクトリのマウント設定
-            - name: minecraft-server-data
-              mountPath: /data
+            # - name: minecraft-server-data
+            #   mountPath: /data
 
       volumes:
         - name: common-mcserver-configs
@@ -418,14 +418,15 @@ spec:
         - name: mod-downloader-volume
           emptyDir: {}
 
-        # サーバーデータが格納されているディレクトリはNAS上の特定のiSCSIパスで公開されたLUNドライブを直接マウントする
-        # このボリュームに保存されたデータのライフサイクルに関する管理(バックアップリストアほか)はkubernetes上で管理されずNASに一任される
-        - name: minecraft-server-data
-          iscsi:
-            targetPortal: 192.168.16.240
-            iqn: iqn.2000-01.com.synology:seichi-cloud.k8s-static-pv--minecraft-server-data-mcserver--debug-s1-0
-            lun: 1
-            readOnly: false
-            fsType: ext4
-            chapAuthDiscovery: false
-            chapAuthSession: false
+        # ワールドデータ周りが保管されると SeichiAssist によるマイグレーションで詰まるので一旦コメントアウト
+        # # サーバーデータが格納されているディレクトリはNAS上の特定のiSCSIパスで公開されたLUNドライブを直接マウントする
+        # # このボリュームに保存されたデータのライフサイクルに関する管理(バックアップリストアほか)はkubernetes上で管理されずNASに一任される
+        # - name: minecraft-server-data
+        #   iscsi:
+        #     targetPortal: 192.168.16.240
+        #     iqn: iqn.2000-01.com.synology:seichi-cloud.k8s-static-pv--minecraft-server-data-mcserver--debug-s1-0
+        #     lun: 1
+        #     readOnly: false
+        #     fsType: ext4
+        #     chapAuthDiscovery: false
+        #     chapAuthSession: false
