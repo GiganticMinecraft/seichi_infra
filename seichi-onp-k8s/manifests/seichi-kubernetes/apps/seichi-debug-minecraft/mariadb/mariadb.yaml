@@ -110,7 +110,9 @@ spec:
 
   volumeMounts:
   - name: sqldump-volume
-    mountPath: /docker-entrypoint-initdb.d
+    mountPath: /
 
   volumes:
+  # 本番サーバーからもってきた sqldump をマウントするためのボリューム
   - name: sqldump-volume
+    emptyDir: {}
