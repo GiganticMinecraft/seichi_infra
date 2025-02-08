@@ -22,8 +22,7 @@ spec:
     - sh
     - -c
     - |
-      mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases flyway_managed_schema seichiassist --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
-      mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
+      echo "initContainers"
     volumeMounts:
     - mountPath: /docker-entrypoint-initdb.d
       name: sqldump-volume
