@@ -4,7 +4,7 @@ metadata:
   name: common-luckperms-permission-configs
 data:
   #region groups
-  # NOTE: ファイルとして Pod 内に配置する場合は `yaml-storage/groups/グループ名.yml`というパスになる。（UUIDはハイフン付き）
+  # NOTE: ファイルとして Pod 内に配置する場合は `yaml-storage/groups/グループ名.yml`というパスになる。
   group-default.yml: |
     name: default
     permissions:
