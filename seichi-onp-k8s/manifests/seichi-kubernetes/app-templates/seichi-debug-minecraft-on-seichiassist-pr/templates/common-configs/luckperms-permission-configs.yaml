@@ -195,8 +195,6 @@ data:
     - fastcraft.use
     - litebans.notify.broadcast:
         value: false
-    - luckperms:
-        value: false
     - lunachat.message
     - lunachat.reply
     - minecraft.command.help:
