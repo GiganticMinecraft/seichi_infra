@@ -29,15 +29,15 @@ spec:
             - "sh"
             - "-c"
             - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
-        - name: delete-jars
-          image: busybox:1.37.0
-          volumeMounts:
-            - name: minecraft-server-data
-              mountPath: /data
-          command:
-            - "sh"
-            - "-c"
-            - "rm -rf /data/plugins/*.jar"
+        # - name: delete-jars
+        #   image: busybox:1.37.0
+        #   volumeMounts:
+        #     - name: minecraft-server-data
+        #       mountPath: /data
+        #   command:
+        #     - "sh"
+        #     - "-c"
+        #     - "rm -rf /data/plugins/*.jar"
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-caa6a66
           env:
@@ -93,7 +93,7 @@ spec:
                 https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
                 https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
                 https://github.com/GiganticMinecraft/RandomTeleport/releases/download/for-1.18/RandomTeleport-1.0-SNAPSHOT.jar,
-                https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-2115-8ec3d17744b2e0949474d08e547eaf155153ad4b/SeichiAssist.jar,
+                https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-2115-e14ac78fc17f8b607f614faa4ff9e40b517eb031/SeichiAssist.jar,
 
             - name: JVM_OPTS
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
@@ -378,8 +378,8 @@ spec:
               mountPath: /plugins
 
             # サーバーデータが格納されているディレクトリのマウント設定
-            - name: minecraft-server-data
-              mountPath: /data
+            # - name: minecraft-server-data
+            #   mountPath: /data
 
       volumes:
         - name: common-mcserver-configs
@@ -426,3 +426,4 @@ spec:
         resources:
           requests:
             storage: 50Gi
+            

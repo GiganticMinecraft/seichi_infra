@@ -311,6 +311,11 @@ spec:
               mountPath: /plugins/Elytra/config.yml
               subPath: Elytra-config.yml
 
+            # EatEgg プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/EatEgg/config.yml
+              subPath: EatEgg-config.yml
+
             # ClickTpa プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/ClickTpa/config.yml

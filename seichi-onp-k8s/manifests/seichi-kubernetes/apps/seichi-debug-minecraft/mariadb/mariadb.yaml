@@ -4,6 +4,31 @@ metadata:
   namespace: seichi-debug-minecraft
   name: mariadb
 spec:
+  initContainers:
+  - name: init
+    image: docker-registry1.mariadb.com/library/mariadb:10.11.11
+    env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mcserver--common--config-secrets
+          key: PROD_GAME_DB_PASSWORD
+    args:
+    - sh
+    - -c
+    - |
+      mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases flyway_managed_schema seichiassist --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
+      mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
+    volumeMounts:
+    - mountPath: /docker-entrypoint-initdb.d
+      name: sqldump-volume
+    resources:
+      requests:
+        cpu: 2
+        memory: 2Gi
+
+  tls:
+    enabled: false
   rootPasswordSecretKeyRef:
     name: mariadb
     generate: false
@@ -16,13 +41,13 @@ spec:
     generate: false
     key: mcserver-password
 
-  image: docker-registry1.mariadb.com/library/mariadb:10.11.10
+  image: docker-registry1.mariadb.com/library/mariadb:10.11.11
   imagePullPolicy: IfNotPresent
 
   port: 3306
 
   storage:
-    size: 20Gi
+    size: 100Gi
     storageClassName: synology-iscsi-storage
     resizeInUseVolumes: true
     waitForVolumeResize: true
@@ -82,3 +107,7 @@ spec:
     enabled: true
     serviceMonitor:
       prometheusRelease: prometheus
+
+  volumes:
+  # 本番サーバーからもってきた sqldump をマウントするためのボリューム
+  - name: sqldump-volume
