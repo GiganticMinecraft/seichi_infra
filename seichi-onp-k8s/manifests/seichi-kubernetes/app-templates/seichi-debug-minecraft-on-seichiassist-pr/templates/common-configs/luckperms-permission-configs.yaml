@@ -359,7 +359,7 @@ data:
         value: 'false'
   #endregion
   #region users
-  # NOTE: ファイルとしてPod内に配置する場合は `yaml-storage/users/UUID.yml`というパスになる。（UUIDはハイフン付き）
+  # NOTE: ファイルとして Pod 内に配置する場合は `yaml-storage/users/UUID.yml`というパスになる。（UUID はハイフン付き）
   user-shirotubu.yml: |
     uuid: 0a25e0f2-b952-4fe4-9843-3c5608aa2f0c
     name: shirotubu
