@@ -29,7 +29,7 @@ spec:
                     operator: In
                     values:
                       - seichi-onp-k8s-wk-1 # CPUの多いwk-1だけにスケジュールする
-      initContainer:
+      initContainers:
         - name: jmx-exporter-downloader
           image: busybox:1.37.0
           env:
