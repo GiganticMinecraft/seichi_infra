@@ -7,7 +7,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
   }
 
   data = {
-    DISCORDSRV_TOKEN = var.minecraft__discordsrv_bot_token
+    DISCORDSRV_TOKEN      = var.minecraft__discordsrv_bot_token
     PROD_GAME_DB_PASSWORD = var.minecraft__prod_game_db__password
   }
 
