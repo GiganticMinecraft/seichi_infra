@@ -108,10 +108,6 @@ spec:
     serviceMonitor:
       prometheusRelease: prometheus
 
-  volumeMounts:
-  - name: sqldump-volume
-    mountPath: /
-
   volumes:
   # 本番サーバーからもってきた sqldump をマウントするためのボリューム
   - name: sqldump-volume
