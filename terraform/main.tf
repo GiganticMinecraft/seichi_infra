@@ -341,3 +341,37 @@ variable "argo_events_github_access_token" {
 }
 
 # endregion
+
+# region env variables for proxmox-backup-client
+
+variable "proxmox_backup_client__user" {
+  description = "proxmox-backup-client user name"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_backup_client__host" {
+  description = "proxmox-backup-client host"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_backup_client__datastore" {
+  description = "proxmox-backup-client datastore"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_backup_client__password" {
+  description = "proxmox-backup-client password"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_backup_client__fingerprint" {
+  description = "proxmox-backup-client fingerprint at target server"
+  type        = string
+  sensitive   = true
+}
+
+# endregion
