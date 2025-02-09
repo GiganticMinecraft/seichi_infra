@@ -75,12 +75,10 @@ spec:
                 https://github.com/ProxioDev/RedisBungee/releases/download/0.6.5/RedisBungee-0.6.5.jar,
                 https://github.com/weihao/bungeecord-prometheus-exporter/releases/download/3.1.5/bungeecord-prometheus-exporter-3.1.5.jar
 
-            # BungeeYAML (depended by SwiftMOTD):
-            #   https://www.spigotmc.org/resources/bungeeyaml-original.13068/
-            # SwiftMOTD:
-            #   https://www.spigotmc.org/resources/swiftmotd.221/
+            # MagicMOTD:
+            #   https://www.spigotmc.org/resources/magicmotd.110063/
             - name: SPIGET_PLUGINS
-              value: 13068,221
+              value: 110063
 
             - name: JVM_OPTS
               value: >-
@@ -132,8 +130,8 @@ spec:
               mountPath: /config/plugins/RedisBungee/config.yml
               subPath: RedisBungee-config.yml
             - name: bungeecord-plugin-configs
-              mountPath: /config/plugins/SwiftMOTD/config.yml
-              subPath: SwiftMOTD-config.yml
+              mountPath: /config/plugins/MagicMOTD/config.yml
+              subPath: MagicMOTD-config.yml
             - name: bungeecord-plugin-configs
               mountPath: /config/plugins/BungeeCordPrometheusExporter/config.json
               subPath: BungeeCordPrometheusExporter-config.json
