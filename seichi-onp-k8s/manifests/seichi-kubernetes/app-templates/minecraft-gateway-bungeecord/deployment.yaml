@@ -78,7 +78,7 @@ spec:
             # MagicMOTD:
             #   https://www.spigotmc.org/resources/magicmotd.110063/
             - name: SPIGET_PLUGINS
-              value: 110063
+              value: '110063'
 
             - name: JVM_OPTS
               value: >-
