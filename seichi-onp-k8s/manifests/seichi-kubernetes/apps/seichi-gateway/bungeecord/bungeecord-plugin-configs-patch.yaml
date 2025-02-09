@@ -51,15 +51,15 @@ data:
     # %online% - Online player count
     # %max% - Max player count
     motds:
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&fあ く し ろ は た ら け'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&fVERY VELL. THEN LET IT BE SEICHI.'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&fよろしい、ならば整地だ'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&f整地の聖地へヨウコソ'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&fすごーい！君は整地ができるフレンズなんだね！'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&f整地にする？整地にする？それとも…セ・イ・チ？'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&f用法用量を守って正しく整地しましょう'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&funchama「wawawa忘れ物」'
-      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2\n%C%&fさて...整地の休憩ついでに 整地するか！'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &fあ く し ろ は た ら け'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &fVERY VELL. THEN LET IT BE SEICHI.'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &fよろしい、ならば整地だ'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &f整地の聖地へヨウコソ'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &fすごーい！君は整地ができるフレンズなんだね！'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &f整地にする？整地にする？それとも…セ・イ・チ？'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &f用法用量を守って正しく整地しましょう'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &funchama「wawawa忘れ物」'
+      - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 \n %C% &fさて...整地の休憩ついでに 整地するか！'
 
     # When using the /forcemotd command, you can specify the position in the list of messages to force.
     # For example, to force the first message, you would use /forcemotd 1.
