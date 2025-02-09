@@ -465,19 +465,6 @@ spec:
               mountPath: /plugins/SimpleElevator/config.yml
               subPath: SimpleElevator-config.yml
 
-            # SimpleTrading プラグイン周りの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/SimpleTrading/config.yml
-              subPath: SimpleTrading-config.yml
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/SimpleTrading/i18n/ja_JP.yml
-              subPath: SimpleTrading-ja_JP.yml
-
-            # SuperVanish プラグイン周りの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/SuperVanish/config.yml
-              subPath: SuperVanish-config.yml
-
             # tce プラグイン周りの設定ファイル
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/tce/events.yml
@@ -581,15 +568,7 @@ spec:
               mountPath: /plugins/OriginSpawn/config.yml
               subPath: OriginSpawn-config.yml
 
-            # AreaShop プラグインの設定ファイル
-            - name: s1-config
-              mountPath: /plugins/AreaShop/config.yml
-              subPath: AreaShop-config.yml
-            - name: s1-config
-              mountPath: /plugins/AreaShop/default.yml
-              subPath: AreaShop-default.yml
-
-            # AreaShop プラグインの設定ファイル
+            # AuctionHouse プラグインの設定ファイル
             - name: s1-config
               mountPath: /plugins/AuctionHouse/config.yml
               subPath: AuctionHouse-config.yml
