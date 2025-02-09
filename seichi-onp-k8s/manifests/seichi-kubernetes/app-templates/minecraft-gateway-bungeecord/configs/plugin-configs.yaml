@@ -108,23 +108,45 @@ data:
     # restart scripts.
     exempt-ip-addresses: []
 
-  SwiftMOTD-config.yml: |
+  MagicMOTD-config.yml: |
+    # The player name to use if the IP has not been seen before.
+    default_player_name: player
+
+    # Define each MOTD here.
+    # You can use formatting codes with § or & and newlines with \n.
+    # To center text, write %C% AT THE START of the line, either at the start of the message or after a newline.
+    # (Note: this is dependent on the player's font size. The default size is used when centering.)
+    # Centering works best with Latin characters (abcd...), but will still work with other character sets.
+    # You can use templates to show dynamic information.
+    # Available templates:
+    # %player% - Player name
+    # %online% - Online player count
+    # %max% - Max player count
     motds:
-      generic:
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fあ く し ろ は た ら け'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fVERY VELL. THEN LET IT BE SEICHI.'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fよろしい、ならば整地だ'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地の聖地へヨウコソ'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fすごーい！君は整地ができるフレンズなんだね！'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地にする？整地にする？それとも…セ・イ・チ？'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f用法用量を守って正しく整地しましょう'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fYou have a pickaxe. You have a time. Oh! Seichi Love.'
-      dynamic:
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fあ く し ろ は た ら け'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fVERY VELL. THEN LET IT BE SEICHI.'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fよろしい、ならば整地だ'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地の聖地へヨウコソ'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fすごーい！君は整地ができるフレンズなんだね！'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f整地にする？整地にする？それとも…セ・イ・チ？'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&f用法用量を守って正しく整地しましょう'
-        - '&b&lseichi.click network &6&l| &7&lver &a&l1.12.2 , 1.14.4%newline&fYou have a pickaxe. You have a time. Oh! Seichi Love.'
+      - "%c%§aHello, §e%player%§a!"
+      - "&cThere are &e%online%/%max%&c players online!"
+      - "%C%§eCentered Line 1\n%C%Centered Line 2"
+      - "%C%§eCentered Line 1\nUncentered Line 2"
+
+    # When using the /forcemotd command, you can specify the position in the list of messages to force.
+    # For example, to force the first message, you would use /forcemotd 1.
+    # To stop forcing a message, use /forcemotd (without a number).
+
+    # Define each message here.
+    # These are the messages sent to users of the commands. You may edit them to change or translate them, for example.
+    # For the force.out-of-range message, you can use the %max% template to show the maximum index.
+    # For the force.success message, you can use the %index% and %content% templates to show the index and content of the forced MOTD.
+    messages:
+      too-many-args: "Too many arguments!"
+      force:
+        command-descriptor: "When using the /forcemotd command, you can specify the position in the list of messages to force."
+        command-example: "For example, /forcemotd 1 will force the first message in the list."
+        reset-descriptor: "To reset the forced MOTD, run /forcemotd without any arguments."
+        reset-success: "Reset the forced MOTD successfully."
+        invalid-index: "Invalid index!"
+        out-of-range: "Index out of range! Specify a number between 1 and %max%."
+        success: "Set the forced MOTD to %index%. Content: %content%"
+      reload:
+        pending: "Reloading the MagicMOTD config..."
+        success: "Reloaded the MagicMOTD config successfully!"
+        fail: "Failed to reload the MagicMOTD config! Please check the proxy console for more information."
