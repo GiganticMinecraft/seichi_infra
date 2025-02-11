@@ -243,7 +243,7 @@ data:
     meta:
     - default:
         value: 'true'
-  group-onserver.yml: |
+  group-observer.yml: |
     name: observer
     permissions:
     - observerutils.obs
