@@ -302,6 +302,8 @@ data:
   group-admin.yml: |
     name: admin
     permissions:
+    # TODO: ホワイトリスト方式にする（ワイルドカードで権限を与えない）
+    - *
     - minecraft.command.deop:
         value: false
     - minecraft.command.op:
