@@ -336,14 +336,12 @@ data:
     primary-group: user
     parents:
     - admin
-    - default
   user-lucky3028.yml: |
     uuid: 0ea34656-b1c7-45c0-8b89-1ec55a70fe17
     name: lucky3028
     primary-group: worldguard-bypass
     parents:
     - admin
-    - default
     - worldguard-bypass
   user-tyanimo.yml: |
     uuid: 4becf8bc-9a46-4f8b-b6e6-9193cf53b46f
@@ -351,7 +349,6 @@ data:
     primary-group: admin
     parents:
     - admin
-    - default
   user-ploptaw.yml: |
     uuid: 788bf7d5-f61a-4090-aec7-2e3a281eaf49
     name: ploptaw
@@ -361,21 +358,18 @@ data:
         value: false
     parents:
     - admin
-    - default
   user-taaa150.yml: |
     uuid: 9599901c-fa82-4943-b748-b46e183c53f4
     name: taaa150
     primary-group: admin
     parents:
     - admin
-    - default
   user-igarasi_k.yml: |
     uuid: b59f5861-f3f1-447f-945f-a40412ef7340
     name: igarasi_k
     primary-group: admin
     parents:
     - admin
-    - default
     - worldguard-bypass
   user-unchama.yml: |
     uuid: b66cc3f6-a045-42ad-b4b8-320f20caf140
@@ -383,21 +377,18 @@ data:
     primary-group: admin
     parents:
     - admin
-    - default
   user-_megatron_.yml: |
     uuid: b7c16b91-57ca-4bbb-95f7-9e9144474799
     name: _megatron_
     primary-group: admin
     parents:
     - admin
-    - default
   user-m1sk9.yml: |
     uuid: bb991c6b-aafb-405c-b2af-57cd5828962d
     name: m1sk9
     primary-group: worldguard-bypass
     parents:
     - admin
-    - default
     - worldguard-bypass
   user-specialboywaka.yml: |
     uuid: d22fe904-d76a-4ec7-a0a8-48f0146d8549
@@ -405,7 +396,6 @@ data:
     primary-group: worldguard-bypass
     parents:
     - admin
-    - default
     - worldguard-bypass
   user-rito_5289.yml: |
     uuid: e1ee55bb-c993-4896-88e9-9893a11df27a
@@ -413,13 +403,11 @@ data:
     primary-group: default
     parents:
     - admin
-    - default
   user-b_makkuro.yml: |
     uuid: e9c3ac5f-7c6a-45f6-a251-4c24a4a3beea
     name: b_makkuro
     primary-group: worldguard-bypass
     parents:
     - admin
-    - default
     - worldguard-bypass
   #endregion
