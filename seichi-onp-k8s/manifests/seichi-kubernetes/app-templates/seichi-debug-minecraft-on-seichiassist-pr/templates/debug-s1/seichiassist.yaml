@@ -152,15 +152,6 @@ spec:
             - name: CFG_LUCKPERMS_SERVER_NAME
               value: "s1"
 
-            - name: CFG_OBSERVERUTILS_SERVER_NAME
-              value: "アルカディア"
-
-            - name: CFG_OBSERVERUTILS_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: observerutils-secrets
-                  key: OBSERVERUTILS_API_KEY
-
             # rg addmemberコマンドで、`__global__`保護に対してメンバーに追加しているプレイヤーはunchamaさん。
             # MCIDで指定しても、当該プレイヤーがまだログインしたことがない判定だからか追加できないので、UUIDを指定している。
             - name: RCON_CMDS_STARTUP
@@ -585,11 +576,6 @@ spec:
             - name: common-mcserver-plugin-configs
               mountPath: /plugins/StreamClock/config.yml
               subPath: StreamClock-config.yml
-
-            # ObserverUtils プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/ObserverUtils/config.yml
-              subPath: ObserverUtils-config.yml
 
             # OriginSpawn プラグインの設定ファイル
             - name: s1-config

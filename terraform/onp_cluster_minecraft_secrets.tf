@@ -159,30 +159,3 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
   }
 
 }
-
-resource "helm_release" "onp_minecraft_debug_observerutils_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
-
-  repository = "https://giganticminecraft.github.io/seichi_infra/"
-  chart      = "raw-resources"
-  name       = "seichi-debug-minecraft-observerutils-secrets"
-  namespace  = "kube-system"
-  version    = "0.3.0"
-
-  set_list {
-    name = "manifests"
-    value = [<<-EOS
-      kind: ClusterSecret
-      apiVersion: clustersecret.io/v1
-      metadata:
-        namespace: clustersecret
-        name: observerutils-secrets
-      matchNamespace:
-        - seichi-debug-minecraft-on-seichiassist-pr-*
-      data:
-        OBSERVERUTILS_API_KEY: ${base64encode(var.minecraft__observerutils_api_key)}
-    EOS
-    ]
-  }
-
-}
