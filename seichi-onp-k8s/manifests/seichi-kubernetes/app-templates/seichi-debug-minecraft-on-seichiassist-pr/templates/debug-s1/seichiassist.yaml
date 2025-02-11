@@ -158,7 +158,7 @@ spec:
             - name: CFG_OBSERVERUTILS_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: mcserver--common--config-secrets
+                  name: observerutils-secrets
                   key: OBSERVERUTILS_API_KEY
 
             # rg addmemberコマンドで、`__global__`保護に対してメンバーに追加しているプレイヤーはunchamaさん。
