@@ -586,6 +586,11 @@ spec:
               mountPath: /plugins/StreamClock/config.yml
               subPath: StreamClock-config.yml
 
+            # ObserverUtils プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ObserverUtils/config.yml
+              subPath: ObserverUtils-config.yml
+
             # OriginSpawn プラグインの設定ファイル
             - name: s1-config
               mountPath: /plugins/OriginSpawn/config.yml
