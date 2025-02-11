@@ -3526,7 +3526,9 @@ data:
     #
     # - A H2 database is the default option.
     # - If you want to edit data manually in "traditional" storage files, we suggest using YAML.
-    storage-method: MariaDB
+    # NOTE: 基本はYAMLでIaCとして管理するが、一部適さない設定もあるので、MariaDBに保存するものもある。
+    # 詳細は、split-storage の設定項目を参照してください。
+    storage-method: yaml
 
     # The following block defines the settings for remote database storage methods.
     #
@@ -3624,14 +3626,16 @@ data:
     # - The connection options above still have to be correct for each type here.
     split-storage:
       # Don't touch this if you don't want to use split storage!
-      enabled: false
+      enabled: true
       methods:
         # These options don't need to be modified if split storage isn't enabled.
-        user: h2
-        group: h2
-        track: h2
-        uuid: h2
-        log: h2
+        user: yaml
+        group: yaml
+        track: yaml
+        # LuckPerms が独自に管理する UUID と MCID の紐づけキャッシュ。特に IaC として管理する必要がないため、DB 管理。
+        uuid: mariadb
+        # LuckPerms の操作ログ。MariaDB に入れておけば、Grafana で検索できるため、DB 管理。
+        log: mariadb
 
 
 
