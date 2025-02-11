@@ -115,7 +115,10 @@ spec:
         args:
         - sh
         - -c
+        # FIXME: LuckPerms の設定変更により、LuckPerms が使用する DB の一部テーブルが不要になったので、それらを削除するために、一旦 DROP DATABASE する
         - |
+          echo 'DROP DATABASE IF EXISTS luckperms;' > /docker-entrypoint-initdb.d/drop-db.sql
+
           echo 'CREATE DATABASE IF NOT EXISTS luckperms;' > /docker-entrypoint-initdb.d/create-db.sql
           echo 'CREATE DATABASE IF NOT EXISTS coreprotect__mc_lobby;' >> /docker-entrypoint-initdb.d/create-db.sql
           echo 'CREATE DATABASE IF NOT EXISTS coreprotect__mc_s1;' >> /docker-entrypoint-initdb.d/create-db.sql
