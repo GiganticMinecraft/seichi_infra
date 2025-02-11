@@ -64,7 +64,8 @@ data:
     # ここに記載されたワールド名ではworldguard.region.claimパーミッションが無くても
     # グリッド式保護メニュー経由で保護が可能になります
     GridProtectEnableWorld:
-      - world_test
+      - world_2
+      - world_SW_2
 
     # グリッドで指定可能な最大ユニット合計数の設定
     # (15ブロック=1ユニット)
