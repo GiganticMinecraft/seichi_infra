@@ -6399,3 +6399,7 @@ data:
     - "world_SW_4"
     - "world_SW_nether"
     - "world_SW_the_end"
+
+  ObserverUtils-config.yml: |
+    server-name: ${CFG_OBSERVERUTILS_SERVER_NAME}
+    redmine-api-key: ${CFG_OBSERVERUTILS_API_KEY}

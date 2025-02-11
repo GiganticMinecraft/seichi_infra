@@ -274,6 +274,12 @@ variable "minecraft__discordsrv_bot_token" {
   sensitive   = true
 }
 
+variable "minecraft__observerutils_api_key" {
+  description = "ObserverUtils Redmine API Key"
+  type        = string
+  sensitive   = true
+}
+
 variable "minecraft__prod_one_day_to_reset__morning_glory_seed_webhook_url" {
   description = "Webhook URL for MorningGlorySeeds on one-day-to-reset server in production env"
   type        = string

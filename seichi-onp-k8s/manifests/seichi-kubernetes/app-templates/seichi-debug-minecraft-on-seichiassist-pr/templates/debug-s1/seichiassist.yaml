@@ -152,6 +152,15 @@ spec:
             - name: CFG_LUCKPERMS_SERVER_NAME
               value: "s1"
 
+            - name: CFG_OBSERVERUTILS_SERVER_NAME
+              value: "アルカディア"
+
+            - name: CFG_OBSERVERUTILS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: OBSERVERUTILS_API_KEY
+
             # rg addmemberコマンドで、`__global__`保護に対してメンバーに追加しているプレイヤーはunchamaさん。
             # MCIDで指定しても、当該プレイヤーがまだログインしたことがない判定だからか追加できないので、UUIDを指定している。
             - name: RCON_CMDS_STARTUP
