@@ -39,8 +39,12 @@ spec:
           image: bitnami/kubectl:1.32.1
           command: ["/bin/sh", "-c"]
           source: |
-            echo "Waiting for StatefulSet to scale down..."
-            while [ "$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')" != "0" ]; do
+            echo "Waiting for Deployment to scale down..."
+            while true; do
+              replicas=$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')
+              if [ -z "$replicas" ] || [ "$replicas" -eq 0 ]; then
+                break
+              fi
               echo "Still scaling down..."
               sleep 5
             done
@@ -115,7 +119,7 @@ spec:
           image: bitnami/kubectl:1.32.1
           command: ["/bin/sh", "-c"]
           source: |
-            echo "Waiting for StatefulSet to scale up..."
+            echo "Waiting for Deployment to scale up..."
             while [ "$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
               echo "Still scaling up..."
               sleep 5
