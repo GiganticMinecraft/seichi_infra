@@ -1,0 +1,138 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: argo-workflows-restore-minio-template
+  namespace: minio
+  annotations:
+    workflows.argoproj.io/description: "MinIOのデータをProxmox Backup Serverからリストアするワークフロー"
+    workflows.argoproj.io/parameters: |
+      RESTORE_TARGET_DATE: "リストアするバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+spec:
+  serviceAccountName: minio-workflow-sa
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  entrypoint: stop-restore-and-boot
+  arguments:
+    parameters:
+      - name: RESTORE_TARGET_DATE
+        description: "リストアするバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+        value: ""  # 初期値を空にしておく
+  templates:
+    - name: stop-restore-and-boot
+      steps:
+        - - name: patch-deployment-to-0
+            template: patch-deployment-to-0
+        - - name: wait-for-scale-to-0
+            template: wait-for-scale-to-0
+        - - name: run-restore
+            template: run-restore
+        - - name: patch-deployment-to-1
+            template: patch-deployment-to-1
+        - - name: wait-for-scale-to-1
+            template: wait-for-scale-to-1
+
+    - name: patch-deployment-to-0
+      script:
+        image: bitnami/kubectl:1.32.1
+        command: ["/bin/sh", "-c"]
+        source: |
+          kubectl patch deployment seichi-private-plugin-blackhole-minio -n minio --type='merge' -p '{"spec": {"replicas": 0}}'
+
+    - name: wait-for-scale-to-0
+      script:
+        image: bitnami/kubectl:1.32.1
+        command: ["/bin/sh", "-c"]
+        source: |
+          echo "Waiting for Deployment to scale down..."
+          while true; do
+            replicas=$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')
+            if [ -z "$replicas" ] || [ "$replicas" -eq 0 ]; then
+              break
+            fi
+            echo "Still scaling down..."
+            sleep 5
+          done
+          echo "Scale-down confirmed!"
+
+    - name: run-restore
+      script:
+        image: debian:12
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+          echo "Updating package lists..."
+          apt update
+          echo "Installing curl..."
+          apt install -y curl
+          echo "Adding Proxmox restore Client repository..."
+          echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
+          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+          echo "Updating package lists..."
+          apt update
+          echo "Installing proxmox-backup-client version 3.3.2-1..."
+          apt install -y proxmox-backup-client=3.3.2-1
+          echo "Running restore..."
+          proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
+            "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+        env:
+          - name: RESTORE_TARGET_DATE
+            value: "{{workflow.parameters.RESTORE_TARGET_DATE}}"
+          - name: RESTORE_ARCHIVE_NAME
+            value: "data.pxar"
+          - name: RESTORE_TARGET_DIR
+            value: "/data"
+          - name: BACKUP_ID
+            value: "seichi-private-plugin-blackhole-minio"
+          - name: PBS_USER
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: user
+          - name: PBS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: host
+          - name: PBS_DATASTORE
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: datastore
+          - name: PBS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: password
+          - name: PBS_FINGERPRINT
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: fingerprint
+        volumeMounts:
+          - name: restore-target-volume
+            mountPath: /data
+
+    - name: patch-deployment-to-1
+      script:
+        image: bitnami/kubectl:1.32.1
+        command: ["/bin/sh", "-c"]
+        source: |
+          kubectl patch deployment seichi-private-plugin-blackhole-minio -n minio --type='merge' -p '{"spec": {"replicas": 1}}'
+
+    - name: wait-for-scale-to-1
+      activeDeadlineSeconds: 300
+      script:
+        image: bitnami/kubectl:1.32.1
+        command: ["/bin/sh", "-c"]
+        source: |
+          echo "Waiting for Deployment to scale up..."
+          while [ "$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
+            echo "Still scaling up..."
+            sleep 5
+          done
+          echo "Scale-up confirmed!"
+  volumes:
+    - name: restore-target-volume
+      persistentVolumeClaim:
+        claimName: seichi-private-plugin-blackhole-minio
