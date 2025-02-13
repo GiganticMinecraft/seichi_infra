@@ -11,7 +11,7 @@ metadata:
   namespace: minio
 rules:
   - apiGroups: ["apps"]
-    resources: ["deployment"]
+    resources: ["deployments"]
     verbs: ["get", "patch"]
   - apiGroups: [""]
     resources: ["pods"]
