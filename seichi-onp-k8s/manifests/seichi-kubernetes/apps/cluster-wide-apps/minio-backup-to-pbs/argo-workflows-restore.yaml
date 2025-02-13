@@ -71,6 +71,8 @@ spec:
           apt update
           echo "Installing proxmox-backup-client version 3.3.2-1..."
           apt install -y proxmox-backup-client=3.3.2-1
+          echo "Deleting RESTORE_TARGET_DIR before restore..."
+          rm -vrf ${RESTORE_TARGET_DIR}
           echo "Running restore..."
           proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
             "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
