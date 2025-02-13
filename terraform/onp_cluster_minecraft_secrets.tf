@@ -160,12 +160,17 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
 
 }
 
+variable "namespaces-to-deploy-pbs-credentials" {
+  type    = list(string)
+  default = ["seichi-debug-minecraft", "minio"]
+}
+
 resource "kubernetes_secret" "onp_minecraft_debug_pbs_credentials" {
-  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
+  for_each = toset(var.namespaces-to-deploy-pbs-credentials)
 
   metadata {
     name      = "pbs-credentials"
-    namespace = "seichi-debug-minecraft"
+    namespace = each.value
   }
 
   data = {

@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: seichi-debug-minecraft
 
 resources:
+  - "./argo-workflows-backup.yaml"
   - "./service-monitor.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"

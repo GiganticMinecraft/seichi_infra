@@ -2,53 +2,58 @@ apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
   name: argo-workflows-backup
-  namespace: seichi-debug-minecraft
+  namespace: minio
 spec:
-  schedule: "0 4 * * *"
+  # minioは日次メンテ時間帯をさけ日中帯にバックアップします
+  schedule: "0 10 * * *"
   timezone: Asia/Tokyo
   concurrencyPolicy: "Forbid"
   workflowSpec:
     workflowTemplateRef:
-      name: argo-workflows-backup-template
+      name: argo-workflows-backup-minio-template
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: argo-workflows-backup-template
-  namespace: seichi-debug-minecraft
+  name: argo-workflows-backup-minio-template
+  namespace: minio
 spec:
-  serviceAccountName: mcserver--debug-s1-workflow-sa
+  serviceAccountName: minio-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
   entrypoint: stop-backup-and-boot
   templates:
     - name: stop-backup-and-boot
       steps:
-        - - name: patch-statefulset-to-0
-            template: patch-statefulset-to-0
+        - - name: patch-deployment-to-0
+            template: patch-deployment-to-0
         - - name: wait-for-scale-to-0
             template: wait-for-scale-to-0
         - - name: run-backup
             template: run-backup
-        - - name: patch-statefulset-to-1
-            template: patch-statefulset-to-1
+        - - name: patch-deployment-to-1
+            template: patch-deployment-to-1
         - - name: wait-for-scale-to-1
             template: wait-for-scale-to-1
 
-    - name: patch-statefulset-to-0
+    - name: patch-deployment-to-0
       script:
         image: bitnami/kubectl:1.32.1
         command: ["/bin/sh", "-c"]
         source: |
-          kubectl patch statefulset mcserver--debug-s1 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
+          kubectl patch deployment seichi-private-plugin-blackhole-minio -n minio --type='merge' -p '{"spec": {"replicas": 0}}'
 
     - name: wait-for-scale-to-0
       script:
         image: bitnami/kubectl:1.32.1
         command: ["/bin/sh", "-c"]
         source: |
-          echo "Waiting for StatefulSet to scale down..."
-          while [ "$(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')" != "0" ]; do
+          echo "Waiting for Deployment to scale down..."
+          while true; do
+            replicas=$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')
+            if [ -z "$replicas" ] || [ "$replicas" -eq 0 ]; then
+              break
+            fi
             echo "Still scaling down..."
             sleep 5
           done
@@ -80,7 +85,7 @@ spec:
             value: "data.pxar:/data"
           # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるbackup-idを指定する
           - name: BACKUP_ID
-            value: "mcserver--debug-s1"
+            value: "seichi-private-plugin-blackhole-minio"
           - name: PBS_USER
             valueFrom:
               secretKeyRef:
@@ -109,15 +114,13 @@ spec:
         volumeMounts:
           - name: backup-target-volume
             mountPath: /data
-      
-    # FIXME ここにMariaDBのメンテ完了を待つ処理を入れる必要がある
 
-    - name: patch-statefulset-to-1
+    - name: patch-deployment-to-1
       script:
         image: bitnami/kubectl:1.32.1
         command: ["/bin/sh", "-c"]
         source: |
-          kubectl patch statefulset mcserver--debug-s1 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
+          kubectl patch deployment seichi-private-plugin-blackhole-minio -n minio --type='merge' -p '{"spec": {"replicas": 1}}'
 
     - name: wait-for-scale-to-1
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
@@ -125,8 +128,8 @@ spec:
         image: bitnami/kubectl:1.32.1
         command: ["/bin/sh", "-c"]
         source: |
-          echo "Waiting for StatefulSet to scale up..."
-          while [ "$(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
+          echo "Waiting for Deployment to scale up..."
+          while [ "$(kubectl get deployment seichi-private-plugin-blackhole-minio -n minio -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
             echo "Still scaling up..."
             sleep 5
           done
@@ -134,4 +137,4 @@ spec:
   volumes:
     - name: backup-target-volume
       persistentVolumeClaim:
-        claimName: minecraft-server-data-mcserver--debug-s1-0
+        claimName: seichi-private-plugin-blackhole-minio
