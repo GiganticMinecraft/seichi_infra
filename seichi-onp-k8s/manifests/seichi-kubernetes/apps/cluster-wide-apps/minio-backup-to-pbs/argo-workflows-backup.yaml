@@ -1,0 +1,128 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: argo-workflows-backup
+  namespace: minio
+spec:
+  # minioは日次メンテ時間帯をさけ日中帯にバックアップします
+  schedule: "0 10 * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  workflowSpec:
+    ttlStrategy:
+      secondsAfterCompletion: 86400
+    serviceAccountName: minio-workflow-sa
+    entrypoint: stop-backup-and-boot
+    templates:
+      - name: stop-backup-and-boot
+        steps:
+          - - name: patch-deployment-to-0
+              template: patch-deployment-to-0
+          - - name: wait-for-scale-to-0
+              template: wait-for-scale-to-0
+          - - name: run-backup
+              template: run-backup
+          - - name: patch-deployment-to-1
+              template: patch-deployment-to-1
+          - - name: wait-for-scale-to-1
+              template: wait-for-scale-to-1
+
+      - name: patch-deployment-to-0
+        script:
+          image: bitnami/kubectl:1.32.1
+          command: ["/bin/sh", "-c"]
+          source: |
+            kubectl patch deployment minio -n minio --type='merge' -p '{"spec": {"replicas": 0}}'
+
+      - name: wait-for-scale-to-0
+        script:
+          image: bitnami/kubectl:1.32.1
+          command: ["/bin/sh", "-c"]
+          source: |
+            echo "Waiting for StatefulSet to scale down..."
+            while [ "$(kubectl get deployment minio -n minio -o jsonpath='{.status.availableReplicas}')" != "0" ]; do
+              echo "Still scaling down..."
+              sleep 5
+            done
+            echo "Scale-down confirmed!"
+
+      - name: run-backup
+        script:
+          image: debian:12
+          command: ["/bin/sh", "-c"]
+          source: |
+            set -e
+            echo "Updating package lists..."
+            apt update
+            echo "Installing curl..."
+            apt install -y curl
+            echo "Adding Proxmox Backup Client repository..."
+            echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
+            curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+            echo "Updating package lists..."
+            apt update
+            echo "Installing proxmox-backup-client version 3.3.2-1..."
+            apt install -y proxmox-backup-client=3.3.2-1
+            echo "Running backup..."
+            proxmox-backup-client backup "${BACKUP_NAME}" \
+              --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
+              --backup-id "${BACKUP_ID}"
+          env:
+            - name: BACKUP_NAME
+              value: "data.pxar:/data"
+            # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるbackup-idを指定する
+            - name: BACKUP_ID
+              value: "seichi-private-plugin-blackhole-minio"
+            - name: PBS_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pbs-credentials
+                  key: user
+            - name: PBS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: pbs-credentials
+                  key: host
+            - name: PBS_DATASTORE
+              valueFrom:
+                secretKeyRef:
+                  name: pbs-credentials
+                  key: datastore
+            - name: PBS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pbs-credentials
+                  key: password
+            - name: PBS_FINGERPRINT
+              valueFrom:
+                secretKeyRef:
+                  name: pbs-credentials
+                  key: fingerprint
+          volumeMounts:
+            - name: backup-target-volume
+              mountPath: /data
+
+      - name: patch-deployment-to-1
+        script:
+          image: bitnami/kubectl:1.32.1
+          command: ["/bin/sh", "-c"]
+          source: |
+            kubectl patch deployment minio -n minio --type='merge' -p '{"spec": {"replicas": 1}}'
+
+      - name: wait-for-scale-to-1
+        activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
+        script:
+          image: bitnami/kubectl:1.32.1
+          command: ["/bin/sh", "-c"]
+          source: |
+            echo "Waiting for StatefulSet to scale up..."
+            while [ "$(kubectl get deployment minio -n minio -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
+              echo "Still scaling up..."
+              sleep 5
+            done
+            echo "Scale-up confirmed!"
+
+    volumes:
+      - name: backup-target-volume
+        persistentVolumeClaim:
+          claimName: seichi-private-plugin-blackhole-minio
