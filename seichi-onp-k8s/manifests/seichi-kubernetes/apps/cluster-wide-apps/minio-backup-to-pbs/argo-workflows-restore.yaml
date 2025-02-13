@@ -58,6 +58,8 @@ spec:
       script:
         image: debian:12
         command: ["/bin/sh", "-c"]
+        securityContext:
+          privileged: true
         source: |
           set -e
           echo "Updating package lists..."
@@ -71,12 +73,16 @@ spec:
           apt update
           echo "Installing proxmox-backup-client version 3.3.2-1..."
           apt install -y proxmox-backup-client=3.3.2-1
-          echo "Deleting RESTORE_TARGET_DIR before restore..."
-          rm -vrf ${RESTORE_TARGET_DIR}
-          echo "Running restore..."
+          df -Th
+          echo "Running restore to tmp dir..."
+          mkdir -p /var/lib/pbs-restore
+          mount -t tmpfs -o size=2G tmpfs /var/lib/pbs-restore
+          ### FIXME "Error: Operation not supported (os error 95)"
           proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
-            "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
+            "${RESTORE_ARCHIVE_NAME}" "/var/lib/pbs-restore" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+          echo "Running restore to RESTORE_TARGET_DIR..."
+          rsync -av --delete --dry-run /var/lib/pbs-restore/ ${RESTORE_TARGET_DIR}/
         env:
           - name: RESTORE_TARGET_DATE
             value: "{{workflow.parameters.RESTORE_TARGET_DATE}}"
