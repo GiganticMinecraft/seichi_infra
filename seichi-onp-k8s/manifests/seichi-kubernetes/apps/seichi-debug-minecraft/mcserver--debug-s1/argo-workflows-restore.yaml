@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
   name: restore--mcserver--debug-s1
-  namespace: minio
+  namespace: seichi-debug-minecraft
   annotations:
     workflows.argoproj.io/description: "mcserver--debug-s1のデータをProxmox Backup Serverからリストアするワークフロー"
     workflows.argoproj.io/parameters: |
