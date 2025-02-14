@@ -4,6 +4,7 @@ namespace: seichi-debug-minecraft
 
 resources:
   - "./argo-workflows-backup.yaml"
+  - "./argo-workflows-restore.yaml"
   - "./service-monitor.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"
