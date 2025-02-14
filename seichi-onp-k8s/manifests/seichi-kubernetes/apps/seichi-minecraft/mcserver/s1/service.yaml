@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcserver--s1
+  labels:
+    app: mcserver
+    role: metrics
+    mcserver: s1
+spec:
+  type: ClusterIP
+  ports:
+    - name: minecraft
+      port: 25565
+      protocol: TCP
+      targetPort: minecraft
+    - name: jmx-metrics
+      port: 18321
+      protocol: TCP
+      targetPort: jmx-metrics
+    - name: mc-metrics
+      port: 9225
+      protocol: TCP
+      targetPort: mc-metrics
+  selector:
+    mcserver: s1
