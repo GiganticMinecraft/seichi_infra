@@ -58,8 +58,6 @@ spec:
       script:
         image: debian:12
         command: ["/bin/sh", "-c"]
-        securityContext:
-          privileged: true
         source: |
           set -e
           echo "Updating package lists..."
