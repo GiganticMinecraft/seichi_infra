@@ -88,6 +88,8 @@ spec:
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
             --backup-id "${BACKUP_ID}"
         env:
+          - name: TZ
+            value: "Asia/Tokyo"
           - name: BACKUP_NAME
             value: "data.pxar:/data"
           # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるbackup-idを指定する

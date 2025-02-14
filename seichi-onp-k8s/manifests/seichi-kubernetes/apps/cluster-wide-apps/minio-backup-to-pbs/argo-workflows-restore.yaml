@@ -85,6 +85,8 @@ spec:
             "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
         env:
+          - name: TZ
+            value: "Asia/Tokyo"
           - name: RESTORE_TARGET_DATE
             value: "{{workflow.parameters.RESTORE_TARGET_DATE}}"
           - name: RESTORE_ARCHIVE_NAME
