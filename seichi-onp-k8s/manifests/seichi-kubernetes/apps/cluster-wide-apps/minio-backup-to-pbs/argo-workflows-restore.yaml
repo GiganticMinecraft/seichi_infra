@@ -60,27 +60,30 @@ spec:
         command: ["/bin/sh", "-c"]
         source: |
           set -e
+          
           echo "Updating package lists..."
           apt update
-          echo "Installing curl..."
+          
+          echo "Installing packages..."
           apt install -y curl
+          
           echo "Adding Proxmox restore Client repository..."
           echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
           curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+          
           echo "Updating package lists..."
           apt update
+          
           echo "Installing proxmox-backup-client version 3.3.2-1..."
           apt install -y proxmox-backup-client=3.3.2-1
-          df -Th
-          echo "Running restore to tmp dir..."
-          mkdir -p /var/lib/pbs-restore
-          mount -t tmpfs -o size=2G tmpfs /var/lib/pbs-restore
-          ### FIXME "Error: Operation not supported (os error 95)"
-          proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
-            "${RESTORE_ARCHIVE_NAME}" "/var/lib/pbs-restore" \
-            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+          
+          echo "Deleting RESTORE_TARGET_DIR before restore..."
+          rm -vrf ${RESTORE_TARGET_DIR}
+
           echo "Running restore to RESTORE_TARGET_DIR..."
-          rsync -av --delete --dry-run /var/lib/pbs-restore/ ${RESTORE_TARGET_DIR}/
+          proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
+            "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
         env:
           - name: RESTORE_TARGET_DATE
             value: "{{workflow.parameters.RESTORE_TARGET_DATE}}"
