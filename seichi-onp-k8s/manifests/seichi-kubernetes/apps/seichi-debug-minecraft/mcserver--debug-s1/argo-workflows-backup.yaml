@@ -49,8 +49,12 @@ spec:
         image: bitnami/kubectl:1.32.1
         command: ["/bin/sh", "-c"]
         source: |
-          echo "Waiting for StatefulSet to scale down..."
-          while [ "$(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')" != "0" ]; do
+          echo "Waiting for statefulset to scale down..."
+          while true; do
+            replicas=$(kubectl get statefulset mcserver--debug-s1 -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')
+            if [ -z "$replicas" ] || [ "$replicas" -eq 0 ]; then
+              break
+            fi
             echo "Still scaling down..."
             sleep 5
           done
