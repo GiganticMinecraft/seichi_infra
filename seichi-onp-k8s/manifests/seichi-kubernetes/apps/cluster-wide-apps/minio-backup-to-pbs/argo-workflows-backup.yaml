@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
-  name: argo-workflows-backup
+  name: backup--seichi-private-plugin-blackhole-minio
   namespace: minio
 spec:
   # minioは日次メンテ時間帯をさけ日中帯にバックアップします
@@ -10,20 +10,22 @@ spec:
   concurrencyPolicy: "Forbid"
   workflowSpec:
     workflowTemplateRef:
-      name: argo-workflows-backup-minio-template
+      name: backup--seichi-private-plugin-blackhole-minio
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: argo-workflows-backup-minio-template
+  name: backup--seichi-private-plugin-blackhole-minio
   namespace: minio
+  annotations:
+    workflows.argoproj.io/description: "MinIOのデータをProxmox Backup Serverにバックアップするワークフロー"
 spec:
   serviceAccountName: minio-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
-  entrypoint: stop-backup-and-boot
+  entrypoint: default
   templates:
-    - name: stop-backup-and-boot
+    - name: default
       steps:
         - - name: patch-deployment-to-0
             template: patch-deployment-to-0
@@ -65,17 +67,23 @@ spec:
         command: ["/bin/sh", "-c"]
         source: |
           set -e
+          
           echo "Updating package lists..."
           apt update
-          echo "Installing curl..."
+          
+          echo "Installing packages..."
           apt install -y curl
-          echo "Adding Proxmox Backup Client repository..."
+          
+          echo "Adding Proxmox restore Client repository..."
           echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
           curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+          
           echo "Updating package lists..."
           apt update
+          
           echo "Installing proxmox-backup-client version 3.3.2-1..."
           apt install -y proxmox-backup-client=3.3.2-1
+          
           echo "Running backup..."
           proxmox-backup-client backup "${BACKUP_NAME}" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \

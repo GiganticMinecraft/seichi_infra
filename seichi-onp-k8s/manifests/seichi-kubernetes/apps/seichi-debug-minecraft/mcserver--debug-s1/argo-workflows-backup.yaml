@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
-  name: argo-workflows-backup
+  name: backup--mcserver--debug-s1
   namespace: seichi-debug-minecraft
 spec:
   schedule: "0 4 * * *"
@@ -9,20 +9,22 @@ spec:
   concurrencyPolicy: "Forbid"
   workflowSpec:
     workflowTemplateRef:
-      name: argo-workflows-backup-template
+      name: backup--mcserver--debug-s1
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: argo-workflows-backup-template
+  name: backup--mcserver--debug-s1
   namespace: seichi-debug-minecraft
+  annotations:
+    workflows.argoproj.io/description: "mcserver--debug-s1のデータをProxmox Backup Serverにバックアップするワークフロー"
 spec:
   serviceAccountName: mcserver--debug-s1-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
-  entrypoint: stop-backup-and-boot
+  entrypoint: default
   templates:
-    - name: stop-backup-and-boot
+    - name: default
       steps:
         - - name: patch-statefulset-to-0
             template: patch-statefulset-to-0
