@@ -109,6 +109,10 @@ spec:
         volumeMounts:
           - name: backup-target-volume
             mountPath: /data
+          # /root/.cache が overlayfs 配下だとスクリプトがこけるので O_TMPFILE フラグ付きの openat(2) が実行可能なファイルシステムをマウントする
+          # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
+          - name: pbs-tmpfs
+            mountPath: /root/.cache
       
     # FIXME ここにMariaDBのメンテ完了を待つ処理を入れる必要がある
 
@@ -135,3 +139,5 @@ spec:
     - name: backup-target-volume
       persistentVolumeClaim:
         claimName: minecraft-server-data-mcserver--debug-s1-0
+    - name: pbs-tmpfs
+      emptyDir: {}
