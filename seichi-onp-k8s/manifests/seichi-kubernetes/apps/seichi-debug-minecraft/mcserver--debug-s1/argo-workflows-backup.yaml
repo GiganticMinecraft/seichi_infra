@@ -66,17 +66,23 @@ spec:
         command: ["/bin/sh", "-c"]
         source: |
           set -e
+          
           echo "Updating package lists..."
           apt update
-          echo "Installing curl..."
+          
+          echo "Installing packages..."
           apt install -y curl
-          echo "Adding Proxmox Backup Client repository..."
+          
+          echo "Adding Proxmox restore Client repository..."
           echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
           curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+          
           echo "Updating package lists..."
           apt update
+          
           echo "Installing proxmox-backup-client version 3.3.2-1..."
           apt install -y proxmox-backup-client=3.3.2-1
+          
           echo "Running backup..."
           proxmox-backup-client backup "${BACKUP_NAME}" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
