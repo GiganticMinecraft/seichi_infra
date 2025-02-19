@@ -6,7 +6,8 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "mcserver--debug-s1のデータをProxmox Backup Serverからリストアするワークフロー"
     workflows.argoproj.io/parameters: |
-      RESTORE_TARGET_DATE: "リストアするバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+      RESTORE_TARGET_DATE_PBS: "リストアするPBSバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+      RESTORE_TARGET_DATE_DB: "リストアするMariaDBバックアップの日付 (例: 2024-02-10T12:00:00Z)"
 spec:
   serviceAccountName: mcserver--debug-s1-workflow-sa
   ttlStrategy:
@@ -14,23 +15,47 @@ spec:
   entrypoint: default
   arguments:
     parameters:
-      - name: RESTORE_TARGET_DATE
-        description: "リストアするバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+      - name: RESTORE_TARGET_DATE_PBS
+        description: "リストアするPBSバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+        value: ""  # 初期値を空にしておく
+      - name: RESTORE_TARGET_DATE_DB
+        description: "リストアするMariaDBバックアップの日付 (例: 2024-02-10T12:00:00Z)"
         value: ""  # 初期値を空にしておく
   templates:
     - name: default
       steps:
+        - - name: generate-timestamp
+            template: get-timestamp
         - - name: patch-statefulset-to-0
             template: patch-statefulset-to-0
         - - name: wait-for-scale-to-0
             template: wait-for-scale-to-0
         - - name: run-restore
             template: run-restore
+          - name: run-mariadb-restore
+            template: run-mariadb-restore
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
+          - name: wait-complete-mariadb-restore
+            template: wait-complete-mariadb-restore
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
         - - name: patch-statefulset-to-1
             template: patch-statefulset-to-1
         - - name: wait-for-scale-to-1
             template: wait-for-scale-to-1
 
+    - name: get-timestamp
+      script:
+        image: alpine
+        command: [sh]
+        source: |
+          echo $(date +%Y%m%d-%H%M%S)
+  
     - name: patch-statefulset-to-0
       script:
         image: bitnami/kubectl:1.32.1
@@ -79,17 +104,17 @@ spec:
           
           echo "Deleting RESTORE_TARGET_DIR before restore..."
           rm -vrf ${RESTORE_TARGET_DIR}/*
-          ls -a ${RESTORE_TARGET_DIR}/ | egrep -v '^.$' | egrep -v '^..$' | xargs rm -vrf
+          ls -a ${RESTORE_TARGET_DIR}/ | egrep -v '^.$' | egrep -v '^..$' | xargs -I {} rm -vrf ${RESTORE_TARGET_DIR}/{}
 
           echo "Running restore to RESTORE_TARGET_DIR..."
-          proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
+          proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE_PBS}}" \
             "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
         env:
           - name: TZ
             value: "Asia/Tokyo"
-          - name: RESTORE_TARGET_DATE
-            value: "{{workflow.parameters.RESTORE_TARGET_DATE}}"
+          - name: RESTORE_TARGET_DATE_PBS
+            value: "{{workflow.parameters.RESTORE_TARGET_DATE_PBS}}"
           - name: RESTORE_ARCHIVE_NAME
             value: "data.pxar"
           - name: RESTORE_TARGET_DIR
@@ -129,8 +154,59 @@ spec:
           - name: pbs-tmpfs
             mountPath: /root/.cache
 
-    # FIXME ここにMariaDBのメンテ完了を待つ処理を入れる必要がある
+    - name: run-mariadb-restore
+      inputs:
+        parameters:
+          - name: timestamp
+      resource:
+        action: create
+        manifest: |
+          apiVersion: k8s.mariadb.com/v1alpha1
+          kind: Restore
+          metadata:
+            name: mariadb-restore--{{inputs.parameters.timestamp}}
+          spec:
+            mariaDbRef:
+              name: mariadb
+            targetRecoveryTime: {{workflow.parameters.RESTORE_TARGET_DATE_DB}}
+            s3:
+              bucket: mariadb-backups
+              prefix: mcserver--debug-s1
+              endpoint: seichi-private-plugin-blackhole-minio.minio:9000
+              accessKeyIdSecretKeyRef:
+                name: minio-access-secret
+                key: MINIO_ACCESS_KEY
+              secretAccessKeySecretKeyRef:
+                name: minio-access-secret
+                key: MINIO_ACCESS_SECRET
 
+    - name: wait-complete-mariadb-restore
+      inputs:
+        parameters:
+          - name: timestamp
+      activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
+      script:
+        image: bitnami/kubectl:1.32.1
+        command: ["/bin/sh", "-c"]
+        source: |
+          while true; do
+            TYPE_FAILED=$(kubectl get restore mariadb-restore--{{inputs.parameters.timestamp}} -n seichi-debug-minecraft -o jsonpath="{.status.conditions[?(@.type=='Failed')].status}")
+            TYPE_COMPLETE=$(kubectl get restore mariadb-restore--{{inputs.parameters.timestamp}} -n seichi-debug-minecraft -o jsonpath="{.status.conditions[?(@.type=='Complete')].status}")
+
+            if [ "$TYPE_FAILED" = "True" ]; then
+              echo "mariadb-restore failed!"
+              exit 1
+            fi
+
+            if [ "$TYPE_COMPLETE" = "True" ]; then
+              echo "mariadb-restore completed successfully!"
+              exit 0
+            fi
+
+            echo "Still waiting for mariadb-restore to complete..."
+            sleep 5
+          done
+  
     - name: patch-statefulset-to-1
       script:
         image: bitnami/kubectl:1.32.1

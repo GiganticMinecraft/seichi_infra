@@ -79,7 +79,7 @@ spec:
           
           echo "Deleting RESTORE_TARGET_DIR before restore..."
           rm -vrf ${RESTORE_TARGET_DIR}/*
-          ls -a ${RESTORE_TARGET_DIR}/ | egrep -v '^.$' | egrep -v '^..$' | xargs rm -vrf
+          ls -a ${RESTORE_TARGET_DIR}/ | egrep -v '^.$' | egrep -v '^..$' | xargs -I {} rm -vrf ${RESTORE_TARGET_DIR}/{}
 
           echo "Running restore to RESTORE_TARGET_DIR..."
           proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
