@@ -202,12 +202,6 @@ spec:
             sleep 5
           done
 
-      - name: patch-statefulset-to-1
-        script:
-          image: bitnami/kubectl:1.32.2
-          command: ["/bin/sh", "-c"]
-          source: |
-            kubectl patch statefulset mcserver--debug-s1 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
     - name: patch-statefulset-to-1
       script:
         image: bitnami/kubectl:1.32.2
