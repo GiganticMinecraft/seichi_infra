@@ -16,7 +16,6 @@ spec:
         architecture: standalone
         auth:
           enabled: false
-          usePasswordFiles: false
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
         master:
