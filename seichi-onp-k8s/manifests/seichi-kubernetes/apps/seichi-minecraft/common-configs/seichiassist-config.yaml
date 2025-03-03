@@ -11,8 +11,8 @@ data:
     host: 'mariadb'
     port: '3306'
     db: 'seichiassist'
-    id: 'root'
-    pw: '${CFG_SEICHIASSIST_MYSQL_ROOT_PASSWORD}'
+    id: 'mcserver'
+    pw: '${CFG_SEICHIASSIST_MYSQL_PASSWORD}'
 
     # サーバ識別設定
     # 複数サーバ構成にする場合はこの値をサーバごとに変更します

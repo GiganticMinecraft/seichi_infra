@@ -135,11 +135,11 @@ spec:
             - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
               value: "1054159676964622426"
 
-            - name: CFG_SEICHIASSIST_MYSQL_ROOT_PASSWORD
+            - name: CFG_SEICHIASSIST_MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mariadb
-                  key: root-password
+                  key: mcserver-password
 
             - name: CFG_SEICHIASSIST_SERVERNUM
               value: "1"
