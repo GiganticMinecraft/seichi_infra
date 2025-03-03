@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: originspawn-config
+data:
+  config.yml: |
+    world-name: world_2
+    loc-x: 41
+    loc-y: 69
+    loc-z: -6
+    loc-yaw: 0.0
+    loc-pitch: 0.0
+    always-force-players-spawn: true

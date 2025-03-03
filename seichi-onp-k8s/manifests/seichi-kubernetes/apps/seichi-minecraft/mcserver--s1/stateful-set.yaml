@@ -1,0 +1,668 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mcserver--s1
+  namespace: seichi-minecraft
+  labels:
+    app: mcserver--s1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcserver--s1
+  template:
+    metadata:
+      labels:
+        app: mcserver--s1
+        mcserver: s1
+    spec:
+      initContainers:
+        - name: jmx-exporter-downloader
+          image: busybox:1.37.0
+          env:
+            - name: JMX_EXPORTER_URL
+              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar"
+          volumeMounts:
+            - name: jmx-exporter-download-volume
+              mountPath: /root/jmx-exporter-download
+          command:
+            - "sh"
+            - "-c"
+            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
+        - name: mod-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: common-plugins
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
+        - name: seichiassist-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichiassist
+            - name: BUCKET_PREFIX_NAME
+              value: master
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
+      containers:
+        - resources:
+            requests:
+              cpu: 6
+              memory: 12Gi
+            limits:
+              cpu: 8
+              memory: 12Gi
+          env:
+            - name: MEMORY
+              value: 10G
+            - name: TYPE
+              value: PAPER
+            - name: VERSION
+              value: "1.18.2"
+            - name: EULA
+              value: "TRUE"
+
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
+            - name: JVM_OPTS
+              # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
+              # ref: https://docs.papermc.io/paper/aikars-flags
+              value: >-
+                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 
+                -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch 
+                -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M 
+                -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 
+                -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 
+                -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem 
+                -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
+                -Daikars.new.flags=true
+
+            - name: COPY_CONFIG_DEST
+              # /config をサーバーディレクトリにコピーするようにする
+              # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
+              value: /data
+
+            # 設定ファイル内の ${CFG_*} の形をした部分を置き換える
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+            - name: REPLACE_ENV_VARIABLE_PREFIX
+              value: CFG_
+
+            - name: CFG_DISCORDSRV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: DISCORDSRV_TOKEN
+
+            - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
+              value: "1054159992447570032"
+
+            - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
+              value: "1054159676964622426"
+
+            - name: CFG_SEICHIASSIST_MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: root-password
+
+            - name: CFG_SEICHIASSIST_SERVERNUM
+              value: "1"
+
+            - name: CFG_SEICHIASSIST_SERVERID
+              value: "s1"
+
+            - name: CFG_COREPROTECT_MYSQL_DATABASE_NAME
+              value: "coreprotect__mc_s1"
+
+            - name: CFG_DYNMAP_SERVER_NAME
+              value: "アルカディア"
+
+            - name: CFG_LITEBANS_SERVER_NAME
+              value: "s1"
+
+            - name: CFG_LUCKPERMS_SERVER_NAME
+              value: "s1"
+
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                mv create world_SW NORMAL
+                mv create world_SW_2 NORMAL
+                mv create world_SW_nether NETHER
+                mv create world_SW_the_end END
+                gamerule keepInventory true
+                mv gamerule keepInventory true world_SW
+                mv gamerule keepInventory true world_SW_2
+                mv gamerule keepInventory true world_SW_nether
+                mv gamerule keepInventory true world_SW_the_end
+                mv gamerule disableRaids true world_2
+                mv gamerule disableRaids true world_SW
+                mv gamerule disableRaids true world_SW_2
+                mv gamerule disableRaids true world_SW_nether
+                mv gamerule disableRaids true world_SW_the_end
+                mv gamerule doInsomnia false world_2
+                mv gamerule doInsomnia false world_SW
+                mv gamerule doInsomnia false world_SW_2
+                mv gamerule doInsomnia false world_SW_nether
+                mv gamerule doInsomnia false world_SW_the_end
+                mvm set difficulty peaceful world_2
+                rg addmember -w world_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_2 __global__ build -g members allow
+                rg addmember -w world_SW_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_SW_2 __global__ build -g members allow
+                rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
+
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_base_1_18_2:sha-b6ee419
+          name: minecraft
+          ports:
+            - containerPort: 25565
+              name: minecraft
+            - containerPort: 18321
+              name: jmx-metrics
+            - containerPort: 9225
+              name: mc-metrics
+
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            # 最大120秒待つ
+            failureThreshold: 6
+            periodSeconds: 20
+
+          readinessProbe:
+            exec:
+              command:
+                - mc-monitor
+                - status
+                - --host
+                - localhost
+                - --port
+                - "25565"
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+
+          volumeMounts:
+            # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/minecraft-server が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+
+            # サーバーの設定ファイル
+            - name: common-mcserver-configs
+              mountPath: /config/bukkit.yml
+              subPath: bukkit.yml
+            - name: common-mcserver-configs
+              mountPath: /config/paper.yml
+              subPath: paper.yml
+            - name: common-mcserver-configs
+              mountPath: /config/server.properties
+              subPath: server.properties
+            - name: common-mcserver-configs
+              mountPath: /config/spigot.yml
+              subPath: spigot.yml
+            - name: common-mcserver-configs
+              mountPath: /config/commands.yml
+              subPath: commands.yml
+            - name: minecraft-ops-config
+              mountPath: /config/ops.json
+              subPath: ops.json
+
+            # DiscordSRV プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DiscordSRV/config.yml
+              subPath: DiscordSRV-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DiscordSRV/messages.yml
+              subPath: DiscordSRV-messages.yml
+
+            # MorningGlorySeeds プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/MorningGlorySeeds/config.yml
+              subPath: MorningGlorySeeds-config.yml
+
+            # LunaChat プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LunaChat/config.yml
+              subPath: LunaChat-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LunaChat/dictionary.yml
+              subPath: LunaChat-dictionary.yml
+
+            # Elytra プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Elytra/config.yml
+              subPath: Elytra-config.yml
+
+            # EatEgg プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/EatEgg/config.yml
+              subPath: EatEgg-config.yml
+
+            # ClickTpa プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ClickTpa/config.yml
+              subPath: ClickTpa-config.yml
+
+            # RandomTeleport プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/RandomTeleport/config.yml
+              subPath: RandomTeleport-config.yml
+
+            # WorldGuard プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/WorldGuard/config.yml
+              subPath: WorldGuard-config.yml
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_2/blacklist.txt
+              subPath: main-Blacklist.txt
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_2/config.yml
+              subPath: main-config.yml
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW/blacklist.txt
+              subPath: world_SW-Blacklist.txt
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW/config.yml
+              subPath: world_SW-config.yml
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW_2/blacklist.txt
+              subPath: world_SW-Blacklist.txt
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW_2/config.yml
+              subPath: world_SW_2-config.yml
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW_nether/blacklist.txt
+              subPath: world_SW_the_end-Blacklist.txt
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW_nether/config.yml
+              subPath: world_SW_the_end-config.yml
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/blacklist.txt
+              subPath: world_SW_the_end-Blacklist.txt
+            - name: common-worldguard-configs
+              mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/config.yml
+              subPath: world_SW_the_end-config.yml
+
+            # ByeByeWither プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ByeByeWither/config.yml
+              subPath: ByeByeWither-config.yml
+
+            # PrometheusExporter プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/PrometheusExporter/config.yml
+              subPath: PrometheusExporter-config.yml
+
+            # antiRedstoneClock プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/antiRedstoneClock/config.yml
+              subPath: antiRedstoneClock.yml
+
+            # AutoMessage プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/AutoMessage/config.yml
+              subPath: AutoMessage-config.yml
+
+            # BetterChairs プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/BetterChairs/config.yml
+              subPath: BetterChairs-config.yml
+
+            # BungeePortals プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/BungeePortals/config.yml
+              subPath: BungeePortals-config.yml
+
+            # ClearLag プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ClearLag/config.yml
+              subPath: ClearLag-config.yml
+
+            # CoreProtect プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/CoreProtect/config.yml
+              subPath: CoreProtect-config.yml
+
+            # CustomEnchantments プラグインの設定ファイル
+            - name: custom-enchantments-config
+              mountPath: /plugins/CustomEnchantments/config.yml
+              subPath: custom-enchantments-config.yml
+
+            # CustomLJoinLeftMessage プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              # フォルダ名は Join-Leave（プラグイン名と一致しない）
+              mountPath: /plugins/Join-Leave/config.yml
+              subPath: CustomJoinLeftMessage-config.yml
+
+            # FastAsyncWorldEdit プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/FastAsyncWorldEdit/config.yml
+              subPath: FastAsyncWorldEdit-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/FastAsyncWorldEdit/worldedit-config.yml
+              subPath: worldedit-config.yml
+
+            # FastCraft プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/FastCraft/config.yml
+              subPath: FastCraft-config.yml
+
+            # LiteBans プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LiteBans/config.yml
+              subPath: LiteBans-config.yml
+
+            # LuckPerms プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/LuckPerms/config.yml
+              subPath: LuckPerms-config.yml
+            # groups
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/default.yml
+              subPath: group-default.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/observer.yml
+              subPath: group-observer.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/observerplus.yml
+              subPath: group-observerplus.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/admin.yml
+              subPath: group-admin.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/groups/worldguardbypass.yml
+              subPath: group-worldguardbypass.yml
+            # users
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/0a25e0f2-b952-4fe4-9843-3c5608aa2f0c.yml
+              subPath: user-shirotubu.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/0ea34656-b1c7-45c0-8b89-1ec55a70fe17.yml
+              subPath: user-lucky3028.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/4becf8bc-9a46-4f8b-b6e6-9193cf53b46f.yml
+              subPath: user-tyanimo.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/788bf7d5-f61a-4090-aec7-2e3a281eaf49.yml
+              subPath: user-ploptaw.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/9599901c-fa82-4943-b748-b46e183c53f4.yml
+              subPath: user-taaa150.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/b59f5861-f3f1-447f-945f-a40412ef7340.yml
+              subPath: user-igarasi_k.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/b66cc3f6-a045-42ad-b4b8-320f20caf140.yml
+              subPath: user-unchama.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/b7c16b91-57ca-4bbb-95f7-9e9144474799.yml
+              subPath: user-_megatron_.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/bb991c6b-aafb-405c-b2af-57cd5828962d.yml
+              subPath: user-m1sk9.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/d22fe904-d76a-4ec7-a0a8-48f0146d8549.yml
+              subPath: user-specialboywaka.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/e1ee55bb-c993-4896-88e9-9893a11df27a.yml
+              subPath: user-rito_5289.yml
+            - name: common-luckperms-permission-configs
+              mountPath: /plugins/LuckPerms/yaml-storage/users/e9c3ac5f-7c6a-45f6-a251-4c24a4a3beea.yml
+              subPath: user-b_makkuro.yml
+
+            # Multiverse-Core プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Multiverse-Core/config.yml
+              subPath: Multiverse-Core-config.yml
+
+            # PlugManX プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/PlugManX/config.yml
+              subPath: PlugManX-config.yml
+
+            # ProtocolLib プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ProtocolLib/config.yml
+              subPath: ProtocolLib-config.yml
+
+            # Shopkeepers プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Shopkeepers/config.yml
+              subPath: Shopkeepers-config.yml
+
+            # ShulkerBoxBackPacks プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ShulkerBoxBackPacks/config.yml
+              subPath: ShulkerBoxBackPacks-config.yml
+
+            # SimpleElevator プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SimpleElevator/config.yml
+              subPath: SimpleElevator-config.yml
+
+            # tce プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/tce/events.yml
+              subPath: tce-events.yml
+
+            # ThisWorld プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/ThisWorld/config.yml
+              subPath: ThisWorld-config.yml
+
+            # TradeSystem プラグインの設定ファイル
+            # TODO: Add Translation
+            - name: common-mcserver-plugin-configs
+              # どうやら "Config.yml" (先頭大文字) で動いているらしい
+              mountPath: /plugins/TradeSystem/Config.yml
+              subPath: TradeSystem-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/TradeSystem/Layouts.yml
+              subPath: TradeSystem-layouts.yml
+
+            # Vault プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Vault/config.yml
+              subPath: Vault-config.yml
+
+            # WeatherRestrictions プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/WeatherRestrictions/config.yml
+              subPath: WeatherRestrictions-config.yml
+
+            # WG-GUI プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/WG-GUI/config.yml
+              subPath: WG-GUI-config.yml
+
+            # XConomy プラグイン周りの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/XConomy/config.yml
+              subPath: XConomy-config.yml
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/XConomy/database.yml
+              subPath: XConomy-database.yml
+
+            # DecentHolograms プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/DecentHolograms/config.yml
+              subPath: DecentHolograms-config.yml
+
+            # DynMap プラグインの設定ファイル
+            # - name: common-dynmap-config
+            #   mountPath: /plugins/dynmap/configuration.txt
+            #   subPath: dynmap-configuration.txt
+            # - name: dynmap-config--s1
+            #   mountPath: /plugins/dynmap/worlds.txt
+            #   subPath: worlds.txt
+            # - name: dynmap-config--s1
+            #   mountPath: /plugins/Dynmap-Towny/config.yml
+            #   subPath: dynmap-Towny-config.yml
+            # - name: common-dynmap-config
+            #   mountPath: /plugins/Dynmap-WorldGuard/config.yml
+            #   subPath: dynmap-WorldGuard-config.yml
+
+            # SeichiAssist プラグインの設定ファイル
+            - name: seichiassist-config
+              mountPath: /plugins/SeichiAssist/config.yml
+              subPath: config.yml
+
+            # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
+            - name: jmx-exporter-download-volume
+              mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
+              subPath: jmx-exporter-javaagent.jar
+            - name: common-jmx-exporter-config
+              mountPath: /jmx-exporter/jmx-exporter-config.yaml
+              subPath: jmx-exporter-config.yaml
+
+            # Multiverse-Portals プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/Multiverse-Portals/config.yml
+              subPath: Multiverse-Portals-config.yml
+            - name: multiverse-portals-config
+              mountPath: /plugins/Multiverse-Portals/portals.yml
+              subPath: portals.yml
+
+            # SpectatorTheater プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/SpectatorTheater/config.yml
+              subPath: SpectatorTheater-config.yml
+
+            # region-grid-fitter プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/region-grid-fitter/config.yml
+              subPath: region-grid-fitter-config.yml
+
+            # StreamClock プラグインの設定ファイル
+            - name: common-mcserver-plugin-configs
+              mountPath: /plugins/StreamClock/config.yml
+              subPath: StreamClock-config.yml
+
+            # OriginSpawn プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/OriginSpawn/config.yml
+              subPath: OriginSpawn-config.yml
+
+            # AuctionHouse プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/AuctionHouse/config.yml
+              subPath: AuctionHouse-config.yml
+
+            # BlocksHub プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/BlocksHub/config.yml
+              subPath: BlocksHub-config.yml
+
+            # ShopChest プラグインの設定ファイル
+            - name: s1-config
+              mountPath: /plugins/ShopChest/config.yml
+              subPath: ShopChest-config.yml
+
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
+            - name: worldedit-schematica-volume
+              mountPath: /worldedit-schematica
+
+      volumes:
+        - name: common-mcserver-configs
+          configMap:
+            name: common-mcserver-configs
+        - name: common-worldguard-configs
+          configMap:
+            name: common-worldguard-configs
+        - name: common-mcserver-plugin-configs
+          configMap:
+            name: common-mcserver-plugin-configs
+        - name: common-luckperms-permission-configs
+          configMap:
+            name: common-luckperms-permission-configs
+        - name: common-dynmap-config
+          configMap:
+            name: common-dynmap-config
+        - name: dynmap-config--s1
+          configMap:
+            name: dynmap-config--s1
+        - name: seichiassist-config
+          configMap:
+            name: seichiassist-config
+        - name: minecraft-ops-config
+          configMap:
+            name: minecraft-ops-config
+        - name: multiverse-portals-config
+          configMap:
+            name: multiverse-portals-config
+        - name: custom-enchantments-config
+          configMap:
+            name: custom-enchantments-config
+        - name: s1-config
+          configMap:
+            name: s1-config
+
+        # JMX exporterをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
+        - name: jmx-exporter-download-volume
+          emptyDir: {}
+        - name: common-jmx-exporter-config
+          configMap:
+            name: common-jmx-exporter-config
+
+        # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
+        - name: mod-downloader-volume
+          emptyDir: {}
+
+        # WorldEditがSchematicaを保存・読み取るするためのvolume
+        - name: worldedit-schematica-volume
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: minecraft-server-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Gi
