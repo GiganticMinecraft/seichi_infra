@@ -140,7 +140,7 @@ data:
 
     # RedisBungeeが利用しているRedisインスタンスの接続情報
     RedisBungee:
-      redis-host: seichi-debug-redisbungee-redis-master.seichi-debug-gateway
+      redis-host: seichi-redisbungee-redis-master.seichi-gateway
       redis-port: 6379
       # Redisサーバーがパスワードを持っている場合、次の行をアンコメントしてパスワードを入れること。
       # redis-password: ""
@@ -154,7 +154,7 @@ data:
       # デフォルトは55秒に設定されている。タイムアウトを無効にする場合負の値を設定すること。
       SaveTimeout: 55000
       Redis:
-        Host: seichi-debug-bungeesemaphore-redis-master.seichi-debug-gateway
+        Host: seichi-bungeesemaphore-redis-master.seichi-gateway
         Port: 6379
         # Redisサーバーがパスワードを持っている場合、次の行をアンコメントしてパスワードを入れること。
         # Password: ""
