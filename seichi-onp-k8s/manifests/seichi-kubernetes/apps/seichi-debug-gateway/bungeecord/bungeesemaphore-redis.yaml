@@ -9,7 +9,7 @@ spec:
     chart: redis
     repoURL: 'registry-1.docker.io/bitnamicharts'
     path: 'redis'
-    targetRevision: 20.11.0
+    targetRevision: 20.11.1
     helm:
       releaseName: seichi-debug-bungeesemaphore-redis
       values: |
