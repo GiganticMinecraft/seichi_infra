@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: mcserver
+    release: prometheus
+    mcserver: s1
+  name: mcserver-metrics--s1
+spec:
+  endpoints:
+    - interval: 30s
+      port: jmx-metrics
+  selector:
+    matchLabels:
+      app: mcserver
+      role: metrics
+      mcserver: s1

@@ -3,6 +3,11 @@ kind: Kustomization
 namespace: seichi-minecraft
 
 resources:
+  - "./custom-enchantments-config.yaml"
+  - "./dynmap-config.yaml"
   - "./jmx-exporter-config.yaml"
+  - "./luckperms-permission-configs.yaml"
   - "./mcserver-configs.yaml"
   - "./plugin-configs.yaml"
+  - "./seichiassist-config.yaml"
+  - "./worldguard-config.yaml"

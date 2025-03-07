@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: seichi-minecraft
+
+resources:
+  - "./argo-workflows-backup.yaml"
+  - "./argo-workflows-restore.yaml"
+  - "./service-monitor.yaml"
+  - "./service.yaml"
+  - "./stateful-set.yaml"
+  - "./plugin-config.yaml"
+  - "./ops-config.yaml"
+  - "./multiverse-portals-config.yaml"

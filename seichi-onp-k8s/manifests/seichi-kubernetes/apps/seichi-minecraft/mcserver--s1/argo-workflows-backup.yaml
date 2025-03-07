@@ -1,0 +1,229 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: backup--mcserver--s1
+  namespace: seichi-minecraft
+spec:
+  schedule: "0 4 * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  workflowSpec:
+    workflowTemplateRef:
+      name: backup--mcserver--s1
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: backup--mcserver--s1
+  namespace: seichi-minecraft
+  annotations:
+    workflows.argoproj.io/description: "mcserver--s1のデータをProxmox Backup Serverにバックアップするワークフロー"
+spec:
+  serviceAccountName: mcserver--s1-workflow-sa
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  entrypoint: default
+  templates:
+    - name: default
+      steps:
+        - - name: generate-timestamp
+            template: get-timestamp
+        - - name: patch-statefulset-to-0
+            template: patch-statefulset-to-0
+        - - name: wait-for-scale-to-0
+            template: wait-for-scale-to-0
+        - - name: run-backup
+            template: run-backup
+          - name: run-mariadb-backup
+            template: run-mariadb-backup
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
+          - name: wait-complete-mariadb-backup
+            template: wait-complete-mariadb-backup
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
+        - - name: patch-statefulset-to-1
+            template: patch-statefulset-to-1
+        - - name: wait-for-scale-to-1
+            template: wait-for-scale-to-1
+
+    - name: get-timestamp
+      script:
+        image: alpine
+        command: [sh]
+        source: |
+          echo $(date +%Y%m%d-%H%M%S)
+
+    - name: patch-statefulset-to-0
+      script:
+        image: bitnami/kubectl:1.32.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          kubectl patch statefulset mcserver--s1 -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
+
+    - name: wait-for-scale-to-0
+      script:
+        image: bitnami/kubectl:1.32.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          echo "Waiting for statefulset to scale down..."
+          while true; do
+            replicas=$(kubectl get statefulset mcserver--s1 -n seichi-minecraft -o jsonpath='{.status.availableReplicas}')
+            if [ -z "$replicas" ] || [ "$replicas" -eq 0 ]; then
+              break
+            fi
+            echo "Still scaling down..."
+            sleep 5
+          done
+          echo "Scale-down confirmed!"
+
+    - name: run-backup
+      script:
+        image: debian:12
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+          
+          echo "Updating package lists..."
+          apt update
+          
+          echo "Installing packages..."
+          apt install -y curl
+          
+          echo "Adding Proxmox restore Client repository..."
+          echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
+          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+          
+          echo "Updating package lists..."
+          apt update
+          
+          echo "Installing proxmox-backup-client version 3.3.2-1..."
+          apt install -y proxmox-backup-client=3.3.2-1
+          
+          echo "Running backup..."
+          proxmox-backup-client backup "${BACKUP_NAME}" \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
+            --backup-id "${BACKUP_ID}"
+        env:
+          - name: TZ
+            value: "Asia/Tokyo"
+          - name: BACKUP_NAME
+            value: "data.pxar:/data"
+          # proxmox-backup-server側でどのサーバのバックアップかを識別するためにサーバごとに異なるbackup-idを指定する
+          - name: BACKUP_ID
+            value: "mcserver--s1"
+          - name: PBS_USER
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: user
+          - name: PBS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: host
+          - name: PBS_DATASTORE
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: datastore
+          - name: PBS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: password
+          - name: PBS_FINGERPRINT
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: fingerprint
+        volumeMounts:
+          - name: backup-target-volume
+            mountPath: /data
+          # /root/.cache が overlayfs 配下だとスクリプトがこけるので O_TMPFILE フラグ付きの openat(2) が実行可能なファイルシステムをマウントする
+          # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
+          - name: pbs-tmpfs
+            mountPath: /root/.cache
+      
+    - name: run-mariadb-backup
+      inputs:
+        parameters:
+          - name: timestamp
+      resource:
+        action: create
+        manifest: |
+          apiVersion: k8s.mariadb.com/v1alpha1
+          kind: Backup
+          metadata:
+            name: mariadb-backup--{{inputs.parameters.timestamp}}
+          spec:
+            mariaDbRef:
+              name: mariadb
+            storage:
+              s3:
+                bucket: mariadb-backups
+                prefix: mcserver--s1
+                endpoint: seichi-private-plugin-blackhole-minio.minio:9000
+                accessKeyIdSecretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+                secretAccessKeySecretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+
+    - name: wait-complete-mariadb-backup
+      inputs:
+        parameters:
+          - name: timestamp
+      activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
+      script:
+        image: bitnami/kubectl:1.32.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          while true; do
+            TYPE_FAILED=$(kubectl get backup mariadb-backup--{{inputs.parameters.timestamp}} -n seichi-minecraft -o jsonpath="{.status.conditions[?(@.type=='Failed')].status}")
+            TYPE_COMPLETE=$(kubectl get backup mariadb-backup--{{inputs.parameters.timestamp}} -n seichi-minecraft -o jsonpath="{.status.conditions[?(@.type=='Complete')].status}")
+
+            if [ "$TYPE_FAILED" = "True" ]; then
+              echo "mariadb-backup failed!"
+              exit 1
+            fi
+
+            if [ "$TYPE_COMPLETE" = "True" ]; then
+              echo "mariadb-backup completed successfully!"
+              exit 0
+            fi
+
+            echo "Still waiting for mariadb-backup to complete..."
+            sleep 5
+          done
+
+    - name: patch-statefulset-to-1
+      script:
+        image: bitnami/kubectl:1.32.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          kubectl patch statefulset mcserver--s1 -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
+
+    - name: wait-for-scale-to-1
+      activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
+      script:
+        image: bitnami/kubectl:1.32.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          echo "Waiting for StatefulSet to scale up..."
+          while [ "$(kubectl get statefulset mcserver--s1 -n seichi-minecraft -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
+            echo "Still scaling up..."
+            sleep 5
+          done
+          echo "Scale-up confirmed!"
+  volumes:
+    - name: backup-target-volume
+      persistentVolumeClaim:
+        claimName: minecraft-server-data-mcserver--s1-0
+    - name: pbs-tmpfs
+      emptyDir: {}

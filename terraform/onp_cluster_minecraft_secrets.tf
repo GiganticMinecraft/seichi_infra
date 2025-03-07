@@ -162,10 +162,10 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
 
 variable "namespaces-to-deploy-pbs-credentials" {
   type    = list(string)
-  default = ["seichi-debug-minecraft", "minio"]
+  default = ["seichi-minecraft", "seichi-debug-minecraft", "minio"]
 }
 
-resource "kubernetes_secret" "onp_minecraft_debug_pbs_credentials" {
+resource "kubernetes_secret" "onp_minecraft_pbs_credentials" {
   for_each = toset(var.namespaces-to-deploy-pbs-credentials)
 
   metadata {

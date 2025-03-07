@@ -19,7 +19,7 @@ data:
 
 
     settings:
-      allow-end: true
+      allow-end: false
       warn-on-overload: true
       permissions-file: permissions.yml
       update-folder: update
@@ -402,7 +402,7 @@ data:
     gamemode=survival
     enable-query=false
     generator-settings=
-    level-name=world
+    level-name=world_2
     motd=A Minecraft Server
     query.port=25565
     pvp=false
@@ -421,7 +421,7 @@ data:
     max-build-height=256
     server-ip=
     resource-pack-prompt=
-    allow-nether=true
+    allow-nether=false
     server-port=25565
     enable-rcon=false
     sync-chunk-writes=true
@@ -447,7 +447,7 @@ data:
     text-filtering-config=
     spawn-monsters=true
     enforce-whitelist=false
-    spawn-protection=16
+    spawn-protection=0
     resource-pack-sha1=
     max-world-size=29999984
 
@@ -526,7 +526,7 @@ data:
         thunder-chance: 100000
         end-portal-sound-radius: 0
         verbose: true
-        hopper-amount: 1
+        hopper-amount: 8
         dragon-death-sound-radius: 0
         seed-village: 10387312
         seed-desert: 14357617
@@ -606,8 +606,8 @@ data:
           misc: 32
           other: 64
         ticks-per:
-          hopper-transfer: 8
-          hopper-check: 1
+          hopper-transfer: 64
+          hopper-check: 20
         hunger:
           jump-walk-exhaustion: 0.05
           jump-sprint-exhaustion: 0.2
@@ -623,3 +623,24 @@ data:
           min: 45.0
     players:
       disable-saving: false
+
+  commands.yml: |
+    # This is the commands configuration file for Bukkit.
+    # For documentation on how to make use of this file, check out the Bukkit Wiki at
+    # http://wiki.bukkit.org/Commands.yml
+    #
+    # If you need help on this file, feel free to join us on irc or leave a message
+    # on the forums asking for advice.
+    #
+    # IRC: #spigot @ irc.spi.gt
+    #    (If this means nothing to you, just go to http://www.spigotmc.org/pages/irc/ )
+    # Forums: http://www.spigotmc.org/
+    # Bug tracker: http://www.spigotmc.org/go/bugs
+
+    command-block-overrides: []
+    unrestricted-advancements: false
+    aliases:
+      icanhasbukkit:
+      - version $1-
+      spawn:
+      - originspawn
