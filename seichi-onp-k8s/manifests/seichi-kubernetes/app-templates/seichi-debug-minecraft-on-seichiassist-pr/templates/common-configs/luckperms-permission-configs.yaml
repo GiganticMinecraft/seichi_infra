@@ -324,6 +324,9 @@ data:
     permissions:
     - worldguard.region.bypass.*
     - weight.11
+    # NOTE: グループを継承していないと、weight が機能しない（deny が優先される）
+    parents:
+      - admin
     meta:
     - default:
         value: 'false'
