@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/getsentry/sentry-go v0.31.1
-	github.com/minio/minio-go/v7 v7.0.87
+	github.com/minio/minio-go/v7 v7.0.88
 )
 
 require (
