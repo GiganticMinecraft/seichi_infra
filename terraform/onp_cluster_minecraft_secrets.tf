@@ -168,7 +168,7 @@ resource "helm_release" "onp_minecraft_pbs_credentials" {
 
   repository = "https://giganticminecraft.github.io/seichi_infra/"
   chart      = "raw-resources"
-  name       = "onp_minecraft_pbs_credentials"
+  name       = "onp-minecraft-pbs-credentials"
   namespace  = "kube-system"
   version    = "0.3.0"
 
