@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: originspawn-config
+  name: s1-config
 data:
-  config.yml: |
+  OriginSpawn-config.yml: |
     world-name: world_2
     loc-x: 41
     loc-y: 69
@@ -11,3 +11,355 @@ data:
     loc-yaw: 0.0
     loc-pitch: 0.0
     always-force-players-spawn: true
+
+  AuctionHouse-config.yml: |
+    #
+    # AuctionHouse
+    locale: en_us
+    decimal_format: '#,##0.00'
+    strict: false
+    chatHook: true
+    updateTicks: 20
+    auction:
+      listingPrice: 0.0
+      listingRate: 0.0
+      listingCooldown: 0d0h0m0s
+      listingDuration: 7d0h0m
+      expiredDuration: 14d0h0m
+      unclaimedDuration: 90d0h0m
+      cleanupDuration: 0d24h0m
+      soldDuration: 365d0h0m
+      unclaimedCheckDuration: 0d0h5m
+      unclaimedCheckOnWorldChange: true
+      preventCreative: true
+      preventSpectator: true
+      minSellPrice: 0.0
+      maxSellPrice: 100000.0
+      salesTax: 0.0
+      maxSalesTax: 100000.0
+      allowDamagedItems: false
+      defaultMaxListings: 45
+      sortOrder: oldest
+      announce: false
+      action_bar: false
+      discord: false
+      discord_channel: auctionhouse
+      multiworld: false
+      groupWorlds: false
+      replaceUUIDs: false
+      replacePlayerNames: false
+      dropAtFeet: false
+      showSeconds: true
+      spawnerInfo: true
+    announce:
+      chat:
+        listings: true
+        purchases: true
+      action_bar:
+        listings: false
+        purchases: false
+    blacklist:
+      '0':
+        item: BEDROCK
+      '1':
+        item: BARRIER
+      '2':
+        item: COMMAND
+      '3':
+        item: STRUCTURE_BLOCK
+      example:
+        name: \u00a7cVorpal Sword
+        item: DIAMOND_SWORD
+        lore:
+        - Special Item
+        - Does not list in AuctionHouse
+        enchantments:
+        - ench: SHARPNESS
+          level: 10
+        - ench: UNBREAKING
+          level: 3
+        - ench: LOOTING
+          level: 3
+        - ench: FIRE_ASPECT
+          level: 2
+    sounds:
+      click: ui.button.click
+      fail: entity.villager.no
+      drop: entity.player.burp
+      sold: block.note.chime
+    buttons:
+      exit: IRON_DOOR
+      back: IRON_DOOR
+      previous: PAPER
+      sort_listings: DOUBLE_PLANT
+      next: PAPER
+      info: BOOK
+      howto: EMERALD
+      return_all: FLOWER_POT
+      player_listings: DIAMOND
+      expired_listings: POISONOUS_POTATO
+      sold_items: GOLD_INGOT
+      clear: BARRIER
+      confirm: STAINED_GLASS_PANE:5
+      cancel: STAINED_GLASS_PANE:14
+    triggers:
+      sign: '[AuctionHouse]'
+      block_name: Auction House
+      entity_name: Auction House
+    commands:
+      exit: msg %player% Exiting AuctionHouse
+    log:
+      listed: true
+      sold: true
+      cancelled: true
+      returned: true
+      dropped: true
+      purged: true
+    disabled-worlds: []
+    configVersion: 25
+
+  BlocksHub-config.yml: |
+    BlocksHub:
+      version: 2
+      disabledBridges: {}
+    #    - CoreProtect
+    #    - Factions
+    #    - GriefPrevention
+    #    - HawkEye
+    #    - LogBlock
+    #    - Prism
+    #    - Residence
+    #    - Residence 4.6
+    #    - Towny
+    #    - WorldGuard
+      worlds:
+        - world
+        - world_nether
+        - world_the_end
+        - world.*
+
+  ShopChest-config.yml: |
+    # ===============================================
+    # ====== Configuration File of 'ShopChest' ======
+    # ===============================================
+    #
+    # Lines starting with '#' are comments and are ignored by the server.
+    #
+    # You can find item names in the 'item_names.txt' file.
+
+    # Set the main command you have to enter to manage the shops.
+    # (default: "/shop ...")
+    main-command-name: "shop"
+
+    # Set the language file for all translatable messages or names.
+    # The value must equal to the name of one of a file in the 'lang' folder
+    # (without the '.lang' extension).
+    language-file: "en_US"
+
+    # Set the item with which a player can click a shop to retrieve information.
+    # You can set this to an empty string ("") to disable this feature.
+    shop-info-item: "STICK"
+
+    # Set whether buys or sells need to be confirmed by the player
+    # in order to prevent accidents.
+    confirm-shopping: false
+
+    # Set whether players should be able to select the shop item from the
+    # creative inventory if they don't hold an item in their hand.
+    creative-select-item: true
+
+    # Set whether the (current) shop creation price should be refunded
+    # when the shop is removed by its creator.
+    refund-shop-creation: false
+
+    # Set whether the plugin will check for updates on server start
+    # and notify permitted players on join.
+    # The command is not affected by this setting and will continue to
+    # check for updates.
+    enable-update-checker: true
+
+    # Set whether buys and sells should be logged in the database.
+    enable-economy-log: false
+
+    # Set the maximum age for economy log entries in days.
+    # All log entries older than this will be deleted on server start.
+    # Set this to 0 to disable this feature.
+    cleanup-economy-log-days: 30
+
+    # Set whether a debug log file should be created.
+    # The file may get large! Please enable this setting when reporting issues.
+    enable-debug-log: false
+
+    # Set whether various protection plugins should be hooked into (if installed)
+    # in order to allow or deny shop creation in certain locations.
+    enable-worldguard-integration: true
+    enable-towny-integration: true
+    enable-authme-integration: true
+    enable-plotsquared-integration: true
+    enable-uskyblock-integration: true
+    enable-askyblock-integration: true
+    enable-bentobox-integration: true
+    enable-islandworld-integration: true
+    enable-griefprevention-integration: true
+    enable-areashop-integration: true
+
+    # Set whether the vendor of a shop should get messages when players buy
+    # or sell something from/to his shop or when his shop is out of stock.
+    enable-vendor-messages: true
+
+    # Set whether the vendor of a shop should get messages on all servers when players
+    # buy or sell something from/to his shop or when his shop is out of stock.
+    enable-vendor-bungee-messages: false
+
+    # Set whether only the shop a player is pointing at should be shown.
+    # If set to false, every shop near the player (with the specified
+    # distance) will be shown to him.
+    only-show-shops-in-sight: true
+
+    # Set whether the hologram's location should be fixed at the bottom,
+    # so when it gets more lines, it won't interfere with the item or chest,
+    # but goes higher.
+    hologram-fixed-bottom: true
+
+    # Set the amount (may be negative) a hologram should be lifted in the y-axis.
+    # A value of '1' equals to one block, and a value of '0.25' is equal to the
+    # height of one line.
+    hologram-lift: 0
+
+    # Set whether players should be allowed to buy or sell less items
+    # than the vendor has specified, in case the player does not have enough
+    # money or items, or if the chest does not have enough items or space,
+    # or if the vendor does not have enough money.
+    # The price will be calculated correspondingly.
+    auto-calculate-item-amount: false
+
+    # Set whether prices may contain decimals (prices of existing shops will stay).
+    allow-decimals-in-price: false
+
+    # Set whether players should be allowed to sell/buy broken items.
+    allow-broken-items: false
+
+    # Set whether the level of a potion or tipped arrow (if upgraded) should be
+    # appended to the item name. If set to true, the level ("II") will be
+    # displayed after the item name, but only if the item does not have a
+    # custom name.
+    append-potion-level-to-item-name: false
+
+    # Set whether shops should automatically be removed from the database if
+    # an error occurred while loading.
+    # (e.g. no chest, no space above chest, or unknown world)
+    remove-shop-on-error: false
+
+    # Set whether the mouse buttons should be inverted.
+    # Default:
+    # Right-Click -> Buy
+    # Left-Click -> Sell
+    invert-mouse-buttons: false
+
+    # Set the maximal distance (in blocks) to the shop where the
+    # player can see the hologram.
+    maximal-distance: 2
+
+    # Set the maximal distance (in blocks) to the shop where the
+    # player can see the floating shop item.
+    maximal-item-distance: 40
+
+    # Set whether the buy price must be greater than or equal to the sell price.
+    buy-greater-or-equal-sell: true
+
+    # Set the minimum and maximum prices for each individual item.
+    minimum-prices:
+    # "DIAMOND": 0.5
+
+    maximum-prices:
+    # "STONE": 2
+
+    # Set the items of which a player can't create a shop.
+    blacklist:
+      - "SKULL:3"
+
+    # Set the price a player has to pay in order to create...
+    # You can set this to 0 to disable costs.
+    shop-creation-price:
+
+      # ...a normal shop
+      normal: 5
+
+      # ...an admin shop
+      admin: 0
+
+    # Shop limits are handled with permissions.
+    # A player with permission "shopchest.limit.X" has a limit of X shops,
+    # a player with permission "shopchest.limit.*" does not have a shop limit.
+    # Admin shops are excluded from the shop limit.
+    shop-limits:
+
+      # Set the amount of shops that anyone who doesn't have a
+      # specific permission may have.
+      # If you don't want the players to have a limit by default
+      # set the value to -1.
+      default: 10
+
+    # Set the events of AreaShop when shops on that region should be removed.
+    # Valid values are: DELETE, UNRENT, RESELL, SELL
+    areashop-remove-shops:
+      - "DELETE"
+      - "UNRENT"
+      - "RESELL"
+      - "SELL"
+
+    # Set whether the custom WorldGuard flags should be allowed by default.
+    worldguard-default-flag-values:
+
+      create-shop: false
+      use-shop: true
+      use-admin-shop: true
+
+    # Set the types of Towny plots where shop creation should be allowed.
+    # Valid values are:
+    # RESIDENTIAL, COMMERCIAL, ARENA, EMBASSY, WILDS, SPLEEF, INN, JAIL, FARM
+    towny-shop-plots:
+
+      residents:
+        - "COMMERCIAL"
+
+      mayor:
+        - "COMMERCIAL"
+
+      king:
+        - "COMMERCIAL"
+
+    # Configuration of the database, where everything is stored.
+    # Shops are found in the table 'shopchest_shops', and logged economy
+    # transactions are found in the table 'shopchest_economy_logs'
+    database:
+
+      # Select the type of database which should be used
+      # Either use 'SQLite' or 'MySQL'. Otherwise you will break the plugin!
+      type: "SQLite"
+
+      # Set the prefix of all table names related to this plugin.
+      table-prefix: "shopchest_"
+
+      # If the specified type is 'MySQL', here you configure the...
+      mysql:
+
+        # ...interval in seconds, when the database should be pinged,
+        # to keep the connection alive
+        # You can set this to '0' to disable the ping interval
+        ping-interval: 3600
+
+        # ...hostname where the database is accessible
+        hostname: ""
+
+        # ...port where the database is accessible (default: 3306)
+        port: 3306
+
+        # ...database you want to use
+        database: ""
+
+        # ...username you are going to login with
+        username: ""
+
+        # ...password you are going to login with
+        password: ""
