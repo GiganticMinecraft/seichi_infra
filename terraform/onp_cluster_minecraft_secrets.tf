@@ -160,26 +160,38 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
 
 }
 
-variable "namespaces-to-deploy-pbs-credentials" {
-  type    = list(string)
-  default = ["seichi-debug-minecraft", "minio"]
-}
+resource "helm_release" "onp_minecraft_pbs_credentials" {
+  depends_on = [
+    kubernetes_namespace.onp_seichi_debug_minecraft,
+    kubernetes_namespace.onp_seichi_minecraft
+  ]
 
-resource "kubernetes_secret" "onp_minecraft_debug_pbs_credentials" {
-  for_each = toset(var.namespaces-to-deploy-pbs-credentials)
+  repository = "https://giganticminecraft.github.io/seichi_infra/"
+  chart      = "raw-resources"
+  name       = "onp_minecraft_pbs_credentials"
+  namespace  = "kube-system"
+  version    = "0.3.0"
 
-  metadata {
-    name      = "pbs-credentials"
-    namespace = each.value
+  set_list {
+    name = "manifests"
+    value = [<<-EOS
+      kind: ClusterSecret
+      apiVersion: clustersecret.io/v1
+      metadata:
+        namespace: clustersecret
+        name: pbs-credentials
+      matchNamespace:
+        - seichi-minecraft
+        - seichi-debug-minecraft
+        - minio
+      data:
+        user: ${var.proxmox_backup_client__user}
+        host: ${var.proxmox_backup_client__host}
+        datastore: ${var.proxmox_backup_client__datastore}
+        password: ${var.proxmox_backup_client__password}
+        fingerprint: ${var.proxmox_backup_client__fingerprint}
+    EOS
+    ]
   }
 
-  data = {
-    user        = var.proxmox_backup_client__user
-    host        = var.proxmox_backup_client__host
-    datastore   = var.proxmox_backup_client__datastore
-    password    = var.proxmox_backup_client__password
-    fingerprint = var.proxmox_backup_client__fingerprint
-  }
-
-  type = "Opaque"
 }

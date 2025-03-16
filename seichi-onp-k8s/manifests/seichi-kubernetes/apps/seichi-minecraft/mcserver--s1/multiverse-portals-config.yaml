@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multiverse-portals-config
+data:
+  portals.yml: |
+    portals:
+      world->world_SW:
+        entryfee:
+          currency: -1
+          amount: 0.0
+        safeteleport: true
+        teleportnonplayers: false
+        handlerscript: ''
+        owner: Lucky3028
+        location: -20.0,64.0,-19.0:-20.0,65.0,-19.0
+        world: world
+        destination: world_SW
+      world->world_SW_2:
+        entryfee:
+          currency: -1
+          amount: 0.0
+        safeteleport: true
+        teleportnonplayers: false
+        handlerscript: ''
+        owner: Lucky3028
+        location: -18.0,64.0,-19.0:-18.0,65.0,-19.0
+        world: world
+        destination: world_SW_2
+      world->world_SW_nether:
+        entryfee:
+          currency: -1
+          amount: 0.0
+        safeteleport: true
+        teleportnonplayers: false
+        handlerscript: ''
+        owner: Lucky3028
+        location: -12.0,64.0,-19.0:-12.0,65.0,-19.0
+        world: world
+        destination: world_SW_nether
+      world->world_SW_the_end:
+        entryfee:
+          currency: -1
+          amount: 0.0
+        safeteleport: true
+        teleportnonplayers: false
+        handlerscript: ''
+        owner: Lucky3028
+        location: -10.0,64.0,-19.0:-10.0,65.0,-19.0
+        world: world
+        destination: world_SW_the_end

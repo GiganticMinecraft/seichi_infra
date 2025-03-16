@@ -1,0 +1,413 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-luckperms-permission-configs
+data:
+  #region groups
+  # NOTE: ファイルとして Pod 内に配置する場合は `yaml-storage/groups/グループ名.yml`というパスになる。
+  group-default.yml: |
+    name: default
+    permissions:
+    - bukkit.command.*:
+        value: false
+    - minecraft.command.*:
+        value: false
+    - minecraft.command.help:
+        value: false
+    - minecraft.command.list
+    - minecraft.command.me:
+        value: false
+    - clicktpa.tpa
+    - clicktpa.tpacancel
+    - clicktpa.tpaccept
+    - clicktpa.tpadeny
+    - clicktpa.tpahere
+    - clicktpa.tptoggle
+    - discordsrv.link
+    - discordsrv.linked
+    - discordsrv.unlink
+    - dynmap.hide.self:
+        value: false
+    - dynmap.show.self
+    - elevator.down
+    - elevator.up
+    - elytra.auto
+    - elytra.const-flight
+    - elytra.runup
+    - elytra.shift-activation
+    - elytra.speedup
+    - fastcraft.command.craft
+    - fastcraft.command.craft.fastcraft
+    - fastcraft.command.toggle
+    - fastcraft.use
+    - joinleave.silentleave
+    - litebans.notify.broadcast:
+        value: false
+    - luckperms:
+        value: false
+    - luckperms.*:
+        value: false
+    - lunachat.message
+    - lunachat.reply
+    - multiverse.help:
+        value: false
+    - multiverse.core.list.who
+    - multiverse.core.spawn.self
+    - multiverse.portal.access.*
+    - multiverse.access.*
+    - multiverse.access.work:
+        value: false
+    # TODO: デバッグサーバには各ワールドへのポータルがないので暫定措置
+    - multiverse.teleport.*
+    - seichiassist.ec
+    - seichiassist.ef
+    - seichiassist.fd
+    - seichiassist.fly
+    - seichiassist.hat
+    - seichiassist.home
+    - seichiassist.sethome
+    - seichiassist.map
+    - seichiassist.shareinv
+    - seichiassist.mebius
+    - seichiassist.minestack
+    - seichiassist.stick
+    - seichiassist.stickmenu
+    - seichiassist.x-transfer
+    - shopchest.buy:
+        value: true
+        context:
+          world: world_towny
+    - shopchest.create:
+        value: true
+        context:
+          world: world_towny
+    - shopchest.sell:
+        value: true
+        context:
+          world: world_towny
+    - shopkeeper.player:
+        value: false
+    - shopkeeper.hire:
+        value: false
+    - shopkeeper.sign:
+        value: false
+    - shopkeeper.hanging-sign:
+        value: false
+    - shopkeeper.entity.*:
+        value: false
+    - towny.command.plot.set.shop
+    - tradesystem.trade.initiate
+    - tradesystem.trade
+    - wesv.toggle
+    - wesv.use
+    - worldedit.selection.contract
+    - worldedit.selection.expand
+    - worldedit.selection.pos
+    - worldedit.analysis.sel
+    - worldedit.wand
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_tt
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_the_end_tt
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_the_end
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_sw_the_end
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_sw_nether
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_sw_3
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_sw
+    - worldguard.region.claim:
+        value: false
+        context:
+          world: world_nether_tt
+    - worldguard.region.flag.flags.deny-spawn.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.enderpearl.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.mob-damage.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.mob-spawning.*:
+        value: true
+        context:
+          world: world_the_end
+    - worldguard.region.flag.flags.fire-spread.*:
+        value: true
+        context:
+          world: world_sw_4
+    - worldguard.region.flag.flags.fire-spread.*:
+        value: true
+        context:
+          world: world_sw_2
+    - worldguard.region.flag.flags.deny-spawn.*:
+        value: true
+        context:
+          world: world_nether
+    - worldguard.region.flag.flags.enderpearl.*:
+        value: true
+        context:
+          world: world_nether
+    - worldguard.region.flag.flags.mob-damage.*:
+        value: true
+        context:
+          world: world_nether
+    - worldguard.region.flag.flags.mob-spawning.*:
+        value: true
+        context:
+          world: world_nether
+    - worldguard.region.flag.flags.enderpearl.*:
+        value: true
+        context:
+          world: world_2
+    - worldguard.region.flag.flags.deny-spawn.*:
+        value: true
+        context:
+          world: world
+    - worldguard.region.flag.flags.enderpearl.*:
+        value: true
+        context:
+          world: world
+    - worldguard.region.flag.flags.mob-damage.*:
+        value: true
+        context:
+          world: world
+    - worldguard.region.flag.flags.mob-spawning.*:
+        value: true
+        context:
+          world: world
+    - worldguard.region.flag.flags.farewell.*
+    - worldguard.region.flag.flags.grass-grouth.*
+    - worldguard.region.flag.flags.greeting.*
+    - worldguard.region.flag.flags.ice-melt.*
+    - worldguard.region.flag.flags.mushroom-grouth.*
+    - worldguard.region.flag.flags.mycelium-spread.*
+    - worldguard.region.flag.flags.pvp.*
+    - worldguard.region.flag.flags.ride.*
+    - worldguard.region.flag.flags.sleep.*
+    - worldguard.region.flag.flags.snow-melt.*
+    - worldguard.region.flag.flags.soil-dry.*
+    - worldguard.region.flag.flags.teleport.*
+    - worldguard.region.flag.flags.time-lock.*
+    - worldguard.region.flag.flags.use.*
+    - worldguard.region.flag.flags.vine-grouth.*
+    - worldguard.region.flag.flags.weather-lock.*
+    - worldguard.region.flag.flags.chest-access.allow:
+        value: false
+    - worldguard.region.flag.flags.chest-access.deny
+    - worldguard.region.flag.flags.chest-access.none
+    - worldguard.region.flag.regions.own.*
+    - worldguard.region.remove.own.*
+    - worldguard.region.removeowner.own.*:
+        value: true
+        context:
+          world: world_dot
+    - worldguard.region.addmember.own.*
+    - worldguard.region.removemember.own.*
+    - worldguard.region.removemember.*:
+        value: true
+        context:
+          world: world_dot
+    - worldguard.region.select.own.*
+    - worldguard.region.info.*
+    - worldguard.region.list.*
+    - worldguard.region.teleport.*
+    - worldguard.region.claim
+    - worldguard.region.remove.own.*
+    - worldguard.region.list.own
+    - worldguard.region.info.*
+    - worldguard.region.select.own.*
+    - worldguard.region.list
+    - worldguard.region.wand
+    meta:
+    - default:
+        value: 'true'
+  group-observer.yml: |
+    name: observer
+    permissions:
+    - observerutils.obs
+    - seichiassist.lastquit
+    - weight.1
+    parents:
+    - default
+    meta:
+    - default:
+        value: 'false'
+  group-observerplus.yml: |
+    name: observerplus
+    permissions:
+    - dynmap.hide.self
+    - spectatortheater.end
+    - spectatortheater.list
+    - spectatortheater.start
+    - worldguard.region.addmember.*:
+        value: true
+        context:
+          world: world_tt
+    - worldguard.region.removemember.*:
+        value: true
+        context:
+          world: world_tt
+    - worldguard.region.addmember.*:
+        value: true
+        context:
+          world: world_the_end_tt
+    - worldguard.region.removemember.*:
+        value: true
+        context:
+          world: world_the_end_tt
+    - worldguard.region.addmember.*:
+        value: true
+        context:
+          world: world_nether_tt
+    - worldguard.region.removemember.*:
+        value: true
+        context:
+          world: world_nether_tt
+    - worldguard.region.addmember.*:
+        value: true
+        context:
+          world: world
+    - worldguard.region.removemember.*:
+        value: true
+        context:
+          world: world
+    - weight.2
+    parents:
+    - observer
+    meta:
+    - default:
+        value: 'false'
+  group-admin.yml: |
+    name: admin
+    permissions:
+    # TODO: ホワイトリスト方式にする（ワイルドカードで権限を与えない）
+    # NOTE: クォーテーションで囲まないと読み込んでくれない
+    - '*'
+    - minecraft.command.deop:
+        value: false
+    - minecraft.command.op:
+        value: false
+    - luckperms.*
+    - luckperms
+    - mv.bypass.gamemode.*
+    - seichiassist.present.*
+    - worldguard.region.bypass.*:
+        value: false
+    - weight.10
+    meta:
+    - default:
+        value: 'false'
+  group-worldguardbypass.yml: |
+    name: worldguard-bypass
+    permissions:
+    - worldguard.region.bypass.*
+    - weight.11
+    meta:
+    - default:
+        value: 'false'
+  #endregion
+  #region users
+  # NOTE: ファイルとして Pod 内に配置する場合は `yaml-storage/users/UUID.yml`というパスになる。（UUID はハイフン付き）
+  user-shirotubu.yml: |
+    uuid: 0a25e0f2-b952-4fe4-9843-3c5608aa2f0c
+    name: shirotubu
+    primary-group: user
+    parents:
+    - admin
+  user-lucky3028.yml: |
+    uuid: 0ea34656-b1c7-45c0-8b89-1ec55a70fe17
+    name: lucky3028
+    primary-group: worldguard-bypass
+    parents:
+    - admin
+    - worldguard-bypass
+  user-tyanimo.yml: |
+    uuid: 4becf8bc-9a46-4f8b-b6e6-9193cf53b46f
+    name: tyanimo
+    primary-group: admin
+    parents:
+    - admin
+  user-ploptaw.yml: |
+    uuid: 788bf7d5-f61a-4090-aec7-2e3a281eaf49
+    name: ploptaw
+    primary-group: admin
+    permissions:
+    - group.worldguard-bypass:
+        value: false
+    parents:
+    - admin
+  user-taaa150.yml: |
+    uuid: 9599901c-fa82-4943-b748-b46e183c53f4
+    name: taaa150
+    primary-group: admin
+    parents:
+    - admin
+  user-igarasi_k.yml: |
+    uuid: b59f5861-f3f1-447f-945f-a40412ef7340
+    name: igarasi_k
+    primary-group: admin
+    parents:
+    - admin
+    - worldguard-bypass
+  user-unchama.yml: |
+    uuid: b66cc3f6-a045-42ad-b4b8-320f20caf140
+    name: unchama
+    primary-group: admin
+    parents:
+    - admin
+  user-_megatron_.yml: |
+    uuid: b7c16b91-57ca-4bbb-95f7-9e9144474799
+    name: _megatron_
+    primary-group: admin
+    parents:
+    - admin
+  user-m1sk9.yml: |
+    uuid: bb991c6b-aafb-405c-b2af-57cd5828962d
+    name: m1sk9
+    primary-group: worldguard-bypass
+    parents:
+    - admin
+    - worldguard-bypass
+  user-specialboywaka.yml: |
+    uuid: d22fe904-d76a-4ec7-a0a8-48f0146d8549
+    name: specialboywaka
+    primary-group: worldguard-bypass
+    parents:
+    - admin
+    - worldguard-bypass
+  user-rito_5289.yml: |
+    uuid: e1ee55bb-c993-4896-88e9-9893a11df27a
+    name: rito_5289
+    primary-group: default
+    parents:
+    - admin
+  user-b_makkuro.yml: |
+    uuid: e9c3ac5f-7c6a-45f6-a251-4c24a4a3beea
+    name: b_makkuro
+    primary-group: worldguard-bypass
+    parents:
+    - admin
+    - worldguard-bypass
+  #endregion

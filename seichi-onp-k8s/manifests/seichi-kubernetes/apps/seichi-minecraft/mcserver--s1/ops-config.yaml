@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minecraft-ops-config
+data:
+  ops.json: |
+    [
+      {
+        "uuid": "0ea34656-b1c7-45c0-8b89-1ec55a70fe17",
+        "name": "Lucky3028",
+        "level": 4,
+        "bypassesPlayerLimit": false
+      },
+      {
+        "uuid": "0e117246-6d1c-46f1-b4f3-4310b9fbfedb",
+        "name": "galapon",
+        "level": 4,
+        "bypassesPlayerLimit": false
+      },
+      {
+        "uuid": "89f9b874-8303-4605-b45b-c271ab6d6a89",
+        "name": "Kory3",
+        "level": 4,
+        "bypassesPlayerLimit": false
+      },
+      {
+        "uuid": "b66cc3f6-a045-42ad-b4b8-320f20caf140",
+        "name": "unchama",
+        "level": 4,
+        "bypassesPlayerLimit": false
+      },
+      {
+        "uuid": "e1ee55bb-c993-4896-88e9-9893a11df27a",
+        "name": "rito_5289",
+        "level": 4,
+        "bypassesPlayerLimit": false
+      }
+    ]

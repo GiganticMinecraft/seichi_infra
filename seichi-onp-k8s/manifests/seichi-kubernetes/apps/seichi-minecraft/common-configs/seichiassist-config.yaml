@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seichiassist-config
+data:
+  config.yml: |
+    # seichiassist 設定ファイル
+    # このファイルを削除orリネームしてからサーバを起動するとデフォルトの設定ファイルが再生成されます(エラーが出たときは真っ先に試しましょう)
+
+    # MySQLデータベースへの接続設定
+    host: 'mariadb'
+    port: '3306'
+    db: 'seichiassist'
+    id: 'mcserver'
+    pw: '${CFG_SEICHIASSIST_MYSQL_PASSWORD}'
+
+    # サーバ識別設定
+    # 複数サーバ構成にする場合はこの値をサーバごとに変更します
+    servernum: '${CFG_SEICHIASSIST_SERVERNUM}'
+    server-id: '${CFG_SEICHIASSIST_SERVERID}'
+
+    # アイテム変換するチャンク座標を検索してprotobufにて吐き出すコマンド
+    chunk-search-command-base: "chunk-search-rs --protobuf --threads 12"
+
+    # 色々な設定、説明は割愛
+    defaultmineamount: '3'
+    minutespeedamount: '0.01'
+    onlineplayersamount: '0.5'
+    dualbreaklevel: '10'
+    trialbreaklevel: '20'
+    explosionlevel: '30'
+    thunderstormlevel: '40'
+    blizzardlevel: '50'
+    meteolevel: '60'
+    gravitylevel: '100'
+    multipleidblockbreaklevel: '1'
+    dropexplevel1: '6'
+    dropexplevel2: '10'
+    dropexplevel3: '16'
+    dropexplevel4: '24'
+    dropexplevel5: '34'
+    dropexplevel6: '46'
+    dropexplevel7: '60'
+    dropexplevel8: '76'
+    dropexplevel9: '94'
+    dropexplevel10: '114'
+    dokodemoenderlevel: '25'
+
+    # 実績名の名称設定 -> Nicknames.scalaを参照すること
+
+    # デバッグモードの設定
+    # debugmode: 0=デバッグモードオフ, 1=デバッグモードオン
+    # 変更値を反映させるにはサーバを再起動するか/reloadしてください
+    debugmode: '0'
+
+    # ギガンティック→椎名林檎交換レートの設定
+    # デフォルト値はギガンティック1個につき椎名林檎4個
+    rategigantictoringo: '4'
+
+    # ギガンティック・フィーバーの効果継続時間を指定します。(単位:分)
+    gigantic_fever_minutes: 120
+
+    # グリッド式保護メニュー経由で保護が可能なワールド名一覧
+    # ここに記載されたワールド名ではworldguard.region.claimパーミッションが無くても
+    # グリッド式保護メニュー経由で保護が可能になります
+    GridProtectEnableWorld:
+      - world_2
+      - world_SW_2
+
+    # グリッドで指定可能な最大ユニット合計数の設定
+    # (15ブロック=1ユニット)
+    ## デフォルト値
+    GridLimitDefault: '32'
+    ## ワールド毎の値(ここにないワールドはDefault値を見る)
+    GridLimitPerWorld:
+      world: '16'
+      world_2: '32'
+
+    #グリッド式保護のテンプレート保存最大数
+    GridTemplateKeepAmount: '5'
+
+    ##自動再生成時の設定
+    #道のY座標
+    road_Y: 70
+    #道の長さ(チャンク単位)
+    road_length: 8
+    #道の上の空洞の高さ
+    space_height: 5
+    #道のブロックID
+    road_blockid: 98
+    #道のブロックダメージ値
+    road_blockdamage: 0
+    #再生成時のワールドサイズ
+    world_size: 2000
+
+    #GiganticBerserk
+    #1分間上限
+    GBLimit: 75
+
+    #各種URL
+    Url:
+      official: "https://www.seichi.network/gigantic"
+      rule: "https://www.seichi.network/rule"
+      map: "https://www.seichi.network/map"
+      jms: "https://minecraft.jp/servers/54d3529e4ddda180780041a7"
+      # アサルト開放やバーサーク完成時にDiscordに通知するWebhookのURL
+      webhook:
+        # 全体通知用
+        notification: ""
+
+    #Fly時の1分辺りの経験値消費量
+    flyexp: '50'
+
+    #直列設置
+    blocklineup:
+      level: '15'
+      mana_mag: '0.0'
+      minestack_level: '30'
+
+    #範囲設置スキル
+    ZoneSetSkill:
+      level: '15'
+      minestack: '30'
+
+    #スキルを使って並べた時のブロックカウント倍率
+    BlockCountMag: '0.2'
+
+    # MineStackブロック一括クラフト
+    minestack_BlockCraft:
+      level1: '25'
+      level2: '35'
+      level3: '45'
+
+    #ブロック設置カウントの1分上限
+    BuildNum1minLimit: '100'
+
+    # オートセーブの設定
+    AutoSave:
+      Enable: true
+
+    # RedisBungeeが利用しているRedisインスタンスの接続情報
+    RedisBungee:
+      redis-host: seichi-redisbungee-redis-master.seichi-gateway
+      redis-port: 6379
+      # Redisサーバーがパスワードを持っている場合、次の行をアンコメントしてパスワードを入れること。
+      # redis-password: ""
+
+    # BungeeCordと協調してデータ保存周りのロックを管理するシステムの設定項目
+    BungeeSemaphoreResponder:
+      # SeichiAssistが保存処理を待つ最大の時間(ミリ秒指定)
+      # プレーヤーが退出してからこのミリ秒数が経過した場合、
+      # 保存処理に失敗したと見なしBungeeCordに失敗シグナルを送信する。
+      #
+      # デフォルトは55秒に設定されている。タイムアウトを無効にする場合負の値を設定すること。
+      SaveTimeout: 55000
+      Redis:
+        Host: seichi-bungeesemaphore-redis-master.seichi-gateway
+        Port: 6379
+        # Redisサーバーがパスワードを持っている場合、次の行をアンコメントしてパスワードを入れること。
+        # Password: ""
+
+

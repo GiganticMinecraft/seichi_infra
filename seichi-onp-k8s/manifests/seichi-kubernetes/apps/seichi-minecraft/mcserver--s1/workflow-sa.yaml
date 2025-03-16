@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mcserver--s1-workflow-sa
+  namespace: seichi-minecraft
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mcserver--s1-workflow-role
+  namespace: seichi-minecraft
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "patch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["workflowtaskresults"]
+    verbs: ["create", "patch"]
+  - apiGroups: ["k8s.mariadb.com"]
+    resources: ["backups"]
+    verbs: ["create", "get", "list", "watch"]
+  - apiGroups: ["k8s.mariadb.com"]
+    resources: ["restores"]
+    verbs: ["create", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mcserver--s1-workflow-binding
+  namespace: seichi-minecraft
+subjects:
+  - kind: ServiceAccount
+    name: mcserver--s1-workflow-sa
+    namespace: seichi-minecraft
+roleRef:
+  kind: Role
+  name: mcserver--s1-workflow-role
+  apiGroup: rbac.authorization.k8s.io
