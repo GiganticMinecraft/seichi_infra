@@ -23,6 +23,8 @@ jobs:
           #     renovate.json も見直すこと。
           #   また、 renovate に認識させるため、 [mcserver_base_image_tag, mcserver_base_image_digest] の順で
           #     フィールドを記述すること。
+          #   itzg/minecraft-server には 2025.3.0-java21 のように日付を含むタグを持つイメージがあるが、
+          #     これらのイメージを使用すると、renovate が更新を検知できないため使用しないこと。
           # java_version_component_in_tag:
           #   mcserver_base_image_tag に含まれる Java バージョンを含む文字列。
           #   当ワークフローが生成する整地鯖の基底イメージは、タグとして
@@ -30,14 +32,14 @@ jobs:
           #   renovate に各サーバーのイメージ更新 PR を出してもらえるように、
           #     各サーバーの基底イメージ指定は
           #     java_version_component_in_tag + digest pinning で行うこととしている。
-          - mcserver_base_image_tag: 2025.1.0-java8-jdk
-            mcserver_base_image_digest: "sha256:6811c18a5852542a3f96054bd92e9042382b7c242d8fd483b657908b43f8ac7b"
+          - mcserver_base_image_tag: java8-jdk
+            mcserver_base_image_digest: "sha256:3a5eccb90f999f42a533eea8ce896032ccd2ab9d564bb7f7c0446f345009bea7"
             java_version_component_in_tag: java8-jdk
-          - mcserver_base_image_tag: 2025.1.0-java17
-            mcserver_base_image_digest: "sha256:68a40106cfffc19bcc3a6a028bd409df7fcd0b40ba27d565d1d6e6694957abb9"
+          - mcserver_base_image_tag: java17
+            mcserver_base_image_digest: "sha256:7ca1ebfe3381af2236c5dce1b66c4d7254869d7ef6b348ee9cb7ae7c4099c271"
             java_version_component_in_tag: java17-jdk
-          - mcserver_base_image_tag: 2024.7.2-java21-jdk
-            mcserver_base_image_digest: "sha256:2147205099ecaf7fa690d1da5d28fe2412d9cb3b464f25ed992ac8821db1b4e9"
+          - mcserver_base_image_tag: java21-jdk
+            mcserver_base_image_digest: "sha256:68fe3039f31bf60ab158bd3d9acf2f7cc384032f2564e5a7f949b641e5a538a2"
             java_version_component_in_tag: java21-jdk
 
     steps:
