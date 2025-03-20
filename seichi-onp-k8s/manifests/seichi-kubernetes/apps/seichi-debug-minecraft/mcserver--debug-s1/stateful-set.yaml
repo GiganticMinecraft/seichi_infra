@@ -201,7 +201,7 @@ spec:
                 lp group default permission set clicktpa.tpahere true
                 lp group default permission set clicktpa.tptoggle true
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-b6ee419
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-990b385
           name: minecraft
           ports:
             - containerPort: 25565
