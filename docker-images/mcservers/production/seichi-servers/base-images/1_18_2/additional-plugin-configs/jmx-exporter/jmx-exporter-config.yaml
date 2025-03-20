@@ -1,0 +1,7 @@
+---
+startDelaySeconds: 0
+lowercaseOutputName: false
+lowercaseOutputLabelNames: false
+whitelistObjectNames: []
+blacklistObjectNames: []
+rules: []

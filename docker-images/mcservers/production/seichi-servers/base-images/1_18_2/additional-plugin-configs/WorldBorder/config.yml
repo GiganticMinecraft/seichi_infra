@@ -1,0 +1,81 @@
+cfg-version: 11
+message: '&cYou have reached the edge of this world.'
+round-border: false
+debug-mode: false
+whoosh-effect: true
+portal-redirection: true
+knock-back-dist: 3.0
+timer-delay-ticks: 5
+remount-delay-ticks: 0
+dynmap-border-enabled: true
+dynmap-border-message: The border of the world.
+dynmap-border-hideByDefault: false
+dynmap-border-priority: 0
+player-killed-bad-spawn: false
+deny-enderpearl: true
+fill-autosave-frequency: 30
+bypass-list-uuids: []
+fill-memory-tolerance: 500
+prevent-block-place: false
+prevent-mob-spawn: false
+worlds:
+  world_2:
+    x: 7.49421317241422
+    z: -7.510128414824765
+    radiusX: 3800
+    radiusZ: 3800
+    wrapping: false
+  world_SW:
+    x: 8.0
+    z: 8.0
+    radiusX: 1500
+    radiusZ: 1500
+    wrapping: false
+  world_SW_2:
+    x: 9.5
+    z: 12.335294553558457
+    radiusX: 8050
+    radiusZ: 8050
+    wrapping: false
+  world_SW_nether:
+    x: 8.764702304161391
+    z: 6.306504436246215
+    radiusX: 3000
+    radiusZ: 3000
+    wrapping: false
+  world_SW_the_end:
+    x: 8.0
+    z: 8.0
+    radiusX: 3000
+    radiusZ: 3000
+    wrapping: false
+  world_SW_3:
+    x: 0.5105898459039747
+    z: 0.17725819666035014
+    radiusX: 8000
+    radiusZ: 8000
+    wrapping: false
+  world_SW_4:
+    x: 0.5
+    z: 0.5
+    radiusX: 8050
+    radiusZ: 8050
+    wrapping: false
+  world_build:
+    x: -1507.5
+    z: 1507.5
+    radiusX: 7560
+    radiusZ: 7560
+    wrapping: false
+  world_dot:
+    x: 0.0
+    z: 0.0
+    radiusX: 10000
+    radiusZ: 10000
+    wrapping: false
+  world_towny:
+    x: 8.413702999835161
+    z: 6.767552455492664
+    radiusX: 10000
+    radiusZ: 10000
+    wrapping: false
