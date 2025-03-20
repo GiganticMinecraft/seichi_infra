@@ -342,10 +342,10 @@ spec:
               mountPath: /plugins/antiRedstoneClock/config.yml
               subPath: antiRedstoneClock.yml
 
-            # AutoMessage プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/AutoMessage/config.yml
-              subPath: AutoMessage-config.yml
+            # # AutoMessage プラグインの設定ファイル
+            # - name: common-mcserver-plugin-configs
+            #   mountPath: /plugins/AutoMessage/config.yml
+            #   subPath: AutoMessage-config.yml
 
             # BetterChairs プラグインの設定ファイル
             - name: common-mcserver-plugin-configs
