@@ -1,0 +1,5 @@
+    uuid: 0a25e0f2-b952-4fe4-9843-3c5608aa2f0c
+    name: shirotubu
+    primary-group: user
+    parents:
+    - admin

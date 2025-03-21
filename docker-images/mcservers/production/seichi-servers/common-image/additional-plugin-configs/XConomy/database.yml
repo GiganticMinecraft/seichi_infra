@@ -1,0 +1,53 @@
+Settings:
+  #SQLite MySQL MariaDB
+  #MariaDB require DatabaseDrivers
+  storage-type: MySQL
+  #Use connection pool or not
+  #Require 'slf4j' dependencies
+  #At least java version 11 is required
+  usepool: true
+
+
+#SQLite settings
+SQLite:
+  #Address is the folder path
+  path: Default
+
+
+#MySQL settings
+MySQL:
+  host: mariadb
+  port: 3306
+  user: root
+  pass:
+  database: xconomy
+  #auto add "_", can use %sign% to indicate Server ID (BungeeCord settings)
+  table-suffix: ''
+  property:
+    usessl: false
+    encoding: utf8
+    timezone: ''
+    allowPublicKeyRetrieval: false
+
+
+#Connection pool settings
+Pool-Settings:
+  maximum-pool-size: 10
+  minimum-idle: 10
+  maximum-lifetime: 180000
+  idle-timeout: 60000
+
+
+#Redis settings
+Redis:
+  host: localhost
+  port: 6379
+  db-index: 1
+  duration: 1000
+  pool-settings:
+    max-total: 20
+    max-idle: 20
+    min-idle: 0
+  auth:
+    user: ''
+    pass: ''

@@ -1,0 +1,6 @@
+uuid: 0ea34656-b1c7-45c0-8b89-1ec55a70fe17
+name: lucky3028
+primary-group: worldguard-bypass
+parents:
+- admin
+- worldguard-bypass

@@ -21,6 +21,8 @@ jobs:
             build_context: ./docker-images/mcservers/production/one-day-to-reset
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby
             build_context: ./docker-images/mcservers/production/lobby
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_common
+            build_context: ./docker-images/mcservers/production/seichi-servers/common-image
 
           ###
           # デバッグサーバーのイメージ (1.12.2)

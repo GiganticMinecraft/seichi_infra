@@ -1,0 +1,10 @@
+name: observer
+permissions:
+- observerutils.obs
+- seichiassist.lastquit
+- weight.1
+parents:
+- default
+meta:
+- default:
+    value: 'false'

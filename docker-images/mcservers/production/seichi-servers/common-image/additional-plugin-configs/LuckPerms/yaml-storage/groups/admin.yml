@@ -1,0 +1,19 @@
+name: admin
+permissions:
+# TODO: ホワイトリスト方式にする（ワイルドカードで権限を与えない）
+# NOTE: クォーテーションで囲まないと読み込んでくれない
+- '*'
+- minecraft.command.deop:
+    value: false
+- minecraft.command.op:
+    value: false
+- luckperms.*
+- luckperms
+- mv.bypass.gamemode.*
+- seichiassist.present.*
+- worldguard.region.bypass.*:
+    value: false
+- weight.10
+meta:
+- default:
+    value: 'false'
