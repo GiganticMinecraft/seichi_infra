@@ -1,0 +1,56 @@
+Messages:
+  DontHavePermission: "&cYou don't have permission."
+  NotAvailable: "&cNot available in this world."
+  ConfigReloaded: "&aConfig has been reloaded."
+  Help:
+    Help: "Show this help."
+    Show: "Show title of this world."
+    Reload: "Reload config file."
+
+# Time to display the title (Unit: seconds)
+# Notice: ActionBar has no effect
+DefaultTime:
+  fadein: 0.5
+  stay: 3.0
+  fadeout: 0.5
+
+Worlds:
+  world_2:
+    title: "&2メインワールド"
+    subtitle: "保護の上建築が可能なワールドです"
+    actionbar: "&c&l土地は保護しないと編集できませんのでご注意ください"
+  world_SW:
+    title: "&2第1整地"
+    subtitle: "自由に整地可能なワールドです"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし・毎週自動リセットされます"
+  world_SW_2:
+    title: "&2第2整地"
+    subtitle: "保護の上整地が可能なワールドです"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_3:
+    title: "&2第3整地"
+    subtitle: "自由に整地可能なワールドです"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_4:
+    title: "&2第4整地"
+    subtitle: "保護の上整地が可能なワールドです"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_nether:
+    title: "&c整地ネザー"
+    subtitle: "鬼畜な整地をあなたに。自由に整地が可能"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+  world_SW_the_end:
+    title: "&8整地エンド"
+    subtitle: "鬼畜な整地をあなたに。自由に整地が可能"
+    actionbar: "&c&l上から掘るべし・空中ブロック、水、マグマは除去すべし"
+# Syntax ------>
+#  world_name:
+#    title: "maintitle message."
+#    subtitle: "&c&o&l&o&r&c&o&d&e subtitle message.(&&escape is &&)"
+#    actionbar: "actionbar message"
+#    # Overrides
+#    fadein: 0.5
+#    stay: 1.75
+#    fadeout: 0.5
+# <------ Syntax
+# Color code is lowercase.

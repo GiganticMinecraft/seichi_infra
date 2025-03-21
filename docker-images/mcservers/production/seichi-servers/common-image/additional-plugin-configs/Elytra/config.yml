@@ -1,0 +1,80 @@
+# Auto-glide
+# If this feature is enabled player will not require
+# to press "space" to start gliding.
+#
+auto-glide:
+  enable: false # Enable auto-glide feature, default: true
+  auto-equip: false # Enable auto-equip feature (If a player has an elytra in his inventory, it is auto-equipped when auto-glide engages)
+  required-air-under-player: 3 # Amount of empty block under player feet required to start gliding
+
+# Constant flight
+# Determines minimum glding speed, allows to flight constantly
+# Most CPU Intensive (0.03% of server tick per active gliding player)
+constant-flight:
+  enable: false     # Enable constant flight feature
+  velocity: 1.1     # Minimum velocity
+
+# Speed boost by pressing shift-key
+shift-speed-up:
+  enable: true      # Enable shift speed-up feature
+  max-activation-speed: 1.2 # player's speed must be lower to activate
+  velocity-multiplier: 1.5  # Velocity multiplier
+  cooldown:
+    enable: true    # Enable cooldown
+    time: 1s        # Cooldown delay
+
+# Speed-up during flying
+# Look up while flying and your speed will be incresed
+speed-up:
+  enable: true      # Enable speed-up feature
+  cooldown:
+    enable: false   # Set true to enable cooldown
+    time: 3s        # Cooldown delay
+  activation:       # Speed-up activation conditions
+    angle-min: 30   # Minimum angle required for activation, default: 50
+    angle-max: 90   # Maximum angle required for activation, default: 80
+    speed-min: 0.5  # Minimum speed required for activation
+    speed-max: 1.5  # Maximum speed required for activation
+    multiplier: 1.3 # Velocity multiplier
+
+# Run-up
+# Allows to start flying just after sprinting with weared Elytra
+# Second Most CPU Intensive (0.03% of server tick per active sprinting player)
+run-up:
+  enable: true      # Enable run-up
+  activation:
+    angle-min: 10   # Minimum angle required for activation, default: 30
+    angle-max: 70   # Maximum angle required for activation
+  boost: 1.5        # Fly-up velocity
+  cooldown:
+    enable: true    # Enable cooldown
+    time: 1s        # Cooldown delay
+
+# G-Force effect
+# Additional effect (debuff) occured when speed-up performed
+g-force:
+  damage-elytra: 0  # Break elytra, default: 10
+  damage-player: 0.0 # Deal damage to player, default: 2.0
+
+# Particles effects
+particles:
+  enable: true       # Enable particles
+  type: SPELL_WITCH  # Particle name, all possible effects listed here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Particle.html
+  radius: 0.3        # Particles parameters
+  amount: 15         # Amount of particles
+  extra-param: 0.0   # Extra param (some effects need it)
+  play-repeat: 3     # Repeat effect playing
+
+# Sound effects
+sound:
+  enable: true       # Enable sound effect
+  activation:
+    type: ENTITY_BAT_TAKEOFF # Sound effect type. You can choose another: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+    pitch: 0.8          # Sound pitch
+    volume: 0.5         # Sound volume
+    play-repeat: 3      # Repeat sounds
+    play-delay-ticks: 3 # Delay between repeats
+  cooldown-fail:          # Cooldown fail sound effect
+    type: UI_BUTTON_CLICK # Sount effect type
+    pitch: 0.8            # Sound pitch
+    volume: 0.5           # Sound volume

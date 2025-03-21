@@ -1,0 +1,434 @@
+Layouts:
+- size: 54
+  name: Standard
+  icons:
+    0:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    1:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    2:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    3:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    4:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    5:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    6:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    7:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    8:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    9:
+      icon: TradeSlot
+    10:
+      icon: TradeSlot
+    11:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    12:
+      icon: StatusIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: LIGHT_GRAY_TERRACOTTA
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: RED_TERRACOTTA
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: LIME_TERRACOTTA
+    13:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    14:
+      icon: ShowStatusIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: RED_TERRACOTTA
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: LIME_TERRACOTTA
+    15:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    16:
+      icon: TradeSlotOther
+    17:
+      icon: TradeSlotOther
+    18:
+      icon: TradeSlot
+    19:
+      icon: TradeSlot
+    20:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    21:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    22:
+      icon: CancelIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BARRIER
+    23:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    24:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    25:
+      icon: TradeSlotOther
+    26:
+      icon: TradeSlotOther
+    27:
+      icon: TradeSlot
+    28:
+      icon: TradeSlot
+    29:
+      icon: TradeSlot
+    30:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    31:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    32:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    33:
+      icon: TradeSlotOther
+    34:
+      icon: TradeSlotOther
+    35:
+      icon: TradeSlotOther
+    36:
+      icon: TradeSlot
+    37:
+      icon: TradeSlot
+    38:
+      icon: TradeSlot
+    39:
+      icon: TradeSlot
+    40:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    41:
+      icon: TradeSlotOther
+    42:
+      icon: TradeSlotOther
+    43:
+      icon: TradeSlotOther
+    44:
+      icon: TradeSlotOther
+    45:
+      icon: TradeSlot
+    46:
+      icon: TradeSlot
+    47:
+      icon: TradeSlot
+    48:
+      icon: TradeSlot
+    49:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    50:
+      icon: TradeSlotOther
+    51:
+      icon: TradeSlotOther
+    52:
+      icon: TradeSlotOther
+    53:
+      icon: TradeSlotOther
+- size: 54
+  name: Standard-Exp
+  icons:
+    0:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    1:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    2:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    3:
+      icon: ExpLevelIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GOLD_NUGGET
+    4:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    5:
+      icon: ShowExpLevelIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GOLD_NUGGET
+    6:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    7:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    8:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    9:
+      icon: TradeSlot
+    10:
+      icon: TradeSlot
+    11:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    12:
+      icon: StatusIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: LIGHT_GRAY_TERRACOTTA
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: RED_TERRACOTTA
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: LIME_TERRACOTTA
+    13:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    14:
+      icon: ShowStatusIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: RED_TERRACOTTA
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: LIME_TERRACOTTA
+    15:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    16:
+      icon: TradeSlotOther
+    17:
+      icon: TradeSlotOther
+    18:
+      icon: TradeSlot
+    19:
+      icon: TradeSlot
+    20:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    21:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    22:
+      icon: CancelIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BARRIER
+    23:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    24:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    25:
+      icon: TradeSlotOther
+    26:
+      icon: TradeSlotOther
+    27:
+      icon: TradeSlot
+    28:
+      icon: TradeSlot
+    29:
+      icon: TradeSlot
+    30:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    31:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    32:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: BLACK_STAINED_GLASS_PANE
+    33:
+      icon: TradeSlotOther
+    34:
+      icon: TradeSlotOther
+    35:
+      icon: TradeSlotOther
+    36:
+      icon: TradeSlot
+    37:
+      icon: TradeSlot
+    38:
+      icon: TradeSlot
+    39:
+      icon: TradeSlot
+    40:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    41:
+      icon: TradeSlotOther
+    42:
+      icon: TradeSlotOther
+    43:
+      icon: TradeSlotOther
+    44:
+      icon: TradeSlotOther
+    45:
+      icon: TradeSlot
+    46:
+      icon: TradeSlot
+    47:
+      icon: TradeSlot
+    48:
+      icon: TradeSlot
+    49:
+      icon: DecorationIcon
+      items:
+      - ==: org.bukkit.inventory.ItemStack
+        v: 2975
+        type: GRAY_STAINED_GLASS_PANE
+    50:
+      icon: TradeSlotOther
+    51:
+      icon: TradeSlotOther
+    52:
+      icon: TradeSlotOther
+    53:
+      icon: TradeSlotOther
+Active: Standard

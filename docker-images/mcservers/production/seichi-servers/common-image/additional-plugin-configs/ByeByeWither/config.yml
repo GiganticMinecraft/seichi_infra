@@ -1,0 +1,6 @@
+wither:
+  is-enabled: true
+  ignored-worlds: []
+ender-dragon:
+  is-enabled: true
+  ignored-worlds: []

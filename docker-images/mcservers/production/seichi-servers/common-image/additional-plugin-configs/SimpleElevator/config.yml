@@ -1,0 +1,7 @@
+DebugMode: 'false'
+Messages:
+  upMessage: Up
+  downMessage: Down
+Sounds:
+  upSound: BLOCK_NOTE_BLOCK_HARP
+  downSound: BLOCK_NOTE_BLOCK_BASS

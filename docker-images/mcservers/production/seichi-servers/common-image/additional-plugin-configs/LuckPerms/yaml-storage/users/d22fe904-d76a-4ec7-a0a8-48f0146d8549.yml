@@ -1,0 +1,6 @@
+uuid: d22fe904-d76a-4ec7-a0a8-48f0146d8549
+name: specialboywaka
+primary-group: worldguard-bypass
+parents:
+- admin
+- worldguard-bypass

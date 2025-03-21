@@ -1,0 +1,44 @@
+name: observerplus
+permissions:
+- dynmap.hide.self
+- spectatortheater.end
+- spectatortheater.list
+- spectatortheater.start
+- worldguard.region.addmember.*:
+    value: true
+    context:
+      world: world_tt
+- worldguard.region.removemember.*:
+    value: true
+    context:
+      world: world_tt
+- worldguard.region.addmember.*:
+    value: true
+    context:
+      world: world_the_end_tt
+- worldguard.region.removemember.*:
+    value: true
+    context:
+      world: world_the_end_tt
+- worldguard.region.addmember.*:
+    value: true
+    context:
+      world: world_nether_tt
+- worldguard.region.removemember.*:
+    value: true
+    context:
+      world: world_nether_tt
+- worldguard.region.addmember.*:
+    value: true
+    context:
+      world: world
+- worldguard.region.removemember.*:
+    value: true
+    context:
+      world: world
+- weight.2
+parents:
+- observer
+meta:
+- default:
+    value: 'false'
