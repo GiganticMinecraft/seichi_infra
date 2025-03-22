@@ -167,7 +167,7 @@ spec:
               value: mariadb
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT
-              value: 3306
+              value: "3306"
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
               value: root
