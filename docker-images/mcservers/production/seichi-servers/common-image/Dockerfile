@@ -9,7 +9,7 @@ COPY --link ./additional-plugin-list.ini /extras/additional-plugin-list.ini
 RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.ini"
 
 # プラグインの設定ファイル
-COPY --link ./additional-plugin-configs /data/plugins
+COPY --link ./additional-plugin-configs /plugins
 
 COPY --link --from=chunk-search-provider /build/chunk-search-rs /usr/bin/chunk-search-rs
 
