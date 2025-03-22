@@ -255,6 +255,10 @@ spec:
               mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
               subPath: jmx-exporter-javaagent.jar
 
+            # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
+            # 自動で /data/plugins に配置してくれるが、seichi_minecraft_server_base は 
+            # /plugins ディレクトリ配下に必要なプラグイン用の設定ファイルを展開しているため、
+            # ここでも /plugins ディレクトリをマウントすると、設定ファイルがすべて上書きされてしまうため /data/plugins に配置している。
             - name: mod-downloader-volume
               mountPath: /data/plugins
 
