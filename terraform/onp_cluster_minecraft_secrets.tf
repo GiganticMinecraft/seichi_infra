@@ -39,7 +39,7 @@ resource "kubernetes_secret" "onp_minecraft_prod_seichiassist_webhook_secrets" {
   }
 
   data = {
-    SEICHIASSIST_S1_WEBHOOK_URL = var.minecaraft__prod_s1_seichiassist_webhook_url
+    SEICHIASSIST_S1_WEBHOOK_URL = var.minecraft__prod_s1_seichiassist_webhook_url
   }
 
   type = "Opaque"
