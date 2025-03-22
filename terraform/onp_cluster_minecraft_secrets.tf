@@ -30,6 +30,21 @@ resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_minecraft_prod_seichiassist_webhook_secrets" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "mcserver--seichiassist-webhook--config-secrets"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    SEICHIASSIST_S1_WEBHOOK_URL = var.minecaraft__prod_s1_seichiassist_webhook_url
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "onp_minecraft_prod_one_day_to_reset_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
