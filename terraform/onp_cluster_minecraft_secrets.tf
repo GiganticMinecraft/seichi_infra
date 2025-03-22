@@ -103,6 +103,12 @@ resource "random_password" "minecraft__prod_mariadb_mcserver_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+resource "random_password" "minecraft__prod_mariadb_luckperms_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
@@ -112,8 +118,9 @@ resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
   }
 
   data = {
-    "root-password"     = random_password.minecraft__prod_mariadb_root_password.result
-    "mcserver-password" = random_password.minecraft__prod_mariadb_mcserver_password.result
+    "root-password"      = random_password.minecraft__prod_mariadb_root_password.result
+    "mcserver-password"  = random_password.minecraft__prod_mariadb_mcserver_password.result
+    "luckperms-password" = random_password.minecraft__prod_mariadb_luckperms_password.result
   }
 
   type = "Opaque"
