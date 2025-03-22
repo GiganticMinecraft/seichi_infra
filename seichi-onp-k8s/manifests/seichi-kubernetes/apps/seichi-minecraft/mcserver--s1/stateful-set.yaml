@@ -256,7 +256,7 @@ spec:
               subPath: jmx-exporter-javaagent.jar
 
             - name: mod-downloader-volume
-              mountPath: /plugins
+              mountPath: /data/plugins
 
             - name: worldedit-schematica-volume
               mountPath: /worldedit-schematica
