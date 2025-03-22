@@ -178,6 +178,24 @@ spec:
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
               value: ""
 
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER
+              value: luckperms
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: luckperms-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
+              value: luckperms
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
