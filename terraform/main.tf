@@ -292,6 +292,12 @@ variable "minecraft__prod_game_db__password" {
   sensitive   = true
 }
 
+variable "minecraft__prod_s1_seichiassist_webhook_url" {
+  description = "Webhook URL for SeichiAssist on s1 server in production env"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise discord bot secrets
