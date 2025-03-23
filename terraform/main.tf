@@ -304,6 +304,12 @@ variable "minecraft__prod_s2_seichiassist_webhook_url" {
   sensitive   = true
 }
 
+variable "minecraft__prod_s3_seichiassist_webhook_url" {
+  description = "Webhook URL for SeichiAssist on s3 server in production env"
+  type        = string
+  sensitive   = true
+}
+
 variable "minecraft__prod_s5_seichiassist_webhook_url" {
   description = "Webhook URL for SeichiAssist on s5 server in production env"
   type        = string
