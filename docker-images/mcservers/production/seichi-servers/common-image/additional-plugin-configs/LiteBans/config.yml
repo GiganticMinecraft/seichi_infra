@@ -24,7 +24,7 @@ sync_dupeip_notifications: false
 # If you need per-server bans, you have to change server_name on all instances.
 # The "$serverScope" and "$serverOrigin" variables can be used in messages.
 # Maximum length is 32 characters. UTF-8 is supported. This is case-sensitive, so it is recommended to only use lowercase characters.
-server_name: "${CFG_LITEBANS_SERVER_NAME}"
+server_name: "${CFG_REPLACEMENT__LITEBANS_SERVER_NAME}"
 
 # This option decides which server(s) will be affected in commands by default.
 default_server_scope: '*'
@@ -38,12 +38,12 @@ sql:
   # and most of these settings won't apply.
 
   # Database server address.
-  address: mariadb:3306
+  address: "${CFG_REPLACEMENT__LITEBANS_MYSQL_HOST}:${CFG_REPLACEMENT__LITEBANS_MYSQL_PORT}"
 
   # Database name, username and password.
-  database: 'litebans'
-  username: 'root'
-  password: ''
+  database: '${CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME}'
+  username: '${CFG_REPLACEMENT__LITEBANS_MYSQL_USER}'
+  password: '${CFG_REPLACEMENT__LITEBANS_MYSQL_PASSWORD}'
 
   # LiteBans utilizes connection pooling for extra performance and reliability.
   # min_connections: Minimum amount of pooled connections.
