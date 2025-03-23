@@ -17,18 +17,6 @@ spec:
         mcserver: s1
     spec:
       initContainers:
-        - name: jmx-exporter-downloader
-          image: busybox:1.37.0
-          env:
-            - name: JMX_EXPORTER_URL
-              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar"
-          volumeMounts:
-            - name: jmx-exporter-download-volume
-              mountPath: /root/jmx-exporter-download
-          command:
-            - "sh"
-            - "-c"
-            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
           env:
@@ -96,7 +84,7 @@ spec:
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
               # ref: https://docs.papermc.io/paper/aikars-flags
               value: >-
-                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch 
                 -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M 
@@ -289,11 +277,6 @@ spec:
             # 参考: https://stackoverflow.com/a/63114800
             # 参考: https://stackoverflow.com/a/50687707
 
-            # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
-            - name: jmx-exporter-download-volume
-              mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
-              subPath: jmx-exporter-javaagent.jar
-
             # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
             # 自動で /data/plugins に配置してくれるが、seichi_minecraft_server_base は 
             # /plugins ディレクトリ配下に必要なプラグイン用の設定ファイルを展開しているため、
@@ -305,10 +288,6 @@ spec:
               mountPath: /worldedit-schematica
 
       volumes:
-        # JMX exporterをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
-        - name: jmx-exporter-download-volume
-          emptyDir: {}
-
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
           emptyDir: {}
