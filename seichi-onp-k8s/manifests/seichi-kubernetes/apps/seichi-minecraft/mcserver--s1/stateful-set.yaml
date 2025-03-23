@@ -300,6 +300,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
+        name: mcserver--s1-data
       spec:
         accessModes:
           - ReadWriteOnce
