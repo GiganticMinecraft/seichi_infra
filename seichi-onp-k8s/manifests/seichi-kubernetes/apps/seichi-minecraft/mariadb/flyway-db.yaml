@@ -2,7 +2,7 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: Database
 metadata:
   namespace: seichi-minecraft
-  name: flyway_managed_schema
+  name: flyway
 spec:
   mariaDbRef:
     name: mariadb
@@ -16,7 +16,7 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   namespace: seichi-minecraft
-  name: flyway_managed_schema
+  name: flyway
 spec:
   mariaDbRef:
     name: mariadb
