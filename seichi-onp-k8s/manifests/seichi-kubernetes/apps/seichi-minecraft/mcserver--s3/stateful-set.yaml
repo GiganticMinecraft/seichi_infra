@@ -321,8 +321,10 @@ spec:
         - name: worldedit-schematica-volume
           emptyDir: {}
   volumeClaimTemplates:
-    - metadata:
-        name: minecraft-server-data
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mcserver--s3-data
       spec:
         accessModes:
           - ReadWriteOnce
