@@ -1,0 +1,93 @@
+version:
+  # This is the current version.  Please do not edit.
+  version: 1.1.2
+update:
+  # Seconds between updating Towny information on the dynmap.
+  period: '300'
+layer:
+  # The name of the Towny layer on dynmap.
+  name: Towny
+  # Is the Towny layer hidden by default?
+  hidebydefault: 'false'
+  # Ordering priority in layer menu (low goes before high - default is 0)
+  layerprio: '2'
+  # (optional) set minimum zoom level before layer is visible (0 = defalt, always visible)
+  minzoom: '0'
+# Requires Player-Info-Is-Protected enabled in dynmap.
+player_visibility:
+  # Allow all residents of a given town to see one another.
+  visibility-by-town: 'true'
+  # Allow all residents of a given nation to see one another.
+  visibility-by-nation: 'true'
+townblock_colours:
+  shops:
+    # Show shop plots with their own fill colour.
+    showshops: 'false'
+    # The colour shops plots are filled with.
+    fillcolour: '#0000FF'
+  arenas:
+    # Show arena plots with their own fill colour.
+    showarenas: 'false'
+    # The colour arena plots are filled with.
+    fillcolour: '#FF00FF'
+  embassies:
+    # Show embassy plots with their own fill colour.
+    showembassies: 'false'
+    # The colour embassy plots are filled with.
+    fillcolour: '#00FFFF'
+  wilds:
+    # Show wilds plots with their own fill colour.
+    showwilds: 'false'
+    # The colour wilds plots are filled with.
+    fillcolour: '#00FF00'
+dynamic_colours:
+  # Use dynamic nation colors, which are set in-game by individual nations (using /t set mapcolor <colour>)
+  town_colours: 'true'
+  # Use dynamic nation colors, which are set in-game by individual nations (using /n set mapcolor <colour>)
+  nation_colours: 'true'
+infowindow:
+  # Format for town popup.
+  town_info_window: <div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>
+  # What is shown in the info window's %nation% when a town has no nation.
+  nonationslug: ''
+regionstyle:
+  strokecolor: '#FF0000'
+  strokeopacity: '0.8'
+  strokeweight: '3'
+  fillcolor: '#FF0000'
+  fillopacity: '0.35'
+  boost: 'false'
+  # Allowed icon names found here: https://github.com/webbukkit/dynmap/wiki/Using-Markers
+  icons:
+    homeicon: blueflag
+    capitalicon: king
+    outposticon: tower
+    ruinicon: warning
+# Optional setting to limit which regions to show, by name - if commented out, all regions are shown.
+# To show all regions on a given world, add 'world:<worldname>' to the list.
+visibleregions: ''
+# Optional setting to hide specific regions, by name.
+# To hide all regions on a given world, add 'world:<worldname>' to the list.
+hiddenregions: ''
+custstyle:
+  customregion1:
+    strokecolor: '#00FF00'
+    y: '64'
+  customregion2:
+    strokecolor: '#007F00'
+    y: '64'
+    boost: 'false'
+nationstyle:
+  NationOfBlue:
+    strokecolor: '#0000FF'
+    fillcolor: '#0000FF'
+    boost: 'false'
+  _none_:
+    homeicon: greenflag
+# Chat settings for use with TownyChat.
+chat:
+  sendlogin: 'true'
+  sendquit: 'true'
+  format: '&color;2[WEB] %playername%: &color;f%message%'
+# The language file you wish to use
+language: english.yml
