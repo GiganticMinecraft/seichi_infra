@@ -81,6 +81,7 @@ spec:
               value: "TRUE"
 
             - name: JVM_OPTS
+              # base image 側で JVM_OPTS に対して jmx exporter の設定を追加しているが、上書きが必要なためここで設定する
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
               # ref: https://docs.papermc.io/paper/aikars-flags
               value: >-
