@@ -304,6 +304,12 @@ variable "minecraft__prod_s2_seichiassist_webhook_url" {
   sensitive   = true
 }
 
+variable "minecraft__prod_s5_seichiassist_webhook_url" {
+  description = "Webhook URL for SeichiAssist on s2 server in production env"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise discord bot secrets
