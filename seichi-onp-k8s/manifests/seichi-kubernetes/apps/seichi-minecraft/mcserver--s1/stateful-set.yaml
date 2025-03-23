@@ -170,13 +170,16 @@ spec:
               value: "3306"
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
-              value: root
+              value: coreprotect
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_DATABASE_NAME
               value: coreprotect__mc_s1
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
-              value: ""
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: coreprotect-password
 
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
               value: mariadb
@@ -195,6 +198,24 @@ spec:
 
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
               value: luckperms
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_USER
+              value: litebans
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME
+              value: litebans
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: litebans-password
 
             - name: RCON_CMDS_STARTUP
               value: |-
@@ -224,7 +245,7 @@ spec:
                 rg flag -w world_SW_2 __global__ build -g members allow
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:sha-282d565
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:sha-1d153d9
           name: minecraft
           ports:
             - containerPort: 25565

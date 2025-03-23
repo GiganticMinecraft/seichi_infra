@@ -1,0 +1,42 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-minecraft
+  name: litebans
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  passwordSecretKeyRef:
+    name: mariadb
+    key: litebans-password
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: litebans
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: litebans
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "litebans"
+  table: "*"
+  username: "litebans"
+  grantOption: false
