@@ -170,13 +170,16 @@ spec:
               value: "3306"
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
-              value: root
+              value: coreprotect
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_DATABASE_NAME
               value: coreprotect__mc_s1
 
             - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
-              value: ""
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: coreprotect-password
 
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
               value: mariadb
