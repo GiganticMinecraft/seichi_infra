@@ -199,6 +199,24 @@ spec:
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
               value: luckperms
 
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_USER
+              value: litebans
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME
+              value: litebans
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: litebans-password
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 mv create world_SW NORMAL
