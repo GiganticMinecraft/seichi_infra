@@ -16,7 +16,7 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: Database
 metadata:
   namespace: seichi-minecraft
-  name: coreprotect
+  name: coreprotect-s1
 spec:
   mariaDbRef:
     name: mariadb
@@ -30,7 +30,7 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: Database
 metadata:
   namespace: seichi-minecraft
-  name: coreprotect
+  name: coreprotect-s2
 spec:
   mariaDbRef:
     name: mariadb
