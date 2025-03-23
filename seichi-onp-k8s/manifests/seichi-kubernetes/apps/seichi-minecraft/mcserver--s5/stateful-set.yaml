@@ -132,7 +132,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mcserver--seichiassist-webhook--config-secrets
-                  key: SEICHIASSIST_s5_WEBHOOK_URL
+                  key: SEICHIASSIST_S5_WEBHOOK_URL
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
               value: seichi-redisbungee-redis-master
