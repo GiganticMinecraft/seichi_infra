@@ -41,6 +41,48 @@ spec:
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s3
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  name: coreprotect__mc_s3
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s5
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  name: coreprotect__mc_s5
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s7
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  name: coreprotect__mc_s7
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   namespace: seichi-minecraft
