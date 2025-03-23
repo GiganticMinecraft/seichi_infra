@@ -224,7 +224,7 @@ spec:
                 rg flag -w world_SW_2 __global__ build -g members allow
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:sha-282d565
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:sha-1d153d9
           name: minecraft
           ports:
             - containerPort: 25565
