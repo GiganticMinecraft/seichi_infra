@@ -1,0 +1,214 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mcserver--lobby
+  namespace: seichi-minecraft
+  labels:
+    app: mcserver--lobby
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcserver--lobby
+  template:
+    metadata:
+      labels:
+        app: mcserver--lobby
+        mcserver: lobby
+    spec:
+      initContainers:
+        - name: mod-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: lobby
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
+      containers:
+        - resources:
+            requests:
+              cpu: 2
+              memory: 12Gi
+            limits:
+              cpu: 4
+              memory: 12Gi
+          env:
+            - name: MEMORY
+              value: 10G
+            - name: EULA
+              value: "TRUE"
+
+            - name: COPY_CONFIG_DEST
+              # /config をサーバーディレクトリにコピーするようにする
+              # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
+              value: /data
+
+            - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: DISCORDSRV_TOKEN
+
+            # TODO: 以下の2つの環境変数は、実際に稼働するときにアンコメントするべき
+            # - name: CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID
+            #   value: "959299122492485652"
+
+            # - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
+            #   value: "295425952492683264"
+
+            - name: CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT
+              value: "9225"
+
+            - name: CFG_REPLACEMENT__WORLDEDIT_SCHEMATICS_DIRECTORY
+              value: /worldedit-schematica
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
+              value: coreprotect
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_DATABASE_NAME
+              value: coreprotect__mc_lobby
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: coreprotect-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER
+              value: luckperms
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: luckperms-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
+              value: luckperms__mc_lobby
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_USER
+              value: litebans
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME
+              value: litebans
+
+            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: litebans-password
+
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                rg flag -w world_2 __global__ build deny
+
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:sha-f372256
+          name: minecraft
+          ports:
+            - containerPort: 25565
+              name: minecraft
+            - containerPort: 18321
+              name: jmx-metrics
+            - containerPort: 9225
+              name: mc-metrics
+
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            # 最大120秒待つ
+            failureThreshold: 6
+            periodSeconds: 20
+
+          readinessProbe:
+            exec:
+              command:
+                - mc-monitor
+                - status
+                - --host
+                - localhost
+                - --port
+                - "25565"
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+
+          volumeMounts:
+            # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/minecraft-server が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+
+            # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
+            # 自動で /data/plugins に配置してくれるが、seichi_minecraft_server_base は 
+            # /plugins ディレクトリ配下に必要なプラグイン用の設定ファイルを展開しているため、
+            # ここでも /plugins ディレクトリをマウントすると、設定ファイルがすべて上書きされてしまうため /data/plugins に配置している。
+            - name: mod-downloader-volume
+              mountPath: /data/plugins
+
+            - name: worldedit-schematica-volume
+              mountPath: /worldedit-schematica
+
+      volumes:
+        # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
+        - name: mod-downloader-volume
+          emptyDir: {}
+
+        # WorldEditがSchematicaを保存・読み取るするためのvolume
+        - name: worldedit-schematica-volume
+          emptyDir: {}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mcserver--lobby-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Gi
