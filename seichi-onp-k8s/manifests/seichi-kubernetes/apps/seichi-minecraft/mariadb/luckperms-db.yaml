@@ -26,6 +26,19 @@ spec:
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: luckperms__mc_lobby
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   namespace: seichi-minecraft
@@ -37,6 +50,23 @@ spec:
   privileges:
     - "ALL"
   database: "luckperms"
+  table: "*"
+  username: "luckperms"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: luckperms
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "luckperms__mc_lobby"
   table: "*"
   username: "luckperms"
   grantOption: false
