@@ -27,6 +27,7 @@ spec:
     #  - argo-workflows
     #  - local-path-storage
     #  - argo
+    #  - trivy-operator
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: "kube-system"
@@ -50,6 +51,8 @@ spec:
     - namespace: "local-path-storage"
       server: https://kubernetes.default.svc
     - namespace: "argo"
+      server: https://kubernetes.default.svc
+    - namespace: "trivy-operator"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"
