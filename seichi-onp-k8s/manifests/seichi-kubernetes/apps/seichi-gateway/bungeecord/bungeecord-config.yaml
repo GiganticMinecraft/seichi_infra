@@ -45,6 +45,30 @@ data:
         address: mcserver--kagawa.seichi-minecraft:25565
         restricted: false
         motd: ''
+      s1-1-18:
+        address: mcserver--s1.seichi-minecraft:25565
+        restricted: false
+        motd: ''
+      s2-1-18:
+        address: mcserver--s2.seichi-minecraft:25565
+        restricted: false
+        motd: ''
+      s3-1-18:
+        address: mcserver--s3.seichi-minecraft:25565
+        restricted: false
+        motd: ''
+      s5-1-18:
+        address: mcserver--s5.seichi-minecraft:25565
+        restricted: false
+        motd: ''
+      s7-1-18:
+        address: mcserver--s7.seichi-minecraft:25565
+        restricted: false
+        motd: ''
+      lobby-1-18:
+        address: mcserver--lobby.seichi-minecraft:25565
+        restricted: false
+        motd: ''
 
     listeners:
       - priorities:
