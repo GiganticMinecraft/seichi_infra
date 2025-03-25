@@ -37,10 +37,10 @@ spec:
             - name: BUCKET_PREFIX_NAME
               value: common-plugins
             - name: DOWNLOAD_TARGET_DIR_PATH
-              value: /plugins
+              value: /downloaded-plugins
           volumeMounts:
             - name: mod-downloader-volume
-              mountPath: /plugins
+              mountPath: /downloaded-plugins
         - name: seichiassist-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
           env:
@@ -61,10 +61,10 @@ spec:
             - name: BUCKET_PREFIX_NAME
               value: master
             - name: DOWNLOAD_TARGET_DIR_PATH
-              value: /plugins
+              value: /downloaded-plugins
           volumeMounts:
             - name: mod-downloader-volume
-              mountPath: /plugins
+              mountPath: /downloaded-plugins
 
       containers:
         - resources:
@@ -234,6 +234,9 @@ spec:
                 rg flag -w world_SW_2 __global__ build -g members allow
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
 
+            - name: COPY_PLUGINS_SRC
+              value: /downloaded-plugins
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s2:sha-64c3f90
           name: minecraft
           ports:
@@ -278,12 +281,25 @@ spec:
             # 参考: https://stackoverflow.com/a/63114800
             # 参考: https://stackoverflow.com/a/50687707
 
+            # /plugins, /data/plugins ディレクトリには直接マウントしないこと。
+            #
             # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
-            # 自動で /data/plugins に配置してくれるが、seichi_minecraft_server_base は 
-            # /plugins ディレクトリ配下に必要なプラグイン用の設定ファイルを展開しているため、
-            # ここでも /plugins ディレクトリをマウントすると、設定ファイルがすべて上書きされてしまうため /data/plugins に配置している。
+            # /data/plugins ディレクトリに自動で配置してくれる。
+            # しかし、この Pod のベースとなっている seichi_minecraft_server_base は、
+            # /plugins ディレクトリに必要なプラグインの設定ファイルを展開している。
+            # そのため、/plugins ディレクトリにボリュームを直接マウントすると、既存の設定ファイルがすべて上書き(削除)されてしまう。
+            #
+            # また、/data/plugins ディレクトリにマウントしていない理由は、
+            # バックアップファイルからサーバーデータをリストアした場合、既存のデータが /data/plugins ディレクトリにも配置される。
+            # しかし、この Pod が起動したときに /data/plugins ディレクトリに mod-downloader-volume をマウントしてしまうと、
+            # 復元したはずのデータがすべて削除されることによって、
+            # /data/plugins/[プラグイン名] ディレクトリ以下にデータを保存するプラグインのデータ整合性が失われるリスクがある。
+            # これを回避するため、別のディレクトリにマウントしたうえで /data/plugins ディレクトリに mod-donwloader からダウンロードしたプラグインを配置する必要がある。
+            # itzg/minecraft-server の機能で COPY_PLUGINS_SRC という環境変数で指定したディレクトリをにプラグインを配置することで、
+            # これを実現するため、Pod 起動時に /data/plugins ディレクトリにプラグインを配置することができ、
+            # そこに指定した /downloaded-plugins ディレクトリにマウントすることとしている。
             - name: mod-downloader-volume
-              mountPath: /data/plugins
+              mountPath: /downloaded-plugins
 
             - name: worldedit-schematica-volume
               mountPath: /worldedit-schematica
