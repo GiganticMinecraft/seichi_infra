@@ -100,7 +100,7 @@ spec:
               memory: 6Gi
           env:
             - name: MEMORY
-              value: 10G
+              value: 6G
             - name: EULA
               value: "TRUE"
 
