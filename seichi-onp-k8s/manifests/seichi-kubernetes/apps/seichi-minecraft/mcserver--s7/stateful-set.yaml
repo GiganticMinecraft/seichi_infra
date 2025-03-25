@@ -76,7 +76,7 @@ spec:
               memory: 4Gi
           env:
             - name: MEMORY
-              value: 8G
+              value: 4G
             - name: EULA
               value: "TRUE"
 

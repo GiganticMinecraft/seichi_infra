@@ -94,10 +94,10 @@ spec:
         - resources:
             requests:
               cpu: 2
-              memory: 6Gi
+              memory: 8Gi
             limits:
               cpu: 4
-              memory: 6Gi
+              memory: 8Gi
           env:
             - name: MEMORY
               value: 6G
