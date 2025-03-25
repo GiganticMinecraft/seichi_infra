@@ -60,7 +60,7 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   namespace: seichi-minecraft
-  name: luckperms
+  name: luckperms-mc-lobby
 spec:
   mariaDbRef:
     name: mariadb
