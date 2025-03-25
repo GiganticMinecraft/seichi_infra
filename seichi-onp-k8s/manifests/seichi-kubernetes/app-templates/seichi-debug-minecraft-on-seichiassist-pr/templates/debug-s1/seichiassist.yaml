@@ -82,14 +82,14 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: 4
-              memory: 12Gi
+              cpu: 2
+              memory: 6Gi
             limits:
-              cpu: 6
-              memory: 12Gi
+              cpu: 4
+              memory: 6Gi
           env:
             - name: MEMORY
-              value: 10G
+              value: 4G
             - name: TYPE
               value: PAPER
             - name: VERSION
