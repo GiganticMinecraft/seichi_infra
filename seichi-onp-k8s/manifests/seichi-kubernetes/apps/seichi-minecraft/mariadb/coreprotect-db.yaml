@@ -83,10 +83,24 @@ spec:
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-lobby
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  name: coreprotect__mc_lobby
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   namespace: seichi-minecraft
-  name: coreprotect
+  name: coreprotect-s1
 spec:
   mariaDbRef:
     name: mariadb
@@ -94,6 +108,91 @@ spec:
   privileges:
     - "ALL"
   database: "coreprotect__mc_s1"
+  table: "*"
+  username: "coreprotect"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s2
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "coreprotect__mc_s2"
+  table: "*"
+  username: "coreprotect"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s3
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "coreprotect__mc_s3"
+  table: "*"
+  username: "coreprotect"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s5
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "coreprotect__mc_s5"
+  table: "*"
+  username: "coreprotect"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-s7
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "coreprotect__mc_s7"
+  table: "*"
+  username: "coreprotect"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: coreprotect-lobby
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "coreprotect__mc_lobby"
   table: "*"
   username: "coreprotect"
   grantOption: false
