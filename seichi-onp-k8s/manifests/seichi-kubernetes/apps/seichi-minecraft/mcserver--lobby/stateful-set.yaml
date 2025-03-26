@@ -142,7 +142,7 @@ spec:
             - name: COPY_PLUGINS_SRC
               value: /downloaded-plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:sha-f372256
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:sha-410bcbb
           name: minecraft
           ports:
             - containerPort: 25565
