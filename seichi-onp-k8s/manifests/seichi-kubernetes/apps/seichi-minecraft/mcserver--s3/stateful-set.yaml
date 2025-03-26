@@ -259,7 +259,9 @@ spec:
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
 
             - name: COPY_PLUGINS_SRC
-              value: /downloaded-plugins
+              value: |-
+               /downloaded-plugins
+               /plugins
 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s3:sha-0056c5e
           name: minecraft
