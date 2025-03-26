@@ -7,6 +7,7 @@ metadata:
     app: mcserver--lobby
 spec:
   replicas: 1
+  serviceName: "mcserver--lobby"
   selector:
     matchLabels:
       app: mcserver--lobby
