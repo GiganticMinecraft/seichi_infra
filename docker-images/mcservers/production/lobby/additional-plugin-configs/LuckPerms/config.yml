@@ -97,15 +97,15 @@ data:
   # - The standard DB engine port is used by default
   #   (MySQL: 3306, PostgreSQL: 5432, MongoDB: 27017)
   # - Specify as "host:port" if differs
-  address: mariadb
+  address: "${CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST}:${CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT}"
 
   # The name of the database to store LuckPerms data in.
   # - This must be created already. Don't worry about this setting if you're using MongoDB.
-  database: luckperms
+  database: "${CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME}"
 
   # Credentials for the database.
-  username: root
-  password: ''
+  username: "${CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER}"
+  password: "${CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD}"
 
   # These settings apply to the MySQL connection pool.
   # - The default values will be suitable for the majority of users.
