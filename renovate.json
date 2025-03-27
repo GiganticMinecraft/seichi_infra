@@ -16,6 +16,12 @@
       "groupName": "terraform packages",
       "enabled": true,
       "schedule": ["at any time"]
+    },
+    {
+      "matchPackagePatterns": [
+        "^ghcr.io/giganticminecraft/seichi_minecraft_server_production_.+$"
+      ],
+      "versioning": "loose"
     }
   ],
   "postUpdateOptions": [
