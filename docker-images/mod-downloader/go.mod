@@ -1,6 +1,6 @@
 module github.com/GiganticMinecraft/mod-downloader
 
-go 1.23
+go 1.24
 
 require (
 	github.com/getsentry/sentry-go v0.31.1
