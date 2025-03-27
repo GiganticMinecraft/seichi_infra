@@ -16,12 +16,6 @@
       "groupName": "terraform packages",
       "enabled": true,
       "schedule": ["at any time"]
-    },
-    {
-      "matchPackagePatterns": [
-        "^ghcr.io/giganticminecraft/.+$"
-      ],
-      "versioning": "loose"
     }
   ],
   "postUpdateOptions": [
