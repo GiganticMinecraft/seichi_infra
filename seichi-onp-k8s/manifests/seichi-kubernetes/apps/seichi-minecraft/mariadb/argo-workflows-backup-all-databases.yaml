@@ -1,0 +1,165 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: backup--mariadb-all-databases
+  namespace: seichi-minecraft
+spec:
+  schedule: "0 4 * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  workflowSpec:
+    workflowTemplateRef:
+      name: backup--mariadb-all-databases
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: backup--mariadb-all-databases
+  namespace: seichi-minecraft
+  annotations:
+    workflows.argoproj.io/description: "Namespace内の全Database CRDを対象に、各.spec.databaseを指定してBackup CRを作成する"
+spec:
+  serviceAccountName: mariadb-workflow-sa
+  entrypoint: default
+  templates:
+    - name: default
+      steps:
+        - - name: generate-timestamp
+            template: get-timestamp
+        - - name: list-databases
+            template: list-databases
+        - - name: backup-each-database
+            template: backup-single
+            arguments:
+              parameters:
+                - name: name
+                  value: "{{item}}"
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
+            withParam: "{{steps.list-databases.outputs.result}}"
+
+    - name: get-timestamp
+      script:
+        image: alpine:3.18
+        command: [sh]
+        source: |
+          date +%Y%m%d-%H%M%S
+
+    - name: list-databases
+      script:
+        image: python:3.10-slim
+        command: [sh]
+        source: |
+          pip install --quiet --no-cache-dir kubernetes
+          python3 <<EOF
+          from kubernetes import client, config
+          import os, json, sys
+
+          config.load_incluster_config()
+          api = client.CustomObjectsApi()
+          namespace = os.getenv("TARGET_NAMESPACE", "default")
+
+          dbs = api.list_namespaced_custom_object(
+              group="k8s.mariadb.com",
+              version="v1alpha1",
+              namespace=namespace,
+              plural="databases"
+          )
+
+          names = [db["metadata"]["name"] for db in dbs.get("items", [])]
+          sys.stdout.write(json.dumps(names))
+          EOF
+        env:
+          - name: TARGET_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+
+    - name: backup-single
+      inputs:
+        parameters:
+          - name: name
+          - name: timestamp
+      script:
+        image: python:3.10-slim
+        command: [sh]
+        source: |
+          pip install --quiet --no-cache-dir kubernetes
+          python3 <<EOF
+          from kubernetes import client, config
+          import os, sys
+
+          config.load_incluster_config()
+          namespace = os.getenv("TARGET_NAMESPACE", "default")
+          name = "{{inputs.parameters.name}}"
+          timestamp = "{{inputs.parameters.timestamp}}"
+
+          api = client.CustomObjectsApi()
+
+          # 対象のDatabase CRを取得
+          db_cr = api.get_namespaced_custom_object(
+              group="k8s.mariadb.com",
+              version="v1alpha1",
+              namespace=namespace,
+              plural="databases",
+              name=name
+          )
+
+          # MariaDBインスタンス名とDB名を抽出
+          maria_db_ref = db_cr.get("spec", {}).get("mariaDbRef", {}).get("name")
+          db_name = db_cr.get("spec", {}).get("name")
+
+          if not maria_db_ref or not db_name:
+              raise Exception(f"spec.mariaDbRef.name or spec.name が定義されていません！")
+
+          backup_name = f"{name}-backup--{timestamp}"
+          backup = {
+              "apiVersion": "k8s.mariadb.com/v1alpha1",
+              "kind": "Backup",
+              "metadata": {
+                  "name": backup_name,
+                  "namespace": namespace
+              },
+              "spec": {
+                  "mariaDbRef": {
+                      "name": maria_db_ref
+                  },
+                  "databases": [db_name],
+                  "storage": {
+                      "s3": {
+                          "bucket": "mariadb-backups",
+                          "prefix": f"database--{name}",
+                          "endpoint": "seichi-private-plugin-blackhole-minio.minio:9000",
+                          "accessKeyIdSecretKeyRef": {
+                              "name": "minio-access-secret",
+                              "key": "MINIO_ACCESS_KEY"
+                          },
+                          "secretAccessKeySecretKeyRef": {
+                              "name": "minio-access-secret",
+                              "key": "MINIO_ACCESS_SECRET"
+                          }
+                      }
+                  }
+              }
+          }
+
+          print(f"Backup作成中: {backup_name} for MariaDB instance '{maria_db_ref}', DB '{db_name}'")
+          try:
+              api.create_namespaced_custom_object(
+                  group="k8s.mariadb.com",
+                  version="v1alpha1",
+                  namespace=namespace,
+                  plural="backups",
+                  body=backup
+              )
+              print(f"✅ 成功: {backup_name}")
+          except client.exceptions.ApiException as e:
+              print(f"❌ 失敗: {backup_name} → {e.reason}")
+          EOF
+        env:
+          - name: TARGET_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
