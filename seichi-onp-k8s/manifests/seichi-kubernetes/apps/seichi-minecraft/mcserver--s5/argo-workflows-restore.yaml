@@ -6,6 +6,7 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "mcserver--s5のデータをProxmox Backup Serverからリストアするワークフロー"
     workflows.argoproj.io/parameters: |
+      RESTORE_TARGET_BACKUP_ID_PBS: "リストア元として使用するPBSバックアップID (デフォルトはargo-workflowでバックアップしたIDなので別のバックアップを使用したい時のみ変更する)"
       RESTORE_TARGET_DATE_PBS: "リストアするPBSバックアップの日付 (例: 2024-02-10T12:00:00Z)"
       RESTORE_TARGET_DATE_DB: "リストアするMariaDBバックアップの日付 (例: 2024-02-10T12:00:00Z)"
 spec:
@@ -15,6 +16,9 @@ spec:
   entrypoint: default
   arguments:
     parameters:
+      - name: RESTORE_TARGET_BACKUP_ID_PBS
+        description: "リストア元として使用するPBSバックアップID (デフォルトはargo-workflowでバックアップしたIDなので別のバックアップを使用したい時のみ変更する)"
+        value: "mcserver--s5"  # 初期値は argo-workflows-backup.yaml で指定したID
       - name: RESTORE_TARGET_DATE_PBS
         description: "リストアするPBSバックアップの日付 (例: 2024-02-10T12:00:00Z)"
         value: ""  # 初期値を空にしておく
@@ -120,7 +124,7 @@ spec:
           - name: RESTORE_TARGET_DIR
             value: "/data"
           - name: BACKUP_ID
-            value: "mcserver--s5"
+            value: "{{workflow.parameters.RESTORE_TARGET_BACKUP_ID_PBS}}"
           - name: PBS_USER
             valueFrom:
               secretKeyRef:
