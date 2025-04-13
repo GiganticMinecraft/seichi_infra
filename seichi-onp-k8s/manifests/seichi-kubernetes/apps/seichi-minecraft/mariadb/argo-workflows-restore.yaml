@@ -1,0 +1,100 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: restore--mariadb--with-prefix
+  namespace: seichi-minecraft
+  annotations:
+    workflows.argoproj.io/description: "指定されたprefixと日付からMariaDBデータをリストアするワークフロー"
+    workflows.argoproj.io/parameters: |
+      RESTORE_TARGET_DATE_DB: "リストアするMariaDBバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+      RESTORE_PREFIX: "S3上のバックアップprefix (例: mariadb--coreprotect-lobby)"
+spec:
+  serviceAccountName: mariadb-workflow-sa
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  entrypoint: default
+  arguments:
+    parameters:
+      - name: RESTORE_TARGET_DATE_DB
+        description: "リストアするMariaDBバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+        value: ""
+      - name: RESTORE_PREFIX
+        description: "S3上のバックアップprefix (例: mariadb--coreprotect-lobby)"
+        value: ""
+  templates:
+    - name: default
+      steps:
+        - - name: generate-timestamp
+            template: get-timestamp
+        - - name: run-mariadb-restore
+            template: run-mariadb-restore
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
+          - name: wait-complete-mariadb-restore
+            template: wait-complete-mariadb-restore
+            arguments:
+              parameters:
+                - name: timestamp
+                  value: "{{steps.generate-timestamp.outputs.result}}"
+
+    - name: get-timestamp
+      script:
+        image: alpine
+        command: [sh]
+        source: |
+          echo $(date +%Y%m%d-%H%M%S)
+
+    - name: run-mariadb-restore
+      inputs:
+        parameters:
+          - name: timestamp
+      resource:
+        action: create
+        manifest: |
+          apiVersion: k8s.mariadb.com/v1alpha1
+          kind: Restore
+          metadata:
+            name: mariadb-restore--{{inputs.parameters.timestamp}}
+          spec:
+            mariaDbRef:
+              name: mariadb
+            targetRecoveryTime: {{workflow.parameters.RESTORE_TARGET_DATE_DB}}
+            s3:
+              bucket: mariadb-backups
+              prefix: {{workflow.parameters.RESTORE_PREFIX}}
+              endpoint: seichi-private-plugin-blackhole-minio.minio:9000
+              accessKeyIdSecretKeyRef:
+                name: minio-access-secret
+                key: MINIO_ACCESS_KEY
+              secretAccessKeySecretKeyRef:
+                name: minio-access-secret
+                key: MINIO_ACCESS_SECRET
+
+    - name: wait-complete-mariadb-restore
+      inputs:
+        parameters:
+          - name: timestamp
+      activeDeadlineSeconds: 300
+      script:
+        image: bitnami/kubectl:1.32.3
+        command: ["/bin/sh", "-c"]
+        source: |
+          while true; do
+            TYPE_FAILED=$(kubectl get restore mariadb-restore--{{inputs.parameters.timestamp}} -n seichi-minecraft -o jsonpath="{.status.conditions[?(@.type=='Failed')].status}")
+            TYPE_COMPLETE=$(kubectl get restore mariadb-restore--{{inputs.parameters.timestamp}} -n seichi-minecraft -o jsonpath="{.status.conditions[?(@.type=='Complete')].status}")
+
+            if [ "$TYPE_FAILED" = "True" ]; then
+              echo "❌ mariadb-restore failed!"
+              exit 1
+            fi
+
+            if [ "$TYPE_COMPLETE" = "True" ]; then
+              echo "✅ mariadb-restore completed successfully!"
+              exit 0
+            fi
+
+            echo "⌛ Waiting for mariadb-restore to complete..."
+            sleep 5
+          done
