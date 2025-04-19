@@ -1,0 +1,26 @@
+# You can use the following placeholders in the messages
+# (player) - the player who has voted
+# (service) - the website that the vote was received from
+
+#message the user is sent when the vote is received.
+message_to_user: "&b&lThank you, for voting for us on (service)!"
+#message that is sent to the whole server when a person has voted.
+broadcast_message: "&l(player) &b&lhas voted for Server &b&lon (service)&b&l!"
+
+voteCMD:
+  titleline: "&b&lVote Sites!"
+  votesites:
+    #add as many as you like and they will be given when you do /vote
+    1:
+      chattext: "Random Vote Site"
+      hovertext: "Click to Open Random Vote Site"
+      name: "Random Vote Site"
+      url: "https://minecraft-server-list.com/"
+
+#The command that is run by the plugin to apply the effect of the vote
+commands:
+  - "seichiassist:vote record %name%"
+
+vote_reminder: true
+reminder_message: "&9&lDon't forget to vote for us!&b&l See the vote sites by doing /vote !"
+reminder_message_hover: "&lClick here to see vote sites!"
