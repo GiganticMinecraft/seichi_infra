@@ -322,6 +322,12 @@ variable "minecraft__prod_s7_seichiassist_webhook_url" {
   sensitive   = true
 }
 
+variable "minecraft__prod_votelistener_default_token" {
+  description = "votelistener default token"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise discord bot secrets
