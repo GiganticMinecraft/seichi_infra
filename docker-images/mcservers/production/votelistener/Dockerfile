@@ -1,0 +1,41 @@
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:f1847a7813ff54e9f3ef341d1e15350d7eae5e08fb116e4845e9730109a6a36e
+
+ENV VERSION="1.18.2"
+ENV DIFFICULTY="peaceful"
+
+# プラグインリスト
+#   このイメージでは基底のリスト (/extras/plugin-list.ini) に追記する
+COPY --link ./additional-plugin-list.ini /extras/additional-plugin-list.ini
+RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.ini"
+
+# プラグインの設定ファイル
+COPY --link ./additional-plugin-configs /plugins
+
+###
+# 環境変数として指定されるべきプラグインの設定
+#
+
+# e.g. "9225"
+ENV CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT=""
+
+# originally it was "\\192.168.xxx.xxx\seichi-share\schematics"
+ENV CFG_REPLACEMENT__WORLDEDIT_SCHEMATICS_DIRECTORY=""
+
+ENV CFG_REPLACEMENT__SEICHIASSIST_DB_HOST=""
+ENV CFG_REPLACEMENT__SEICHIASSIST_DB_PORT=""
+ENV CFG_REPLACEMENT__SEICHIASSIST_DB_USER=""
+ENV CFG_REPLACEMENT__SEICHIASSIST_DB_PASSWORD=""
+
+ENV CFG_REPLACEMENT__SEICHIASSIST_SERVER_NUM="4"
+ENV CFG_REPLACEMENT__SEICHIASSIST_SERVER_ID="votelistener"
+
+# Discord のチャットチャンネルへの Webhook
+ENV CFG_REPLACEMENT__SEICHIASSIST_URL_WEBHOOK_NOTIFICATION=""
+
+ENV CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST=""
+ENV CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT=""
+
+ENV CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_HOST=""
+ENV CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_PORT=""
+
+ENV CFG_REPLACEMENT__VOTIFIER_TOKEN_DEFAULT=""

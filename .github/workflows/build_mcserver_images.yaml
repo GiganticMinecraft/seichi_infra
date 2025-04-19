@@ -33,6 +33,8 @@ jobs:
             build_context: ./docker-images/mcservers/production/seichi-servers/individual-images/s5
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7
             build_context: ./docker-images/mcservers/production/seichi-servers/individual-images/s7
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener
+            build_context: ./docker-images/mcservers/production/votelistener
 
           ###
           # デバッグサーバーのイメージ (1.12.2)
