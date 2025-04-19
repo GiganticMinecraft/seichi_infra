@@ -1,15 +1,10 @@
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:f1847a7813ff54e9f3ef341d1e15350d7eae5e08fb116e4845e9730109a6a36e
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_production_common:sha-410bcbb
 
 ENV VERSION="1.18.2"
 ENV DIFFICULTY="peaceful"
 
-# プラグインリスト
-#   このイメージでは基底のリスト (/extras/plugin-list.ini) に追記する
-COPY --link ./additional-plugin-list.ini /extras/additional-plugin-list.ini
-RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.ini"
-
 # プラグインの設定ファイル
-COPY --link ./additional-plugin-configs /plugins
+COPY --link ./additional-plugin-configs /data/plugins
 
 ###
 # 環境変数として指定されるべきプラグインの設定
