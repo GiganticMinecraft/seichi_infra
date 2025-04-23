@@ -10,5 +10,5 @@ parameters:
   location: '/volume1'
   csi.storage.k8s.io/fstype: 'btrfs'
   formatOptions: '--nodiscard'
-reclaimPolicy: Retain
+reclaimPolicy: Delete
 allowVolumeExpansion: true
