@@ -76,7 +76,7 @@ spec:
       inputs:
         parameters:
           - name: timestamp
-      activeDeadlineSeconds: 300
+      activeDeadlineSeconds: 3600
       script:
         image: bitnami/kubectl:1.32.3
         command: ["/bin/sh", "-c"]
