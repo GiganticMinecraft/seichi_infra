@@ -308,7 +308,6 @@ spec:
 
             - name: mcserver--s1-data
               mountPath: /data
-              subPath: data
 
       volumes:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
