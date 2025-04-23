@@ -163,11 +163,12 @@ spec:
       schedule: "00 7 * * *" # 7:00 から
       duration: 1h           # 1時間 selfHeal を有効化
       applications: ["*"]
-      manualSync: false
+      manualSync: true       # 手動でのsyncを許可
     - kind: deny
       schedule: "00 8 * * *" # 毎日 8:00 から
       duration: 23h          # 23時間 selfHeal を無効化
       applications: ["*"]
+      manualSync: true       # 手動でのsyncを許可
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -212,8 +213,9 @@ spec:
       schedule: "00 7 * * *" # 7:00 から
       duration: 1h           # 1時間 selfHeal を有効化
       applications: ["*"]
-      manualSync: false
+      manualSync: true       # 手動でのsyncを許可
     - kind: deny
       schedule: "00 8 * * *" # 毎日 8:00 から
       duration: 23h          # 23時間 selfHeal を無効化
       applications: ["*"]
+      manualSync: true        # 手動でのsyncを許可
