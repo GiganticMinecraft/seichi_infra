@@ -159,6 +159,6 @@ spec:
   volumes:
     - name: backup-target-volume
       persistentVolumeClaim:
-        claimName: mcserver--s5-data-mcserver--s7-0
+        claimName: mcserver--s7-data-mcserver--s7-0
     - name: pbs-tmpfs
       emptyDir: {}
