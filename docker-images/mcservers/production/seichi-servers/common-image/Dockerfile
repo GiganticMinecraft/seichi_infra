@@ -10,6 +10,7 @@ RUN /bin/bash -c "cat /extras/additional-plugin-list.ini >> /extras/plugin-list.
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
+COPY --link ./common-minecraft-server-configs /config
 
 COPY --link --from=chunk-search-provider /build/chunk-search-rs /usr/bin/chunk-search-rs
 
