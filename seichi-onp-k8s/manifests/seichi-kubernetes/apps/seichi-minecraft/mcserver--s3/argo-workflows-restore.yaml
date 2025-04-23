@@ -98,6 +98,9 @@ spec:
           proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE_PBS}}" \
             "${RESTORE_ARCHIVE_NAME}" "${RESTORE_TARGET_DIR}" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+
+          echo "Deleting plugins jar file..."
+          rm -vrf ${RESTORE_TARGET_DIR}/plugins/*.jar
         env:
           - name: TZ
             value: "Asia/Tokyo"
