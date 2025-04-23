@@ -306,6 +306,10 @@ spec:
             - name: worldedit-schematica-volume
               mountPath: /worldedit-schematica
 
+            - name: mcserver--s1-data
+              mountPath: /data
+              subPath: data
+
       volumes:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
