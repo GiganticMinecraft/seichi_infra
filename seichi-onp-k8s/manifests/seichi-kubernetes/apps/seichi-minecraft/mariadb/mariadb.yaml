@@ -11,16 +11,6 @@ spec:
     generate: false
     key: root-password
 
-  database: seichiassist
-  username: mcserver
-  passwordSecretKeyRef:
-    name: mariadb
-    generate: false
-    key: mcserver-password
-  # NOTE: mcserver ユーザーは、すべての mcserver から seichiassist データベースにアクセスするために使われ、
-  #       一部機能によって一時的に大量のコネクションが必要になることがあり、それが解決するまで maxUserConnections を増やす必要がある。
-  maxUserConnections: 100
-
   image: docker-registry1.mariadb.com/library/mariadb:10.11.11
   imagePullPolicy: IfNotPresent
 
