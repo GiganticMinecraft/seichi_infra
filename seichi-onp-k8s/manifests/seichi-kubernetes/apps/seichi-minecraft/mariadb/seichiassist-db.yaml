@@ -2,11 +2,10 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: User
 metadata:
   namespace: seichi-minecraft
-  name: mcserver
+  name: seichiassist
 spec:
   mariaDbRef:
-    name: mariadb
-    waitForIt: true
+    name: seichiassist
   passwordSecretKeyRef:
     name: mariadb
     generate: false
@@ -22,8 +21,19 @@ metadata:
   namespace: seichi-minecraft
   name: seichiassist
 spec:
-  mariaDbRef:
-    name: mariadb
-    waitForIt: true
   characterSet: utf8mb4
   collate: utf8mb4_general_ci
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: seichiassist
+spec:
+  privileges:
+    - "ALL"
+  database: "seichiassist"
+  table: "*"
+  username: "mcserver"
+  grantOption: false
