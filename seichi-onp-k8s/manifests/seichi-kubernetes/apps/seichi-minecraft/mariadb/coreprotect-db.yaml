@@ -10,6 +10,7 @@ spec:
   passwordSecretKeyRef:
     name: mariadb
     key: coreprotect-password
+  maxUserConnections: 30
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
