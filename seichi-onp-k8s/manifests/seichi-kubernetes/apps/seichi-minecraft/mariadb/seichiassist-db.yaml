@@ -9,7 +9,6 @@ spec:
     waitForIt: true
   passwordSecretKeyRef:
     name: mariadb
-    generate: false
     key: mcserver-password
   # NOTE: mcserver ユーザーは、すべての mcserver から seichiassist データベースにアクセスするために使われ、
   #       一部機能によって一時的に大量のコネクションが必要になることがあり、それが解決するまで maxUserConnections を増やす必要がある。
