@@ -226,11 +226,11 @@ resource "helm_release" "onp_minecraft_pbs_credentials" {
         - seichi-debug-minecraft
         - minio
       data:
-        user: ${var.proxmox_backup_client__user}
-        host: ${var.proxmox_backup_client__host}
-        datastore: ${var.proxmox_backup_client__datastore}
-        password: ${var.proxmox_backup_client__password}
-        fingerprint: ${var.proxmox_backup_client__fingerprint}
+        user: ${base64encode(var.proxmox_backup_client__user)}
+        host: ${base64encode(var.proxmox_backup_client__host)}
+        datastore: ${base64encode(var.proxmox_backup_client__datastore)}
+        password: ${base64encode(var.proxmox_backup_client__password)}
+        fingerprint: ${base64encode(var.proxmox_backup_client__fingerprint)}
     EOS
     ]
   }
