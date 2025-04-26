@@ -126,6 +126,12 @@ resource "random_password" "minecraft__prod_mariadb_litebans_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+resource "random_password" "minecraft__prod_mariadb_xconomy_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
@@ -140,6 +146,7 @@ resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
     "luckperms-password"   = random_password.minecraft__prod_mariadb_luckperms_password.result
     "coreprotect-password" = random_password.minecraft__prod_mariadb_coreprotect_password.result
     "litebans-password"    = random_password.minecraft__prod_mariadb_litebans_password.result
+    "xconomy-password"     = random_password.minecraft__prod_mariadb_xconomy_password.result
   }
 
   type = "Opaque"
