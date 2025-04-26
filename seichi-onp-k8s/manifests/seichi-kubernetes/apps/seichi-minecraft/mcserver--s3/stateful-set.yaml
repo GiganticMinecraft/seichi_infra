@@ -229,6 +229,24 @@ spec:
                 secretKeyRef:
                   name: mariadb
                   key: litebans-password
+            
+            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_USER
+              value: xconomy
+
+            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_DATABASE_NAME
+              value: prod_seichi_xconomy
+
+            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: xconomy-password
 
             - name: RCON_CMDS_STARTUP
               value: |-
@@ -263,7 +281,7 @@ spec:
                /downloaded-plugins
                /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s3:sha-e24713b
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s3:sha-1b1af94
           name: minecraft
           ports:
             - containerPort: 25565
