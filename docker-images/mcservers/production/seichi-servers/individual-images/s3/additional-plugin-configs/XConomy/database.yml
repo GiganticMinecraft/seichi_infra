@@ -16,11 +16,11 @@ SQLite:
 
 #MySQL settings
 MySQL:
-  host: mariadb
-  port: 3306
-  user: root
-  pass:
-  database: xconomy
+  host: "${CFG_REPLACEMENT__XCONOMY_MYSQL_HOST}"
+  port: "${CFG_REPLACEMENT__XCONOMY_MYSQL_PORT}"
+  user: "${CFG_REPLACEMENT__XCONOMY_MYSQL_USER}"
+  pass: "${CFG_REPLACEMENT__XCONOMY_MYSQL_PASSWORD}"
+  database: "${CFG_REPLACEMENT__XCONOMY_MYSQL_DATABASE_NAME}"
   #auto add "_", can use %sign% to indicate Server ID (BungeeCord settings)
   table-suffix: ''
   property:
