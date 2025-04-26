@@ -26,6 +26,7 @@ spec:
     waitForIt: true
   characterSet: utf8mb4
   collate: utf8mb4_general_ci
+  name: seichiassist
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
