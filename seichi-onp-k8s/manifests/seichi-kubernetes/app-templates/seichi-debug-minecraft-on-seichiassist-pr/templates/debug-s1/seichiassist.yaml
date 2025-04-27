@@ -117,6 +117,12 @@ spec:
                 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem 
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
                 -Daikars.new.flags=true
+                -Dcom.sun.management.jmxremote
+                -Dcom.sun.management.jmxremote.port=32000
+                -Dcom.sun.management.jmxremote.rmi.port=32000
+                -Dcom.sun.management.jmxremote.authenticate=false
+                -Dcom.sun.management.jmxremote.ssl=false
+                -Dcom.sun.management.jmxremote.local.only=false
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
@@ -191,6 +197,8 @@ spec:
               name: jmx-metrics
             - containerPort: 9225
               name: mc-metrics
+            - containerPort: 32000
+              name: jmx-remote
 
           startupProbe:
             tcpSocket:

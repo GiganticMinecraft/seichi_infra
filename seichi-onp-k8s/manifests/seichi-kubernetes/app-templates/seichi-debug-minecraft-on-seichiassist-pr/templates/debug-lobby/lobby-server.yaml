@@ -105,6 +105,12 @@ spec:
             - name: JVM_OPTS
               value: >-
                 -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -Dcom.sun.management.jmxremote
+                -Dcom.sun.management.jmxremote.port=32000
+                -Dcom.sun.management.jmxremote.rmi.port=32000
+                -Dcom.sun.management.jmxremote.authenticate=false
+                -Dcom.sun.management.jmxremote.ssl=false
+                -Dcom.sun.management.jmxremote.local.only=false
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
@@ -154,6 +160,8 @@ spec:
               name: jmx-metrics
             - containerPort: 9225
               name: mc-metrics
+            - containerPort: 32000
+              name: jmx-remote
 
           startupProbe:
             tcpSocket:

@@ -21,5 +21,9 @@ spec:
       port: 9225
       protocol: TCP
       targetPort: mc-metrics
+    - name: jmx-remote
+      port: 32000
+      protocol: TCP
+      targetPort: jmx-remote
   selector:
     mcserver: s3
