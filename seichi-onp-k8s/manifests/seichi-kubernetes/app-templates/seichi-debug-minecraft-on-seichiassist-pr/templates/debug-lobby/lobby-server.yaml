@@ -105,6 +105,7 @@ spec:
             - name: JVM_OPTS
               value: >-
                 -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -Djava.rmi.server.hostname=0.0.0.0
                 -Dcom.sun.management.jmxremote
                 -Dcom.sun.management.jmxremote.port=32000
                 -Dcom.sun.management.jmxremote.rmi.port=32000
