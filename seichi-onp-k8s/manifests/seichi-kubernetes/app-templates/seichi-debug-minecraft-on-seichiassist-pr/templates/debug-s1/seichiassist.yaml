@@ -118,12 +118,12 @@ spec:
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
                 -Daikars.new.flags=true
 
-            - name: ENABLE_JMX
-              value: "true"
-            - name: JMX_HOST
-              value: "127.0.0.1"
-            - name: JMX_PORT
-              value: "32000"
+            # - name: ENABLE_JMX
+            #   value: "true"
+            # - name: JMX_HOST
+            #   value: "127.0.0.1"
+            # - name: JMX_PORT
+            #   value: "32000"
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
