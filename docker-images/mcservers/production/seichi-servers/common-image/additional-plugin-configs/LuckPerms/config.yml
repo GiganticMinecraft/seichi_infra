@@ -186,9 +186,9 @@ split-storage:
   enabled: true
   methods:
     # These options don't need to be modified if split storage isn't enabled.
-    user: yaml
-    group: yaml
-    track: yaml
+    user: mariadb
+    group: mariadb
+    track: mariadb
     # LuckPerms が独自に管理する UUID と MCID の紐づけキャッシュ。特に IaC として管理する必要がないため、DB 管理。
     uuid: mariadb
     # LuckPerms の操作ログ。MariaDB に入れておけば、Grafana で検索できるため、DB 管理。
