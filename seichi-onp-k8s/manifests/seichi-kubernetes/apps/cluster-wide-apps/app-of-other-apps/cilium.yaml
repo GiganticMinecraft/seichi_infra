@@ -25,6 +25,7 @@ spec:
         autoDirectNodeRoutes: true
         bpf:
           # datapathMode: netkit
+          lbExternalClusterIP: true
           masquerade: true
         # bandwidthManager:
         #   enabled: true
