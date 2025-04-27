@@ -212,6 +212,9 @@ spec:
                   name: mariadb
                   key: litebans-password
 
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keepInventory true
