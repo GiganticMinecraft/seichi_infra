@@ -24,7 +24,7 @@ spec:
         routingMode: native
         autoDirectNodeRoutes: true
         bpf:
-          # datapathMode: netkit
+          datapathMode: netkit
           lbExternalClusterIP: true
           masquerade: true
         # bandwidthManager:
@@ -32,7 +32,7 @@ spec:
         #   bbr: true
         ipv4:
           enabled: true
-        # enableIPv4BIGTCP: true
+        enableIPv4BIGTCP: true
         ipv4NativeRoutingCIDR: "10.96.128.0/18" # modify it if necessary
         ipam:
           operator:
