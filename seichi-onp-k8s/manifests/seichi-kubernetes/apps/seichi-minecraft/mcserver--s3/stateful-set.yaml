@@ -41,30 +41,6 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        - name: s3-mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
-          env:
-            - name: MINIO_ENDPOINT
-              value: seichi-private-plugin-blackhole-minio.minio:9000
-            - name: MINIO_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: minio-access-secret
-                  key: MINIO_ACCESS_KEY
-            - name: MINIO_ACCESS_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: minio-access-secret
-                  key: MINIO_ACCESS_SECRET
-            - name: BUCKET_NAME
-              value: seichi-plugins
-            - name: BUCKET_PREFIX_NAME
-              value: s3
-            - name: DOWNLOAD_TARGET_DIR_PATH
-              value: /downloaded-plugins
-          volumeMounts:
-            - name: mod-downloader-volume
-              mountPath: /downloaded-plugins
         - name: seichiassist-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
           env:
@@ -229,24 +205,6 @@ spec:
                 secretKeyRef:
                   name: mariadb
                   key: litebans-password
-            
-            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_HOST
-              value: mariadb
-
-            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_PORT
-              value: "3306"
-
-            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_USER
-              value: xconomy
-
-            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_DATABASE_NAME
-              value: prod_seichi_xconomy
-
-            - name: CFG_REPLACEMENT__XCONOMY_MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mariadb
-                  key: xconomy-password
 
             - name: RCON_CMDS_STARTUP
               value: |-
