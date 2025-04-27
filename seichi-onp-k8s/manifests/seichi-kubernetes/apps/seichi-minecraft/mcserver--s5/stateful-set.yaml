@@ -221,6 +221,9 @@ spec:
                 mv gamerule doInsomnia false world_SW_3
                 mv gamerule doInsomnia false world_SW_4
 
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
             - name: COPY_PLUGINS_SRC
               value: |-
                /downloaded-plugins

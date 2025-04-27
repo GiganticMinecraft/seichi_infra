@@ -145,6 +145,9 @@ spec:
                /downloaded-plugins
                /plugins
 
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:sha-e5c2f4e
           name: minecraft
           ports:
