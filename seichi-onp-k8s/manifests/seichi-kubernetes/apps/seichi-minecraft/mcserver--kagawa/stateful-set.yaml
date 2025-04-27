@@ -23,8 +23,34 @@ spec:
         app: mcserver--kagawa
         mcserver: kagawa
     spec:
+      initContainers:
+        - name: mod-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: kawaga
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa@sha256:a6d63969809954f4a2af0bb9fb352f7502de8c8f02449f8c05b1dbe308c72860
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa:sha-8a80dfe
           name: minecraft
           resources:
             requests:
@@ -59,3 +85,11 @@ spec:
             # 最大120秒待つ
             failureThreshold: 6
             periodSeconds: 20
+
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
+    volumes:
+      - name: mod-downloader-volume
+        emptyDir: {}

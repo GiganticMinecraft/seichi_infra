@@ -23,8 +23,33 @@ spec:
         app: mcserver--one-day-to-reset
         mcserver: one-day-to-reset
     spec:
+      initContainers:
+        - name: mod-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: kawaga
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:sha-2fe9eeb
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:sha-8a80dfe
           name: minecraft
           resources:
             requests:
@@ -59,3 +84,11 @@ spec:
             # 最大120秒待つ
             failureThreshold: 6
             periodSeconds: 20
+
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
+
+    volumes:
+      - name: mod-downloader-volume
+        emptyDir: {}
