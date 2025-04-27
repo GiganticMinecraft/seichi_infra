@@ -1,8 +1,0 @@
-uuid: 788bf7d5-f61a-4090-aec7-2e3a281eaf49
-name: ploptaw
-primary-group: admin
-permissions:
-- group.worldguard-bypass:
-    value: false
-parents:
-- admin

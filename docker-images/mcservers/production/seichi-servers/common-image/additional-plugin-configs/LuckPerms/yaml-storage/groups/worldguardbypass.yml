@@ -1,7 +1,0 @@
-name: worldguard-bypass
-permissions:
-- worldguard.region.bypass.*
-- weight.11
-meta:
-- default:
-    value: 'false'
