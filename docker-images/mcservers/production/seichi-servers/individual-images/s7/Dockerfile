@@ -3,6 +3,8 @@ FROM ghcr.io/giganticminecraft/seichi_minecraft_server_production_common:sha-e5c
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /data/plugins
 
+COPY --link ./custom-minecraft-server-configs /config
+
 ###
 # 環境変数として指定されるべきプラグインの設定
 #
