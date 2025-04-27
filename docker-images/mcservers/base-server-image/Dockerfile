@@ -47,16 +47,8 @@ ENV REMOVE_OLD_MODS="true"
 
 ENV TZ="Asia/Tokyo"
 
-# プラグインリスト
-#   https://github.com/itzg/docker-minecraft-server/tree/ef9318f22e60c210289080561c9042050bb4fc4e#modplugin-url-listing-file
-ENV MODS_FILE="/extras/plugin-list.ini"
-# ---
-
 # サーバー自体の設定ファイル
 COPY --link ./common-minecraft-server-configs /config
-
-# プラグインリスト
-COPY --link ./common-plugin-list.ini /extras/plugin-list.ini
 
 # プラグインの設定ファイル
 COPY --link ./common-plugin-configs /plugins
