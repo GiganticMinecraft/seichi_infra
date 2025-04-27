@@ -101,10 +101,6 @@ spec:
 
           echo "Deleting plugins jar file..."
           rm -vrf ${RESTORE_TARGET_DIR}/plugins/*.jar
-
-          echo "Deleting old plugin setting files..."
-          rm -vrf ${RESTORE_TARGET_DIR}/plugins/Towny
-          rm -vrf ${RESTORE_TARGET_DIR}/plugins/Xconomy
         env:
           - name: TZ
             value: "Asia/Tokyo"
