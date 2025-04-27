@@ -119,11 +119,11 @@ spec:
                 -Daikars.new.flags=true
 
             - name: ENABLE_JMX
-              value: true
+              value: "true"
             - name: JMX_HOST
-              value: 127.0.0.1
+              value: "0.0.0.0"
             - name: JMX_PORT
-              value: 32000
+              value: "32000"
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
