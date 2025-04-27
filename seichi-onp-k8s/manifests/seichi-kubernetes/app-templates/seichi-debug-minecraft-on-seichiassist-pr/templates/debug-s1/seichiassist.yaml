@@ -121,7 +121,7 @@ spec:
             - name: ENABLE_JMX
               value: true
             - name: JMX_HOST
-              value: 0.0.0.0
+              value: 127.0.0.1
             - name: JMX_PORT
               value: 32000
 
