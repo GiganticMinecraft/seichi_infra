@@ -9,7 +9,7 @@ spec:
       kubernetes.io/hostname: seichi-onp-k8s-cp-1
   virtualRouters:
   - localASN: 65201
-    exportPodCIDR: true
+    exportPodCIDR: false
     # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
@@ -17,6 +17,7 @@ spec:
         - {key: somekey, operator: NotIn, values: ['never-used-value']}
     serviceAdvertisements:
       - LoadBalancerIP
+      - ClusterIP
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -39,7 +40,7 @@ spec:
       kubernetes.io/hostname: seichi-onp-k8s-cp-2
   virtualRouters:
   - localASN: 65202
-    exportPodCIDR: true
+    exportPodCIDR: false
     # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
@@ -47,6 +48,7 @@ spec:
         - {key: somekey, operator: NotIn, values: ['never-used-value']}
     serviceAdvertisements:
       - LoadBalancerIP
+      - ClusterIP
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -69,7 +71,7 @@ spec:
       kubernetes.io/hostname: seichi-onp-k8s-cp-3
   virtualRouters:
   - localASN: 65203
-    exportPodCIDR: true
+    exportPodCIDR: false
     # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
@@ -77,6 +79,7 @@ spec:
         - {key: somekey, operator: NotIn, values: ['never-used-value']}
     serviceAdvertisements:
       - LoadBalancerIP
+      - ClusterIP
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -99,7 +102,7 @@ spec:
       kubernetes.io/hostname: seichi-onp-k8s-wk-1
   virtualRouters:
   - localASN: 65301
-    exportPodCIDR: true
+    exportPodCIDR: false
     # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
@@ -107,6 +110,7 @@ spec:
         - {key: somekey, operator: NotIn, values: ['never-used-value']}
     serviceAdvertisements:
       - LoadBalancerIP
+      - ClusterIP
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -129,7 +133,7 @@ spec:
       kubernetes.io/hostname: seichi-onp-k8s-wk-2
   virtualRouters:
   - localASN: 65302
-    exportPodCIDR: true
+    exportPodCIDR: false
     # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
@@ -137,6 +141,7 @@ spec:
         - {key: somekey, operator: NotIn, values: ['never-used-value']}
     serviceAdvertisements:
       - LoadBalancerIP
+      - ClusterIP
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
@@ -159,7 +164,7 @@ spec:
       kubernetes.io/hostname: seichi-onp-k8s-wk-3
   virtualRouters:
   - localASN: 65303
-    exportPodCIDR: true
+    exportPodCIDR: false
     # 全てのServiceIPとLoadBalancerIPを広報するためのおまじない的なserviceSelector
     # https://docs.cilium.io/en/stable/network/bgp-control-plane/#service-announcements
     serviceSelector:
@@ -167,6 +172,7 @@ spec:
         - {key: somekey, operator: NotIn, values: ['never-used-value']}
     serviceAdvertisements:
       - LoadBalancerIP
+      - ClusterIP
     neighbors:
     - peerAddress: "192.168.3.254/32"
       peerASN: 65184
