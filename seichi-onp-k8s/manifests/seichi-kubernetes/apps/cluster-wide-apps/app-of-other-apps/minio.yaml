@@ -15,7 +15,7 @@ spec:
         mode: standalone
         replicas: 1
         persistence:
-          size: 5Gi
+          size: 50Gi
         DeploymentUpdate:
           type: Recreate
         resources:
