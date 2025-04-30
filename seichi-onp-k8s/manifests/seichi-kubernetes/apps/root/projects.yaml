@@ -68,12 +68,13 @@ spec:
       duration: 1h           # 1時間 selfHeal を有効化
       timeZone: "Asia/Tokyo"
       applications: ["minio"]
-      manualSync: false
+      manualSync: true
     - kind: deny
       schedule: "00 8 * * *" # 毎日 8:00 から
       duration: 23h          # 23時間 selfHeal を無効化
       timeZone: "Asia/Tokyo"
       applications: ["minio"]
+      manualSync: true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
