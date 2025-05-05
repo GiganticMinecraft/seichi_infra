@@ -1,25 +1,36 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "timezone": "Asia/Tokyo",
-  "reviewers": ["outductor"],
+  "reviewers": [
+    "outductor"
+  ],
   "packageRules": [
     {
-      "managers": ["gomod"],
-      "packageNames": ["go"],
-      "supportPolicy": ["active"]
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchPackageNames": [
+        "go"
+      ]
     },
     {
-      "managers": ["terraform"],
-      "matchPackageNames": ["*"],
+      "matchManagers": [
+        "terraform"
+      ],
+      "matchPackageNames": [
+        "*"
+      ],
       "groupName": "terraform packages",
       "enabled": true,
-      "schedule": ["at any time"]
+      "schedule": [
+        "at any time"
+      ]
     },
     {
       "matchPackageNames": [
-        "/^ghcr.io\/giganticminecraft\/seichi_minecraft_server_production_.+$/"
+        "/^ghcr.io/giganticminecraft/seichi_minecraft_server_production_.+$/"
       ],
       "versioning": "loose"
     }
@@ -40,9 +51,12 @@
       "^seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/.+\\.yaml$"
     ]
   },
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["^.github/workflows/build_mcserver_base_images.yaml$"],
+      "customType": "regex",
+      "fileMatch": [
+        "^.github/workflows/build_mcserver_base_images.yaml$"
+      ],
       "matchStrings": [
         "- mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\\"(?<currentDigest>sha256:[a-f0-9]+)\\\""
       ],
@@ -51,7 +65,10 @@
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"],
+      "customType": "regex",
+      "fileMatch": [
+        "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"
+      ],
       "matchStrings": [
         "https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<currentValue>[\\d.]+)/components.yaml"
       ],
