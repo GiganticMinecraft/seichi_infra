@@ -242,8 +242,6 @@ spec:
                 rg flag -w world_SW_2 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_4 __global__ deny-spawn PHANTOM
-                rg flag -w world_build __global__ deny-spawn PHANTOM
-                rg flag -w world_dot __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
 
             - name: COPY_PLUGINS_SRC
