@@ -238,6 +238,8 @@ spec:
                 rg flag -w world_2 __global__ build -g members allow
                 rg addmember -w world_SW_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
                 rg flag -w world_SW_2 __global__ build -g members allow
+                rg addmember -w world_SW_4 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_4 __global__ build -g members allow
                 rg flag -w world_SW __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_2 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
