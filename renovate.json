@@ -19,7 +19,7 @@
     },
     {
       "matchPackageNames": [
-        "^ghcr.io/giganticminecraft/seichi_minecraft_server_production_.+$"
+        "/^ghcr.io\/giganticminecraft\/seichi_minecraft_server_production_.+$/"
       ],
       "versioning": "loose"
     }
