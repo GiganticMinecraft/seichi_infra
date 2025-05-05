@@ -21,7 +21,8 @@
       "matchPackageNames": [
         "/^ghcr.io/giganticminecraft/seichi_minecraft_server_production_.+$/"
       ],
-      "versioning": "loose"
+      "versioning": "loose",
+      "pinDigests": true
     }
   ],
   "postUpdateOptions": [
