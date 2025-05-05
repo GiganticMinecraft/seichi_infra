@@ -221,6 +221,8 @@ spec:
                 mv gamerule disableRaids true world_SW_4
                 mv gamerule doInsomnia false world_SW_3
                 mv gamerule doInsomnia false world_SW_4
+                rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_4 __global__ deny-spawn PHANTOM
 
             - name: REMOVE_OLD_MODS
               value: "TRUE"
