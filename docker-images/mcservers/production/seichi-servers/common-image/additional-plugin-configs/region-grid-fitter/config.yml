@@ -1,3 +1,3 @@
-default_grid_size: 16
+default_grid_size: 15
 grid_size:
-    world: 16
+    world: 15
