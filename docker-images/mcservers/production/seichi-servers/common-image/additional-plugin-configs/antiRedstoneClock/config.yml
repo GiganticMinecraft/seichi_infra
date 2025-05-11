@@ -44,8 +44,8 @@ worldGuardSupport: true
 checkedClock:
   comparator: true
   observer: true
-  piston: false # default: true
-  redstoneAndRepeater: false # default: true
+  piston: true
+  redstoneAndRepeater: true
 
 AutomaticallyBreakDetectedClock: true
 SummonLigthningAtRedstoneLocation: true
