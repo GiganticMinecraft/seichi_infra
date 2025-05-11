@@ -94,7 +94,6 @@ jobs:
           images: ${{ matrix.image }}
           tags: |
             type=sha,prefix=sha-,suffix=,format=short
-            type=schedule,pattern={{date 'YYYYMMDD'}}
 
       - if: steps.should_build.outputs.should_build == 'true'
         name: Build (and push if on main)
