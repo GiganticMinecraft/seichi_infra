@@ -48,7 +48,7 @@ checkedClock:
   redstoneAndRepeater: true
 
 AutomaticallyBreakDetectedClock: true
-SummonLigthningAtRedstoneLocation: true
+SummonLigthningAtRedstoneLocation: false # default: true
 
 #En: Customize the teleport command (variable : $x, $y, $z, $world, $player)
 #Fr: Customise la commande de teleportation (variable : $x, $y, $z, $world, $player)
