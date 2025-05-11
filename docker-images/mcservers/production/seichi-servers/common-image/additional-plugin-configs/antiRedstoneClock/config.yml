@@ -63,7 +63,7 @@ checkTPS:
 
 #En: Disable the check of redstoneclock above an Y value
 #Fr: Desactive la vérification des boucles de redstone au dessus d'une valeur Y
-disableRedstoneClockCheckAbove: 255
+disableRedstoneClockCheckAbove: 320
 
 Msg:
   default:
