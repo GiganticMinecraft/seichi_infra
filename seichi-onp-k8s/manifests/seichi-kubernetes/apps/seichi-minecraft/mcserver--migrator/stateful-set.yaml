@@ -44,19 +44,15 @@ spec:
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
                 -Daikars.new.flags=true
 
-            - name: RCON_CMDS_STARTUP
-              value: |-
-                fixer deserialize
-
             - name: VERSION
-              value: "1.12.2"
+              value: "1.18.2"
 
             - name: TYPE
               value: "PAPER"
 
             - name: MODS
               value: >-
-                https://github.com/GiganticMinecraft/SerializedItemStackFixer/releases/download/sha-f8ab2c8/SerializedItemStackFixer-1-12.jar
+                https://github.com/GiganticMinecraft/SerializedItemStackFixer/releases/download/sha-f8ab2c8/SerializedItemStackFixer-1-18.jar
 
             - name: REMOVE_OLD_MODS
               value: "TRUE"
@@ -79,7 +75,7 @@ spec:
                   name: mariadb
                   key: mcserver-password
 
-          image: itzg/minecraft-server:java8-jdk
+          image: itzg/minecraft-server:java17
           name: minecraft
           ports:
             - containerPort: 25565
