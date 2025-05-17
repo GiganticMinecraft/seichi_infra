@@ -5,6 +5,8 @@ namespace: seichi-minecraft
 resources:
   - "./argo-workflows-backup.yaml"
   - "./argo-workflows-restore.yaml"
+  - "./argo-workflows-start-server.yaml"
+  - "./argo-workflows-stop-server.yaml"
   - "./service-monitor.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"
