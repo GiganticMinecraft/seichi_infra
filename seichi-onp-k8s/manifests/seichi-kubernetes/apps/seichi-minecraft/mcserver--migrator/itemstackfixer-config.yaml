@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: serialized-itemstack-fixer-config
+data:
+ config.yml: |
+  host: '${CFG_MYSQL_HOST}'
+  port: '${CFG_MYSQL_PORT}'
+  user: '${CFG_MYSQL_USER}'
+  password: '${CFG_MYSQL_USER_PASSWORD}'
