@@ -9,11 +9,13 @@ data:
         worker_connections 32;
     }
 
-    server {
-      listen       80;
-      server_name  s1.map.gigantic.seichi.click;
+    http {
+      server {
+        listen       80;
+        server_name  s1.map.gigantic.seichi.click;
 
-      location / {
-        root       /data/plugins/dynmap/web/
+        location / {
+          root       /data/plugins/dynmap/web/
+        }
       }
     }
