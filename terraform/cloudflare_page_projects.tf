@@ -47,7 +47,7 @@ resource "cloudflare_pages_project" "seichi_playguide" {
 resource "cloudflare_pages_domain" "seichi_playguide_domain" {
   account_id   = local.cloudflare_account_id
   project_name = cloudflare_pages_project.seichi_playguide.name
-  domain       = "seichi-playguide.${local.root_domain}"
+  domain       = "playguide.${local.root_domain}"
 }
 
 #endregion
