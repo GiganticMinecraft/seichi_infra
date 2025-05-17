@@ -50,7 +50,7 @@ data:
     synchronized-server-regex:
 
     redis:
-      host: 192.168.1.188
+      host: seichi-redisbungee-redis
       port: 11788
 
     locale:
@@ -71,7 +71,7 @@ data:
 
     # The Redis server you use.
     # Get Redis from http://redis.io/
-    redis-server: 192.168.1.188
+    redis-server: seichi-redisbungee-redis
     redis-port: 11787
     # OPTIONAL: If your Redis server uses AUTH, set the password required.
     redis-password: ""
