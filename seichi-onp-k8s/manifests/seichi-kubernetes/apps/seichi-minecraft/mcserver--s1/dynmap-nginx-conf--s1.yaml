@@ -13,9 +13,11 @@ data:
       server {
         listen       80;
         server_name  s1.map.gigantic.seichi.click;
+        root         /data/plugins/dynmap/web/;
+        index        index.php index.html index.htm;
 
         location / {
-          root       /data/plugins/dynmap/web/;
+          try_files $uri $uri/ =404;
         }
       }
     }
