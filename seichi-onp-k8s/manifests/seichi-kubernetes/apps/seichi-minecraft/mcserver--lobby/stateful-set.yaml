@@ -126,7 +126,7 @@ spec:
               value: litebans
 
             - name: CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME
-              value: litebans__lobby
+              value: litebans-mc-lobby
 
             - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PASSWORD
               valueFrom:
