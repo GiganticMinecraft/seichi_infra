@@ -83,9 +83,7 @@ use-server-uuid-cache: false
 #
 # - A H2 database is the default option.
 # - If you want to edit data manually in "traditional" storage files, we suggest using YAML.
-# NOTE: 基本はYAMLでIaCとして管理するが、一部適さない設定もあるので、MariaDBに保存するものもある。
-# 詳細は、split-storage の設定項目を参照してください。
-storage-method: yaml
+storage-method: mariadb
 
 # The following block defines the settings for remote database storage methods.
 #
@@ -183,7 +181,7 @@ data:
 # - The connection options above still have to be correct for each type here.
 split-storage:
   # Don't touch this if you don't want to use split storage!
-  enabled: true
+  enabled: false
   methods:
     # These options don't need to be modified if split storage isn't enabled.
     user: yaml
