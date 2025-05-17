@@ -29,20 +29,8 @@ data:
         address: 192.168.2.7:25565
         restricted: false
         motd: ''
-      cre:
-        address: 192.168.1.187:25568
-        restricted: false
-        motd: ''
-      eve:
-        address: 192.168.1.187:25574
-        restricted: false
-        motd: ''
-      reset:
-        address: mcserver--one-day-to-reset.seichi-minecraft:25565
-        restricted: false
-        motd: ''
-      kagawa:
-        address: mcserver--kagawa.seichi-minecraft:25565
+      lobby-1-18:
+        address: mcserver--lobby.seichi-minecraft:25565
         restricted: false
         motd: ''
       s1-1-18:
@@ -65,8 +53,20 @@ data:
         address: mcserver--s7.seichi-minecraft:25565
         restricted: false
         motd: ''
-      lobby-1-18:
-        address: mcserver--lobby.seichi-minecraft:25565
+      cre:
+        address: 192.168.1.187:25568
+        restricted: false
+        motd: ''
+      eve:
+        address: 192.168.1.187:25574
+        restricted: false
+        motd: ''
+      reset:
+        address: mcserver--one-day-to-reset.seichi-minecraft:25565
+        restricted: false
+        motd: ''
+      kagawa:
+        address: mcserver--kagawa.seichi-minecraft:25565
         restricted: false
         motd: ''
 
