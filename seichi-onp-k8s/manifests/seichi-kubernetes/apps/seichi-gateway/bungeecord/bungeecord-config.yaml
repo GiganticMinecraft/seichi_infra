@@ -6,27 +6,27 @@ data:
   config.yml: |
     servers:
       lobby:
-        address: 192.168.2.100:25565
+        address: mcserver--lobby.seichi-minecraft:25565
         restricted: false
         motd: ''
       s1:
-        address: 192.168.2.1:25565
+        address: mcserver--s1.seichi-minecraft:25565
         restricted: false
         motd: ''
       s2:
-        address: 192.168.2.2:25565
+        address: mcserver--s2.seichi-minecraft:25565
         restricted: false
         motd: ''
       s3:
-        address: 192.168.2.3:25565
+        address: mcserver--s3.seichi-minecraft:25565
         restricted: false
         motd: ''
       s5:
-        address: 192.168.2.5:25565
+        address: mcserver--s5.seichi-minecraft:25565
         restricted: false
         motd: ''
       s7:
-        address: 192.168.2.7:25565
+        address: mcserver--s7.seichi-minecraft:25565
         restricted: false
         motd: ''
       cre:
