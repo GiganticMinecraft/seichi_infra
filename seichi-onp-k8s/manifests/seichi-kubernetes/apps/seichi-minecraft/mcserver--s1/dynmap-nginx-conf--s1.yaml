@@ -10,14 +10,12 @@ data:
     }
 
     http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+
       server {
         listen       80;
         server_name  s1.map.gigantic.seichi.click;
         root         /data/plugins/dynmap/web/;
-        index        index.php index.html index.htm;
-
-        location / {
-          try_files $uri $uri/ =404;
-        }
       }
     }
