@@ -113,12 +113,11 @@ spec:
                   name: mcserver--common--config-secrets
                   key: DISCORDSRV_TOKEN
 
-            # TODO: 以下の2つの環境変数は、実際に稼働するときにアンコメントするべき
-            # - name: CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID
-            #   value: "535436718405451777"
+            - name: CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID
+              value: "535436718405451777"
 
-            # - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
-            #   value: "295043380914683906"
+            - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
+              value: "295043380914683906"
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_DB_HOST
               value: mariadb

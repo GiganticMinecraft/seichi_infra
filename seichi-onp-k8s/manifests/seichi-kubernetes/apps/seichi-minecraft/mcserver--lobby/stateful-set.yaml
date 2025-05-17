@@ -68,12 +68,11 @@ spec:
                   name: mcserver--common--config-secrets
                   key: DISCORDSRV_TOKEN
 
-            # TODO: 以下の2つの環境変数は、実際に稼働するときにアンコメントするべき
-            # - name: CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID
-            #   value: "959299122492485652"
+            - name: CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID
+              value: "959299122492485652"
 
-            # - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
-            #   value: "295425952492683264"
+            - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
+              value: "295425952492683264"
 
             - name: CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT
               value: "9225"
