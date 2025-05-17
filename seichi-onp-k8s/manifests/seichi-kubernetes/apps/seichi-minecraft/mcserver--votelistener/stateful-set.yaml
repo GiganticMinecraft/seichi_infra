@@ -117,9 +117,8 @@ spec:
             - name: CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID
               value: ""
 
-            # TODO: 稼働時にアンコメントする
-            # - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
-            #   value: "326323671893409792"
+            - name: CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID
+              value: "326323671893409792"
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_DB_HOST
               value: mariadb
