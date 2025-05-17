@@ -137,7 +137,9 @@ spec:
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keepInventory true
-                rg flag -w world_2 __global__ build deny
+                rg flag -w world_springlobby __global__ build deny
+                rg flag -w world_springlobby __global__ use allow
+                rg flag -w world_springlobby __global__ deny-spawn WANDERING_TRADER
 
             - name: COPY_PLUGINS_SRC
               value: |-
