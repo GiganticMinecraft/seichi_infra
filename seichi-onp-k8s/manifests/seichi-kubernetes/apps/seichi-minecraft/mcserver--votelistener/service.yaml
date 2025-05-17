@@ -25,5 +25,9 @@ spec:
       port: 32000
       protocol: TCP
       targetPort: jmx-remote
+    - name: votifier
+      port: 8192
+      protocol: TCP
+      targetPort: votifier
   selector:
     mcserver: votelistener
