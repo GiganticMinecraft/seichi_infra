@@ -11,8 +11,3 @@ resources:
   - "./service.yaml"
   - "./stateful-set.yaml"
   - "./workflow-sa.yaml"
-
-configMapGenerator:
-  - name: dynmap-nginx-conf--s1
-    files:
-      - nginx-conf/nginx.conf

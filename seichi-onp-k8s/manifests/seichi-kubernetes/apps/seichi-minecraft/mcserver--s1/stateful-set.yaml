@@ -83,7 +83,7 @@ spec:
             periodSeconds: 5
           volumeMounts:
             - mountPath: /etc/nginx/nginx.conf
-              name: nginx-conf
+              name: nginx-conf--s1
               subPath: nginx.conf
             - name: mcserver--s1-data
               mountPath: /data
@@ -367,3 +367,23 @@ spec:
         resources:
           requests:
             storage: 200Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf--s1
+  namespace: seichi-minecraft
+data:
+  nginx.conf: |
+    events {
+        worker_connections 32;
+    }
+
+    server {
+      listen       80;
+      server_name  s1.map.gigantic.seichi.click;
+
+      location / {
+        root       /data/plugins/dynmap/web/
+      }
+    }
