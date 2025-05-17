@@ -20,7 +20,7 @@ spec:
 
     - name: patch-statefulset-to-1
       script:
-        image: bitnami/kubectl:1.33.0
+        image: bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--s5 -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
@@ -28,7 +28,7 @@ spec:
     - name: wait-for-scale-to-1
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
       script:
-        image: bitnami/kubectl:1.33.0
+        image: bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for StatefulSet to scale up..."
