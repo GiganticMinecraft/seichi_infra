@@ -7,7 +7,7 @@ data:
   HTTP_HOST: "0.0.0.0"
   HTTP_PORT: "80"
 
-  DB_HOST: "192.168.2.186"
+  DB_HOST: "mariadb"
   DB_PORT: "3306"
   DB_DATABASE_NAME: "seichiassist"
   DB_USER: "mcserver"
