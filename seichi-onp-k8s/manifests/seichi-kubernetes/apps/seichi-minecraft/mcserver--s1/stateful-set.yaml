@@ -261,6 +261,8 @@ spec:
               name: mc-metrics
             - containerPort: 32000
               name: jmx-remote
+            - containerPort: 80
+              name: dynmap
 
           startupProbe:
             tcpSocket:
