@@ -71,9 +71,6 @@ spec:
           - name: dynmap-cre
             external-hostname: cre.map.gigantic.seichi.click
             internal-authority: "192.168.1.187:80"
-          - name: dynmap-h1
-            external-hostname: h1.map.spring.seichi.click
-            internal-authority: "192.168.1.187:82"
 
           # プレーヤー統計量を公開するエンドポイント。
           - name: seichi-game-data
