@@ -23,7 +23,7 @@ spec:
             - name: PMA_ABSOLUTE_URI
               value: phpmyadmin.onp-k8s.admin.seichi.click
             - name: PMA_HOST
-              value: 192.168.2.186
+              value: "mariadb"
             - name: PMA_USER
               value: mcserver
             - name: PMA_PASSWORD
