@@ -178,6 +178,8 @@ spec:
               name: mc-metrics
             - containerPort: 32000
               name: jmx-remote
+            - containerPort: 8192
+              name: votifier
 
           startupProbe:
             tcpSocket:
