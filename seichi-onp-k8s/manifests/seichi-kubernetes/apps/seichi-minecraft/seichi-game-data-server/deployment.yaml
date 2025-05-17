@@ -31,8 +31,8 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mcserver--common--config-secrets
-                  key: GAME_DB_PASSWORD
+                  name: mariadb
+                  key: mcserver-password
 
           image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-286fbcb
           name: seichi-game-data-server
