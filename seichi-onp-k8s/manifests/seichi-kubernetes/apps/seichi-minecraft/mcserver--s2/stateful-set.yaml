@@ -65,6 +65,19 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: remove-old-dynmap-web-contents
+          image: busybox:1.37.0
+          volumeMounts:
+            - name: mcserver--s2-data
+              mountPath: /data
+          command:
+            - "sh"
+            - "-c"
+            - |
+              echo 'dynmap: ==========================================='
+              ls -la /data/plugins/dynmap
+              echo 'dynmap/web: ==========================================='
+              ls -la /data/plugins/dynmap/web
 
       containers:
         - resources:
