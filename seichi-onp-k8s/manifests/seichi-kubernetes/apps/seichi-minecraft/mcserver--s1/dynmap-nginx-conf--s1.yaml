@@ -27,5 +27,6 @@ data:
         # deny access to .htaccess files, if Apache's document root concurs with nginx's one
         location ~ /\.ht {
           deny all;
+        }
       }
     }
