@@ -65,6 +65,16 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        # TODO: 1回実行したら不要なの削除する
+        - name: remove-old-dynmap-web-contents
+          image: busybox:1.37.0
+          volumeMounts:
+            - name: mcserver--s1-data
+              mountPath: /data
+          command:
+            - "sh"
+            - "-c"
+            - 'rm -rf /data/plugins/dynmap/web/'
 
       containers:
         - resources:
