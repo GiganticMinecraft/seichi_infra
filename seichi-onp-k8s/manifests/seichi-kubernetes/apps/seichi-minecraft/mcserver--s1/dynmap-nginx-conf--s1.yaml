@@ -4,6 +4,7 @@ metadata:
   name: dynmap-nginx-conf--s1
   namespace: seichi-minecraft
 data:
+  # Note: https://github.com/webbukkit/dynmap/wiki/%5BTutorial%5D-Setting-up-a-standalone-web-server-with-MySQL-SQLite/#editing-the-website-config-file
   nginx.conf: |
     events {
         worker_connections 32;
