@@ -284,6 +284,7 @@ spec:
               value: |-
                /downloaded-plugins
                /plugins
+               /additional-plugins
 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:sha-764048d
           name: minecraft
