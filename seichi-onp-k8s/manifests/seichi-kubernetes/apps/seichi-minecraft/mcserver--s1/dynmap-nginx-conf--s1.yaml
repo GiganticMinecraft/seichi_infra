@@ -4,6 +4,7 @@ metadata:
   name: dynmap-nginx-conf--s1
   namespace: seichi-minecraft
 data:
+  # Note: https://github.com/webbukkit/dynmap/wiki/%5BTutorial%5D-Setting-up-a-standalone-web-server-with-MySQL-SQLite/#editing-the-website-config-file
   nginx.conf: |
     events {
         worker_connections 32;
@@ -14,7 +15,7 @@ data:
       default_type application/octet-stream;
 
       server {
-        listen       80;
+        listen       80 default_server;
         server_name  s1.map.gigantic.seichi.click;
         root         /data/plugins/dynmap/web/;
         index        index.php index.html index.htm;
@@ -22,5 +23,9 @@ data:
         location / {
           try_files $uri $uri/ =404;
         }
+
+        # deny access to .htaccess files, if Apache's document root concurs with nginx's one
+        location ~ /\.ht {
+          deny all;
       }
     }
