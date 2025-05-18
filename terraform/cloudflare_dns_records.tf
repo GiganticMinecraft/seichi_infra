@@ -40,14 +40,6 @@ resource "cloudflare_record" "portal" {
   ttl     = 1 # automatic
 }
 
-resource "cloudflare_record" "playguide" {
-  zone_id = local.cloudflare_zone_id
-  name    = "playguide"
-  value   = "${cloudflare_pages_project.seichi_playguide.name}.pages.dev"
-  type    = "CNAME"
-  ttl     = 1 # automatic
-}
-
 # ローカルにトンネルを生やしてアクセスすることを想定したドメイン。
 #
 # 例えば、オンプレのk8sクラスタのAPIエンドポイントへは、
