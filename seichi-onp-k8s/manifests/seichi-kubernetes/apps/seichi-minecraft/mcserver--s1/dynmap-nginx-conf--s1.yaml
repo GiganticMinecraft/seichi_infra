@@ -14,7 +14,7 @@ data:
       default_type application/octet-stream;
 
       server {
-        listen       80;
+        listen       80 default_server;
         server_name  s1.map.gigantic.seichi.click;
         root         /data/plugins/dynmap/web/;
         index        index.php index.html index.htm;
