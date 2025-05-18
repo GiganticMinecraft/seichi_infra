@@ -22,5 +22,9 @@ data:
         location / {
           try_files $uri $uri/ =404;
         }
+
+        # deny access to .htaccess files, if Apache's document root concurs with nginx's one
+        location ~ /\.ht {
+          deny all;
       }
     }
