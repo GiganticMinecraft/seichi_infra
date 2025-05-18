@@ -79,8 +79,6 @@ spec:
               ls -la /data/plugins/dynmap
               echo 'dynmap/web: ==========================================='
               ls -la /data/plugins/dynmap/web
-              echo '==========================================='
-              rm -rf /data/plugins/dynmap
 
       containers:
         - resources:
