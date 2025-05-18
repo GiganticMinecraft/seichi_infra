@@ -65,17 +65,6 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        # TODO: 1.12.2時代に生成されたDynMapのWebコンテンツを削除する。1回実行すれば、このコンテナ定義は削除しなくてはいけない
-        - name: remove-old-dynmap-web-contents
-          image: busybox:1.37.0
-          volumeMounts:
-            - name: mcserver--s1-data
-              mountPath: /data
-          command:
-            - "sh"
-            - "-c"
-            - |
-              rm -rf /data/plugins/dynmap/worlds.txt /data/plugins/dynmap/configuration.txt
 
       containers:
         - resources:
