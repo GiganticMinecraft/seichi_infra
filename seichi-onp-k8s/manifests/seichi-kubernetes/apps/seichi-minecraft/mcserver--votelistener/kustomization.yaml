@@ -6,6 +6,7 @@ resources:
   - "./argo-workflows-start-server.yaml"
   - "./argo-workflows-stop-server.yaml"
   - "./service-monitor.yaml"
+  - "./service-votelistener-loadbalancer.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"
   - "./workflow-sa.yaml"

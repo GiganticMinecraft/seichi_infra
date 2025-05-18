@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynmap-nginx-conf--s1
+  namespace: seichi-minecraft
+data:
+  nginx.conf: |
+    events {
+        worker_connections 32;
+    }
+
+    http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+
+      server {
+        listen       80;
+        server_name  s1.map.gigantic.seichi.click;
+        root         /data/plugins/dynmap/web/;
+        index        index.php index.html index.htm;
+
+        location / {
+          try_files $uri $uri/ =404;
+        }
+      }
+    }
