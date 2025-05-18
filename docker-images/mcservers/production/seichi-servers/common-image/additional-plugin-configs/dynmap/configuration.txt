@@ -332,7 +332,7 @@ render-triggers:
   #- blockredstone
 
 # Title for the web page - if not specified, defaults to the server's name (unless it is the default of 'Unknown Server')
-webpage-title: "${CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME}サーバマップ - ギガンティック☆整地鯖"
+webpage-title: "${CFG_REPLACEMENT__DYNMAP_SERVER_NAME}サーバマップ - ギガンティック☆整地鯖"
 
 # The path where the tile-files are placed.
 tilespath: web/tiles

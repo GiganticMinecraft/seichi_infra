@@ -243,7 +243,7 @@ spec:
                   name: mariadb
                   key: litebans-password
 
-            - name: CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME
+            - name: CFG_REPLACEMENT__DYNMAP_SERVER_NAME
               value: アルカディア
 
             - name: REMOVE_OLD_MODS
