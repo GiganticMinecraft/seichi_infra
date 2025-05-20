@@ -36,7 +36,7 @@ jobs:
             mcserver_base_image_digest: "sha256:2c082c735ade8e68e6483792e24e1339f80758520a50ec37702a16eb47bc10c6"
             java_version_component_in_tag: java8-jdk
           - mcserver_base_image_tag: java17
-            mcserver_base_image_digest: "sha256:3c94b89ee60c3a16b2b294a3fd51caaee9ccd2352c9a649351c8e5eb9ab51724"
+            mcserver_base_image_digest: "sha256:dfc52958fe8645da3a5fb21387d337398a513b74e0416729cb6bb329d3c06e7f"
             java_version_component_in_tag: java17-jdk
           - mcserver_base_image_tag: java21-jdk
             mcserver_base_image_digest: "sha256:7c907cd511116ebbe1235203a82a76ad0eb9113c1fb822ea4862cdb6390e1b40"
