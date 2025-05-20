@@ -35,7 +35,8 @@ spec:
           # 本番クラスタ向け
           - name: proxmox
             external-hostname: proxmox.onp.admin.seichi.click
-            internal-authority: 10.123.0.154:8006
+            # unchama-sv-prox03
+            internal-authority: 10.123.0.152:8006
           # 監視専用ホスト向け
           - name: proxmox-mon
             external-hostname: proxmox-mon.onp.admin.seichi.click
