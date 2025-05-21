@@ -73,11 +73,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - |
-              echo 'dynmap: ==========================================='
-              ls -la /data/plugins/dynmap
-              echo 'dynmap/web: ==========================================='
-              ls -la /data/plugins/dynmap/web  
+            - "rm -rf /data/plugins/dynmap/web"
         
       containers:
         - resources:
