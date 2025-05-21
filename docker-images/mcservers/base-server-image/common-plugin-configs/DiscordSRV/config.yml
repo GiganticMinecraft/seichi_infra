@@ -26,7 +26,7 @@ BotToken: "${CFG_REPLACEMENT__DISCORDSRV_TOKEN}"
 #
 # チャンネルペアの最初の部分はDiscordチャンネル名ではありません！
 # このオプションを変更した後、サーバーを再起動する必要があります
-Channels: {"global": "${CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID}"}
+Channels: {"global": "${CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID}", "join": "", "leave": ""}
 
 # コンソールチャンネルの数値のID(チャンネル名ではありません)。コンソールチャンネルを全て無効にするなら、空のままにしてください。
 DiscordConsoleChannelId: "${CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID}"
