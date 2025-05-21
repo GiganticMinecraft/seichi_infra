@@ -7,6 +7,7 @@ resources:
   - "./argo-workflows-restore.yaml"
   - "./argo-workflows-start-server.yaml"
   - "./argo-workflows-stop-server.yaml"
+  - "./dynmap-nginx-conf--s7.yaml"
   - "./service-monitor.yaml"
   - "./service.yaml"
   - "./stateful-set.yaml"
