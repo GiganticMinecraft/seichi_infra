@@ -69,27 +69,6 @@ spec:
       containers:
         - resources:
             requests:
-              memory: 128Mi
-          image: nginx:1.28.0
-          name: dynmap
-          ports:
-            - containerPort: 80
-              name: dynmap
-          startupProbe:
-            tcpSocket:
-              port: 80
-            # 最大30秒待つ
-            failureThreshold: 6
-            periodSeconds: 5
-          volumeMounts:
-            - mountPath: /etc/nginx/nginx.conf
-              name: nginx-conf
-              subPath: nginx.conf
-            - name: mcserver--s5-data
-              mountPath: /data
-
-        - resources:
-            requests:
               cpu: 2
               memory: 10Gi
             limits:
@@ -326,6 +305,27 @@ spec:
             - name: worldedit-schematica-volume
               mountPath: /worldedit-schematica
 
+            - name: mcserver--s5-data
+              mountPath: /data
+
+        - resources:
+            requests:
+              memory: 128Mi
+          image: nginx:1.28.0
+          name: dynmap
+          ports:
+            - containerPort: 80
+              name: dynmap
+          startupProbe:
+            tcpSocket:
+              port: 80
+            # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-conf
+              subPath: nginx.conf
             - name: mcserver--s5-data
               mountPath: /data
 
