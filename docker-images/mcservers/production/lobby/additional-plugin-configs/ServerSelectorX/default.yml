@@ -1,0 +1,239 @@
+# Number of rows of slots of your server selector menu. For example '2' will mean 2*9 = 18 slots. Max value is 6.
+rows: 2
+
+# This will be displayed as the title of the menu.
+title: 'サーバーを選択 - select server'
+
+# This will be the name of the server selector item
+item-name: '&b&o右クリックしてサーバーを選択 - Right click plz'
+
+item-lore: []
+
+# The name of the server selector item.
+item: NETHER_STAR
+
+# Give the item when a player joins?
+on-join: true
+
+# What slot should the item be in? Specify -1 to automatically put it in the first available slot.
+inv-slot: 0
+
+# URL clickable message
+url-message: '&3&lClick here'
+
+# Command to open the menu. Specify "none" for no command. (without /)
+command: "menu"
+
+# Require permission to open menu?
+require-permission: false
+# Which permission node to require?
+permission-node: 'ssx.menu.default'
+no-permission-message: "&cYou don't have permission to open this menu."
+
+# Uncomment to configure an allow list of worlds. The compass won't be given to players joining other
+# worlds. However, they might still keep the compass when switching between worlds. You should install
+# a per-world inventories plugin.
+#only-in-worlds: [hub1, hub2]
+
+# https://github.com/ServerSelectorX/ServerSelectorX/wiki/Free-%7C-Items-in-the-server-selector
+menu:
+
+  # Server item
+  0:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: s1
+    
+    # Action to run when the item is clicked
+    action: 'srv:s1'
+
+    online:
+      item: DIAMOND_PICKAXE
+      name: '&fギガンティック☆整地鯖\n&eアルカディア&bサーバー'
+      lore:
+       - '整地も生活もできる。初心者におすすめ'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s1'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&fギガンティック☆整地鯖\n&eアルカディア&bサーバー'
+      lore:
+       - '整地も生活もできる。初心者におすすめ'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s1'
+
+  1:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: s2
+    
+    # Action to run when the item is clicked
+    action: 'srv:s2'
+
+    online:
+      item: DIAMOND_SHOVEL
+      name: '&fギガンティック☆整地鯖\n&eエデン&bサーバー'
+      lore:
+       - '整地も生活もできる。初心者におすすめ'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s2'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&fギガンティック☆整地鯖\n&eエデン&bサーバー'
+      lore:
+       - '整地も生活もできる。初心者におすすめ'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s2'
+
+  2:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: s3
+    
+    # Action to run when the item is clicked
+    action: 'srv:s3'
+
+    online:
+      item: DIAMOND_AXE
+      name: '&fギガンティック☆整地鯖\n&eヴァルハラ&bサーバー'
+      lore:
+       - '整地も生活もできる。初心者におすすめ'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s3'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&fギガンティック☆整地鯖\n&eヴァルハラ&bサーバー'
+      lore:
+       - '整地も生活もできる。初心者におすすめ'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s3'
+  3:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: s5
+    
+    # Action to run when the item is clicked
+    action: 'srv:s5'
+
+    online:
+      item: IRON_PICKAXE
+      name: '&fギガンティック☆整地鯖\n&e整地専用特設&bサーバー'
+      lore:
+       - '整地ワールドのみで構成された'
+       - '整地専用の特殊サーバーです'
+       - '他サーバー混雑時にご利用ください'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s5'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&fギガンティック☆整地鯖\n&e整地専用特設&bサーバー'
+      lore:
+       - '整地ワールドのみで構成された'
+       - '整地専用の特殊サーバーです'
+       - '他サーバー混雑時にご利用ください'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s5'
+
+  8:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: s7
+    
+    # Action to run when the item is clicked
+    action: 'srv:s7'
+
+    online:
+      item: DIAMOND
+      name: '&fギガンティック☆整地鯖\n&e公共施設&bサーバー'
+      lore:
+       - '各種ショップやトラップタワーなど'
+       - '公共施設のみで構成されたサーバー'
+       - '初めての方用にチュートリアルを用意しています'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s7'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&fギガンティック☆整地鯖\n&e公共施設&bサーバー'
+      lore:
+       - '各種ショップやトラップタワーなど'
+       - '公共施設のみで構成されたサーバー'
+       - '初めての方用にチュートリアルを用意しています'
+       - ''
+       - 'Version: 1.18.2'
+       - 'Command: /server s7'
+
+  13:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: reset
+    
+    # Action to run when the item is clicked
+    action: 'srv:reset'
+
+    online:
+      item: GRASS_BLOCK
+      name: '&f1day to reset\n\n&eサバイバル&bサーバー'
+      lore:
+       - '日次再起動時に全リセット 無慈悲の極み'
+       - ''
+       - 'Version: 1.21.4'
+       - 'Command: /server reset'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&f1day to reset\n\n&eサバイバル&bサーバー'
+      lore:
+       - '日次再起動時に全リセット 無慈悲の極み'
+       - ''
+       - 'Version: 1.21.4'
+       - 'Command: /server reset'
+
+  14:
+  
+    # Enter a server name to show server status and placeholders
+    ping-server: kagawa
+    
+    # Action to run when the item is clicked
+    action: 'srv:kagawa'
+
+    online:
+      item: GRASS_BLOCK
+      name: '&f香川チャレンジ\n\n&eサバイバル&bサーバー'
+      lore:
+       - '香川県ゲーム条例超絶遵守 目指せエンドラ討伐'
+       - '月~金: 20時 ~ 21時'
+       - '土~日: 19時半 ~ 21時'
+       - ''
+       - 'Version: 1.16.5'
+       - 'Command: /server kagawa'
+
+    offline:
+      item: BARRIER
+      name: '&c[オフライン]&f香川チャレンジ\n\n&eサバイバル&bサーバー'
+      lore:
+       - '香川県ゲーム条例超絶遵守 目指せエンドラ討伐'
+       - '月~金: 20時 ~ 21時'
+       - '土~日: 19時半 ~ 21時'
+       - ''
+       - 'Version: 1.16.5'
+       - 'Command: /server kagawa'   
+
+  # No action item
+  -1: # -1 means everything else
+    action: 'none'
+    offline:
+      item: AIR
