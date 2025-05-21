@@ -12,7 +12,7 @@ RUN wget \
 # 最終 stage
 #
 # MCSERVER_BASE_IMAGE は、 build args を通して
-#   itmz/minecraft-server の特定のタグを指定することを想定している
+#   itzg/minecraft-server の特定のタグを指定することを想定している
 FROM ${MCSERVER_BASE_IMAGE}
 
 # JMX exporter と設定ファイルをイメージに移す
