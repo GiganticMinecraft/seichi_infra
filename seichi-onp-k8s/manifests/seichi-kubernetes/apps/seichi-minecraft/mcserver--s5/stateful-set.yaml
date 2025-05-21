@@ -73,7 +73,7 @@ spec:
           command:
             - "sh"
             - "-c"
-            - "rm -rf /data/plugins/dynmap/web"       
+            - "rm -rf /data/plugins/dynmap/worlds.txt /data/plugins/dynmap/configuration.txt"       
 
       containers:
         - resources:
