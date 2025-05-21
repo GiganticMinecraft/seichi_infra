@@ -42,6 +42,15 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: check-plugins-directory
+          image: busybox:1.37.0
+          command:
+            - "sh"
+            - "-c"
+            - "ls -la /data/plugins"
+          volumeMounts:
+            - name: mcserver--lobby-data
+              mountPath: /data
 
       containers:
         - resources:
