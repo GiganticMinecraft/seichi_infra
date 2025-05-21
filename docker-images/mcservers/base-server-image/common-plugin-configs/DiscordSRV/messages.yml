@@ -365,7 +365,7 @@ MinecraftPlayerAchievementMessage:
 # %tps%:           サーバーの平均TPS
 # PlaceholderAPIプレースホルダもサポートされています
 #
-ChannelTopicUpdaterChatChannelTopicFormat: "オンラインプレイヤー数 %playercount%/%playermax% | 接続したプレイヤーの総数 %totalplayers% | サーバー起動時間 %uptimemins% 分 | 最終更新 %date%"
+ChannelTopicUpdaterChatChannelTopicFormat: "%playercount%/%playermax% 人が接続中 | %date%"
 ChannelTopicUpdaterConsoleChannelTopicFormat: "TPS: %tps% | メモリー: %usedmemorygb%GB used/%freememorygb%GB free/%maxmemorygb%GB max | %serverversion%"
 # AtServerShutdownFormatsは%totalplayers%、%serverversion%、%date%のみをサポートしています。
 ChannelTopicUpdaterChatChannelTopicAtServerShutdownFormat: "サーバーはオフラインです | 接続したプレイヤーの総数 %totalplayers%"
