@@ -40,197 +40,122 @@ menu:
 
   # Server item
   0:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: s1
     
     # Action to run when the item is clicked
     action: 'srv:s1'
 
-    online:
-      item: DIAMOND_PICKAXE
-      name: '&fギガンティック☆整地鯖\n&eアルカディア&bサーバー'
-      lore:
-       - '整地も生活もできる。初心者におすすめ'
-       - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s1'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&fギガンティック☆整地鯖\n&eアルカディア&bサーバー'
+      item: DIAMOND_PICKAXE
+      name: '&fギガンティック☆整地鯖'
       lore:
-       - '整地も生活もできる。初心者におすすめ'
+       - '&eアルカディア&bサーバー'
        - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s1'
+       - '&7整地も生活もできる。初心者におすすめ'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server s1'
 
   1:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: s2
     
     # Action to run when the item is clicked
     action: 'srv:s2'
 
-    online:
-      item: DIAMOND_SHOVEL
-      name: '&fギガンティック☆整地鯖\n&eエデン&bサーバー'
-      lore:
-       - '整地も生活もできる。初心者におすすめ'
-       - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s2'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&fギガンティック☆整地鯖\n&eエデン&bサーバー'
+      item: DIAMOND_SHOVEL
+      name: '&fギガンティック☆整地鯖'
       lore:
-       - '整地も生活もできる。初心者におすすめ'
+       - '&eエデン&bサーバー'
        - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s2'
+       - '&7整地も生活もできる。初心者におすすめ'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server s2'
 
   2:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: s3
     
     # Action to run when the item is clicked
     action: 'srv:s3'
 
-    online:
-      item: DIAMOND_AXE
-      name: '&fギガンティック☆整地鯖\n&eヴァルハラ&bサーバー'
-      lore:
-       - '整地も生活もできる。初心者におすすめ'
-       - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s3'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&fギガンティック☆整地鯖\n&eヴァルハラ&bサーバー'
+      item: DIAMOND_AXE
+      name: '&fギガンティック☆整地鯖'
       lore:
-       - '整地も生活もできる。初心者におすすめ'
+       - '&eヴァルハラ&bサーバー'
        - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s3'
+       - '&7整地も生活もできる。初心者におすすめ'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server s3'
+
   3:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: s5
     
     # Action to run when the item is clicked
     action: 'srv:s5'
 
-    online:
-      item: IRON_PICKAXE
-      name: '&fギガンティック☆整地鯖\n&e整地専用特設&bサーバー'
-      lore:
-       - '整地ワールドのみで構成された'
-       - '整地専用の特殊サーバーです'
-       - '他サーバー混雑時にご利用ください'
-       - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s5'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&fギガンティック☆整地鯖\n&e整地専用特設&bサーバー'
+      item: IRON_PICKAXE
+      name: '&fギガンティック☆整地鯖'
       lore:
-       - '整地ワールドのみで構成された'
-       - '整地専用の特殊サーバーです'
-       - '他サーバー混雑時にご利用ください'
+       - '&e整地専用特設&bサーバー'
        - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s5'
+       - '&7整地ワールドのみで構成された'
+       - '&7整地専用の特殊サーバーです'
+       - '&7他サーバー混雑時にご利用ください'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server s5'
 
   8:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: s7
     
     # Action to run when the item is clicked
     action: 'srv:s7'
 
-    online:
-      item: DIAMOND
-      name: '&fギガンティック☆整地鯖\n&e公共施設&bサーバー'
-      lore:
-       - '各種ショップやトラップタワーなど'
-       - '公共施設のみで構成されたサーバー'
-       - '初めての方用にチュートリアルを用意しています'
-       - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s7'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&fギガンティック☆整地鯖\n&e公共施設&bサーバー'
+      item: DIAMOND
+      name: '&fギガンティック☆整地鯖'
       lore:
-       - '各種ショップやトラップタワーなど'
-       - '公共施設のみで構成されたサーバー'
-       - '初めての方用にチュートリアルを用意しています'
+       - '&e公共施設&bサーバー'
        - ''
-       - 'Version: 1.18.2'
-       - 'Command: /server s7'
+       - '&7各種ショップやトラップタワーなど'
+       - '&7公共施設のみで構成されたサーバー'
+       - '&7初めての方用にチュートリアルを用意しています'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server s7'
 
   13:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: reset
-    
+
     # Action to run when the item is clicked
     action: 'srv:reset'
 
-    online:
-      item: GRASS_BLOCK
-      name: '&f1day to reset\n\n&eサバイバル&bサーバー'
-      lore:
-       - '日次再起動時に全リセット 無慈悲の極み'
-       - ''
-       - 'Version: 1.21.4'
-       - 'Command: /server reset'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&f1day to reset\n\n&eサバイバル&bサーバー'
+      item: GRASS_BLOCK
+      name: '&f1day to reset'
       lore:
-       - '日次再起動時に全リセット 無慈悲の極み'
+       - '&eサバイバル&bサーバー'
        - ''
-       - 'Version: 1.21.4'
-       - 'Command: /server reset'
+       - '&7日次再起動時に全リセット 無慈悲の極み'
+       - ''
+       - '&7Version: 1.21.4'
+       - '&7Command: /server reset'
 
   14:
-  
-    # Enter a server name to show server status and placeholders
-    ping-server: kagawa
     
     # Action to run when the item is clicked
     action: 'srv:kagawa'
 
-    online:
-      item: GRASS_BLOCK
-      name: '&f香川チャレンジ\n\n&eサバイバル&bサーバー'
-      lore:
-       - '香川県ゲーム条例超絶遵守 目指せエンドラ討伐'
-       - '月~金: 20時 ~ 21時'
-       - '土~日: 19時半 ~ 21時'
-       - ''
-       - 'Version: 1.16.5'
-       - 'Command: /server kagawa'
-
     offline:
-      item: BARRIER
-      name: '&c[オフライン]&f香川チャレンジ\n\n&eサバイバル&bサーバー'
+      item: GRASS_BLOCK
+      name: '&f香川チャレンジ'
       lore:
-       - '香川県ゲーム条例超絶遵守 目指せエンドラ討伐'
-       - '月~金: 20時 ~ 21時'
-       - '土~日: 19時半 ~ 21時'
+       - '&eサバイバル&bサーバー'
        - ''
-       - 'Version: 1.16.5'
-       - 'Command: /server kagawa'   
+       - '&7香川県ゲーム条例超絶遵守 目指せエンドラ討伐'
+       - '&7月~金: 20時 ~ 21時'
+       - '&7土~日: 19時半 ~ 21時'
+       - ''
+       - '&7Version: 1.16.5'
+       - '&7Command: /server kagawa'
 
   # No action item
   -1: # -1 means everything else
