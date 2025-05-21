@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.15
+# syntax=docker/dockerfile:1.16
 FROM golang:1.24-bookworm AS builder
 # Build
 ARG GOOS=linux
