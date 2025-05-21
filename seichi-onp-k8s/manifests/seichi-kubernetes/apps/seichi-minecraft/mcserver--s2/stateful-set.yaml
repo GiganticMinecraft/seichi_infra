@@ -82,6 +82,27 @@ spec:
       containers:
         - resources:
             requests:
+              memory: 128Mi
+          image: nginx:1.28.0
+          name: dynmap
+          ports:
+            - containerPort: 80
+              name: dynmap
+          startupProbe:
+            tcpSocket:
+              port: 80
+            # 最大30秒待つ
+            failureThreshold: 6
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-conf
+              subPath: nginx.conf
+            - name: mcserver--s2-data
+              mountPath: /data
+
+        - resources:
+            requests:
               cpu: 2
               memory: 8Gi
             limits:
@@ -346,6 +367,11 @@ spec:
         # WorldEditがSchematicaを保存・読み取るするためのvolume
         - name: worldedit-schematica-volume
           emptyDir: {}
+
+        # DynMapをホストするためのnginxの設定ファイル
+        - name: nginx-conf
+          configMap:
+            name: dynmap-nginx-conf--s2
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
