@@ -6,7 +6,7 @@ COPY --link ./additional-plugin-configs /plugins
 ###
 # 環境変数として指定されるべきプラグインの設定
 #
-ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="エデンサーバマップ - ギガンティック☆整地鯖"
+ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="エデンサーバーマップ - ギガンティック☆整地鯖"
 
 ENV CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME="s2"
 

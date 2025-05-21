@@ -6,7 +6,7 @@ COPY --link ./additional-plugin-configs /plugins
 ###
 # 環境変数として指定されるべきプラグインの設定
 #
-ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="アルカディアサーバマップ - ギガンティック☆整地鯖"
+ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="アルカディアサーバーマップ - ギガンティック☆整地鯖"
 
 ENV CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME="s1"
 

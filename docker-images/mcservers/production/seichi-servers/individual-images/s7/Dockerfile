@@ -8,7 +8,7 @@ COPY --link ./custom-minecraft-server-configs /config
 ###
 # 環境変数として指定されるべきプラグインの設定
 #
-ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="公共施設鯖マップ - ギガンティック☆整地鯖"
+ENV CFG_REPLACEMENT__DYNMAP_WEBPAGE_TITLE="公共施設サーバーマップ - ギガンティック☆整地鯖"
 
 ENV CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME="s7"
 
