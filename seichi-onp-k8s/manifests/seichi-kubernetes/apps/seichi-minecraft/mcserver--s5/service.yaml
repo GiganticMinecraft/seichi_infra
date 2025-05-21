@@ -25,5 +25,9 @@ spec:
       port: 32000
       protocol: TCP
       targetPort: jmx-remote
+    - name: dynmap
+      port: 80
+      protocol: TCP
+      targetPort: dynmap
   selector:
     mcserver: s5
