@@ -8,6 +8,8 @@ metadata:
     mcserver: s3
 spec:
   type: ClusterIP
+  # VisualVMを使用したのデバッグのためにClusterIPを固定する
+  clusterIP: 10.96.66.211
   ports:
     - name: minecraft
       port: 25565

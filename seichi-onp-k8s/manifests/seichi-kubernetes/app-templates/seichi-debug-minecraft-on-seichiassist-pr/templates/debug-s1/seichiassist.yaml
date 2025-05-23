@@ -120,6 +120,8 @@ spec:
 
             # - name: ENABLE_JMX
             #   value: "true"
+            # 固定化したClusterIPを指定することで、VisualVMによるアクセスが正しく動作するようにする
+            # FIXME : PR環境は複数のServiceが想定されるため、ClusterIPを指定するのは良くない
             # - name: JMX_HOST
             #   value: "127.0.0.1"
             # - name: JMX_PORT

@@ -109,12 +109,13 @@ spec:
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
                 -Daikars.new.flags=true
 
-            # - name: ENABLE_JMX
-            #   value: "true"
-            # - name: JMX_HOST
-            #   value: "127.0.0.1"
-            # - name: JMX_PORT
-            #   value: "32000"
+            - name: ENABLE_JMX
+              value: "true"
+            # 固定化したClusterIPを指定することで、VisualVMによるアクセスが正しく動作するようにする
+            - name: JMX_HOST
+              value: "10.96.87.190"
+            - name: JMX_PORT
+              value: "32000"
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする

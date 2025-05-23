@@ -8,6 +8,8 @@ metadata:
     mcserver: votelistener
 spec:
   type: ClusterIP
+  # VisualVMを使用したのデバッグのためにClusterIPを固定する
+  clusterIP: 10.96.67.1
   ports:
     - name: minecraft
       port: 25565
