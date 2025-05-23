@@ -1,0 +1,38 @@
+# NOTE: AntiProxy に設定するホワイト/ブラックリストの設定では、グローバル IP を指定することになるが、
+# さすがにそれを seichi_infra で管理するのはまずいので、MinIO に乗せて管理することとする。
+
+Options:
+  UseLightweight: true
+  useSSL: true
+  APIKey: "${CFG_REPLACEMENT__ANTI_PROXY_API_KEY}"
+  APITimeout: 5000
+  Strictness: 1
+  PunishmentType: "Kick"
+  AutoBlacklist: true
+
+Messages:
+  Prefix: "&9&l[AntiProxy]"
+  PunishmentMessage: "You are not allowed to join this server with Proxies."
+  BlackListPunishMessage: "You are blacklisted from joining this server."
+  NoPermission: "You do not have permission for this command!"
+  ReloadMessage: "Config Reloaded Successfully."
+  BlackListAddedMessage: "Added IP Successfully to BlackList."
+  WhiteListAddedMessage: "Added IP Successfully to WhiteList."
+  BlackListRemovedMessage: "Removed IP Successfully from BlackList."
+  WhiteListRemovedMessage: "Removed IP Successfully from WhiteList."
+  IPNotInList: "IP does not exist in current List."
+  IPExistsInList: "IP already exists in current List."
+  NotifyAdminMessage: "Player {Player} tried to login with a potential proxy with IP: {IP}"
+  GetBlackListColor: "&9"
+  GetWhiteListColor: "&9"
+  WhiteListHeader: "&9AntiProxy WhiteListed IPs"
+  BlackListHeader: "&9AntiProxy BlackListed IPs"
+
+Permissions:
+  Reload: "AntiProxy.Reload"
+  WhiteList: "AntiProxy.WhiteList"
+  BlackList: "AntiProxy.BlackList"
+  NotifyAdmin: "AntiProxy.Notify"
+  GetBlackListPermission: "AntiProxy.GetBlackList"
+  GetWhiteListPermission: "AntiProxy.GetWhiteList"
+  Help: "AntiProxy.help"
