@@ -8,6 +8,8 @@ metadata:
     mcserver: s2
 spec:
   type: ClusterIP
+  # VisualVMを使用したのデバッグのためにClusterIPを固定する
+  clusterIP: 10.96.82.45
   ports:
     - name: minecraft
       port: 25565

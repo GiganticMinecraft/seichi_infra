@@ -97,8 +97,9 @@ spec:
 
             - name: ENABLE_JMX
               value: "true"
+            # 固定化したClusterIPを指定することで、VisualVMによるアクセスが正しく動作するようにする
             - name: JMX_HOST
-              value: "10.96.70.123"
+              value: "10.96.82.45"
             - name: JMX_PORT
               value: "32000"
 
