@@ -6,7 +6,7 @@ metadata:
 spec:
   initContainers:
   - name: init
-    image: docker-registry1.mariadb.com/library/mariadb:10.11.11
+    image: docker-registry1.mariadb.com/library/mariadb:11.4
     env:
     - name: DB_PASSWORD
       valueFrom:
@@ -41,7 +41,7 @@ spec:
     generate: false
     key: mcserver-password
 
-  image: docker-registry1.mariadb.com/library/mariadb:10.11.11
+  image: docker-registry1.mariadb.com/library/mariadb:11.4
   imagePullPolicy: IfNotPresent
 
   port: 3306
