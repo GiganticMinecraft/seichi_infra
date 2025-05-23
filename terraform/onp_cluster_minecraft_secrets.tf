@@ -31,6 +31,21 @@ resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_minecraft_prod_lobby_secrets" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "mcserver--lobby--config-secrets"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    ANTI_PROXY_API_KEY = var.minecraft__prod_lobby_anti_proxy_api_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "onp_minecraft_prod_seichiassist_webhook_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
