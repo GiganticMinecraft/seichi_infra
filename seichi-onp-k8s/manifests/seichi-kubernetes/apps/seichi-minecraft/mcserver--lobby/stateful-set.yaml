@@ -6,6 +6,9 @@ metadata:
   labels:
     app: mcserver--lobby
 spec:
+  securityContext:
+    fsGroup: 1000
+    runAsUser: 1000
   replicas: 1
   serviceName: "mcserver--lobby"
   selector:
