@@ -11,7 +11,7 @@ spec:
     generate: false
     key: root-password
 
-  image: docker-registry1.mariadb.com/library/mariadb:10.11.11
+  image: docker-registry1.mariadb.com/library/mariadb:10.11.13
   imagePullPolicy: IfNotPresent
 
   port: 3306
