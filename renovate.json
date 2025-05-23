@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "config:base"
-  ],
+  "extends": ["config:base"],
   "timezone": "Asia/Tokyo",
   "reviewers": ["outductor"],
   "packageRules": [
@@ -16,16 +14,20 @@
       "groupName": "terraform packages",
       "enabled": true,
       "schedule": ["at any time"]
+    },
+    {
+      "matchManagers": ["dockerfile", "regex"],
+      "matchPackageNames": [
+        "ghcr.io/giganticminecraft/seichi_minecraft_server_*"
+      ],
+      "groupName": "seichi_minecraft_server images",
+      "enabled": true,
+      "schedule": ["at any time"]
     }
   ],
-  "postUpdateOptions": [
-    "gomodTidy",
-    "gomodUpdateImportPaths"
-  ],
+  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
   "argocd": {
-    "fileMatch": [
-      "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"
-    ]
+    "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"]
   },
   "kubernetes": {
     "fileMatch": [
@@ -45,7 +47,9 @@
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"],
+      "fileMatch": [
+        "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"
+      ],
       "matchStrings": [
         "https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<currentValue>[\\d.]+)/components.yaml"
       ],
@@ -56,8 +60,6 @@
   ],
   "terraform": {
     "enabled": true,
-    "fileMatch": [
-      "^terraform/.*\\.tf$"
-    ]
+    "fileMatch": ["^terraform/.*\\.tf$"]
   }
 }
