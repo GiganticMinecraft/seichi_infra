@@ -24,6 +24,10 @@ data:
           try_files $uri $uri/ =404;
         }
 
+        location /tiles/ {
+          log_not_found off;
+        }
+
         # deny access to .htaccess files, if Apache's document root concurs with nginx's one
         location ~ /\.ht {
           deny all;
