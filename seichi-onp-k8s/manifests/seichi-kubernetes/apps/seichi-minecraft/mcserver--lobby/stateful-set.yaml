@@ -134,6 +134,12 @@ spec:
                   name: mariadb
                   key: litebans-password
 
+            - name: CFG_REPLACEMENT__ANTI_PROXY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--lobby--config-secrets
+                  key: ANTI_PROXY_API_KEY
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keepInventory true

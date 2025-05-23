@@ -330,6 +330,16 @@ variable "minecraft__prod_votelistener_default_token" {
 
 #endregion
 
+#region lobby server secrets
+
+variable "minecraft__prod_lobby_anti_proxy_api_key" {
+  description = "Anti Proxy API Key"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region on-premise discord bot secrets
 
 variable "discord_bot__idea_reaction__discord_token" {
