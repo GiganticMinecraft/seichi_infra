@@ -42,6 +42,30 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: anti-proxy-settings-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: anti-proxy
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /anti-proxy-settings
+          volumeMounts:
+            - name: anti-proxy-settings-volume
+              mountPath: /anti-proxy-settings
 
       containers:
         - resources:
@@ -151,6 +175,7 @@ spec:
               value: |-
                /downloaded-plugins
                /plugins
+               /anti-proxy-settings
 
             - name: REMOVE_OLD_MODS
               value: "TRUE"
@@ -225,9 +250,15 @@ spec:
             - name: mcserver--lobby-data
               mountPath: /data
 
+            - name: anti-proxy-settings-volume
+              mountPath: /anti-proxy-settings
+
       volumes:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
+          emptyDir: {}
+
+        - name: anti-proxy-settings-volume
           emptyDir: {}
 
         # WorldEditがSchematicaを保存・読み取るするためのvolume
