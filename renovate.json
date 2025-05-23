@@ -22,7 +22,9 @@
       ],
       "groupName": "seichi_minecraft_server images",
       "enabled": true,
-      "schedule": ["at any time"]
+      "schedule": ["at any time"],
+      "automatic": true,
+      "automergeSchedule": ["* 0-7 * * *", "* 8-23 * * *"]
     }
   ],
   "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
