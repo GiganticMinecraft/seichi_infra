@@ -6,9 +6,6 @@ metadata:
   labels:
     app: mcserver--lobby
 spec:
-  securityContext:
-    fsGroup: 1000
-    runAsUser: 1000
   replicas: 1
   serviceName: "mcserver--lobby"
   selector:
@@ -20,6 +17,9 @@ spec:
         app: mcserver--lobby
         mcserver: lobby
     spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
       initContainers:
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
