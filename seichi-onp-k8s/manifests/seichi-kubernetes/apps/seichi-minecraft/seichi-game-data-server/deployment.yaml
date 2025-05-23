@@ -34,7 +34,7 @@ spec:
                   name: mariadb
                   key: mcserver-password
 
-          image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-286fbcb
+          image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-019129d
           name: seichi-game-data-server
           ports:
             - containerPort: 80
