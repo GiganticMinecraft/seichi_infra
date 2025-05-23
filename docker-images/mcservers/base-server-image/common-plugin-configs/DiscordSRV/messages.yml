@@ -81,8 +81,8 @@ DiscordToMinecraftMessageReplyFormat: " (に返信する %name%)"
 #                  例: Global
 # PlaceholderAPIプレースホルダもサポートされています
 #
-MinecraftChatToDiscordMessageFormat: "%displayname% » %message%"
-MinecraftChatToDiscordMessageFormatNoPrimaryGroup: "%displayname% » %message%"
+MinecraftChatToDiscordMessageFormat: "%displayname%(%world%) » %message%"
+MinecraftChatToDiscordMessageFormatNoPrimaryGroup: "%displayname%(%world%) » %message%"
 
 # チャットチャンネルのプラグインメッセージ
 # これは、サポートされているチャットチャンネルプラグインがフックされている場合にのみ使用される特別なメッセージです。
