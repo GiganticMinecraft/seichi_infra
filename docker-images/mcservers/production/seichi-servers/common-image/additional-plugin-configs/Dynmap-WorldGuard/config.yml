@@ -4,7 +4,7 @@ update:
 layer:
   name: WorldGuard保護範囲表示
   # Make mobs layer hidden by default
-  hidebydefault: false
+  hidebydefault: true
   # ordering priority in layer menu (low goes before high - default is 0)
   layerprio: 0
   # (optional) set minimum zoom level before layer is visible (0 = defalt, always visible)
