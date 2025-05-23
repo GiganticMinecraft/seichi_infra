@@ -26,7 +26,14 @@ BotToken: "${CFG_REPLACEMENT__DISCORDSRV_TOKEN}"
 #
 # チャンネルペアの最初の部分はDiscordチャンネル名ではありません！
 # このオプションを変更した後、サーバーを再起動する必要があります
-Channels: {"global": "${CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID}", "awards": "", "deaths": "", "join": "", "leave": ""}
+Channels: {
+  "global": "${CFG_REPLACEMENT__DISCORDSRV_GLOBAL_CHANNEL_ID}",
+  # 以下のメッセージを出力させないため、ダミーのチャンネルIDを指定している
+  "awards": "000000000000000000",
+  "deaths": "000000000000000000",
+  "join": "000000000000000000",
+  "leave": "000000000000000000"
+}
 
 # コンソールチャンネルの数値のID(チャンネル名ではありません)。コンソールチャンネルを全て無効にするなら、空のままにしてください。
 DiscordConsoleChannelId: "${CFG_REPLACEMENT__DISCORDSRV_CONSOLE_CHANNEL_ID}"
