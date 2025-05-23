@@ -4,4 +4,4 @@ loc-y: 64
 loc-z: 458
 loc-yaw: 0.0
 loc-pitch: 0.0
-always-force-players-spawn: true
+always-force-players-spawn: false
