@@ -100,8 +100,11 @@ spec:
 
             - name: ENABLE_JMX
               value: "true"
+            # podのIPアドレスを指定する必要があるため、環境変数で指定する
             - name: JMX_HOST
-              value: "10.96.67.1"
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: JMX_PORT
               value: "32000"
 

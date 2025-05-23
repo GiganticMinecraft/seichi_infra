@@ -109,12 +109,15 @@ spec:
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
                 -Daikars.new.flags=true
 
-            # - name: ENABLE_JMX
-            #   value: "true"
-            # - name: JMX_HOST
-            #   value: "127.0.0.1"
-            # - name: JMX_PORT
-            #   value: "32000"
+            - name: ENABLE_JMX
+              value: "true"
+            # podのIPアドレスを指定する必要があるため、環境変数で指定する
+            - name: JMX_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: JMX_PORT
+              value: "32000"
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
