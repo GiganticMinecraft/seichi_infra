@@ -65,6 +65,22 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: check-plugins-directory
+          image: busybox:1.37.0
+          command:
+            - "sh"
+            - "-c"
+            - |
+              ls -la /data/plugins/WorldGuard/worlds
+              ls -la /data/plugins/WorldGuard/worlds/world_SW_3
+              ls -la /data/plugins/WorldGuard/worlds/world_SW_4
+              cat /data/plugins/WorldGuard/worlds/world_SW_3/config.yml
+              cat /data/plugins/WorldGuard/worlds/world_SW_4/config.yml
+              cat /data/plugins/WorldGuard/worlds/world_SW_3/blacklist.txt
+              cat /data/plugins/WorldGuard/worlds/world_SW_4/blacklist.txt
+          volumeMounts:
+            - name: mcserver--lobby-data
+              mountPath: /data
 
       containers:
         - resources:
