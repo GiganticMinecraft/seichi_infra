@@ -73,3 +73,20 @@ spec:
   table: "*"
   username: "litebans"
   grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: litebans-gigantic-prod
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "litebans_gigantic_prod"
+  table: "*"
+  username: "litebans"
+  grantOption: false
