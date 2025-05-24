@@ -9,12 +9,6 @@
 # Remove the {} and add your own entries.
 #
 
-regions:
-  max-region-count-per-player:
-    default: 5
-    observer: 5
-  # 1 グリッド = 15 * 15 * 384 ブロック = 86400 ブロック
-  # ※384 ブロック = Y座標が -64 ～ +320
-  # となるので、
-  # メイン: 256 グリッド = 86400 * 256 ブロック = 22118400 ブロック
-  max-claim-volume: 22118400
+fire:
+    disable-lava-fire-spread: false
+    disable-all-fire-spread: false
