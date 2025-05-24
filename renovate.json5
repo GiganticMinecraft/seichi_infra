@@ -18,7 +18,7 @@
       "schedule": ["at any time"]
     },
     {
-      matchManagers: ["dockerfile", "regex"],
+      matchManagers: ["dockerfile", "kubernetes"],
       matchPackageNames: [
         "ghcr.io/giganticminecraft/seichi_minecraft_server_*",
       ],
