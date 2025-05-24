@@ -16,8 +16,22 @@
       "groupName": "terraform packages",
       "enabled": true,
       "schedule": ["at any time"]
-    }
-  ],
+    },
+    {
+      matchManagers: ["dockerfile", "regex"],
+      matchPackageNames: [
+        "ghcr.io/giganticminecraft/seichi_minecraft_server_*",
+      ],
+      groupName: "seichi_minecraft_server images",
+      enabled: true,
+      schedule: ["at any time"],
+      automerge: true,
+      // 07:00～08:00(JST) の間は ArgoCD の自動 Sync が有効になっていることから、
+      // この時間帯に自動マージがされると、Sync されてサーバが再起動されてしまうため、その時間帯を避けて自動マージする
+      // ref: https://github.com/GiganticMinecraft/seichi_infra/blob/7fb9a41ce385675aed955c42c833caafcbaf387e/seichi-onp-k8s/manifests/seichi-kubernetes/apps/root/projects.yaml#L217-L231
+      automergeSchedule: ["* 0-7 * * *", "* 8-23 * * *"],
+    },
+   ],
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths"
