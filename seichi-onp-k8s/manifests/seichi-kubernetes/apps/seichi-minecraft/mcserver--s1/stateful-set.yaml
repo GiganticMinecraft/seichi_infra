@@ -79,7 +79,7 @@ spec:
               cat /data/plugins/WorldGuard/worlds/world_SW_3/blacklist.txt
               cat /data/plugins/WorldGuard/worlds/world_SW_4/blacklist.txt
           volumeMounts:
-            - name: mcserver--lobby-data
+            - name: mcserver--s1-data
               mountPath: /data
 
       containers:
