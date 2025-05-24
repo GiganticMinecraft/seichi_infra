@@ -1,19 +1,21 @@
 {
-  extends: ["config:base"],
-  timezone: "Asia/Tokyo",
-  reviewers: ["outductor"],
-  packageRules: [
+  "extends": [
+    "config:base"
+  ],
+  "timezone": "Asia/Tokyo",
+  "reviewers": ["outductor"],
+  "packageRules": [
     {
-      managers: ["gomod"],
-      packageNames: ["go"],
-      supportPolicy: ["active"],
+      "managers": ["gomod"],
+      "packageNames": ["go"],
+      "supportPolicy": ["active"]
     },
     {
-      managers: ["terraform"],
-      matchPackageNames: ["*"],
-      groupName: "terraform packages",
-      enabled: true,
-      schedule: ["at any time"],
+      "managers": ["terraform"],
+      "matchPackageNames": ["*"],
+      "groupName": "terraform packages",
+      "enabled": true,
+      "schedule": ["at any time"]
     },
     {
       matchManagers: ["dockerfile", "regex"],
@@ -28,42 +30,47 @@
       // この時間帯に自動マージがされると、Sync されてサーバが再起動されてしまうため、その時間帯を避けて自動マージする
       automergeSchedule: ["* 0-7 * * *", "* 8-23 * * *"],
     },
+   ],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths"
   ],
-  postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
-  argocd: {
-    fileMatch: ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"],
+  "argocd": {
+    "fileMatch": [
+      "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"
+    ]
   },
-  kubernetes: {
-    fileMatch: [
+  "kubernetes": {
+    "fileMatch": [
       "^helm-charts/[^/]+/templates/.+\\.yaml$",
       "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
-      "^seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/.+\\.yaml$",
-    ],
+      "^seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/.+\\.yaml$"
+    ]
   },
-  regexManagers: [
+  "regexManagers": [
     {
-      fileMatch: ["^.github/workflows/build_mcserver_base_images.yaml$"],
-      matchStrings: [
-        '- mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\"(?<currentDigest>sha256:[a-f0-9]+)\\"',
+      "fileMatch": ["^.github/workflows/build_mcserver_base_images.yaml$"],
+      "matchStrings": [
+        "- mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\\"(?<currentDigest>sha256:[a-f0-9]+)\\\""
       ],
-      depNameTemplate: "itzg/minecraft-server",
-      extractVersionTemplate: "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
-      datasourceTemplate: "docker",
+      "depNameTemplate": "itzg/minecraft-server",
+      "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
+      "datasourceTemplate": "docker"
     },
     {
-      fileMatch: [
-        "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml",
+      "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"],
+      "matchStrings": [
+        "https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<currentValue>[\\d.]+)/components.yaml"
       ],
-      matchStrings: [
-        "https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<currentValue>[\\d.]+)/components.yaml",
-      ],
-      datasourceTemplate: "github-releases",
-      depNameTemplate: "kubernetes-sigs/metrics-server",
-      versioningTemplate: "semver",
-    },
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes-sigs/metrics-server",
+      "versioningTemplate": "semver"
+    }
   ],
-  terraform: {
-    enabled: true,
-    fileMatch: ["^terraform/.*\\.tf$"],
-  },
+  "terraform": {
+    "enabled": true,
+    "fileMatch": [
+      "^terraform/.*\\.tf$"
+    ]
+  }
 }
