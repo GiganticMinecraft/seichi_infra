@@ -205,7 +205,7 @@ spec:
               value: litebans
 
             - name: CFG_REPLACEMENT__LITEBANS_MYSQL_DATABASE_NAME
-              value: litebans
+              value: litebans_gigantic_prod
 
             - name: CFG_REPLACEMENT__LITEBANS_MYSQL_PASSWORD
               valueFrom:
