@@ -4,7 +4,7 @@ metadata:
   name: backup--mcserver--lobby
   namespace: seichi-minecraft
 spec:
-  schedule: "0 4 * * *"
+  schedule: "0 2 * * 1" # 毎週月曜日の午前2時に実行
   timezone: Asia/Tokyo
   concurrencyPolicy: "Forbid"
   workflowSpec:
