@@ -52,7 +52,7 @@ spec:
     waitForIt: true
   privileges:
     - "ALL"
-  database: "litebans"
+  database: "litebans_gigantic_prod"
   table: "*"
   username: "litebans"
   grantOption: false
