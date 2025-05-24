@@ -13,7 +13,11 @@ regions:
   max-region-count-per-player:
     default: 2
     observer: 2
-  max-claim-volume: 14803200
+  # 1 グリッド = 15 * 15 * 384 ブロック = 86400 ブロック
+  # ※384 ブロック = Y座標が -64 ～ +320
+  # となるので、
+  # 第2整地: 256 グリッド = 86400 * 256 ブロック = 22118400 ブロック
+  max-claim-volume: 22118400
 fire:
   disable-lava-fire-spread: false
   disable-all-fire-spread: false
