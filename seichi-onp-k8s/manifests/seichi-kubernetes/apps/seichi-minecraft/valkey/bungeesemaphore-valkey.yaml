@@ -14,7 +14,9 @@ spec:
       releaseName: seichi-bungeesemaphore-valkey
       values: |
         global:
-          imageRegistry: "mirror.gcr.io"      
+          imageRegistry: "mirror.gcr.io"
+          security: 
+            allowInsecureImages: true          
         architecture: standalone
         auth:
           enabled: false

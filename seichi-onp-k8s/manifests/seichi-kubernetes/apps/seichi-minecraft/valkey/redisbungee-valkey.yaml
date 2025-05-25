@@ -14,7 +14,9 @@ spec:
       releaseName: seichi-redisbungee-valkey
       values: |
         global:
-          imageRegistry: "mirror.gcr.io"      
+          imageRegistry: "mirror.gcr.io"
+          security: 
+            allowInsecureImages: true
         architecture: standalone
         auth:
           enabled: false
