@@ -63,19 +63,19 @@ block-movement: true
 pistons: true
 
 # Logs blocks that burn up in a fire.
-block-burn: false
+block-burn: false  # default: true
 
 # Logs when a block naturally ignites, such as from fire spreading.
-block-ignite: false
+block-ignite: false  # default: true
 
 # Logs explosions, such as TNT and Creepers.
-explosions: false
+explosions: false  # default: true
 
 # Track when an entity changes a block, such as an Enderman destroying blocks.
-entity-change: false
+entity-change: false  # default: true
 
 # Logs killed entities, such as killed cows and enderman.
-entity-kills: false
+entity-kills: false  # default: true
 
 # Logs text on signs. If disabled, signs will be blank when rolled back.
 sign-text: true
@@ -84,22 +84,22 @@ sign-text: true
 buckets: true
 
 # Logs natural tree leaf decay.
-leaf-decay: false
+leaf-decay: false  # default: true
 
 # Logs tree growth. Trees are linked to the player who planted the sappling.
-tree-growth: false
+tree-growth: false  # default: true
 
 # Logs mushroom growth.
-mushroom-growth: false
+mushroom-growth: false  # default: true
 
 # Logs natural vine growth.
-vine-growth: false
+vine-growth: false  # default: true
 
 # Logs the spread of sculk blocks from sculk catalysts.
-sculk-spread: false
+sculk-spread: false  # default: true
 
 # Logs when portals such as Nether portals generate naturally.
-portals: false
+portals: false  # default: true
 
 # Logs water flow. If water destroys other blocks, such as torches,
 # this allows it to be properly rolled back.
@@ -119,30 +119,30 @@ liquid-tracking: true
 item-transactions: true
 
 # Logs items dropped by players.
-item-drops: false
+item-drops: false  # default: true
 
 # Logs items picked up by players.
-item-pickups: false
+item-pickups: false  # default: true
 
 # Track all hopper transactions, such as when a hopper removes items from a
 # chest, furnace, or dispenser.
-hopper-transactions: false
+hopper-transactions: false # default: true
 
 # Track player interactions, such as when a player opens a door, presses
 # a button, or opens a chest. Player interactions can't be rolled back.
 player-interactions: true
 
 # Logs messages that players send in the chat.
-player-messages: false
+player-messages: false # default: true
 
 # Logs all commands used by players.
-player-commands: false
+player-commands: false # default: true
 
 # Logs the logins and logouts of players.
-player-sessions: false
+player-sessions: false # default: true
 
 # Logs when a player changes their Minecraft username.
-username-changes: false
+username-changes: false # default: true
 
 # Logs changes made via the plugin "WorldEdit" if it's in use on your server.
-worldedit: true
+worldedit: true # default: true
