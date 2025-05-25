@@ -69,7 +69,7 @@ spec:
                       args: ["wget -P /work https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"]
                   - name: upload-artifact
                     container:
-                      image: minio/mc:latest
+                      image: minio/mc:RELEASE.2025-04-16T18-13-26Z-cpuv1
                       env:
                         - name: MINIO_ACCESS_KEY
                           valueFrom:
