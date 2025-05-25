@@ -15,7 +15,7 @@ data:
   BungeeSemaphore-config.yml: |
     synchronized-server-regex: "^(s\\d+)$"
     redis:
-      host: seichi-bungeesemaphore-redis-master.seichi-minecraft
+      host: seichi-bungeesemaphore-valkey-master.seichi-minecraft
       port: 6379
 
     locale:
@@ -28,7 +28,7 @@ data:
   RedisBungee-config.yml: |
     server-id: ""
     use-random-id-string: true
-    redis-server: seichi-redisbungee-redis-master.seichi-minecraft
+    redis-server: seichi-redisbungee-valkey-master.seichi-minecraft
     redis-port: 6379
     redis-password: ""
     max-redis-connections: 8

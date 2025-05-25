@@ -140,13 +140,13 @@ spec:
                   key: mcserver-password
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
-              value: seichi-redisbungee-redis-master
+              value: seichi-redisbungee-valkey-master
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT
               value: "6379"
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_HOST
-              value: seichi-bungeesemaphore-redis-master
+              value: seichi-bungeesemaphore-valkey-master
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_PORT
               value: "6379"
