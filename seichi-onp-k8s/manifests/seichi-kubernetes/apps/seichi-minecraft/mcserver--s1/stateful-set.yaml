@@ -142,7 +142,7 @@ spec:
                   key: SEICHIASSIST_S1_WEBHOOK_URL
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
-              value: seichi-redisbungee-valkey-master-master
+              value: seichi-redisbungee-valkey-master
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT
               value: "6379"

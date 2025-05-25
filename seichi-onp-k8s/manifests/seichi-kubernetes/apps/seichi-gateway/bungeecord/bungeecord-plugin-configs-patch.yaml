@@ -28,7 +28,7 @@ data:
   RedisBungee-config.yml: |
     server-id: ""
     use-random-id-string: true
-    redis-server: seichi-redisbungee-valkey-master-master.seichi-minecraft
+    redis-server: seichi-redisbungee-valkey-master.seichi-minecraft
     redis-port: 6379
     redis-password: ""
     max-redis-connections: 8
