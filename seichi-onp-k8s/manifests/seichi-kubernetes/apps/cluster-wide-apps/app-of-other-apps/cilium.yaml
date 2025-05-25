@@ -75,7 +75,7 @@ spec:
             tls:
               server:
                 # set this to true if tls is enabled on Hubble relay server side
-                enabled: false
+                enabled: true
         operator:
           rollOutPods: true
           prometheus:
