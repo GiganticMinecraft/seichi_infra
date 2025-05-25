@@ -14,7 +14,11 @@ spec:
       releaseName: seichi-redisbungee-valkey
       values: |
         global:
-          imageRegistry: "mirror.gcr.io"      
+          imageRegistry: "mirror.gcr.io"
+          security: 
+            allowInsecureImages: true
+        image:
+          registry: "mirror.gcr.io"
         architecture: standalone
         auth:
           enabled: false
@@ -35,6 +39,8 @@ spec:
             - "--maxmemory 2048mb"
         metrics:
           enabled: true
+          image:
+            registry: "mirror.gcr.io"          
           serviceMonitor:
             enabled: true
             additionalLabels:
