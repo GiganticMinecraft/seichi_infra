@@ -1,3 +1,5 @@
+global:
+  imageRegistry: "mirror.gcr.io"
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -13,8 +15,6 @@ spec:
     helm:
       releaseName: seichi-redisbungee-valkey
       values: |
-        image:
-          registry: mirror.gcr.io
         architecture: standalone
         auth:
           enabled: false
