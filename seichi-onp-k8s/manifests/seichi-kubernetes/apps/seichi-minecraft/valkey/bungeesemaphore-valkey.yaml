@@ -1,3 +1,5 @@
+global:
+  imageRegistry: "mirror.gcr.io"
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -18,7 +20,7 @@ spec:
           enabled: false
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
-        master:
+        primary:
           service:
             type: LoadBalancer
             loadBalancerClass: io.cilium/bgp-control-plane
