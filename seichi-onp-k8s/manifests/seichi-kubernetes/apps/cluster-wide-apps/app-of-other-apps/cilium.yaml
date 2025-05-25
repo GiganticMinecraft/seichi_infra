@@ -61,21 +61,12 @@ spec:
               labels:
                 release: prometheus
           tls:
-            enabled: true
-            auto:
-              enabled: true
-              method: certmanager
-              certManagerIssuerRef:
-                group: cert-manager.io
-                kind: ClusterIssuer
-                name: ca-issuer
+            enabled: false
           relay:
-            # set this to false as Hubble relay is already installed
             enabled: true
             tls:
               server:
-                # set this to true if tls is enabled on Hubble relay server side
-                enabled: true
+                enabled: false
         operator:
           rollOutPods: true
           prometheus:
