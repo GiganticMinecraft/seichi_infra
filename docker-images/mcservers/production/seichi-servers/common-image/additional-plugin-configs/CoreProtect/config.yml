@@ -145,4 +145,4 @@ player-sessions: false # default: true
 username-changes: false # default: true
 
 # Logs changes made via the plugin "WorldEdit" if it's in use on your server.
-worldedit: true # default: true
+worldedit: true
