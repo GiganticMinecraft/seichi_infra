@@ -13,6 +13,8 @@ spec:
     helm:
       releaseName: seichi-redisbungee-redis
       values: |
+        image:
+          registry: mirror.gcr.io
         architecture: standalone
         auth:
           enabled: false
