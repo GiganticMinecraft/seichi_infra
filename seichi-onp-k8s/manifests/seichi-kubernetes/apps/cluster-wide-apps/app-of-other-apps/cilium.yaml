@@ -44,6 +44,8 @@ spec:
           enabled: false
         hubble:
           enabled: true
+          ui:
+            enabled: true
           metrics:
             enabled:
               - dns:query;ignoreAAAA
@@ -67,6 +69,13 @@ spec:
                 group: cert-manager.io
                 kind: ClusterIssuer
                 name: ca-issuer
+          relay:
+            # set this to false as Hubble relay is already installed
+            enabled: false
+            tls:
+              server:
+                # set this to true if tls is enabled on Hubble relay server side
+                enabled: true
         operator:
           rollOutPods: true
           prometheus:
