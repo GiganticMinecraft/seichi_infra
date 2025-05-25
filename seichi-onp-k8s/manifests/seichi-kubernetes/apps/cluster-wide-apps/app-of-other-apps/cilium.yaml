@@ -71,11 +71,11 @@ spec:
                 name: ca-issuer
           relay:
             # set this to false as Hubble relay is already installed
-            enabled: false
+            enabled: true
             tls:
               server:
                 # set this to true if tls is enabled on Hubble relay server side
-                enabled: true
+                enabled: false
         operator:
           rollOutPods: true
           prometheus:
