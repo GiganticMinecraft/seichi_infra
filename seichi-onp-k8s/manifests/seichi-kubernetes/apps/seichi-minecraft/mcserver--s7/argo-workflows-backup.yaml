@@ -137,6 +137,13 @@ spec:
           - name: pbs-tmpfs
             mountPath: /root/.cache
 
+    - name: delete-coreprotect--s7-db
+      script:
+        image: bitnami/kubectl:1.33.1
+        command: ["/bin/sh", "-c"]
+        source: |
+          kubectl delete database coreprotect-s7 -n seichi-minecraft --wait=true
+
     - name: patch-statefulset-to-1
       script:
         image: bitnami/kubectl:1.33.1
