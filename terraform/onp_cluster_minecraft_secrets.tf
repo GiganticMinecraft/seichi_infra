@@ -14,7 +14,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_seichiassist_webhook_secrets" {
+resource "kubernetes_secret" "onp_minecraft_debug_seichiassist_webhook_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
   metadata {
