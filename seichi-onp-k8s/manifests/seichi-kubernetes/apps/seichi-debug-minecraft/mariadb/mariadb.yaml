@@ -21,7 +21,7 @@ spec:
             name: minio-access-secret
             key: MINIO_ACCESS_SECRET
       - name: BUCKET_NAME
-        value: mariadb-buckups
+        value: mariadb-backups
       - name: BUCKET_PREFIX_NAME
         value: database--seichiassist-with-flyway-for-debug
       - name: DOWNLOAD_TARGET_DIR_PATH
