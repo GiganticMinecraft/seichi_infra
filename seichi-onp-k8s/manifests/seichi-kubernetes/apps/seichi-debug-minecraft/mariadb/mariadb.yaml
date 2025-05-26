@@ -111,6 +111,10 @@ spec:
     serviceMonitor:
       prometheusRelease: prometheus
 
+  volumeMounts:
+  - mountPath: /docker-entrypoint-initdb.d
+    name: sqldump-volume
+
   volumes:
   # 本番サーバーからもってきた sqldump をマウントするためのボリューム
   - name: sqldump-volume
