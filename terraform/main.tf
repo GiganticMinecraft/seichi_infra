@@ -266,6 +266,16 @@ variable "minio_debug_access_secret" {
 
 #endregion
 
+#region seichi-debug-minecraft secrets
+
+variable "minecraft__debug_s1_seichiassist_webhook_url" {
+  description = "Webhook URL for SeichiAssist on s1 server in debug env"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region on-premise minecraft config secrets
 
 variable "minecraft__discordsrv_bot_token" {

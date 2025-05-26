@@ -5,27 +5,30 @@ metadata:
   name: mariadb
 spec:
   initContainers:
-  - name: init
-    image: docker-registry1.mariadb.com/library/mariadb:11.4
+  - name: mod-downloader
+    image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
     env:
-    - name: DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mcserver--common--config-secrets
-          key: PROD_GAME_DB_PASSWORD
-    args:
-    - sh
-    - -c
-    - |
-      mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 --databases flyway_managed_schema seichiassist --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
-      mysqldump -umcserver -p${DB_PASSWORD} -h192.168.2.186 seichiassist mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
+      - name: MINIO_ENDPOINT
+        value: seichi-private-plugin-blackhole-minio.minio:9000
+      - name: MINIO_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: minio-access-secret
+            key: MINIO_ACCESS_KEY
+      - name: MINIO_ACCESS_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: minio-access-secret
+            key: MINIO_ACCESS_SECRET
+      - name: BUCKET_NAME
+        value: mariadb-buckups
+      - name: BUCKET_PREFIX_NAME
+        value: database--seichiassist-with-flyway-for-debug
+      - name: DOWNLOAD_TARGET_DIR_PATH
+        value: /docker-entrypoint-initdb.d
     volumeMounts:
-    - mountPath: /docker-entrypoint-initdb.d
-      name: sqldump-volume
-    resources:
-      requests:
-        cpu: 2
-        memory: 2Gi
+      - mountPath: /docker-entrypoint-initdb.d
+        name: sqldump-volume
 
   tls:
     enabled: false

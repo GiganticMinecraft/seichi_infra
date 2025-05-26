@@ -14,6 +14,22 @@ resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_minecraft_debug_seichiassist_webhook_secrets" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "mcserver--seichiassist-webhook--config-secrets"
+    namespace = "seichi-debug-minecraft"
+  }
+
+  data = {
+    SEICHIASSIST_DEBUG_S1_WEBHOOK_URL = var.minecraft__debug_s1_seichiassist_webhook_url
+  }
+
+  type = "Opaque"
+}
+
+
 resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
@@ -172,6 +188,18 @@ resource "random_password" "minecraft__debug_mariadb_mcserver_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
+resource "random_password" "minecraft__debug_mariadb_coreprotect_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "random_password" "minecraft__debug_mariadb_luckperms_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
 
@@ -181,8 +209,10 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   }
 
   data = {
-    "root-password"     = random_password.minecraft__debug_mariadb_root_password.result
-    "mcserver-password" = random_password.minecraft__debug_mariadb_mcserver_password.result
+    "root-password"        = random_password.minecraft__debug_mariadb_root_password.result
+    "mcserver-password"    = random_password.minecraft__debug_mariadb_mcserver_password.result
+    "coreprotect-password" = random_password.minecraft__debug_mariadb_coreprotect_password.result
+    "luckperms-password"   = random_password.minecraft__debug_mariadb_luckperms_password.result
   }
 
   type = "Opaque"

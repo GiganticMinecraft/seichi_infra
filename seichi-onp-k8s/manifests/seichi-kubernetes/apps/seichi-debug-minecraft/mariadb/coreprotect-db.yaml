@@ -1,0 +1,44 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-debug-minecraft
+  name: coreprotect
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  passwordSecretKeyRef:
+    name: mariadb
+    key: coreprotect-password
+  maxUserConnections: 60
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-debug-minecraft
+  name: coreprotect-debug-s1
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  name: coreprotect__mc_debug_s1
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-debug-minecraft
+  name: coreprotect-debug-s1
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "coreprotect__mc_debug_s1"
+  table: "*"
+  username: "coreprotect"
+  grantOption: false
