@@ -1,82 +1,129 @@
-# BlackScarx All right reserved
-# The list of the stairs
-#     - acacia_stairs
-#     - birch_wood_stairs
-#     - brick_stairs
-#     - cobblestone_stairs
-#     - dark_oak_stairs
-#     - jungle_wood_stairs
-#     - nether_brick_stairs
-#     - quartz_stairs
-#     - red_sandstone_stairs
-#     - sandstone_stairs
-#     - smooth_stairs
-#     - spruce_wood_stairs
-#     - wood_stairs
-#     - purpur_stairs
-# The list of the slabs
-#     - stone_slab
-#     - sandstone_slab
-#     - cobblestone_slab
-#     - bricks_slab
-#     - stone_bricks_slab
-#     - nether_brick_slab
-#     - quartz_slab
-#     - oak_wood_slab
-#     - spruce_wood_slab
-#     - brich_wood_slab
-#     - jungle_wood_slab
-#     - acacia_wood_slab
-#     - dark_oak_wood_slab
-#     - red_sandstone_slab
-#     - purpur_slab
+# BetterChairs Remastered
+#
+# Support: https://Sprax.me/Discord
+# Updates and Information:
+# Statistics: https://bstats.org/plugin/bukkit/BetterChairs%20Remastered/8214
+# Information for developers: https://github.com/SpraxDev/BetterChairs/wiki
 
-Update Checker: true
-Use permission for sit: false
-Enable Stairs Block:
-- acacia_stairs
-- birch_wood_stairs
-- brick_stairs
-- cobblestone_stairs
-- dark_oak_stairs
-- jungle_wood_stairs
-- nether_brick_stairs
-- quartz_stairs
-- red_sandstone_stairs
-- sandstone_stairs
-- smooth_stairs
-- spruce_wood_stairs
-- wood_stairs
-- purpur_stairs
-Use slab: false
-Enable Slab Block:
-- stone_slab
-- sandstone_slab
-- cobblestone_slab
-- bricks_slab
-- stone_bricks_slab
-- nether_brick_slab
-- quartz_slab
-- oak_wood_slab
-- spruce_wood_slab
-- brich_wood_slab
-- jungle_wood_slab
-- acacia_wood_slab
-- dark_oak_wood_slab
-- red_sandstone_slab
-- purpur_slab
-Send message when player sit: false
-Send message when player standing: false
-Send message if the chairs is already occupied: false
-Send message if the word is disable: false
-Disable world:
-- example1
-- example2
-AutoTurn: true
-Distance of the stairs: 2
-Need to sign or chair on each side: false
-Send message if the Chairs need sign or chair: false
-No item in hand: true
-Regen need permission: false
-Regen when sit: false
-Amplifier: 1
+
+# You shouldn't make any changes to this
+version: 0
+Chairs:
+
+  # Enabling this makes BetterChairs use Arrows instead of ArmorStands.
+  # ArmorStands are made invisible so the player doesn't see anything of the magic happening when sitting.
+  # But Spigot can be very unreliable on some versions (e.g. players instantly stopping to sit)
+  #
+  # If you are experiencing issues with ArmorStands, enable this option.
+  SitOnArrows: false
+
+  # Allowed distance a player is allowed to have when trying to sit? (-1 to ignore)
+  AllowedDistanceToChair: -1
+
+  # Should a player automatically look forward when starting to sit
+  AutoRotatePlayer: true
+
+  # Does a player need his hands empty when trying to sit?
+  NeedEmptyHands: true
+
+  # Does a chair need signs on both sides attached to be detected as an chair
+  NeedsSignsOnBothSides: false
+
+  # Enable this if you want players to be able to sit on chairs
+  # while other plugins (like WorldGuard or PlotSquared) are not
+  # allowing interactions/use with the chair blocks.
+  IgnoreOtherPluginsPreventingInteract: false
+
+  # This requires players to use /toggleChairs or /BetterChairs toggle
+  # before they can right-click on chair blocks.
+  HaveChairsDisabledForPlayerByDefault: false
+
+  # Enable this if you want BetterChairs to remember a player who used /bc <toggle|on|off> after a plugin reload or him rejoining
+  RememberIfPlayerDisabledChairsAfterRelogin: true
+  Position:
+
+    # Set to false, if you do not care about a player suffocating while sitting
+    NeedAirAbove: true
+
+    # Set to false, to force chairs to have a block below them
+    AllowAirBelow: true
+
+  # Can stairs be chairs?
+  UseStairs: true
+
+  # Can half slabs be chairs too?
+  UseSlabs: false
+  LeavingChair:
+
+    # Should a player be teleported to its original position when leaving a chair
+    TeleportPlayerToOldLocation: true
+
+    # Should a player keep his head rotation when teleported to its original position
+    KeepHeadRotation: true
+
+  # This controls whether players can switch seats while already sitting.
+  # If 'Chairs.LeavingChair.TeleportPlayerToOldLocation' is set,
+  # the player will be teleported to the *first* location they startet sitting at.
+  AllowSwitchingSeats: false
+  Messages:
+
+    # Should the player receive a message when the chair is already occupied
+    AlreadyOccupied: false
+
+    # Should the player receive a message when a chair is missing signs on both sided
+    NeedsSignsOnBothSides: false
+
+    # Should the player receive a message when he starts sitting
+    NowSitting: false
+  Regeneration:
+
+    # Should player receive regeneration effect when sitting?
+    Enabled: false
+
+    # Should only players with the permission 'BetterChairs.regeneration' get the effect?
+    CheckPermission: true
+
+    # What amplifier should be applied?
+    Amplifier: 1
+Filter:
+  Worlds:
+
+    # Should we only enable chairs in specific worlds?
+    Enabled: false
+
+    # Should be the list below be used as blacklist or whitelist?
+    UseAsBlacklist: false
+
+    # List of all enabled/disabled worlds
+    Names:
+    - worldname
+    - worldname2
+  Blocks:
+
+    # Should we only enable specific blocks as chairs?
+    Enabled: false
+
+    # Setting this to true, won't check if a chair
+    # is a stair or slab but only look if it is in the list below
+    #
+    # This is kinda experimental.
+    # Enabling overwrites 'UseStairs' and 'UseSlabs' further above
+    AllowAllTypes: false
+
+    # Should be the list below be used as blacklist or whitelist?
+    UseAsBlacklist: false
+
+    # List of all enabled/disabled block types
+    #
+    # The names from Minecraft do not always work
+    # Full list: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    Names:
+    - blockname
+    - blockname2
+Updater:
+
+  # Should we check for new versions and report to the console? (Recommended)
+  CheckForUpdates: true
+
+  # Should be notify admins when they join the server? (Permission: BetterChairs.updater)
+  NotifyOnJoin: true

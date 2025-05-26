@@ -1,9 +1,13 @@
-# You may have to change some items (e.g. TOTEM) if you're running older versions!
 Items:
-  FlagItem: REDSTONE_TORCH_ON
+  FlagItem: REDSTONE_TORCH
   RegionItem: END_CRYSTAL
-  WorldItem: GRASS
-  OwnerMemberItem: TOTEM
+  WorldItem: GRASS_BLOCK
+  OwnerMemberItem: TOTEM_OF_UNDYING
   GUIItem:
-    Material: WATCH
+    Material: CLOCK
     Name: '&3&lWG-GUI'
+AllowedEditCommands:
+- //pos1
+- //pos2
+- /gamemode 1
+- /gamemode 3

@@ -1,0 +1,14 @@
+  # JOIN-LEAVE V2.4.3 Config || Copyright (C) 2023 IdW0309
+
+  Join: '&7%player% &7がログインしました'
+  Leave: '[&c-&r] &6The player &6&l%player% &6has left the server!'
+  First-Join-Message: false # default: true
+  First-Join: '[&a+&r] &6The player &6&l%player% &6has joined for the first time!'
+  Language: EN
+  CommandPrefix: Join-Leave
+  Title-Onjoin: false # default: true
+  Hide-Players-With-Perms: true # default: true
+  Disable-Join-LeaveMessage: false
+  Fireworks-onJoin: false # default: true
+  Sound-onJoin: false # default: true
+  Use-Essentials: false

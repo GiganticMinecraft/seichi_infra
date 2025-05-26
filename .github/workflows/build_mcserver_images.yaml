@@ -45,20 +45,7 @@ jobs:
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener
             build_context: ./docker-images/mcservers/production/seichi-servers/individual-images/votelistener
             image_ver: 1.0.0
-
-          ###
-          # デバッグサーバーのイメージ (1.12.2)
-          #
-          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_12_2
-            build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_12_2
-            image_ver: 1.0.0
-          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
-            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
-            image_ver: 1.0.0
-          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
-            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
-            image_ver: 1.0.0
-
+            
           ###
           # デバッグサーバーのイメージ (1.18.2)
           #

@@ -1,9 +1,0 @@
-Wither:
-  Enable: true
-  Allow:
-  - hogehoge
-
-EnderDragon:
-  Enable: true
-  Allow:
-  - hogehoge

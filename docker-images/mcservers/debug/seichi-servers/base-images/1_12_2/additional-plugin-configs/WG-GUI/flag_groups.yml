@@ -1,5 +1,0 @@
-# Custom flag groups. Permission example: wggui.flags.examplegroup
-examplegroup:
-- use
-- chest-access
-- pvp

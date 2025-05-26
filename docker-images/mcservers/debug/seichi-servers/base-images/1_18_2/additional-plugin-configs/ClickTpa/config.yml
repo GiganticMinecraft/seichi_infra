@@ -1,12 +1,12 @@
-# Config message for ClickTpa
-# Version v1.5.1
+# Config for ClickTpa
+# Version v1.7.3
 # Author: jklmao
 
 # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                               #
 #                ClickTpa Config                #
 #                                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # #
 
 #           Be aware of all warnings!           #
 
@@ -14,7 +14,7 @@
 #                                               #
 #                 Place Holders                 #
 #                                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Use '%player%' for the player who sent the request.
 # Use '%accept%' for the 'Click-to-accept' message.
@@ -66,19 +66,20 @@ Player-Is-TpToggled: '&cテレポート申請を受け付けない設定にな�
 
 Tpacancel-message: '&6テレポート申請がキャンセルされました。 (&6Tpa request has been canceled.)'
 
+# TPA request expires in seconds
+Request-expire-time: 120
+
 
 # Seconds until tpa
 # Please use whole numbers
 
 Seconds-until-tpa: 3
 
-
 # Becareful in this part!
 # This is when a player uses not enough args
 # For example, when a player does '/tpa', it will say 'Usage: /tpa <player>'
 # So please fit the correct command under the correct message!
 # P.S '/tpohere' is also '/s' (essentials-type command).
-
 
 Tpa-usage: '&cUse: /tpa <player>'
 
@@ -90,14 +91,14 @@ Tpdeny-usage: '&cUse: /tpadeny <player>'
 
 Tpo-usage: '&cUse: /tpo <player>'
 
-Tpohere-usage: '&cUse: /tpohere <player> or /s <player>' 
+Tpohere-usage: '&cUse: /tpohere <player> or /s <player>'
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                               #
 #                  Please Read!                 #
 #                                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # #
 
 # This section is when a player gets a tpa request
 # Since the code used is broken into many parts, there will be many messages.
@@ -107,28 +108,29 @@ Tpohere-usage: '&cUse: /tpohere <player> or /s <player>'
 
 # Lets you choose if you want players to be able
 # to move before being teleported
-Allow-player-to-move: true
+Allow-player-to-move: false
 
-Player-moved-before-tp: '&6The request was canceled because %player% moved!'
+Player-moved-before-tp: '&6%player%が動いたため、テレポートがキャンセルされました。'
 
-Player-sent-request: '&6%target% にテレポート申請を送りました。 (&eYou have sent a request to &6%target%)'
+Player-sent-request: '&eプレイヤー&6%target%&eにtpaリクエストを送信しました。'
 
-Tpa-message: 
+Tpa-message:
   - ''
   - '&6%player% &eさんがあなたのところにテレポート申請しました。'
   - '&e%accept% &eをクリックで許可、または、 &e %deny% &eをクリックで拒否します。'
   - '&e何もしない場合、120秒後に自動でキャンセルされます。'
   - ''
 
-Tpahere-message: 
+Tpahere-message:
   - ''
   - '&6%player% &eさんがあなたを相手の地点にテレポート申請しています。'
   - '&e%accept% &eをクリックで許可、または、 &e %deny% &eをクリックで拒否します。'
   - '&e何もしない場合、120秒後に自動でキャンセルされます。'
   - ''
 
-# This will put additional spaces for the accept/deny messages
-Added-accept-deny-space: true
+
+# This will center the accept/deny messages
+Center-accept-deny-msg: true
 
 Click-to-accept: '&a&l&n[許可]&r'
 Click-to-deny: '&c&l&n[拒否]&r'
@@ -136,8 +138,24 @@ Click-to-deny: '&c&l&n[拒否]&r'
 Hover-message-on-accept: '&aクリックで許可'
 Hover-message-on-deny: '&cクリックで拒否'
 
+#
+# On-Screen Messages
+# Pops up in the middle of the player's screen
+#
+
+Send-on-screen-message: true
+
+# When  a player accepts a tp
+On-screen-teleporting:
+  - '&6テレポート中...'
+  - '&e動かないでください!'
+
+# When a player has successfully tp'd
+On-screen-teleported: '&aテレポートしました!'
+
+# If a player moves while they are being tp'd
+On-screen-canceled-tp: '&cテレポートをキャンセルしました!'
 
 #~~~~~~~~~~~~~~~~~~#
 # More Coming Soon!#
 #~~~~~~~~~~~~~~~~~~#
-

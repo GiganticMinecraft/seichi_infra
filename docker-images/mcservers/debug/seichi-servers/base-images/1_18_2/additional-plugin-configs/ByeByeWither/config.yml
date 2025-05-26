@@ -1,9 +1,6 @@
-Wither:
-  Enable: true
-  Allow:
-  - hogehoge
-
-EnderDragon:
-  Enable: true
-  Allow:
-  - hogehoge
+wither:
+  is-enabled: true
+  ignored-worlds: []
+ender-dragon:
+  is-enabled: true
+  ignored-worlds: []

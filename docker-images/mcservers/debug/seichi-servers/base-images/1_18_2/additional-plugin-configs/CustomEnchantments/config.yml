@@ -188,7 +188,7 @@ Enchantments:
     - 0LVL&0$
     - 0LVL&0$
   Firework:
-    Enabled: 'true'
+    Enabled: 'false'
     DisplayName: Firework
     EnchantmentProbability: '20'
     EnchantmentMaxLevel: '5'
