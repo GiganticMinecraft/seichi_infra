@@ -58,7 +58,8 @@ Messages:
 - '&6[Tips]&f&cルールは必ず読みましょう&f→&ehttps://www.seichi.network/rule'
 - '&6[Tips]&f&cはじめての方はチャットで質問する前に公式ホームページをチェックしましょう。読んでもわからなかったことをチャットで質問するようにしてください。&f→&ehttps://www.seichi.network/helloworld'
 - '&6[Tips]&f疑問点は公式サイトで解決！→&ehttps://www.seichi.network/gigantic'
-- '&6[Tips]&f整地鯖で使えるコマンド→&ehttps://cmd.seichi.click/'
+- '&6[Tips]&f整地鯖で使えるコマンド→&ehttps://playguide.seichi.click/command/overview.html'
+- '&6[Tips]&f整地鯖の遊び方→&ehttps://playguide.seichi.click/'
 - '&6[Tips]&f1日1回投票して特典をゲット！→&ehttps://goo.gl/cu7ziG'
 - '&6[Tips]&fお問い合わせ→&ehttps://www.seichi.network/access'
 - '&6[Tips]&fサーバーマップ→&ehttps://www.seichi.network/map'
@@ -85,7 +86,6 @@ Messages:
 - '&6[Tips]&e/minestack store-all&fでインベントリ内のアイテムをMineStackに格納できます。'
 - '&6[Tips]&e/trade <プレイヤー名>&fで指定のプレイヤーと取引を開始できます。(取引中はチャット機能が使えないので交換内容は事前にしておきましょう。)'
 - '&6[Tips]&f静かに整地がしたい？そんなときはエデンやヴァルハラをオススメします。'
-- '&6[Tips]&fTownyはヴァルハラサーバーで利用できます。'
 - '&6[Tips]&f最新情報は公式ホームページまたは公式Discordサーバーで！'
 - '&6[Tips]&cご自身のエリアで災害が発生した際は、ゲーム内チャットの災害情報は鵜呑みにせず &l"すぐにゲームを終了"&cしてテレビやラジオなどのメディアで災害情報を入手しましょう。'
 TellRawMessages:
