@@ -26,9 +26,6 @@ spec:
         value: database--seichiassist-with-flyway-for-debug
       - name: DOWNLOAD_TARGET_DIR_PATH
         value: /docker-entrypoint-initdb.d
-    volumeMounts:
-      - mountPath: /docker-entrypoint-initdb.d
-        name: sqldump-volume
 
   tls:
     enabled: false
@@ -110,3 +107,11 @@ spec:
     enabled: true
     serviceMonitor:
       prometheusRelease: prometheus
+
+  volumeMounts:
+  - mountPath: /docker-entrypoint-initdb.d
+    name: sqldump-volume
+
+  volumes:
+  # 本番サーバーからもってきた sqldump をマウントするためのボリューム
+  - name: sqldump-volume
