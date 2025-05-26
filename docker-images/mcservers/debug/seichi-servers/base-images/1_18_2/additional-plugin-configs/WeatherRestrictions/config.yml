@@ -1,5 +1,5 @@
 worlds:
-  world:
+  world_2:
     CanRain: true
     CanIceForm: true
     CanIceMelt: true
@@ -7,45 +7,6 @@ worlds:
     MaxSunTime: 21600
     MinimumSunTime: 1200
     MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_nether:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_the_end:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_spawn:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
     CanSnowForm: true
     CanSnowMelt: true
     ThunderstormChancePercentage: 20
@@ -64,137 +25,7 @@ worlds:
     ThunderstormChancePercentage: 20
     SuperchargedThunderChance: 0.0
     SuperchargedExplosionRadius: 3.0
-  world_nether_s:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_the_end_s:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_s:
-    CanRain: true
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: 1200
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_tt:
-    CanRain: true
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: 1200
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_nether_tt:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_the_end_tt:
-    CanRain: false
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: -1
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: -1
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
   world_sw_2:
-    CanRain: true
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: 1200
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_sw_nether:
-    CanRain: true
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: 1200
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_sw_the_end:
-    CanRain: true
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: 1200
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_2:
-    CanRain: true
-    CanIceForm: true
-    CanIceMelt: true
-    MaxRainTime: 1200
-    MaxSunTime: 21600
-    MinimumSunTime: 1200
-    MinimumRainTime: 60
-    CanSnowForm: true
-    CanSnowMelt: true
-    ThunderstormChancePercentage: 20
-    SuperchargedThunderChance: 0.0
-    SuperchargedExplosionRadius: 3.0
-  world_sw_zero:
     CanRain: true
     CanIceForm: true
     CanIceMelt: true
@@ -233,7 +64,7 @@ worlds:
     ThunderstormChancePercentage: 20
     SuperchargedThunderChance: 0.0
     SuperchargedExplosionRadius: 3.0
-  world_sougen:
+  world_sw_nether:
     CanRain: true
     CanIceForm: true
     CanIceMelt: true
@@ -246,7 +77,7 @@ worlds:
     ThunderstormChancePercentage: 20
     SuperchargedThunderChance: 0.0
     SuperchargedExplosionRadius: 3.0
-  world_towny:
+  world_sw_the_end:
     CanRain: true
     CanIceForm: true
     CanIceMelt: true
@@ -260,6 +91,32 @@ worlds:
     SuperchargedThunderChance: 0.0
     SuperchargedExplosionRadius: 3.0
   world_build:
+    CanRain: true
+    CanIceForm: true
+    CanIceMelt: true
+    MaxRainTime: 1200
+    MaxSunTime: 21600
+    MinimumSunTime: 1200
+    MinimumRainTime: 60
+    CanSnowForm: true
+    CanSnowMelt: true
+    ThunderstormChancePercentage: 20
+    SuperchargedThunderChance: 0.0
+    SuperchargedExplosionRadius: 3.0
+  world_dot:
+    CanRain: true
+    CanIceForm: true
+    CanIceMelt: true
+    MaxRainTime: 1200
+    MaxSunTime: 21600
+    MinimumSunTime: 1200
+    MinimumRainTime: 60
+    CanSnowForm: true
+    CanSnowMelt: true
+    ThunderstormChancePercentage: 20
+    SuperchargedThunderChance: 0.0
+    SuperchargedExplosionRadius: 3.0
+  world_towny:
     CanRain: true
     CanIceForm: true
     CanIceMelt: true

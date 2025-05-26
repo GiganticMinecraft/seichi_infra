@@ -1,16 +1,5 @@
 # https://github.com/BenWoodworth/FastCraft/wiki/Configuration
-language: EN
-default-enabled: true
-toolbar:
-  gap: true
-  layout:
-    page-prev: 0
-    page-next: 8
-    multiplier: 3
-    workbench: 4
-    refresh: 5
-  multiplier-order: 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64
-debug: false
+
 disable-recipes:
   recipe-ids: []
 recipe-calculations:
@@ -54,4 +43,4 @@ layout:
       command: say $player pressed a custom button
   background:
     enable: false
-    item: minecraft:stained_glass_pane:8
+    item: minecraft:light_gray_stained_glass_pane

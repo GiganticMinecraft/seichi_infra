@@ -1,4 +1,4 @@
-﻿timer: 300 # default: 10
+timer: 300 # default: 10
 Random: false
 UseTellRawMessages: false
 Messages:
