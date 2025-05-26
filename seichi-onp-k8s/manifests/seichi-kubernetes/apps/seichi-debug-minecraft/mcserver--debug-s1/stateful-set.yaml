@@ -17,27 +17,6 @@ spec:
         mcserver: debug-s1
     spec:
       initContainers:
-        - name: jmx-exporter-downloader
-          image: busybox:1.37.0
-          env:
-            - name: JMX_EXPORTER_URL
-              value: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar"
-          volumeMounts:
-            - name: jmx-exporter-download-volume
-              mountPath: /root/jmx-exporter-download
-          command:
-            - "sh"
-            - "-c"
-            - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
-        # - name: delete-jars
-        #   image: busybox:1.37.0
-        #   volumeMounts:
-        #     - name: minecraft-server-data
-        #       mountPath: /data
-        #   command:
-        #     - "sh"
-        #     - "-c"
-        #     - "rm -rf /data/plugins/*.jar"
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
           env:
@@ -58,48 +37,55 @@ spec:
             - name: BUCKET_PREFIX_NAME
               value: deb-1-18-2
             - name: DOWNLOAD_TARGET_DIR_PATH
-              value: /plugins
+              value: /downloaded-plugins
           volumeMounts:
             - name: mod-downloader-volume
-              mountPath: /plugins
+              mountPath: /downloaded-plugins
+        - name: seichiassist-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichiassist
+            - name: BUCKET_PREFIX_NAME
+              value: develop
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
 
       containers:
         - resources:
             requests:
-              cpu: 4
-              memory: 6Gi
+              cpu: 8
+              memory: 18Gi
             limits:
-              cpu: 6
-              memory: 6Gi
+              cpu: 10
+              memory: 18Gi
           env:
             - name: MEMORY
-              value: 4G
-            - name: TYPE
-              value: PAPER
-            - name: VERSION
-              value: "1.18.2"
+              value: 16G
             - name: EULA
               value: "TRUE"
 
-            - name: REMOVE_OLD_MODS
-              value: "TRUE"
-
-            - name: MODS
-              value: >-
-                https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar,
-                https://github.com/GiganticMinecraft/LunaChat/releases/download/for-1.18.2-lunachat-3.0.17/LunaChat.jar,
-                https://github.com/GiganticMinecraft/Elytra/releases/download/release-at-3d2239a54b1c0cfa5c1b5017ee36256056df911f/Elytra-1.0-SNAPSHOT.jar,
-                https://github.com/GiganticMinecraft/OriginSpawn/releases/download/v0.2.7/OriginSpawn-0.2.7-SNAPSHOT.jar,
-                https://github.com/GiganticMinecraft/ByeByeWither/releases/download/sha-e2a0a69/ByeByeWither-1.0.0.jar,
-                https://github.com/sladkoff/minecraft-prometheus-exporter/releases/download/v2.5.0/minecraft-prometheus-exporter-2.5.0.jar,
-                https://github.com/GiganticMinecraft/RandomTeleport/releases/download/for-1.18/RandomTeleport-1.0-SNAPSHOT.jar,
-                https://github.com/GiganticMinecraft/SeichiAssist/releases/download/pr-2115-e14ac78fc17f8b607f614faa4ff9e40b517eb031/SeichiAssist.jar,
-
             - name: JVM_OPTS
+              # base image 側で JVM_OPTS に対して jmx exporter の設定を追加しているが、上書きが必要なためここで設定する
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
               # ref: https://docs.papermc.io/paper/aikars-flags
               value: >-
-                -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch 
                 -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M 
@@ -111,9 +97,6 @@ spec:
 
             - name: ENABLE_JMX
               value: "true"
-            # 固定化したClusterIPを指定することで、VisualVMによるアクセスが正しく動作するようにする
-            - name: JMX_HOST
-              value: "10.96.87.190"
             - name: JMX_PORT
               value: "32000"
 
@@ -122,28 +105,89 @@ spec:
               # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
               value: /data
 
-            # 設定ファイル内の ${CFG_*} の形をした部分を置き換える
-            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
-            - name: REPLACE_ENV_VARIABLE_PREFIX
-              value: CFG_
-
-            - name: CFG_DISCORDSRV_TOKEN
+            - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: mcserver--common--config-secrets
                   key: DISCORDSRV_TOKEN
 
-            - name: CFG_DISCORDSRV_GLOBAL_CHANNEL_ID
-              value: "1054159992447570032"
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_HOST
+              value: mariadb
 
-            - name: CFG_DISCORDSRV_CONSOLE_CHANNEL_ID
-              value: "1054159676964622426"
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PORT
+              value: "3306"
+            
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_USER
+              value: mcserver
 
-            - name: CFG_SEICHIASSIST_MYSQL_ROOT_PASSWORD
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mariadb
-                  key: root-password
+                  key: mcserver-password
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_URL_WEBHOOK_NOTIFICATION
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--seichiassist-webhook--config-secrets
+                  key: SEICHIASSIST_DEBUG_S1_WEBHOOK_URL
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
+              value: seichi-debug-redisbungee-redis
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT
+              value: "6379"
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_HOST
+              value: seichi-debug-bungeesemaphore-redis
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_PORT
+              value: "6379"
+
+            - name: CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT
+              value: "9225"
+
+            - name: CFG_REPLACEMENT__WORLDEDIT_SCHEMATICS_DIRECTORY
+              value: /worldedit-schematica
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
+              value: coreprotect
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_DATABASE_NAME
+              value: coreprotect__mc_debug_s1
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: coreprotect-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER
+              value: luckperms
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: LUCKPERMS_PASSWORD
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
+              value: luckperms
+
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
 
             - name: RCON_CMDS_STARTUP
               value: |-
@@ -167,49 +211,27 @@ spec:
                 mv gamerule doInsomnia false world_SW_nether
                 mv gamerule doInsomnia false world_SW_the_end
                 mvm set difficulty peaceful world_2
-                rg flag -w world_2 __global__ build -g members allow
-                rg addmember -w world_2 __global__ unchama
+                rg addmember -w world_SW_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
                 rg flag -w world_SW_2 __global__ build -g members allow
-                rg addmember -w world_SW_2 __global__ unchama
+                rg addmember -w world_SW_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_SW_2 __global__ build -g members allow
+                rg addmember -w world_SW_4 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_SW_4 __global__ build -g members allow
+                rg flag -w world_SW __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_2 __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_4 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
-                lp group default permission set multiverse.core.list.who true
-                lp group default permission set multiverse.teleport.* true
-                lp group default permission set multiverse.core.spawn.self true
-                lp group default permission set worldedit.wand true
-                lp group default permission set worldedit.selection.pos true
-                lp group default permission set worldguard.region.claim true
-                lp group default permission set worldguard.region.select.own.* true
-                lp group default permission set worldguard.region.list.own true
-                lp group default permission set worldguard.region.info.* true
-                lp group default permission set worldguard.region.flag.regions.own.* true
-                lp group default permission set worldguard.region.remove.own.* true
-                lp group default permission set fastcraft.command.craft.fastcraft true
-                lp group default permission set seichiassist.fly true
-                lp group default permission set seichiassist.stick true
-                lp group default permission set seichiassist.shareinv true
-                lp group default permission set seichiassist.mebius true
-                lp group default permission set seichiassist.home true
-                lp group default permission set seichiassist.sethome true
-                lp group default permission set seichiassist.stickmenu true
-                lp group default permission set seichiassist.fd true
-                lp group default permission set seichiassist.hat true
-                lp group default permission set seichiassist.ec true
-                lp group default permission set seichiassist.minestack true
-                lp group default permission set seichiassist.map true
-                lp group default permission set seichiassist.ef true
-                lp group default permission set elytra.auto true
-                lp group default permission set elytra.const-flight true
-                lp group default permission set elytra.runup true
-                lp group default permission set elytra.shift-activation true
-                lp group default permission set elytra.speedup true
-                lp group default permission set clicktpa.tpa true
-                lp group default permission set clicktpa.tpacancel true
-                lp group default permission set clicktpa.tpadeny true
-                lp group default permission set clicktpa.tpaccept true
-                lp group default permission set clicktpa.tpahere true
-                lp group default permission set clicktpa.tptoggle true
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:sha-a52f2d5
+            # /downloaded-plugins: minio からダウンロードしたプラグインを配置
+            # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
+            # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
+            - name: COPY_PLUGINS_SRC
+              value: |-
+               /downloaded-plugins
+               /plugins
+
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:sha-bdb28e2
           name: minecraft
           ports:
             - containerPort: 25565
@@ -255,184 +277,49 @@ spec:
             # 参考: https://stackoverflow.com/a/63114800
             # 参考: https://stackoverflow.com/a/50687707
 
-            # サーバーの設定ファイル
-            - name: common-mcserver-configs
-              mountPath: /config/bukkit.yml
-              subPath: bukkit.yml
-            - name: common-mcserver-configs
-              mountPath: /config/paper.yml
-              subPath: paper.yml
-            - name: common-mcserver-configs
-              mountPath: /config/server.properties
-              subPath: server.properties
-            - name: common-mcserver-configs
-              mountPath: /config/spigot.yml
-              subPath: spigot.yml
-            - name: common-mcserver-configs
-              mountPath: /config/commands.yml
-              subPath: commands.yml
-            - name: minecraft-ops-config
-              mountPath: /config/ops.json
-              subPath: ops.json
-
-            # DiscordSRV プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/DiscordSRV/config.yml
-              subPath: DiscordSRV-config.yml
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/DiscordSRV/messages.yml
-              subPath: DiscordSRV-messages.yml
-
-            # MorningGlorySeeds プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/MorningGlorySeeds/config.yml
-              subPath: MorningGlorySeeds-config.yml
-
-            # LunaChat プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/LunaChat/config.yml
-              subPath: LunaChat-config.yml
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/LunaChat/dictionary.yml
-              subPath: LunaChat-dictionary.yml
-
-            # Elytra プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/Elytra/config.yml
-              subPath: Elytra-config.yml
-
-            # ClickTpa プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/ClickTpa/config.yml
-              subPath: ClickTpa-config.yml
-
-            # RandomTeleport プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/RandomTeleport/config.yml
-              subPath: RandomTeleport-config.yml
-
-            # WorldGuard プラグイン周りの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/WorldGuard/config.yml
-              subPath: WorldGuard-config.yml
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_2/blacklist.txt
-              subPath: main-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_2/config.yml
-              subPath: main-config.yml
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW/blacklist.txt
-              subPath: world_SW-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW/config.yml
-              subPath: world_SW-config.yml
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_2/blacklist.txt
-              subPath: world_SW-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_2/config.yml
-              subPath: world_SW_2-config.yml
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_nether/blacklist.txt
-              subPath: world_SW_the_end-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_nether/config.yml
-              subPath: world_SW_the_end-config.yml
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/blacklist.txt
-              subPath: world_SW_the_end-Blacklist.txt
-            - name: common-worldguard-configs
-              mountPath: /plugins/WorldGuard/worlds/world_SW_the_end/config.yml
-              subPath: world_SW_the_end-config.yml
-
-            # ByeByeWither プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/ByeByeWither/config.yml
-              subPath: ByeByeWither-config.yml
-
-            # PrometheusExporter プラグインの設定ファイル
-            - name: common-mcserver-plugin-configs
-              mountPath: /plugins/PrometheusExporter/config.yml
-              subPath: PrometheusExporter-config.yml
-
-            # SeichiAssist プラグインの設定ファイル
-            - name: seichiassist-config
-              mountPath: /plugins/SeichiAssist/config.yml
-              subPath: config.yml
-
-            # JMX exporter 周りのファイルが入ったボリューム達のマウント設定
-            - name: jmx-exporter-download-volume
-              mountPath: /jmx-exporter/jmx-exporter-javaagent.jar
-              subPath: jmx-exporter-javaagent.jar
-            - name: common-jmx-exporter-config
-              mountPath: /jmx-exporter/jmx-exporter-config.yaml
-              subPath: jmx-exporter-config.yaml
-
-            # Multiverse-Portals プラグインの設定ファイル
-            - name: multiverse-portals-config
-              mountPath: /plugins/Multiverse-Portals/portals.yml
-              subPath: portals.yml
-
-            # CustomEnchantments プラグインの設定ファイル
-            - name: custom-enchantments-config
-              mountPath: /plugins/CustomEnchantments/config.yml
-              subPath: custom-enchantments-config.yml
-
-            # OriginSpawn プラグインの設定ファイル
-            - name: originspawn-config
-              mountPath: /plugins/OriginSpawn/config.yml
-              subPath: config.yml
-
+            # /plugins, /data/plugins ディレクトリには直接マウントしないこと。
+            #
+            # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
+            # /data/plugins ディレクトリに自動で配置してくれる。
+            # しかし、この Pod のベースとなっている seichi_minecraft_server_base は、
+            # /plugins ディレクトリに必要なプラグインの設定ファイルを展開している。
+            # そのため、/plugins ディレクトリにボリュームを直接マウントすると、既存の設定ファイルがすべて上書き(削除)されてしまう。
+            #
+            # また、/data/plugins ディレクトリにマウントしていない理由は、
+            # バックアップファイルからサーバーデータをリストアした場合、既存のデータが /data/plugins ディレクトリにも配置される。
+            # しかし、この Pod が起動したときに /data/plugins ディレクトリに mod-downloader-volume をマウントしてしまうと、
+            # 復元したはずのデータがすべて削除されることによって、
+            # /data/plugins/[プラグイン名] ディレクトリ以下にデータを保存するプラグインのデータ整合性が失われるリスクがある。
+            # これを回避するため、別のディレクトリにマウントしたうえで /data/plugins ディレクトリに mod-donwloader からダウンロードしたプラグインを配置する必要がある。
+            # itzg/minecraft-server の機能で COPY_PLUGINS_SRC という環境変数で指定したディレクトリをにプラグインを配置することで、
+            # これを実現するため、Pod 起動時に /data/plugins ディレクトリにプラグインを配置することができ、
+            # そこに指定した /downloaded-plugins ディレクトリにマウントすることとしている。
             - name: mod-downloader-volume
-              mountPath: /plugins
+              mountPath: /downloaded-plugins
 
-            # サーバーデータが格納されているディレクトリのマウント設定
-            # - name: minecraft-server-data
-            #   mountPath: /data
+            - name: worldedit-schematica-volume
+              mountPath: /worldedit-schematica
 
+            - name: mcserver--debug-s1-data
+              mountPath: /data
+      
       volumes:
-        - name: common-mcserver-configs
-          configMap:
-            name: common-mcserver-configs
-        - name: common-worldguard-configs
-          configMap:
-            name: common-worldguard-configs
-        - name: common-mcserver-plugin-configs
-          configMap:
-            name: common-mcserver-plugin-configs
-        - name: seichiassist-config
-          configMap:
-            name: seichiassist-config
-        - name: minecraft-ops-config
-          configMap:
-            name: minecraft-ops-config
-        - name: multiverse-portals-config
-          configMap:
-            name: multiverse-portals-config
-        - name: custom-enchantments-config
-          configMap:
-            name: custom-enchantments-config
-        - name: originspawn-config
-          configMap:
-            name: originspawn-config
-
-        # JMX exporterをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
-        - name: jmx-exporter-download-volume
-          emptyDir: {}
-        - name: common-jmx-exporter-config
-          configMap:
-            name: common-jmx-exporter-config
-
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
           emptyDir: {}
+
+        # WorldEditがSchematicaを保存・読み取るするためのvolume
+        - name: worldedit-schematica-volume
+          emptyDir: {}
+
   volumeClaimTemplates:
-    - metadata:
-        name: minecraft-server-data
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mcserver--debug-s1-data
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 50Gi
+            storage: 30Gi
