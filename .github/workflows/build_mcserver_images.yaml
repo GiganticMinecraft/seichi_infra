@@ -52,10 +52,10 @@ jobs:
           - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2
             build_context: ./docker-images/mcservers/debug/seichi-servers/base-images/1_18_2
             image_ver: 1.0.0
-          # - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
-          #   build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
-          # - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
-          #   build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1
+            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s1
+          - image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2
+            build_context: ./docker-images/mcservers/debug/seichi-servers/individual-images/deb-s2
 
     steps:
       - name: checkout
