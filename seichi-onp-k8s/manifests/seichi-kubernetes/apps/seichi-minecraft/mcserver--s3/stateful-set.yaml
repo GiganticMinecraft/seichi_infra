@@ -245,6 +245,9 @@ spec:
                 rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_4 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
+                # Towny 専用ワールドの読み込みをさせない
+                # Towny でログアウトしたプレイヤーは自動的にメインワールドに引き戻されることを確認済み
+                mvunload world_towny
 
             # /downloaded-plugins: minio からダウンロードしたプラグインを配置
             # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
