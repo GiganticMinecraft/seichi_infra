@@ -43,21 +43,21 @@ spec:
 
     - name: get-timestamp
       script:
-        image: alpine
+        image: mirror.gcr.io/alpine
         command: [sh]
         source: |
           echo $(date +%Y%m%d-%H%M%S)
 
     - name: patch-statefulset-to-0
       script:
-        image: bitnami/kubectl:1.33.1
+        image: mirror.gcr.io/bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--s3 -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
 
     - name: wait-for-scale-to-0
       script:
-        image: bitnami/kubectl:1.33.1
+        image: mirror.gcr.io/bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
@@ -73,7 +73,7 @@ spec:
 
     - name: run-backup
       script:
-        image: debian:12
+        image: mirror.gcr.io/debian:12
         command: ["/bin/sh", "-c"]
         source: |
           set -e
@@ -141,14 +141,14 @@ spec:
 
     - name: delete-coreprotect--s3-db
       script:
-        image: bitnami/kubectl:1.33.1
+        image: mirror.gcr.io/bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           kubectl delete database coreprotect-s3 -n seichi-minecraft --wait=true
 
     - name: patch-statefulset-to-1
       script:
-        image: bitnami/kubectl:1.33.1
+        image: mirror.gcr.io/bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--s3 -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
@@ -156,7 +156,7 @@ spec:
     - name: wait-for-scale-to-1
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
       script:
-        image: bitnami/kubectl:1.33.1
+        image: mirror.gcr.io/bitnami/kubectl:1.33.1
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for StatefulSet to scale up..."
