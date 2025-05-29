@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: backup--mcservers
+  namespace: seichi-minecraft
+spec:
+  schedule: "0 4 * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  workflowSpec:
+    workflowTemplateRef:
+      name: mcserver-backup-workflow-template
+  retryStrategy:
+    limit: 3
