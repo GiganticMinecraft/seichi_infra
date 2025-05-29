@@ -2,7 +2,7 @@ timer: 300 # default: 10
 Random: false
 UseTellRawMessages: false
 Messages:
-- '&6[Tips]&f岩盤までぶち抜いた後&eY5&fにハーフブロックを敷く文化があるらしい。'
+- '&6[Tips]&f岩盤までぶち抜いた後&eY-59&fにハーフブロックを敷く文化があるらしい。'
 - '&6[Tips]&f&eALL値&fが&c200&fを超える建築やMOB溜め等はご遠慮ください。'
 - '&6[Tips]&f看板の文字には&e&系各種カラーコードが使用可能&fです。'
 - '&6[Tips]&f&e/mvspawn&fで今いるワールドのスポーン地点に移動します。'
@@ -10,12 +10,12 @@ Messages:
 - '&6[Tips]&fルール違反を見かけたら&c反応せずに通報&fしましょう。'
 - '&6[Tips]&f嫌なチャットは&e/ch hide <プレイヤー名>&fで非表示にしましょう。'
 - '&6[Tips]&f個人間チャットは&e/tell&fコマンドをご利用ください。'
-- '&6[Tips]&f&elunachat&fによるチャンネルチャット機能が利用可能です。'
-- '&6[Tips]&f混雑時は空いてるサーバーに移動しての整地がオススメ。'
+- '&6[Tips]&f&eLunaChat&fによるチャンネルチャット機能が利用可能です。'
+- '&6[Tips]&f混雑時は空いてるサーバーに移動しての整地がオススメ。サーバー間移動について→https://playguide.seichi.click/gameplay/travel/server.html'
 - '&6[Tips]&fチャットはサーバーごとに独立しています。'
 - '&6[Tips]&f運営チームのなりすましにご注意ください。'
 - '&6[Tips]&fゲーム内で運営チームへチャットしても(大体)反応しません。'
-- '&6[Tips]&f運営チームへのお問い合わせは&ewebフォーム&fを使ってネ。(運営チーム個人宛の問い合わせはご遠慮ください)→&ehttps://www.seichi.network/access'
+- '&6[Tips]&f運営チームへのお問い合わせは&eWebフォーム&fを使ってネ。(運営チーム個人宛の問い合わせはご遠慮ください)→&ehttps://www.seichi.network/access'
 - '&6[Tips]&f地形にハマって出られない時は&e/spawn&fを使おう！'
 - '&6[Tips]&fログインせずに投票しても特典は配布されます。'
 - '&6[Tips]&fロビーサーバーへの移動は&e/hub&fで！'
@@ -32,7 +32,6 @@ Messages:
 - '&6[Tips]&f整地の心得③：水やマグマは除去すべし！'
 - '&6[Tips]&f整地の心得④：掘りぬいた後は綺麗に整えるべし！'
 - '&6[Tips]&f&e整地の心得違反者&fは&c処罰&fされます。詳しくはルールをご確認下さい。'
-- '&6[Tips]&f公式Discordサーバーで運営のお手伝いを募集しています。'
 - '&6[Tips]&f1000ブロック整地するごとにガチャ券がもらえます。'
 - '&6[Tips]&f公式サイトではガチャの景品リストを公開しています。'
 - '&6[Tips]&f名前の左に表示されるのは&e整地レベルor二つ名&fです。'
@@ -88,6 +87,7 @@ Messages:
 - '&6[Tips]&f静かに整地がしたい？そんなときはエデンやヴァルハラをオススメします。'
 - '&6[Tips]&f最新情報は公式ホームページまたは公式Discordサーバーで！'
 - '&6[Tips]&cご自身のエリアで災害が発生した際は、ゲーム内チャットの災害情報は鵜呑みにせず &l"すぐにゲームを終了"&cしてテレビやラジオなどのメディアで災害情報を入手しましょう。'
+- '&6[Tips]&cコマンドの使い方がわからないときはコマンドガイドを見てみよう！→&e https://playguide.seichi.click/command/overview.html'
 TellRawMessages:
 - '{"text":"[Get more info on TellRaws here: minecraft.tools/en/tellraw.php ]","color":"dark_purple"}'
 - '{"text":"[This is a test message!] ","color":"aqua"}'
