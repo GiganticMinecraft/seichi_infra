@@ -8,18 +8,14 @@ spec:
   ttlStrategy:
     secondsAfterCompletion: 86400
   entrypoint: mcserver-backup-entrypoint
-  # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
   arguments:
+    # NOTE: Argo Workflows の Example やドキュメントには spec.arguments.parameters で指定する parameter には必ず value を指定しているように見えるが、
+    #   Argo Workflows の Parameters の定義を読みに行くと Optional であることがわかるのでこれでよい。
+    #   ref: https://github.com/argoproj/argo-workflows/blob/7f0f9decf5c133ed1726e09397f4357b752c43b4/pkg/apis/workflow/v1alpha1/workflow_types.go#L886-L909
     parameters:
-      - name: targets
-        value: |
-          [
-            { "statefulset-name": "mcserver--s1", "coreprotect-db-name": "coreprotect-s1", "persistent-volume-claim-name": "mcserver--s1-data-mcserver--s1-0" },
-            { "statefulset-name": "mcserver--s2", "coreprotect-db-name": "coreprotect-s2", "persistent-volume-claim-name": "mcserver--s2-data-mcserver--s2-0" },
-            { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect-s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" },
-            { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect-s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" },
-            { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect-s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" } 
-          ]
+      - name: statefulset-name
+      - name: coreprotect-db-name
+      - name: persistent-volume-claim-name
   templates:
     - name: mcserver-backup-entrypoint
       dag:
@@ -28,60 +24,54 @@ spec:
 
         - name: patch-statefulset-to-0
           template: patch-statefulset-to-0
-          withParam: "{{workflow.parameters.targets}}"
           arguments:
             parameters:
               - name: statefulset-name
-                value: "{{item.statefulset-name}}"
+                value: "{{workflow.parameters.statefulset-name}}"
 
         - name: wait-for-scale-to-0
           template: wait-for-scale-to-0
-          withParam: "{{workflow.parameters.targets}}"
           arguments:
             parameters:
               - name: statefulset-name
-                value: "{{item.statefulset-name}}"
+                value: "{{workflow.parameters.statefulset-name}}"
           dependencies:
             - patch-statefulset-to-0
 
         - name: run-backup
           template: run-backup
-          withParam: "{{workflow.parameters.targets}}"
           arguments:
             parameters:
               - name: statefulset-name
-                value: "{{item.statefulset-name}}"
+                value: "{{workflow.parameters.statefulset-name}}"
           dependencies:
             - wait-for-scale-to-0
 
         - name: delete-coreprotect-db
           template: delete-coreprotect-db
-          withParam: "{{workflow.parameters.targets}}"
           arguments:
             parameters:
               - name: coreprotect-db-name
-                value: "{{item.parameters.coreprotect-db-name}}"
+                value: "{{workflow.parameters.coreprotect-db-name}}"
           dependencies:
             - wait-for-scale-to-0
 
         - name: patch-statefulset-to-1
           template: patch-statefulset-to-1
-          withParam: "{{workflow.parameters.targets}}"
           arguments:
             parameters:
               - name: statefulset-name
-                value: "{{item.statefulset-name}}"
+                value: "{{workflow.parameters.statefulset-name}}"
           dependencies:
             - run-backup
             - delete-coreprotect-db
 
         - name: wait-for-scale-to-1
           template: wait-for-scale-to-1
-          withParam: "{{workflow.parameters.targets}}"
           arguments:
             parameters:
               - name: statefulset-name
-                value: "{{item.statefulset-name}}"
+                value: "{{workflow.parameters.statefulset-name}}"
           dependencies:
             - patch-statefulset-to-1
 
