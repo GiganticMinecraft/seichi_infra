@@ -96,7 +96,9 @@ messages:
     flying-vehicle: Flying is not enabled on this server
 timings:
   url: https://timings.aikar.co/
-  enabled: true
+  # Timings はメンテナンスが終了しているため，Spark に移行している
+  # この設定で Timings を無効化する
+  enabled: false
   verbose: true
   server-name-privacy: false
   hidden-config-entries:
