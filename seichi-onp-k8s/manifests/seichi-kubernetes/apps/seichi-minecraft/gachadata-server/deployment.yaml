@@ -31,8 +31,8 @@ spec:
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mcserver--common--config-secrets
-                  key: GAME_DB_PASSWORD
+                  name: mariadb
+                  key: mcserver-password
             - name: MYSQL_HOST
               value: "mariadb"
             - name: MYSQL_PORT
