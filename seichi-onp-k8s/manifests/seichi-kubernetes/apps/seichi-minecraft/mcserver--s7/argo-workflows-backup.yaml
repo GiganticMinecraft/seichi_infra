@@ -34,8 +34,8 @@ spec:
             template: wait-for-scale-to-0
         - - name: run-backup
             template: run-backup
-        - - name: delete-coreprotect--s7-db
-            template: delete-coreprotect--s7-db
+        # - - name: delete-coreprotect--s7-db
+        #     template: delete-coreprotect--s7-db
         - - name: patch-statefulset-to-1
             template: patch-statefulset-to-1
         - - name: wait-for-scale-to-1
