@@ -137,6 +137,19 @@ else
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 fi
 
+# Create mirror repository settings for docker.io
+# refs: https://gist.github.com/unchama/3073ca78e4a0febe40575d457cc89070
+sudo mkdir -p /etc/containerd/certs.d/docker.io
+sudo tee /etc/containerd/certs.d/docker.io/hosts.toml << 'EOF'
+server = "https://registry-1.docker.io"
+
+[host."https://mirror.gcr.io"]
+  capabilities = ["pull", "resolve"]
+EOF
+
+sudo sed -i '/^\s*\[plugins\."io.containerd.grpc.v1.cri"\.registry\]/,/\[/{s|config_path = ""|config_path = "/etc/containerd/certs.d"|}' /etc/containerd/config.toml
+
+# Restart containerd to apply changes
 sudo systemctl restart containerd
 
 # Modify kernel parameters for Kubernetes
