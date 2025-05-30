@@ -13,7 +13,7 @@ Options:
 Messages:
   Prefix: "&9&l[AntiProxy]"
   PunishmentMessage: "You are not allowed to join this server with Proxies."
-  BlackListPunishMessage: "You are blacklisted from joining this server."
+  BlackListPunishMessage: "このIPアドレスからの接続は利用規約に違反していると判断されました。プロキシなどをお使いの場合は、プロキシを通さずに接続してください。問題が解決しない場合は、お問い合わせフォームからお問い合わせください。"
   NoPermission: "You do not have permission for this command!"
   ReloadMessage: "Config Reloaded Successfully."
   BlackListAddedMessage: "Added IP Successfully to BlackList."
