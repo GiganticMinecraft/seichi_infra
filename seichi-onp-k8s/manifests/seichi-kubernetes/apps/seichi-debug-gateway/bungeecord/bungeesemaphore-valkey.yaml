@@ -1,24 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: seichi-debug-bungeesemaphore-redis
+  name: seichi-debug-bungeesemaphore-valkey
   namespace: argocd
 spec:
   project: seichi-debug-gateway
   source:
-    chart: redis
+    chart: valkey
     repoURL: 'registry-1.docker.io/bitnamicharts'
-    path: 'redis'
+    path: 'valkey'
     targetRevision: 21.1.7
     helm:
-      releaseName: seichi-debug-bungeesemaphore-redis
+      releaseName: seichi-debug-bungeesemaphore-valkey
       values: |
         architecture: standalone
         auth:
           enabled: false
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
-        master:
+        primary:
           service:
             type: LoadBalancer
             loadBalancerClass: io.cilium/bgp-control-plane
@@ -42,37 +42,37 @@ spec:
             additionalLabels:
               release: prometheus
             rules:
-              - alert: RedisDown
-                expr: redis_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
+              - alert: ValkeyDown
+                expr: valkey_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
                 for: 2m
                 labels:
                   severity: error
                 annotations:
-                  summary: Redis&reg; instance {{ "{{ $labels.instance }}" }} down
-                  description: Redis&reg; instance {{ "{{ $labels.instance }}" }} is down
-              - alert: RedisMemoryHigh
+                  summary: Valkey&reg; instance {{ "{{ $labels.instance }}" }} down
+                  description: Valkey&reg; instance {{ "{{ $labels.instance }}" }} is down
+              - alert: ValkeyMemoryHigh
                 expr: >
-                  redis_memory_used_bytes{service="{{ template "common.names.fullname" . }}-metrics"} * 100
+                  valkey_memory_used_bytes{service="{{ template "common.names.fullname" . }}-metrics"} * 100
                   /
-                  redis_memory_max_bytes{service="{{ template "common.names.fullname" . }}-metrics"}
+                  valkey_memory_max_bytes{service="{{ template "common.names.fullname" . }}-metrics"}
                   > 90
                 for: 2m
                 labels:
                   severity: error
                 annotations:
-                  summary: Redis&reg; instance {{ "{{ $labels.instance }}" }} is using too much memory
+                  summary: Valkey&reg; instance {{ "{{ $labels.instance }}" }} is using too much memory
                   description: |
-                    Redis&reg; instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
-              - alert: RedisKeyEviction
+                    Valkey&reg; instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
+              - alert: ValkeyKeyEviction
                 expr: |
-                  increase(redis_evicted_keys_total{service="{{ template "common.names.fullname" . }}-metrics"}[5m]) > 0
+                  increase(valkey_evicted_keys_total{service="{{ template "common.names.fullname" . }}-metrics"}[5m]) > 0
                 for: 1s
                 labels:
                   severity: error
                 annotations:
-                  summary: Redis&reg; instance {{ "{{ $labels.instance }}" }} has evicted keys
+                  summary: Valkey&reg; instance {{ "{{ $labels.instance }}" }} has evicted keys
                   description: |
-                    Redis&reg; instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
+                    Valkey&reg; instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
   destination:
     server: https://kubernetes.default.svc
     namespace: seichi-debug-gateway
