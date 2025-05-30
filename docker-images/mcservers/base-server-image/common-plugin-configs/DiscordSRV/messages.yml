@@ -196,7 +196,7 @@ DiscordChatChannelListCommandAllPlayersSeparator: ", "
 # %message%:        ゲーム内で見られるメッセージに参加
 #
 MinecraftPlayerJoinMessage:
-  Enabled: true
+  Enabled: ${CFG_REPLACEMENT__DISCORDSRV_MINECRAFT_PLAYER_JOIN_MESSAGE_ENABLED}
   Webhook:
     Enable: false
     AvatarUrl: "%botavatarurl%"
@@ -225,7 +225,7 @@ MinecraftPlayerJoinMessage:
 # %message%:        ゲーム内で見られるメッセージに参加
 #
 MinecraftPlayerFirstJoinMessage:
-  Enabled: true
+  Enabled: ${CFG_REPLACEMENT__DISCORDSRV_MINECRAFT_PLAYER_FIRST_JOIN_MESSAGE_ENABLED}
   Webhook:
     Enable: false
     AvatarUrl: "%botavatarurl%"
@@ -254,7 +254,7 @@ MinecraftPlayerFirstJoinMessage:
 # %message%:        ゲーム内のメッセージを残す
 #
 MinecraftPlayerLeaveMessage:
-  Enabled: true
+  Enabled: ${CFG_REPLACEMENT__DISCORDSRV_MINECRAFT_PLAYER_LEAVE_MESSAGE_ENABLED}
   Webhook:
     Enable: false
     AvatarUrl: "%botavatarurl%"
@@ -284,7 +284,7 @@ MinecraftPlayerLeaveMessage:
 # %world%:        プレイヤーが死亡したワールドの名前
 #
 MinecraftPlayerDeathMessage:
-  Enabled: true
+  Enabled: ${CFG_REPLACEMENT__DISCORDSRV_MINECRAFT_PLAYER_DEATH_MESSAGE_ENABLED}
   Webhook:
     Enable: false
     AvatarUrl: "%botavatarurl%"
@@ -314,7 +314,7 @@ MinecraftPlayerDeathMessage:
 # %world%:       実績を得たときにいたワールドの名前
 #
 MinecraftPlayerAchievementMessage:
-  Enabled: true
+  Enabled: ${CFG_REPLACEMENT__DISCORDSRV_MINECRAFT_PLAYER_ACHIEVEMENT_MESSAGE_ENABLED}
   Webhook:
     Enable: false
     AvatarUrl: "%botavatarurl%"
