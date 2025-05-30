@@ -28,7 +28,7 @@ data:
   RedisBungee-config.yml: |
     server-id: ""
     use-random-id-string: true
-    redis-server: seichi-debug-redisbungee-redis-master.seichi-debug-gateway
+    redis-server: seichi-debug-redisbungee-valkey-primary.seichi-debug-gateway
     redis-port: 6379
     redis-password: ""
     max-redis-connections: 8
