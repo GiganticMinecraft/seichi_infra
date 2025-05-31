@@ -46,11 +46,7 @@ spec:
 
   port: 3306
 
-  storage:
-    size: 100Gi
-    storageClassName: synology-iscsi-storage
-    resizeInUseVolumes: true
-    waitForVolumeResize: true
+  ephemeralStorage: true
 
   myCnf: |
     [mariadb]
