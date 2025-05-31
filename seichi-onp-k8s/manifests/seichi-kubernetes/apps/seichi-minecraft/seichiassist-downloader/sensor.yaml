@@ -61,7 +61,7 @@ spec:
                           template: upload-artifact
                   - name: download-release
                     container:
-                      image: alpine:3.21
+                      image: alpine:3.22
                       volumeMounts:
                         - name: work
                           mountPath: /work
