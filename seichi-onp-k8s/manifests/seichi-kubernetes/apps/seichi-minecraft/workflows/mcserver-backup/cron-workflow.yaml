@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: backup--mcservers
+  namespace: seichi-minecraft
+spec:
+  schedule: "0 4 * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  workflowSpec:
+    entrypoint: run-mcserver-backups
+
+    arguments:
+      parameters:
+        - name: targets
+          value: |
+            [
+              { "statefulset-name": "mcserver--s1", "coreprotect-db-name": "coreprotect-s1", "persistent-volume-claim-name": "mcserver--s1-data-mcserver--s1-0" },
+              { "statefulset-name": "mcserver--s2", "coreprotect-db-name": "coreprotect-s2", "persistent-volume-claim-name": "mcserver--s2-data-mcserver--s2-0" },
+              { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect-s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" },
+              { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect-s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" },
+              { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect-s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" } 
+            ]
+
+    # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
+    templates:
+      - name: run-mcserver-backups
+        withParam: "{{workflow.parameters.targets}}"
+        arguments:
+          parameters:
+          - name: statefulset-name
+            value: "{{item.statefulset-name}}"
+          - name: coreprotect-db-name
+            value: "{{item.coreprotect-db-name}}"
+          - name: persistent-volume-claim-name
+            value: "{{item.persistent-volume-claim-name}}"
+        steps:
+          - name: mcserver-backup-steps
+            templateRef:
+              name: mcserver-backup-workflow-template
+  retryStrategy:
+    limit: 3
