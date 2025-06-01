@@ -184,13 +184,20 @@ spec:
 
     - name: delete-coreprotect-db
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.1
+        image: mirror.gcr.io/mariadb:11.4
         inputs:
           parameters:
             - name: coreprotect-db-name
+        env:
+          - name: coreprotect-db-user-password
+            valueFrom:
+              secretKeyRef:
+                name: mariadb
+                key: coreprotect-password
         command: ["/bin/sh", "-c"]
         source: |
-          kubectl delete database {{inputs.parameters.coreprotect-db-name}} -n seichi-minecraft --wait=true
+          mariadb -h mariadb -u coreprotect -p"${coreprotect-db-user-password}" -e "DROP DATABASE IF EXISTS {{inputs.parameters.coreprotect-db-name}};"
+          mariadb -h mariadb -u coreprotect -p"${coreprotect-db-user-password}" -e "CREATE DATABASE {{inputs.parameters.coreprotect-db-name}};"
 
     - name: patch-statefulset-to-1
       script:
