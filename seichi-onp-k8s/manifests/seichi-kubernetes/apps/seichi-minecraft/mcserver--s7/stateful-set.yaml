@@ -96,7 +96,9 @@ spec:
                 -Daikars.new.flags=true
 
             - name: JVM_XX_OPTS
-              value: "-XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/data/"
+              value: >-
+                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError 
+                -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
 
             - name: ENABLE_JMX
               value: "true"
