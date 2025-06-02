@@ -35,8 +35,7 @@ spec:
     innodb_io_capacity_max = 3000
     max_allowed_packet = 256M
     performance_schema=on
-    max-connections=500
-    max_user_connections=100
+    max-connections=1000
 
   # resources:
   #   requests:
