@@ -196,8 +196,8 @@ spec:
                 name: mariadb
                 key: coreprotect-password
         command: ["/bin/sh", "-c"]
+        # データベースを DROP -> CREATE するのは権限の関係でできないので、テーブルを TRUNCATE する
         source: |
-          # データベースを DROP -> CREATE するのは権限の関係でできないので、テーブルを TRUNCATE する
           mariadb -hmariadb -ucoreprotect -p"${coreprotect-db-user-password}" -Nse 'SHOW TABLES' {{workflow.parameters.coreprotect-db-name}} | 
             while read table; do mariadb -hmariadb -ucoreprotect -p"${coreprotect-db-user-password}" -e "TRUNCATE TABLE $table" {{workflow.parameters.coreprotect-db-name}}; done
 
