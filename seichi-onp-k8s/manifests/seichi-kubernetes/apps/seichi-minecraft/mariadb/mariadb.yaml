@@ -36,6 +36,7 @@ spec:
     max_allowed_packet = 256M
     performance_schema=on
     max-connections=500
+    max_user_connections=100
 
   # resources:
   #   requests:
