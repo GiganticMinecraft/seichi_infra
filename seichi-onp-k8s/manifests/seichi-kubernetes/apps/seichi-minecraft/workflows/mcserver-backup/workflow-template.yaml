@@ -19,61 +19,62 @@ spec:
   templates:
     - name: mcserver-backup-entrypoint
       dag:
-        - name: get-timestamp
-          template: get-timestamp
+        tasks:
+          - name: get-timestamp
+            template: get-timestamp
 
-        - name: patch-statefulset-to-0
-          template: patch-statefulset-to-0
-          arguments:
-            parameters:
-              - name: statefulset-name
-                value: "{{workflow.parameters.statefulset-name}}"
+          - name: patch-statefulset-to-0
+            template: patch-statefulset-to-0
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
 
-        - name: wait-for-scale-to-0
-          template: wait-for-scale-to-0
-          arguments:
-            parameters:
-              - name: statefulset-name
-                value: "{{workflow.parameters.statefulset-name}}"
-          dependencies:
-            - patch-statefulset-to-0
+          - name: wait-for-scale-to-0
+            template: wait-for-scale-to-0
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
+            dependencies:
+              - patch-statefulset-to-0
 
-        - name: run-backup
-          template: run-backup
-          arguments:
-            parameters:
-              - name: statefulset-name
-                value: "{{workflow.parameters.statefulset-name}}"
-          dependencies:
-            - wait-for-scale-to-0
+          - name: run-backup
+            template: run-backup
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
+            dependencies:
+              - wait-for-scale-to-0
 
-        - name: delete-coreprotect-db
-          template: delete-coreprotect-db
-          arguments:
-            parameters:
-              - name: coreprotect-db-name
-                value: "{{workflow.parameters.coreprotect-db-name}}"
-          dependencies:
-            - wait-for-scale-to-0
+          - name: delete-coreprotect-db
+            template: delete-coreprotect-db
+            arguments:
+              parameters:
+                - name: coreprotect-db-name
+                  value: "{{workflow.parameters.coreprotect-db-name}}"
+            dependencies:
+              - wait-for-scale-to-0
 
-        - name: patch-statefulset-to-1
-          template: patch-statefulset-to-1
-          arguments:
-            parameters:
-              - name: statefulset-name
-                value: "{{workflow.parameters.statefulset-name}}"
-          dependencies:
-            - run-backup
-            - delete-coreprotect-db
+          - name: patch-statefulset-to-1
+            template: patch-statefulset-to-1
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
+            dependencies:
+              - run-backup
+              - delete-coreprotect-db
 
-        - name: wait-for-scale-to-1
-          template: wait-for-scale-to-1
-          arguments:
-            parameters:
-              - name: statefulset-name
-                value: "{{workflow.parameters.statefulset-name}}"
-          dependencies:
-            - patch-statefulset-to-1
+          - name: wait-for-scale-to-1
+            template: wait-for-scale-to-1
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
+            dependencies:
+              - patch-statefulset-to-1
 
     - name: get-timestamp
       script:
