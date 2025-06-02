@@ -15,11 +15,11 @@ spec:
         - name: targets
           value: |
             [
-              { "statefulset-name": "mcserver--s1", "coreprotect-db-name": "coreprotect-s1", "persistent-volume-claim-name": "mcserver--s1-data-mcserver--s1-0" },
-              { "statefulset-name": "mcserver--s2", "coreprotect-db-name": "coreprotect-s2", "persistent-volume-claim-name": "mcserver--s2-data-mcserver--s2-0" },
-              { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect-s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" },
-              { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect-s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" },
-              { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect-s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" } 
+              { "statefulset-name": "mcserver--s1", "coreprotect-db-name": "coreprotect__mc_s1", "persistent-volume-claim-name": "mcserver--s1-data-mcserver--s1-0" },
+              { "statefulset-name": "mcserver--s2", "coreprotect-db-name": "coreprotect__mc_s2", "persistent-volume-claim-name": "mcserver--s2-data-mcserver--s2-0" },
+              { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect__mc_s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" },
+              { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect__mc_s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" },
+              { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect__mc_s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" } 
             ]
 
     # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
