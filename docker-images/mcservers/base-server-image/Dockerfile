@@ -6,7 +6,7 @@ ARG MCSERVER_BASE_IMAGE
 FROM busybox:1.37.0 AS jmx-prometheus-exporter-downloader
 RUN wget \
   -O /root/jmx_prometheus_javaagent.jar \
-  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar
+  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/1.0.1/jmx_prometheus_javaagent-1.0.1.jar
 
 ##---
 # 最終 stage
