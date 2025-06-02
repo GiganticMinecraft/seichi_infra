@@ -95,6 +95,9 @@ spec:
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs 
                 -Daikars.new.flags=true
 
+            - name: JVM_XX_OPTS
+              value: "-XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/data/"
+
             - name: ENABLE_JMX
               value: "true"
             # 固定化したClusterIPを指定することで、VisualVMによるアクセスが正しく動作するようにする
