@@ -190,7 +190,7 @@ spec:
           parameters:
             - name: coreprotect-db-name
         env:
-          - name: coreprotect-db-user-password
+          - name: COREPROTECT_DB_USER_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: mariadb
@@ -198,8 +198,8 @@ spec:
         command: ["/bin/sh", "-c"]
         # データベースを DROP -> CREATE するのは権限の関係でできないので、テーブルを TRUNCATE する
         source: |
-          mariadb -hmariadb -ucoreprotect -p"${coreprotect-db-user-password}" -Nse 'SHOW TABLES' -D {{workflow.parameters.coreprotect-db-name}} | 
-            while read table; do mariadb -hmariadb -ucoreprotect -p"${coreprotect-db-user-password}" -e "TRUNCATE TABLE $table" -D {{workflow.parameters.coreprotect-db-name}}; done
+          mariadb -hmariadb -ucoreprotect -p"${COREPROTECT_DB_USER_PASSWORD}" -Nse 'SHOW TABLES' -D {{workflow.parameters.coreprotect-db-name}} | 
+            while read table; do mariadb -hmariadb -ucoreprotect -p"${COREPROTECT_DB_USER_PASSWORD}" -e "TRUNCATE TABLE $table" -D {{workflow.parameters.coreprotect-db-name}}; done
 
     - name: patch-statefulset-to-1
       script:
