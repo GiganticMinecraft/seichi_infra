@@ -25,13 +25,21 @@ spec:
 
           - name: patch-statefulset-to-0
             template: patch-statefulset-to-0
-            arguments:
+            inputs:
               parameters:
                 - name: statefulset-name
                   value: "{{workflow.parameters.statefulset-name}}"
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{inputs.parameters.statefulset-name}}"
 
           - name: wait-for-scale-to-0
             template: wait-for-scale-to-0
+            inputs:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"             
             arguments:
               parameters:
                 - name: statefulset-name
@@ -41,6 +49,10 @@ spec:
 
           - name: run-backup
             template: run-backup
+            inputs:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"            
             arguments:
               parameters:
                 - name: statefulset-name
@@ -50,6 +62,10 @@ spec:
 
           - name: delete-coreprotect-db
             template: delete-coreprotect-db
+            inputs:
+              parameters:
+                - name: coreprotect-db-name
+                  value: "{{workflow.parameters.coreprotect-db-name}}"
             arguments:
               parameters:
                 - name: coreprotect-db-name
@@ -59,6 +75,10 @@ spec:
 
           - name: patch-statefulset-to-1
             template: patch-statefulset-to-1
+            inputs:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
             arguments:
               parameters:
                 - name: statefulset-name
@@ -69,6 +89,10 @@ spec:
 
           - name: wait-for-scale-to-1
             template: wait-for-scale-to-1
+            inputs:
+              parameters:
+                - name: statefulset-name
+                  value: "{{workflow.parameters.statefulset-name}}"
             arguments:
               parameters:
                 - name: statefulset-name
