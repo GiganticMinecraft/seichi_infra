@@ -138,7 +138,13 @@ spec:
     - name: run-backup
       inputs:
         parameters:
-          - name: statefulset-name    
+          - name: statefulset-name
+      volumes:
+        - name: backup-target-volume
+          persistentVolumeClaim:
+            claimName: "{{inputs.parameters.persistent-volume-claim-name}}"
+        - name: pbs-tmpfs
+      emptyDir: {}
       script:
         image: mirror.gcr.io/debian:12
         command: ["/bin/sh", "-c"]
@@ -249,9 +255,3 @@ spec:
             sleep 5
           done
           echo "Scale-up confirmed!"
-  volumes:
-    - name: backup-target-volume
-      persistentVolumeClaim:
-        claimName: "{{inputs.parameters.persistent-volume-claim-name}}"
-    - name: pbs-tmpfs
-      emptyDir: {}
