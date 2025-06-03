@@ -25,6 +25,9 @@ spec:
     # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
     templates:
       - name: run-mcserver-backups
+        inputs:
+          parameters:
+            - name: targets
         steps:
         - - name: mcserver-backup-steps
             templateRef:
