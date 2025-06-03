@@ -18,11 +18,6 @@ spec:
       - name: persistent-volume-claim-name
   templates:
     - name: mcserver-backup-entrypoint
-      inputs:
-        parameters:
-          - name: statefulset-name
-          - name: coreprotect-db-name
-          - name: persistent-volume-claim-name
       dag:
         tasks:
           - name: get-timestamp
