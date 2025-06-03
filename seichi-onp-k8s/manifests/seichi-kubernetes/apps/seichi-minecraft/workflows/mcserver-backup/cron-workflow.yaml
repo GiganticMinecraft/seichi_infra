@@ -39,4 +39,5 @@ spec:
                 value: "{{item.coreprotect-db-name}}"
               - name: persistent-volume-claim-name
                 value: "{{item.persistent-volume-claim-name}}"
+  retryStrategy:
     limit: 3
