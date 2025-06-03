@@ -55,10 +55,13 @@ spec:
             inputs:
               parameters:
                 - name: statefulset-name        
+                - name: persistent-volume-claim-name
             arguments:
               parameters:
                 - name: statefulset-name
                   value: "{{inputs.parameters.statefulset-name}}"
+                - name: persistent-volume-claim-name
+                  value: "{{inputs.parameters.persistent-volume-claim-name}}"
             dependencies:
               - wait-for-scale-to-0
 
