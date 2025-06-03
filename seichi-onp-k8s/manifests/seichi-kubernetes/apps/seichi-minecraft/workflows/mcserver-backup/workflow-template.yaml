@@ -107,11 +107,11 @@ spec:
           echo $(date +%Y%m%d-%H%M%S)
 
     - name: patch-statefulset-to-0
+      inputs:
+        parameters:
+          - name: statefulset-name
       script:
         image: mirror.gcr.io/bitnami/kubectl:1.33.1
-        inputs:
-          parameters:
-            - name: statefulset-name
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
