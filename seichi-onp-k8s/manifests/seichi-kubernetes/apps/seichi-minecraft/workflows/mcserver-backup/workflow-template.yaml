@@ -28,7 +28,6 @@ spec:
             inputs:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
             arguments:
               parameters:
                 - name: statefulset-name
@@ -38,12 +37,11 @@ spec:
             template: wait-for-scale-to-0
             inputs:
               parameters:
-                - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"             
+                - name: statefulset-name             
             arguments:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
+                  value: "{{inputs.parameters.statefulset-name}}"
             dependencies:
               - patch-statefulset-to-0
 
@@ -51,12 +49,11 @@ spec:
             template: run-backup
             inputs:
               parameters:
-                - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"            
+                - name: statefulset-name        
             arguments:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
+                  value: "{{inputs.parameters.statefulset-name}}"
             dependencies:
               - wait-for-scale-to-0
 
@@ -65,11 +62,10 @@ spec:
             inputs:
               parameters:
                 - name: coreprotect-db-name
-                  value: "{{workflow.parameters.coreprotect-db-name}}"
             arguments:
               parameters:
                 - name: coreprotect-db-name
-                  value: "{{workflow.parameters.coreprotect-db-name}}"
+                  value: "{{inputs.parameters.coreprotect-db-name}}"
             dependencies:
               - wait-for-scale-to-0
 
@@ -78,11 +74,10 @@ spec:
             inputs:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
             arguments:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
+                  value: "{{inputs.parameters.statefulset-name}}"
             dependencies:
               - run-backup
               - delete-coreprotect-db
@@ -92,11 +87,10 @@ spec:
             inputs:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
             arguments:
               parameters:
                 - name: statefulset-name
-                  value: "{{workflow.parameters.statefulset-name}}"
+                  value: "{{inputs.parameters.statefulset-name}}"
             dependencies:
               - patch-statefulset-to-1
 
