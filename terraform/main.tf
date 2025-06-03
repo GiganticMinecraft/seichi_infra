@@ -284,6 +284,12 @@ variable "minecraft__discordsrv_bot_token" {
   sensitive   = true
 }
 
+variable "minecraft__gt_seichi_discordsrv_bot_token" {
+  description = "DiscordSRV bot token for GT Seichi"
+  type        = string
+  sensitive   = true
+}
+
 variable "minecraft__prod_one_day_to_reset__morning_glory_seed_webhook_url" {
   description = "Webhook URL for MorningGlorySeeds on one-day-to-reset server in production env"
   type        = string
