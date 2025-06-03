@@ -38,5 +38,6 @@ spec:
         - - name: mcserver-backup-steps
             templateRef:
               name: mcserver-backup-workflow-template
+              template: mcserver-backup-entrypoint
   retryStrategy:
     limit: 3
