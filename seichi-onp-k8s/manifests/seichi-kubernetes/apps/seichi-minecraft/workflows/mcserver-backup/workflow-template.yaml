@@ -139,6 +139,7 @@ spec:
       inputs:
         parameters:
           - name: statefulset-name
+          - name: persistent-volume-claim-name
       volumes:
         - name: backup-target-volume
           persistentVolumeClaim:
