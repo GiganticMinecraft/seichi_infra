@@ -26,18 +26,17 @@ spec:
     templates:
       - name: run-mcserver-backups
         withParam: "{{workflow.parameters.targets}}"
-        arguments:
-          parameters:
-          - name: statefulset-name
-            value: "{{item.statefulset-name}}"
-          - name: coreprotect-db-name
-            value: "{{item.coreprotect-db-name}}"
-          - name: persistent-volume-claim-name
-            value: "{{item.persistent-volume-claim-name}}"
         steps:
         - - name: mcserver-backup-steps
             templateRef:
               name: mcserver-backup-workflow-template
               template: mcserver-backup-entrypoint
-  retryStrategy:
+            arguments:
+              parameters:
+              - name: statefulset-name
+                value: "{{item.statefulset-name}}"
+              - name: coreprotect-db-name
+                value: "{{item.coreprotect-db-name}}"
+              - name: persistent-volume-claim-name
+                value: "{{item.persistent-volume-claim-name}}"
     limit: 3
