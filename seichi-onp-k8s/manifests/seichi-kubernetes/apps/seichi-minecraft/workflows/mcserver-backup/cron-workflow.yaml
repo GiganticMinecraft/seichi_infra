@@ -41,6 +41,6 @@ spec:
                 value: "{{item.coreprotect-db-name}}"
               - name: persistent-volume-claim-name
                 value: "{{item.persistent-volume-claim-name}}"
-            withParam: "{{workflow.parameters.targets}}"
+            withParam: "{{inputs.parameters.targets}}"
   retryStrategy:
     limit: 3
