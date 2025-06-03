@@ -15,9 +15,7 @@ spec:
       - name: run-mcserver-backups
         steps:
         - - name: mcserver-backup-steps
-            templateRef:
-              name: mcserver-backup-workflow-template
-              template: mcserver-backup-entrypoint
+            template: run-mcserver-backup
             arguments:
               parameters:
               - name: statefulset-name
@@ -32,5 +30,15 @@ spec:
               - { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect__mc_s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" }
               - { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect__mc_s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" }
               - { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect__mc_s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" }
+
+          - name: run-mcserver-backup
+            inputs:
+              parameters:
+                - name: statefulset-name
+                - name: coreprotect-db-name
+                - name: persistent-volume-claim-name
+            templateRef:
+              name: mcserver-backup-workflow-template
+              template: mcserver-backup-entrypoint
   retryStrategy:
     limit: 3
