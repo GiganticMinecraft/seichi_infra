@@ -117,11 +117,11 @@ spec:
           kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
 
     - name: wait-for-scale-to-0
+      inputs:
+        parameters:
+          - name: statefulset-name
       script:
         image: mirror.gcr.io/bitnami/kubectl:1.33.1
-        inputs:
-          parameters:
-            - name: statefulset-name
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
@@ -136,11 +136,11 @@ spec:
           echo "Scale-down confirmed!"
 
     - name: run-backup
+      inputs:
+        parameters:
+          - name: statefulset-name    
       script:
         image: mirror.gcr.io/debian:12
-        inputs:
-          parameters:
-            - name: statefulset-name
         command: ["/bin/sh", "-c"]
         source: |
           set -e
@@ -207,11 +207,11 @@ spec:
             mountPath: /root/.cache
 
     - name: delete-coreprotect-db
+      inputs:
+        parameters:
+          - name: coreprotect-db-name
       script:
         image: mirror.gcr.io/mariadb:11.4
-        inputs:
-          parameters:
-            - name: coreprotect-db-name
         env:
           - name: COREPROTECT_DB_USER_PASSWORD
             valueFrom:
@@ -225,11 +225,11 @@ spec:
             while read table; do mariadb -hmariadb -ucoreprotect -p"${COREPROTECT_DB_USER_PASSWORD}" -e "TRUNCATE TABLE $table" -D {{workflow.parameters.coreprotect-db-name}}; done
 
     - name: patch-statefulset-to-1
+      inputs:
+        parameters:
+          - name: statefulset-name
       script:
         image: mirror.gcr.io/bitnami/kubectl:1.33.1
-        inputs:
-          parameters:
-            - name: statefulset-name
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset {{workflow.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
