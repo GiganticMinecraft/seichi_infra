@@ -8,6 +8,7 @@ spec:
   timezone: Asia/Tokyo
   concurrencyPolicy: "Forbid"
   workflowSpec:
+    serviceAccountName: mcserver--backup-workflow-sa
     entrypoint: run-mcserver-backups
 
     # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
