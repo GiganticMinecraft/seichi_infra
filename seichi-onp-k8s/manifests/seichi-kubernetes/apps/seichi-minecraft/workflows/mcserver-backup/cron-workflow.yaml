@@ -25,7 +25,6 @@ spec:
     # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
     templates:
       - name: run-mcserver-backups
-        withParam: "{{workflow.parameters.targets}}"
         steps:
         - - name: mcserver-backup-steps
             templateRef:
@@ -39,5 +38,6 @@ spec:
                 value: "{{item.coreprotect-db-name}}"
               - name: persistent-volume-claim-name
                 value: "{{item.persistent-volume-claim-name}}"
+            withParam: "{{workflow.parameters.targets}}"
   retryStrategy:
     limit: 3
