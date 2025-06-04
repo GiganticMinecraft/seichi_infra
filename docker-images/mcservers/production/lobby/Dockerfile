@@ -3,6 +3,9 @@ FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk
 ENV VERSION="1.18.2"
 ENV DIFFICULTY="peaceful"
 
+# サーバー自体の設定ファイル
+COPY --link ./common-minecraft-server-configs /config
+
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
 
