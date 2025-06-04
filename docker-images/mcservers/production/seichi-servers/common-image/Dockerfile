@@ -6,6 +6,8 @@ ENV VERSION="1.18.2"
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
+
+# サーバー自体の設定ファイル
 COPY --link ./common-minecraft-server-configs /config
 
 COPY --link --from=chunk-search-provider /build/chunk-search-rs /usr/bin/chunk-search-rs
