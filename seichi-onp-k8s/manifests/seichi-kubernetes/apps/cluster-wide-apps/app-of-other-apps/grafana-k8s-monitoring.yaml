@@ -28,6 +28,20 @@ spec:
             type: loki
             url: https://loki-gateway:3100/loki/api/v1/push
 
+          - name: localTempo
+            type: otlp
+            url: ""
+            metrics:
+              enabled: true
+            logs:
+              enabled: true
+            traces:
+              enabled: true
+
+          - name: localPyroscope
+            type: pyroscope
+            url: ""
+
         clusterMetrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
 

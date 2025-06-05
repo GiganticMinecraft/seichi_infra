@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pyroscope
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: cluster-wide-apps
+  source:
+    chart: pyroscope
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 1.13.4
+    helm:
+      values: |
+        pyroscope:
+          persistence:
+            enabled: false
+            accessModes:
+              - ReadWriteOnce
+            size: 50Gi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
