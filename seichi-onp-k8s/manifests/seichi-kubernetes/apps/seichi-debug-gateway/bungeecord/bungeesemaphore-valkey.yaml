@@ -19,11 +19,6 @@ spec:
         commonConfiguration: |-
           notify-keyspace-events "Eg$x"
         primary:
-          service:
-            type: LoadBalancer
-            loadBalancerClass: io.cilium/bgp-control-plane
-            annotations:
-              "io.cilium/lb-ipam-ips": "10.96.0.135"
           resources:
             requests:
               cpu: "250m"
