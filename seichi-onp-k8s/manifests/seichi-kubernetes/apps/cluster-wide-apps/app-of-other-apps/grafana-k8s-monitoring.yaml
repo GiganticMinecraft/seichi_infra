@@ -55,16 +55,16 @@ spec:
           enabled: true
 
         applicationObservability:
-          enabled: true
+          enabled: false
 
         autoInstrumentation:
-          enabled: true
+          enabled: false
 
         annotationAutodiscovery:
-          enabled: true
+          enabled: false
 
         prometheusOperatorObjects:
-          enabled: true
+          enabled: false
 
         profiling:
           enabled: true
