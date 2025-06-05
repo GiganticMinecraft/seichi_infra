@@ -159,8 +159,6 @@ spec:
                     spanBar:
                       type: 'Tag'
                       tag: 'http.path'
-                    streamingEnabled:
-                      search: true
                 - name: MariaDB
                   type: mysql
                   url: mariadb.seichi-minecraft:3306
