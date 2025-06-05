@@ -39,6 +39,12 @@ spec:
         metrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
 
+        opencost
+          enabled: false
+
+        prometheus-node-exporter:
+          enabled: false # kube-prometheus-stackがあるのでオフ
+
         clusterMetrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
 
