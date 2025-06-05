@@ -1,0 +1,80 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-monitoring
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: cluster-wide-apps
+  source:
+    chart: k8s-monitoring
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 1.1.0
+    helm:
+      values: |
+        cluster:
+          name: "seichi-cloud"
+
+        destinations:
+          - name: localPrometheus
+            type: prometheus
+            url: http://prometheus-kube-prometheus-prometheus:9090
+
+          - name: localLoki
+            type: loki
+            url: https://loki-gateway:3100/loki/api/v1/push
+
+        clusterMetrics:
+          enabled: true
+
+        clusterEvents:
+          enabled: true
+
+        nodeLogs:
+          enabled: true
+
+        podLogs:
+          enabled: true
+
+        applicationObservability:
+          enabled: true
+
+        autoInstrumentation:
+          enabled: true
+
+        annotationAutodiscovery:
+          enabled: true
+
+        prometheusOperatorObjects:
+          enabled: true
+
+        profiling:
+          enabled: true
+
+        alloy-metrics:
+          enabled: true
+
+        alloy-singleton:
+          enabled: true
+
+        alloy-logs:
+          enabled: true
+
+        alloy-receiver:
+          enabled: true
+
+        alloy-profiles:
+          enabled: true
+
+        alloy-operator:
+          deploy: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
