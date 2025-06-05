@@ -36,6 +36,9 @@ spec:
           tempo:
             host: ""
 
+        metrics:
+          enabled: false # kube-prometheus-stackがあるのでオフ
+
         clusterMetrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
 
