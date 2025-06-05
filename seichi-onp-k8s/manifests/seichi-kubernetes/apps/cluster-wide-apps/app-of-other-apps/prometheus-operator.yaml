@@ -112,6 +112,55 @@ spec:
                   type: loki
                   url: http://loki-gateway
                   isDefault: false
+                - name: Pyroscope
+                  type: grafana-pyroscope-datasource
+                  access: proxy
+                  url: http://pyroscope:4040
+                  isDefault: false
+                  jsonData:
+                    minStep: '15s'
+                - name: Tempo
+                  type: tempo
+                  access: proxy
+                  url: http://tempo:3100
+                  isDefault: false
+                  jsonData:
+                    tracesToLogsV2:
+                      datasourceUid: Loki
+                      tags: ['job', 'instance', 'pod', 'namespace']
+                      filterByTraceID: true
+                      filterBySpanID: false
+                      spanStartTimeShift: '-1h'
+                      spanEndTimeShift: '1h'
+                      customQuery: true
+                      query: 'method="$${__span.tags.method}"'
+                    tracesToMetrics:
+                      datasourceUid: Prometheus
+                      tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
+                      queries:
+                        - name: 'Sample query'
+                          query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))'
+                    tracesToProfiles:
+                      datasourceUid: Pyroscope
+                      tags: ['job', 'instance', 'pod', 'namespace']
+                      profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
+                      customQuery: true
+                      query: 'method="$${__span.tags.method}"'
+                    serviceMap:
+                      datasourceUid: 'prometheus'
+                    nodeGraph:
+                      enabled: true
+                    search:
+                      hide: false
+                    traceQuery:
+                      timeShiftEnabled: true
+                      spanStartTimeShift: '-1h'
+                      spanEndTimeShift: '1h'
+                    spanBar:
+                      type: 'Tag'
+                      tag: 'http.path'
+                    streamingEnabled:
+                      search: true
                 - name: MariaDB
                   type: mysql
                   url: mariadb.seichi-minecraft:3306
