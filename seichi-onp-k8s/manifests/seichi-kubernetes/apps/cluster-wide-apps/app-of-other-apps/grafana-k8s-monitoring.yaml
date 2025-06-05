@@ -26,7 +26,7 @@ spec:
 
           - name: localLoki
             type: loki
-            url: http://loki-gateway:3100
+            url: http://loki-gateway
 
           - name: localTempo
             type: otlp
