@@ -28,23 +28,6 @@ spec:
             type: loki
             url: https://loki-gateway:3100/loki/api/v1/push
 
-        externalServices:
-          loki:
-            host: "https://loki-gateway:3100/loki/api/v1/push"
-          prometheus:
-            host: "http://prometheus-kube-prometheus-prometheus:9090"
-          tempo:
-            host: ""
-
-        metrics:
-          enabled: false # kube-prometheus-stackがあるのでオフ
-
-        opencost:
-          enabled: false
-
-        prometheus-node-exporter:
-          enabled: false # kube-prometheus-stackがあるのでオフ
-
         clusterMetrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
 
