@@ -37,7 +37,7 @@ spec:
             host: ""
 
         clusterMetrics:
-          enabled: true
+          enabled: false # kube-prometheus-stackがあるのでオフ
 
         clusterEvents:
           enabled: true
