@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: cluster-wide-apps
+  source:
+    chart: alloy
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 1.1.0
+    helm:
+      values: |
+        alloy:
+          mounts:
+            varlog: true
+
+        serviceMonitor:
+          enabled: true
+          additionalLabels:
+            release: prometheus
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
