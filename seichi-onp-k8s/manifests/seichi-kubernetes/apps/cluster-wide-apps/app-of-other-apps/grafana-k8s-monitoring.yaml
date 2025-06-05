@@ -39,7 +39,7 @@ spec:
         metrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
 
-        opencost
+        opencost:
           enabled: false
 
         prometheus-node-exporter:
