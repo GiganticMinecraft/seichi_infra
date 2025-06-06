@@ -334,7 +334,7 @@ spec:
               
         - resources:
             requests:
-              memory: 128Mi
+              limits: 128Mi
           image: nginx:1.28.0
           name: dynmap
           ports:
