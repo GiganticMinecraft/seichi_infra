@@ -101,6 +101,11 @@ dex:
       enabled: true
       additionalLabels:
         release: prometheus
+  livenessProbe:
+    enabled: true
+    timeoutSeconds: 1
+  readinessProbe:
+    enabled: true
 
 redis:
   resources:
