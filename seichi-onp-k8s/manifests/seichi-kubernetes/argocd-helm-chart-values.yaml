@@ -85,6 +85,9 @@ controller:
         release: prometheus
 
 dex:
+  image:
+    repository: ghcr.io/dexidp/dex
+    tag: v2.42.1
   env:
     - name: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
       valueFrom:
