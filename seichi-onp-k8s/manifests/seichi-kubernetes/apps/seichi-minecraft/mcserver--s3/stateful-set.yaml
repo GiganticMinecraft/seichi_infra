@@ -333,7 +333,7 @@ spec:
               mountPath: /data
 
         - resources:
-            requests:
+            limits:
               memory: 128Mi
           image: nginx:1.28.0
           name: dynmap
