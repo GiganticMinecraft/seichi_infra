@@ -16,6 +16,11 @@ spec:
           enabled: true
           labels:
             release: prometheus
+        nodeCollector:
+          tolerations:
+            - key: "node-role.kubernetes.io/control-plane"
+              operator: "Exists"
+              effect: "NoSchedule"
   destination:
     server: https://kubernetes.default.svc
     namespace: trivy-operator
