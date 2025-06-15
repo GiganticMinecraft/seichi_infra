@@ -45,23 +45,6 @@ apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   namespace: seichi-minecraft
-  name: litebans
-spec:
-  mariaDbRef:
-    name: mariadb
-    waitForIt: true
-  privileges:
-    - "ALL"
-  database: "litebans"
-  table: "*"
-  username: "litebans"
-  grantOption: false
-
----
-apiVersion: k8s.mariadb.com/v1alpha1
-kind: Grant
-metadata:
-  namespace: seichi-minecraft
   name: litebans-mc-lobby
 spec:
   mariaDbRef:
