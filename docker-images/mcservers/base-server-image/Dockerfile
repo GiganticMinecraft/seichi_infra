@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.16
+# syntax=docker/dockerfile:1.17
 ARG MCSERVER_BASE_IMAGE
 
 ##---
