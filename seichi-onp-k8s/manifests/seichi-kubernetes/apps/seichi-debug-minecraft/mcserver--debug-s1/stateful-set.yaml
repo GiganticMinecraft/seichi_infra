@@ -69,14 +69,14 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: 8
-              memory: 18Gi
+              cpu: 3
+              memory: 6Gi
             limits:
-              cpu: 10
-              memory: 18Gi
+              cpu: 3
+              memory: 6Gi
           env:
             - name: MEMORY
-              value: 16G
+              value: 4G
             - name: EULA
               value: "TRUE"
 
@@ -116,7 +116,7 @@ spec:
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PORT
               value: "3306"
-            
+
             - name: CFG_REPLACEMENT__SEICHIASSIST_DB_USER
               value: mcserver
 
@@ -181,7 +181,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mariadb
-                  key: LUCKPERMS_PASSWORD
+                  key: luckperms-password
 
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
               value: luckperms
@@ -228,8 +228,8 @@ spec:
             # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
             - name: COPY_PLUGINS_SRC
               value: |-
-               /downloaded-plugins
-               /plugins
+                /downloaded-plugins
+                /plugins
 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:sha-bdb28e2
           name: minecraft
@@ -302,7 +302,7 @@ spec:
 
             - name: mcserver--debug-s1-data
               mountPath: /data
-      
+
       volumes:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
