@@ -1,0 +1,29 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  namespace: seichi-debug-minecraft
+  name: flyway
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  name: flyway_managed_schema
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-debug-minecraft
+  name: flyway
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "ALL"
+  database: "flyway_managed_schema"
+  table: "*"
+  username: "mcserver"
+  grantOption: false
