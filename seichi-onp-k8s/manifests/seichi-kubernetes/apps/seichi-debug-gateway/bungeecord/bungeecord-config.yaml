@@ -1,9 +1,9 @@
 apiVersion: seichi.click/v1alpha1
-kind: ConfigMap
+kind: BungeeConfigMapTemplate
 metadata:
   name: bungeecord-config
-data:
-  config.yml: |
+spec:
+  dataGoTemplate: |-
     config.yml: |
       servers:
       {{- range . }}
