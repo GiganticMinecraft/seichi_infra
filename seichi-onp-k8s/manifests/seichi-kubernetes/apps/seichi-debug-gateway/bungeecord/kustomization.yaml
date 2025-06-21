@@ -13,8 +13,8 @@ transformers:
 resources:
   - ../../../app-templates/minecraft-gateway-bungeecord
   - ./bungeecord-config.yaml
-  - ./bungeesemaphore-redis.yaml
-  - ./redisbungee-redis.yaml
+  - ./bungeesemaphore-valkey.yaml
+  - ./redisbungee-valkey.yaml
   - ./network-policy.yaml
 
 patches:
