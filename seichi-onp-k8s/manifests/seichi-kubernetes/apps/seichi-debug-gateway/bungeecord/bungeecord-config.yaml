@@ -24,9 +24,11 @@ spec:
       listeners:
         - priorities:
             # FIXME: PR が一個も出ていない時に壊れる。そもそもそのような状況で繋ぐサーバーを用意すべきかも
-            - debug-pr-{{ (index . 0) }}-lobby
+            # - debug-pr-{{ (index . 0) }}-lobby
+            - debug-s1
           forced_hosts:
-            play-debug.seichi.click: debug-pr-{{ (index . 0) }}-lobby
+            debug-s1
+            # play-debug.seichi.click: debug-pr-{{ (index . 0) }}-lobby
 
           query_port: 25565
           motd: ''
