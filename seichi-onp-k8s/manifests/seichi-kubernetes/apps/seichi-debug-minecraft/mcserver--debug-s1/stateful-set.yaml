@@ -133,13 +133,13 @@ spec:
                   key: SEICHIASSIST_DEBUG_S1_WEBHOOK_URL
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
-              value: seichi-debug-redisbungee-valkey
+              value: seichi-debug-redisbungee-valkey-primary.seichi-debug-gateway
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT
               value: "6379"
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_HOST
-              value: seichi-debug-bungeesemaphore-valkey
+              value: seichi-debug-bungeesemaphore-valkey-primary.seichi-debug-gateway
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_PORT
               value: "6379"
