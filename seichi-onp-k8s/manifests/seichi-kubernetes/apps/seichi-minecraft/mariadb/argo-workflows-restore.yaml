@@ -78,7 +78,7 @@ spec:
           - name: timestamp
       activeDeadlineSeconds: 3600
       script:
-        image: bitnami/kubectl:1.33.1
+        image: bitnami/kubectl:1.33.2
         command: ["/bin/sh", "-c"]
         source: |
           while true; do
