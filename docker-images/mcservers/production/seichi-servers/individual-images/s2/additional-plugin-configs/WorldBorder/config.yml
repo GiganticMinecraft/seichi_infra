@@ -39,14 +39,14 @@ worlds:
     radiusZ: 8050
     wrapping: false
   world_SW_3:
-    x: 0.0
-    z: 0.0
-    radiusX: 8050
-    radiusZ: 8050
+    x: 0.5105898459039747
+    z: 0.17725819666035014
+    radiusX: 8000
+    radiusZ: 8000
     wrapping: false
   world_SW_4:
-    x: 0.0
-    z: 0.0
+    x: 0.5
+    z: 0.5
     radiusX: 8050
     radiusZ: 8050
     wrapping: false
@@ -61,16 +61,4 @@ worlds:
     z: 8.0
     radiusX: 3000
     radiusZ: 3000
-    wrapping: false
-  world_build:
-    x: -1507.5
-    z: 1507.5
-    radiusX: 7560
-    radiusZ: 7560
-    wrapping: false
-  world_dot:
-    x: 0.0
-    z: 0.0
-    radiusX: 10000
-    radiusZ: 10000
     wrapping: false
