@@ -45,8 +45,8 @@ worlds:
     radiusZ: 8050
     wrapping: false
   world_SW_4:
-    x: 0.5
-    z: 0.5
+    x: 0.0
+    z: 0.0
     radiusX: 8050
     radiusZ: 8050
     wrapping: false
