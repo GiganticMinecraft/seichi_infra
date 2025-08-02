@@ -51,26 +51,14 @@ worlds:
     radiusZ: 8050
     wrapping: false
   world_SW_nether:
-    x: 0.0
-    z: 0.0
+    x: 8.764702304161391
+    z: 6.306504436246215
     radiusX: 3000
     radiusZ: 3000
     wrapping: false
   world_SW_the_end:
-    x: 0.0
-    z: 0.0
+    x: 8.0
+    z: 8.0
     radiusX: 3000
     radiusZ: 3000
-    wrapping: false
-  world_build:
-    x: -1507.5
-    z: 1507.5
-    radiusX: 7560
-    radiusZ: 7560
-    wrapping: false
-  world_dot:
-    x: 0.0
-    z: 0.0
-    radiusX: 10000
-    radiusZ: 10000
     wrapping: false
