@@ -39,14 +39,14 @@ worlds:
     radiusZ: 8050
     wrapping: false
   world_SW_3:
-    x: 0.5105898459039747
-    z: 0.17725819666035014
-    radiusX: 8000
-    radiusZ: 8000
+    x: 0.0
+    z: 0.0
+    radiusX: 8050
+    radiusZ: 8050
     wrapping: false
   world_SW_4:
-    x: 0.5
-    z: 0.5
+    x: 0.0
+    z: 0.0
     radiusX: 8050
     radiusZ: 8050
     wrapping: false
