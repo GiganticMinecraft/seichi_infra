@@ -1,4 +1,4 @@
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java8-jdk@sha256:e2951e8b57f71372fd2fa5cbfd8ba5effbd8fe9ffc484fa7a39cedf329f188ca
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java8-jdk@sha256:c92285a4b6498268b2dd71a14cc73f63c94baa278d35405e269cc86028b2c6bd
 
 ENV VERSION="1.16.5"
 
