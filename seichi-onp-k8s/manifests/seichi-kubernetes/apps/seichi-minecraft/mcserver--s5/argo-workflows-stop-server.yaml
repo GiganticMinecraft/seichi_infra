@@ -20,14 +20,14 @@ spec:
 
     - name: patch-statefulset-to-0
       script:
-        image: bitnami/kubectl:1.33.3
+        image: bitnami/kubectl:1.33.4
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--s5 -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
 
     - name: wait-for-scale-to-0
       script:
-        image: bitnami/kubectl:1.33.3
+        image: bitnami/kubectl:1.33.4
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
