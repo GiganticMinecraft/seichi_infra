@@ -242,7 +242,7 @@ spec:
                /downloaded-plugins
                /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s5:1.0.0@sha256:bab8ce11b31a9d795ae9bc58a048f8df5e037341b51a00a63d16110fccea9df9
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s5:1.0.0@sha256:28ab4e94973844733cfffdb3603be0a2b364dc040bddc035f3606b19ea0693d1
           name: minecraft
           ports:
             - containerPort: 25565
