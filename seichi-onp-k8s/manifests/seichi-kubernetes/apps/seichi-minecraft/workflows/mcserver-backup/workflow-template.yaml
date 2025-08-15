@@ -114,7 +114,7 @@ spec:
         parameters:
           - name: statefulset-name
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.3
+        image: mirror.gcr.io/bitnami/kubectl:1.33.4
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
@@ -124,7 +124,7 @@ spec:
         parameters:
           - name: statefulset-name
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.3
+        image: mirror.gcr.io/bitnami/kubectl:1.33.4
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
@@ -239,7 +239,7 @@ spec:
         parameters:
           - name: statefulset-name
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.3
+        image: mirror.gcr.io/bitnami/kubectl:1.33.4
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
@@ -250,7 +250,7 @@ spec:
           - name: statefulset-name
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.3
+        image: mirror.gcr.io/bitnami/kubectl:1.33.4
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for StatefulSet to scale up..."
