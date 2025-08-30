@@ -322,6 +322,9 @@ spec:
           ports:
             - containerPort: 80
               name: dynmap
+          env:
+            - name: TZ
+              value: Asia/Tokyo
           startupProbe:
             tcpSocket:
               port: 80
