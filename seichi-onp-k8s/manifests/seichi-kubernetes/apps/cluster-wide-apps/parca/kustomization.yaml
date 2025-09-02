@@ -3,3 +3,17 @@ kind: Kustomization
 resources:
 - https://github.com/parca-dev/parca/releases/download/v0.24.0/kubernetes-manifest.yaml
 - https://github.com/parca-dev/parca-agent/releases/download/v0.41.0/kubernetes-manifest.yaml
+patches:
+# Merge duplicate namespace definitions  
+- patch: |-
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: parca
+      labels:
+        pod-security.kubernetes.io/audit: privileged  
+        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/warn: privileged
+  target:
+    kind: Namespace
+    name: parca
