@@ -97,6 +97,11 @@ spec:
             external-hostname: argo-wf-webhook.onp-k8s.admin.seichi.click
             internal-authority: "argo-wf-proxy.seichi-minecraft:80"
 
+          # Parca - continuous profiling for applications
+          - name: parca
+            external-hostname: parca.onp-k8s.admin.seichi.click
+            internal-authority: "parca.parca:7070"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
