@@ -71,7 +71,7 @@ spec:
 
     - name: run-backup
       script:
-        image: debian:12
+        image: debian:13
         command: ["/bin/sh", "-c"]
         source: |
           set -e
