@@ -12,7 +12,7 @@ spec:
   project: cluster-wide-apps
   source:
     repoURL: https://github.com/parca-dev/parca
-    targetRevision: v0.24.0
+    targetRevision: v0.24.2
     path: .
     directory:
       include: kubernetes-manifest.yaml
