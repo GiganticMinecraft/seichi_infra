@@ -76,3 +76,9 @@ resource "github_team" "onp_phpmyadmin" {
   description = "オンプレ環境のphpMyAdminに接続できるTeam"
   privacy     = "closed"
 }
+
+resource "github_team" "onp_admin_bugsink" {
+  name        = "onp-admin-bugsink"
+  description = "BugsinkにアクセスできるTeam"
+  privacy     = "closed"
+}
