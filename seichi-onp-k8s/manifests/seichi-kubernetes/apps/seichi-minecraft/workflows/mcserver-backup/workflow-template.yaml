@@ -150,7 +150,7 @@ spec:
         - name: pbs-tmpfs
       emptyDir: {}
       script:
-        image: mirror.gcr.io/debian:12
+        image: mirror.gcr.io/debian:13
         command: ["/bin/sh", "-c"]
         source: |
           set -e
