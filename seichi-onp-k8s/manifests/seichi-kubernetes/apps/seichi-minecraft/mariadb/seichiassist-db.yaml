@@ -10,9 +10,12 @@ spec:
   passwordSecretKeyRef:
     name: mariadb
     key: mcserver-password
-  # NOTE: mcserver ユーザーは、すべての mcserver から seichiassist データベースにアクセスするために使われ、
-  #       一部機能によって一時的に大量のコネクションが必要になることがあり、それが解決するまで maxUserConnections を増やす必要がある。
-  maxUserConnections: 100
+  # NOTE: mcserver ユーザーは、ゲーム内プラグイン SeichiAssist に加え、seichi-game-data-server(ゲームデータ公開用サーバー)が使用する。
+  #   SeichiAssist は初期化時に Connection を5つ、最大時に20個張る。
+  #   seichi-game-data-server は初期化時に Connection を最大5つ貼る。
+  #   また、SeichiAssist が稼働しているサーバーは6サーバーあり、各サーバーで最大20個のコネクションを張ることがある。
+  #   したがって、最大で 20*6 + 5 = 125 個のコネクションを張る可能性がある。
+  maxUserConnections: 150
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
