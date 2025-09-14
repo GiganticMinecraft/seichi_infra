@@ -1,0 +1,71 @@
+apiVersion: "secretgenerator.mittwald.de/v1alpha1"
+kind: "StringSecret"
+metadata:
+  namespace: seichi-minecraft
+  name: bugsink-secret-credentials
+spec:
+  forceRegenerate: false
+  fields:
+    - fieldName: "secret_key"
+      encoding: "hex"
+      length: "50"
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bugsink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bugsink
+  template:
+    metadata:
+      labels:
+        app: bugsink
+    spec:
+      containers:
+        - name: bugsink
+          image: bugsink/bugsink:1.7.6
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bugsink-secret-credentials
+                  key: secret_key
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bugsink-db-credentials
+                  key: password
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bugsink-admin-password
+                  key: ADMIN_PASSWORD
+            - name: CREATE_SUPERUSER
+              value: "admin:$(ADMIN_PASSWORD)"
+            - name: PORT
+              value: "9000"
+            - name: DATABASE_URL
+              value: mysql://bugsink:$(MYSQL_PASSWORD)@mariadb/bugsink
+            - name: BEHIND_HTTPS_PROXY
+              value: "True"
+            - name: BASE_URL
+              value: "https:/bugsink.onp-k8s.admin.seichi.click"
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+              ephemeral-storage: 500Mi
+            requests:
+              cpu: 200m
+              memory: 500Mi
+              ephemeral-storage: 500Mi
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

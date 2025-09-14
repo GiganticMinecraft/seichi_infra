@@ -127,6 +127,21 @@ resource "kubernetes_secret" "argo_events_github_access_token" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_minecraft_prod_bugsink_admin_password" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "bugsink-admin-password"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    ADMIN_PASSWORD = var.bugsink_admin_password
+  }
+
+  type = "Opaque"
+}
+
 resource "random_password" "minecraft__prod_mariadb_root_password" {
   length           = 16
   special          = true
