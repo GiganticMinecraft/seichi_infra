@@ -10,7 +10,7 @@ spec:
   passwordSecretKeyRef:
     name: mariadb
     key: luckperms-password
-  maxUserConnections: 30
+  maxUserConnections: 50
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
