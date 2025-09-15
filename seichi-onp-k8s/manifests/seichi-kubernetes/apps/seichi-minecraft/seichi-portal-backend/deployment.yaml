@@ -14,10 +14,10 @@ spec:
     metadata:
       labels:
         app: seichi-portal-backend
-    spec:  
+    spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:main-02ebe93
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:main-649c758
           resources:
             requests:
               cpu: 250m
