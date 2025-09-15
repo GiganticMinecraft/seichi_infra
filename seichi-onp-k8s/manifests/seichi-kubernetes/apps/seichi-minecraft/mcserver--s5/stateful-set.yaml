@@ -65,14 +65,14 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        # 第4整地再生成に伴い、ワールドの保護をすべて削除する
-        - name: reset-regions-in-sw4
+        # 第4整地再生成に伴い、ワールドのフォルダ名を変更
+        - name: change-world-folder-name
           image: busybox:1.37.0
           command:
             - "sh"
             - "-c"
             - |
-              rm /data/plugins/WorldGuard/worlds/world_SW_4/regions.yml
+              mv /data/world_SW_4 /data/world_SW_4_old || true
           volumeMounts:
             - name: mcserver--s5-data
               mountPath: /data
