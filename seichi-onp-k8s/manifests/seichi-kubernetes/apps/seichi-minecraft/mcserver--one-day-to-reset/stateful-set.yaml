@@ -48,6 +48,16 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /plugins
+        - name: list-volume
+          image: busybox:1.37.0
+          command:
+            - "sh"
+            - "-c"
+            - |
+              ls -l /plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /plugins
       containers:
         - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:c572c30b26d9e0a88f6ba274e7ac5c588dd350ca9c8429286bfd6f48a298cf5a
           name: minecraft
