@@ -42,7 +42,7 @@ spec:
             - name: BUCKET_NAME
               value: seichi-plugins
             - name: BUCKET_PREFIX_NAME
-              value: kawaga
+              value: one-day-to-reset
             - name: DOWNLOAD_TARGET_DIR_PATH
               value: /plugins
           volumeMounts:
