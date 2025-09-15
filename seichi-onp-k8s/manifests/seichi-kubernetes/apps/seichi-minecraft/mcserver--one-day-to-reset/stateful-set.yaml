@@ -89,6 +89,6 @@ spec:
             - name: mod-downloader-volume
               mountPath: /plugins
 
-    volumes:
-      - name: mod-downloader-volume
-        emptyDir: {}
+      volumes:
+        - name: mod-downloader-volume
+          emptyDir: {}
