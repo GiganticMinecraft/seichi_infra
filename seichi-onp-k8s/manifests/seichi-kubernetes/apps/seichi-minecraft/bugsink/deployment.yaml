@@ -52,6 +52,8 @@ spec:
               value: "9000"
             - name: DATABASE_URL
               value: mysql://bugsink:$(MYSQL_PASSWORD)@mariadb/bugsink
+            - value: SINGLE_TEAM
+              name: "True"
             - name: BEHIND_HTTPS_PROXY
               value: "True"
             - name: BASE_URL
