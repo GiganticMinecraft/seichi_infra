@@ -42,14 +42,14 @@ spec:
             - name: BUCKET_NAME
               value: seichi-plugins
             - name: BUCKET_PREFIX_NAME
-              value: kawaga
+              value: one-day-to-reset
             - name: DOWNLOAD_TARGET_DIR_PATH
-              value: /plugins
+              value: /downloaded-plugins
           volumeMounts:
             - name: mod-downloader-volume
-              mountPath: /plugins
+              mountPath: /downloaded-plugins
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:1e444a80e14e2946c80b4171e2162e8b08c7c5a4335b737bc257d1a2c2e9eb09
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:c572c30b26d9e0a88f6ba274e7ac5c588dd350ca9c8429286bfd6f48a298cf5a
           name: minecraft
           resources:
             requests:
@@ -72,6 +72,14 @@ spec:
                   name: mcserver--one-day-to-reset--config-secrets
                   key: MORNING_GLORY_SEEDS_WEBHOOK_URL
 
+            # /downloaded-plugins: minio からダウンロードしたプラグインを配置
+            # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
+            # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
+            - name: COPY_PLUGINS_SRC
+              value: |-
+                /downloaded-plugins
+                /plugins
+
           ports:
             - containerPort: 25565
               name: minecraft
@@ -86,9 +94,40 @@ spec:
             periodSeconds: 20
 
           volumeMounts:
-            - name: mod-downloader-volume
-              mountPath: /plugins
+            # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
 
-    volumes:
-      - name: mod-downloader-volume
-        emptyDir: {}
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/minecraft-server が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+
+            # /plugins, /data/plugins ディレクトリには直接マウントしないこと。
+            #
+            # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
+            # /data/plugins ディレクトリに自動で配置してくれる。
+            # しかし、この Pod のベースとなっている seichi_minecraft_server_base は、
+            # /plugins ディレクトリに必要なプラグインの設定ファイルを展開している。
+            # そのため、/plugins ディレクトリにボリュームを直接マウントすると、既存の設定ファイルがすべて上書き(削除)されてしまう。
+            #
+            # また、/data/plugins ディレクトリにマウントしていない理由は、
+            # バックアップファイルからサーバーデータをリストアした場合、既存のデータが /data/plugins ディレクトリにも配置される。
+            # しかし、この Pod が起動したときに /data/plugins ディレクトリに mod-downloader-volume をマウントしてしまうと、
+            # 復元したはずのデータがすべて削除されることによって、
+            # /data/plugins/[プラグイン名] ディレクトリ以下にデータを保存するプラグインのデータ整合性が失われるリスクがある。
+            # これを回避するため、別のディレクトリにマウントしたうえで /data/plugins ディレクトリに mod-donwloader からダウンロードしたプラグインを配置する必要がある。
+            # itzg/minecraft-server の機能で COPY_PLUGINS_SRC という環境変数で指定したディレクトリをにプラグインを配置することで、
+            # これを実現するため、Pod 起動時に /data/plugins ディレクトリにプラグインを配置することができ、
+            # そこに指定した /downloaded-plugins ディレクトリにマウントすることとしている。
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
+
+      volumes:
+        # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
+        - name: mod-downloader-volume
+          emptyDir: {}

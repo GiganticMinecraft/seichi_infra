@@ -378,6 +378,16 @@ variable "discord_bot__babyrite__discord_token" {
 
 #endregion
 
+#region env variables for Bugsink
+
+variable "bugsink_admin_password" {
+  description = "Admin password for Bugsink"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region env variables for Cloudflare Pages projects
 
 variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
