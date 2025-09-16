@@ -63,7 +63,7 @@ spec:
 
     - name: run-backup
       script:
-        image: debian:12
+        image: debian:13
         command: ["/bin/sh", "-c"]
         source: |
           set -e
@@ -75,14 +75,14 @@ spec:
           apt install -y curl
           
           echo "Adding Proxmox restore Client repository..."
-          echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" > /etc/apt/sources.list.d/pbs-client.list
-          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
+          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
           
           echo "Updating package lists..."
           apt update
           
-          echo "Installing proxmox-backup-client version 3.3.2-1..."
-          apt install -y proxmox-backup-client=3.3.2-1
+          echo "Installing proxmox-backup-client version 4.0.14-1..."
+          apt install -y proxmox-backup-client=4.0.14-1
           
           echo "Running backup..."
           proxmox-backup-client backup "${BACKUP_NAME}" \

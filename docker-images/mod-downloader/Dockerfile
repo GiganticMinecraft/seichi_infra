@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.17
-FROM golang:1.25-bookworm AS builder
+FROM golang:1.25-trixie AS builder
 # Build
 ARG GOOS=linux
 ARG GOARCH=amd64
@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
     CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -buildvcs=false -ldflags="-s -w" -trimpath -o /mod-downloader
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 LABEL org.opencontainers.image.authors="outductor <inductor.kela+seichi@gmail.com>"
 LABEL org.opencontainers.image.url="https://github.com/GiganticMinecraft/seichi_infra"
