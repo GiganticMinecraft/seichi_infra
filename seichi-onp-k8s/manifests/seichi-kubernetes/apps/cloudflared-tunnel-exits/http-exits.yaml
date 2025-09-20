@@ -107,6 +107,11 @@ spec:
             external-hostname: bugsink.onp-k8s.admin.seichi.click
             internal-authority: "bugsink.seichi-minecraft:80"
 
+          # Bugsink - DSN (Data Source Name) 用のリバースプロキシ
+          - name: bugsink-dsn
+            external-hostname: bugsink-dsn.onp-k8s.admin.seichi.click
+            internal-authority: "bugsink-dsn-proxy.seichi-minecraft:80"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"
