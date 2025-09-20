@@ -27,7 +27,7 @@ spec:
             # - debug-pr-{{ (index . 0) }}-lobby
             - debug-s1
           forced_hosts:
-            debug-s1
+            play-debug.seichi.click: debug-s1
             # play-debug.seichi.click: debug-pr-{{ (index . 0) }}-lobby
 
           query_port: 25565
