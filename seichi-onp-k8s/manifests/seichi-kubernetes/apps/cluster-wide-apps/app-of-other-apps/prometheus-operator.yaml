@@ -168,6 +168,7 @@ spec:
                     password: ${MARIADB_MONITORING_PASSWORD}
         prometheus:
           prometheusSpec:
+            enableOTLPReceiver: true
             storageSpec:
               volumeClaimTemplate:
                 spec:
