@@ -80,6 +80,12 @@ spec:
                 /downloaded-plugins
                 /plugins
 
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "mcserver.one-day-to-reset"
+
+            - name: PYROSCOPE_LABELS
+              value: "server=one-day-to-reset,namespace=seichi-minecraft"
+
           ports:
             - containerPort: 25565
               name: minecraft
