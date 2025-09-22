@@ -174,6 +174,12 @@ spec:
             - name: REMOVE_OLD_MODS
               value: "TRUE"
 
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "mcserver.votelistener"
+
+            - name: PYROSCOPE_LABELS
+              value: "server=votelistener,namespace=seichi-minecraft"
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:5f6fa70bc8e47261e4dd32c301343c0f144c39a158ccd527bac3d234a05414b9
           name: minecraft
           ports:

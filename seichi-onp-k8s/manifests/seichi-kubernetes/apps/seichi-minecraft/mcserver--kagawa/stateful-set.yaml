@@ -73,6 +73,12 @@ spec:
                   name: mcserver--kagawa--config-secrets
                   key: MORNING_GLORY_SEEDS_WEBHOOK_URL
 
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "mcserver.kagawa"
+
+            - name: PYROSCOPE_LABELS
+              value: "server=kagawa,namespace=seichi-minecraft"
+
           ports:
             - containerPort: 25565
               name: minecraft
