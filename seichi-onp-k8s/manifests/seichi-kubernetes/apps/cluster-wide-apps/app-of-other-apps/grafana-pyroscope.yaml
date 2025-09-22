@@ -21,7 +21,7 @@ spec:
             enabled: false
             accessModes:
               - ReadWriteOnce
-            size: 50Gi
+            size: 100Gi
   syncPolicy:
     automated:
       prune: true

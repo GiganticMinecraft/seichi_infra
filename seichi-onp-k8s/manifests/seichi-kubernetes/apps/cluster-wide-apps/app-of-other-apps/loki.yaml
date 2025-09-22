@@ -42,14 +42,14 @@ spec:
         minio:
           enabled: true
           persistence:
-            size: 50Gi
+            size: 100Gi
 
         deploymentMode: SingleBinary
 
         singleBinary:
           replicas: 1
           persistence:
-            size: 50Gi
+            size: 100Gi
 
         # Zero out replica counts of other deployment modes
         backend:

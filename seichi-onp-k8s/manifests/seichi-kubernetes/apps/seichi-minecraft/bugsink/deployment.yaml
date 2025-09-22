@@ -57,7 +57,9 @@ spec:
             - name: BEHIND_HTTPS_PROXY
               value: "True"
             - name: BASE_URL
-              value: "https://bugsink.onp-k8s.admin.seichi.click"
+              value: "https://bugsink-dsn.onp-k8s.admin.seichi.click"
+            - name: ALLOWED_HOSTS
+              value: "bugsink.onp-k8s.admin.seichi.click,bugsink-dsn.onp-k8s.admin.seichi.click,bugsink.seichi-minecraft"
           resources:
             limits:
               cpu: 200m
