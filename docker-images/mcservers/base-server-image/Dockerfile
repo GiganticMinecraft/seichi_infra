@@ -43,8 +43,15 @@ ENV JVM_OPTS="-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-e
 
 # Pyroscope agent の設定
 # JAVA_TOOL_OPTIONS は JVM_OPTS とは独立して適用される
-# 各サーバーで SERVICE_NAME を上書きする必要がある
-ENV JAVA_TOOL_OPTIONS="-javaagent:/pyroscope/pyroscope.jar -Dpyroscope.server.address=http://pyroscope.monitoring:4040 -Dpyroscope.profiler=async -Dpyroscope.format=pprof -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
+ENV JAVA_TOOL_OPTIONS="-javaagent:/pyroscope/pyroscope.jar -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
+
+# Pyroscope 設定（環境変数で管理）
+ENV PYROSCOPE_SERVER_ADDRESS="http://pyroscope.monitoring:4040"
+ENV PYROSCOPE_FORMAT="jfr"
+ENV PYROSCOPE_PROFILING_INTERVAL="10ms"
+ENV PYROSCOPE_PROFILER_EVENT="cpu"
+ENV PYROSCOPE_PROFILER_ALLOC="512k"
+ENV PYROSCOPE_PROFILER_LOCK="10ms"
 
 # Pyroscope のアプリケーション名とラベルは各サーバーで設定される
 ENV PYROSCOPE_APPLICATION_NAME=""
