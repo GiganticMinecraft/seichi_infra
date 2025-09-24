@@ -221,6 +221,12 @@ spec:
             - name: REMOVE_OLD_MODS
               value: "TRUE"
 
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "mcserver.s1"
+
+            - name: PYROSCOPE_LABELS
+              value: "server=s1,namespace=seichi-minecraft"
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keepInventory true

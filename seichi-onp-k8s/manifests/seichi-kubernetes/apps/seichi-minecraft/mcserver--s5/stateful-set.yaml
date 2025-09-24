@@ -234,6 +234,12 @@ spec:
             - name: REMOVE_OLD_MODS
               value: "TRUE"
 
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "mcserver.s5"
+
+            - name: PYROSCOPE_LABELS
+              value: "server=s5,namespace=seichi-minecraft"
+
             # /downloaded-plugins: minio からダウンロードしたプラグインを配置
             # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
             # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
