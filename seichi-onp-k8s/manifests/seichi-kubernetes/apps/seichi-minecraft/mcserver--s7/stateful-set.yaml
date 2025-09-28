@@ -271,6 +271,7 @@ spec:
                 - --port
                 - "25565"
             initialDelaySeconds: 30
+            timeoutSeconds: 5
             periodSeconds: 5
             failureThreshold: 18
 
