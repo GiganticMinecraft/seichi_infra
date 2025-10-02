@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.18
+# syntax=docker/dockerfile:1.19
 FROM golang:1.25-trixie AS builder
 # Build
 ARG GOOS=linux
