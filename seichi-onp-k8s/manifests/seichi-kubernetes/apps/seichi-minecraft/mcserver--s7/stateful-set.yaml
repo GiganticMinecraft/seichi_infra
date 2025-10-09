@@ -242,7 +242,7 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=s7,namespace=seichi-minecraft"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7:1.0.0@sha256:4afdba2ccd3758c5a85951cb23172a93f21468c4b9ee1e4e3ae6223d7bf2b003
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7:1.0.0@sha256:0b33c78a2c757ec1d7692976eabb54c532d7a10debb3742ade526efdca019d69
           name: minecraft
           ports:
             - containerPort: 25565
