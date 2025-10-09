@@ -41,9 +41,11 @@ ENV TYPE="PAPER"
 # Pyroscope設定はJAVA_TOOL_OPTIONSで行うため、ここではJMX exporterのみ
 ENV JVM_OPTS="-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml"
 
+# TODO: 2025/10/9 SIGSEGVが発生する問題があるため、一旦コメントアウト
+#
 # Pyroscope agent の設定
 # JAVA_TOOL_OPTIONS は JVM_OPTS とは独立して適用される
-ENV JAVA_TOOL_OPTIONS="-javaagent:/pyroscope/pyroscope.jar -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
+# ENV JAVA_TOOL_OPTIONS="-javaagent:/pyroscope/pyroscope.jar -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
 
 # Pyroscope 設定（環境変数で管理）
 ENV PYROSCOPE_SERVER_ADDRESS="http://pyroscope.monitoring:4040"
