@@ -49,7 +49,7 @@ spec:
 
     - name: list-databases
       script:
-        image: python:3.13-slim
+        image: python:3.14-slim
         command: [sh]
         source: |
           pip install --quiet --no-cache-dir kubernetes
@@ -83,7 +83,7 @@ spec:
           - name: name
           - name: timestamp
       script:
-        image: python:3.13-slim
+        image: python:3.14-slim
         command: [sh]
         source: |
           pip install --quiet --no-cache-dir kubernetes
