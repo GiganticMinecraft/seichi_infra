@@ -144,7 +144,7 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host                   = var.onp_k8s_server_url
     cluster_ca_certificate = local.onp_kubernetes_cluster_ca_certificate
     client_certificate     = local.onp_kubernetes_client_certificate
