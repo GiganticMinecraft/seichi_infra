@@ -210,7 +210,7 @@ resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
   namespace  = "kube-system"
   version    = "0.3.0"
 
-  set_list {
+  set_list = [{
     name = "manifests"
     value = [<<-EOS
       kind: ClusterSecret
@@ -226,7 +226,7 @@ resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
         monitoring-password: ${base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result)}
     EOS
     ]
-  }
+  }]
 }
 
 resource "random_password" "minecraft__pr_review_mariadb_root_password" {
@@ -248,7 +248,7 @@ resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
   namespace  = "kube-system"
   version    = "0.3.0"
 
-  set_list {
+  set_list = [{
     name = "manifests"
     value = [<<-EOS
       kind: ClusterSecret
@@ -264,7 +264,7 @@ resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
         prod-mariadb-password: ${base64encode(var.minecraft__prod_game_db__password)}
     EOS
     ]
-  }
+  }]
 }
 
 resource "kubernetes_secret" "idea_reaction_discord_token" {

@@ -242,7 +242,7 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
   namespace  = "kube-system"
   version    = "0.3.0"
 
-  set_list {
+  set_list = [{
     name = "manifests"
     value = [<<-EOS
       kind: ClusterSecret
@@ -257,7 +257,7 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
         MINIO_ACCESS_SECRET: ${base64encode(var.minio_debug_access_secret)}
     EOS
     ]
-  }
+  }]
 
 }
 
@@ -273,7 +273,7 @@ resource "helm_release" "onp_minecraft_pbs_credentials" {
   namespace  = "kube-system"
   version    = "0.3.0"
 
-  set_list {
+  set_list = [{
     name = "manifests"
     value = [<<-EOS
       kind: ClusterSecret
@@ -293,6 +293,6 @@ resource "helm_release" "onp_minecraft_pbs_credentials" {
         fingerprint: ${base64encode(var.proxmox_backup_client__fingerprint)}
     EOS
     ]
-  }
+  }]
 
 }
