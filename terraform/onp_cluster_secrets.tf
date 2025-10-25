@@ -7,7 +7,7 @@ resource "helm_release" "onp_cluster_clustersecret" {
   chart      = "cluster-secret"
   name       = "clustersecret"
   namespace  = "kube-system"
-  version    = "0.4.1"
+  version    = "0.7.0"
 
   reset_values    = true
   recreate_pods   = true
