@@ -214,6 +214,7 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+      - Replace=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
