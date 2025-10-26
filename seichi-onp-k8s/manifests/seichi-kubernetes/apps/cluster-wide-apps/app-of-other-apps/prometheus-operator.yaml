@@ -13,12 +13,8 @@ spec:
     targetRevision: 78.5.0
     helm:
       releaseName: prometheus
-      skipCrds: true
+      skipCrds: false
       values: |
-        crds:
-          enabled: true
-          upgradeJob:
-            enabled: true
         defaultRules:
           create: true
           rules:
