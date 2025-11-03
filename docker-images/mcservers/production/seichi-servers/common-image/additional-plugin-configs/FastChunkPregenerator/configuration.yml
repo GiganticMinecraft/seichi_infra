@@ -1,0 +1,36 @@
+# Max millis the generation thread should take per tick.
+# Increase for more chunks per tick and less TPS
+# Should be below 35 if async.
+MaxMillisPerTick: 28.5
+
+# Amount of ticks to wait between generations.
+WaitTicksBetween: 0
+
+# Only enable on Paper.
+# default: false
+AsyncChunkLoadingEnabled: true
+
+# Increases chunk priority.
+# This could prevent loading of chunks that
+# players may need but could also increase generation speed.
+# Disable if you want steady generations.
+HighAsyncPriority: true
+
+# Experimental. Disable for now.
+UnsafeAsyncCalls: false
+
+# Only usefull when using AsyncChunkLoading
+# A good value is 4 * CPU core count for exampe.
+MaxParallelAsyncCalls: 8
+
+# How many seconds to wait between each notification.
+SecondsPerNotification: 5
+
+# The progess output. Can be one of:
+# NONE, CONSOLE, BROADCAST, OP, OP_AND_CONSOLE
+NotificationType: CONSOLE
+
+# Pauses generation if a player logs in
+# and resumes when the last one logs out
+# Can be bypassed with perm: fcp.pause.bypass
+OnlyGenerateWithNoPlayersOnline: false
