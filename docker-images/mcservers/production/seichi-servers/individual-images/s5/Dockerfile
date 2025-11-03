@@ -1,4 +1,4 @@
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_production_common:1.0.0@sha256:a132044235dcbaa4cf2288c0e85eabd9afd83ce8f2fb38b6d0abf1071b63062a
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_production_common:1.0.0@sha256:523f1df5140e135add4052cf7f90dc83035698209dfddd1a4dbc45d44d87d685
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
