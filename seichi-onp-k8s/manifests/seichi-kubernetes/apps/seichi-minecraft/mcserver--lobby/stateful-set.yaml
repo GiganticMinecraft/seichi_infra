@@ -164,7 +164,7 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=lobby,namespace=seichi-minecraft"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:6b27da45592ee6aef65c9ce70be62352fde33734e37682b0a8a92595124c8d9e
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:c842815f5dabb62219b537d57f78988eb6bb46ae3077556e54623c66bcdbf333
           name: minecraft
           ports:
             - containerPort: 25565
