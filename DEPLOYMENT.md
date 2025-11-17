@@ -79,3 +79,39 @@ spec:
 [Argo CD](https://argocd.onp-k8s.admin.seichi.click/) は GitHub SSO を経由して Web 上でも動作を確認できます。[こちらの YAML](https://github.com/GiganticMinecraft/seichi_infra/blob/main/seichi-onp-k8s/manifests/seichi-kubernetes/argocd-apps-helm-chart-values.yaml) に最初に読み込む Git リポジトリが記されているので確認すると、[./seichi-onp-k8s/manifests/seichi-kubernetes/apps/root](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/root) には `Application` リソースと `AppProject` リソースがあります。これが、Argo CD で管理対象に入るリポジトリ及びそのパスを示しています。詳しくは [./seichi-onp-k8s/README.md](./seichi-onp-k8s/README.md) あたりにも説明があります。
 
 文字だけでは説明が難しい部分もあるので、一旦は`マニフェストを書いて　Git の所定の場所に配置する`ことと、`Argo CD というツールが自動的にデプロイ処理を請け負ってくれる`ことだけ理解しておけば大丈夫です。
+
+## Minecraftサーバーのメンテナンスモード
+
+整地鯖のMinecraftサーバー群（`seichi-minecraft` namespace）には、メンテナンス時にトラフィックを遮断するメンテナンスモード機能が実装されています。
+
+### 概要
+
+メンテナンスモードを有効化すると、全Minecraftサーバーが自動的にKubernetesのServiceエンドポイントから除外され、新規接続を受け付けなくなります。Pod自体は起動したままのため、管理者はサーバーにアクセスしてメンテナンス作業を継続できます。
+
+### 仕組み
+
+- 各MinecraftサーバーのreadinessProbeが、5秒ごとに `maintenance-mode` ConfigMapの `enabled` フィールドを確認
+- `enabled: "true"` の場合、readinessProbeが失敗し続ける
+- `failureThreshold: 18` × `periodSeconds: 5` = 90秒後にServiceエンドポイントから除外され、トラフィックが遮断される
+- Pod再起動は不要で、ConfigMap変更後5秒以内に反映開始
+- GitOpsによる管理のため、変更履歴が全てGitに記録される
+
+### メンテナンスモードの有効化
+
+[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集し、`enabled` を `"true"` に変更してコミット＆プッシュします。
+
+```yaml
+data:
+  enabled: "true"  # falseをtrueに変更
+```
+
+ArgoCDが自動的に変更を検知し、数分以内に反映されます。反映後、5秒以内に全サーバーのreadinessProbeが失敗し始め、90秒後に全トラフィックが遮断されます。
+
+### メンテナンスモードの無効化
+
+同じファイルで `enabled: "false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映後、5秒以内にreadinessProbeが成功し始め、即座にServiceエンドポイントに復帰します。
+
+### 注意事項
+
+- Pod自体は起動し続けるため、リソース（CPU/メモリ）は解放されません
+- 完全にサーバーを停止したい場合は、既存のArgo Workflows（`argo-workflows-stop-server.yaml`）を使用してください
