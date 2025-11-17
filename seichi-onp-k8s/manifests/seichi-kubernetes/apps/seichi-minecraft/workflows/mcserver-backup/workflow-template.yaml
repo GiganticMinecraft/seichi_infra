@@ -25,8 +25,13 @@ spec:
           - name: persistent-volume-claim-name
       dag:
         tasks:
+          - name: check-maintenance-mode
+            template: check-maintenance-mode
+
           - name: get-timestamp
             template: get-timestamp
+            dependencies:
+              - check-maintenance-mode
 
           - name: patch-statefulset-to-0
             template: patch-statefulset-to-0
@@ -37,6 +42,8 @@ spec:
               parameters:
                 - name: statefulset-name
                   value: "{{inputs.parameters.statefulset-name}}"
+            dependencies:
+              - check-maintenance-mode
 
           - name: wait-for-scale-to-0
             template: wait-for-scale-to-0
@@ -102,6 +109,19 @@ spec:
             dependencies:
               - patch-statefulset-to-1
 
+    - name: check-maintenance-mode
+      script:
+        image: mirror.gcr.io/bitnami/kubectl:1.34.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+          MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
+          if [ "$MAINTENANCE_ENABLED" = "true" ]; then
+            echo "メンテナンスモードが有効です。バックアップワークフローをスキップします。"
+            exit 1
+          fi
+          echo "メンテナンスモードは無効です。バックアップを続行します。"
+
     - name: get-timestamp
       script:
         image: mirror.gcr.io/alpine
@@ -114,7 +134,7 @@ spec:
         parameters:
           - name: statefulset-name
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.4
+        image: mirror.gcr.io/bitnami/kubectl:1.34.2
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
@@ -124,7 +144,7 @@ spec:
         parameters:
           - name: statefulset-name
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.4
+        image: mirror.gcr.io/bitnami/kubectl:1.34.2
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
@@ -239,7 +259,7 @@ spec:
         parameters:
           - name: statefulset-name
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.4
+        image: mirror.gcr.io/bitnami/kubectl:1.34.2
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
@@ -250,7 +270,7 @@ spec:
           - name: statefulset-name
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
       script:
-        image: mirror.gcr.io/bitnami/kubectl:1.33.4
+        image: mirror.gcr.io/bitnami/kubectl:1.34.2
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for StatefulSet to scale up..."
