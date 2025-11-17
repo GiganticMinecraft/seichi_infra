@@ -105,9 +105,8 @@ spec:
                 - sh
                 - -c
                 - |
-                  # メンテナンスモードチェック（ConfigMapを直接読み取り、Pod再起動不要で即座反映）
-                  MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
-                  if [ "$MAINTENANCE_ENABLED" = "true" ]; then
+                  # メンテナンスモードチェック（ConfigMapをボリュームマウントで読み取り）
+                  if grep -q "^true$" /maintenance-mode/enabled 2>/dev/null; then
                     echo "Maintenance mode is enabled"
                     exit 1
                   fi
@@ -119,6 +118,11 @@ spec:
             failureThreshold: 18
 
           volumeMounts:
+            # メンテナンスモードの状態確認用ConfigMap
+            - name: maintenance-mode
+              mountPath: /maintenance-mode
+              readOnly: true
+
             # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
             # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
             # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
@@ -153,6 +157,11 @@ spec:
               mountPath: /downloaded-plugins
 
       volumes:
+        # メンテナンスモードの状態を保持するConfigMap
+        - name: maintenance-mode
+          configMap:
+            name: maintenance-mode
+
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
           emptyDir: {}
