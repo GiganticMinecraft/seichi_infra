@@ -8,4 +8,4 @@ data:
   # この値を "true" に変更すると、全Minecraftサーバーが即座にReadinessProbeで失敗し、
   # Serviceのエンドポイントから除外される（トラフィック遮断）。
   # Pod自体は起動したままなので、メンテナンス作業は継続可能。
-  enabled: "true"
+  enabled: "false"
