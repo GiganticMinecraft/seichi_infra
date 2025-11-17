@@ -288,12 +288,17 @@ spec:
           readinessProbe:
             exec:
               command:
-                - mc-monitor
-                - status
-                - --host
-                - localhost
-                - --port
-                - "25565"
+                - sh
+                - -c
+                - |
+                  # メンテナンスモードチェック（ConfigMapを直接読み取り、Pod再起動不要で即座反映）
+                  MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
+                  if [ "$MAINTENANCE_ENABLED" = "true" ]; then
+                    echo "Maintenance mode is enabled"
+                    exit 1
+                  fi
+                  # 通常のヘルスチェック
+                  mc-monitor status --host localhost --port 25565
             initialDelaySeconds: 30
             timeoutSeconds: 5
             periodSeconds: 5
