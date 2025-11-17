@@ -241,7 +241,7 @@ spec:
         parameters:
           - name: coreprotect-db-name
       script:
-        image: mirror.gcr.io/mariadb:11.4
+        image: mirror.gcr.io/mariadb:11.8
         env:
           - name: COREPROTECT_DB_USER_PASSWORD
             valueFrom:
