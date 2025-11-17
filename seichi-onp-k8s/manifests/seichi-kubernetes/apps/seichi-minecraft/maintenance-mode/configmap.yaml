@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maintenance-mode
+  namespace: seichi-minecraft
+data:
+  # メンテナンス有効化: "true", 無効化: "false"
+  # この値を "true" に変更すると、全Minecraftサーバーが即座にReadinessProbeで失敗し、
+  # Serviceのエンドポイントから除外される（トラフィック遮断）。
+  # Pod自体は起動したままなので、メンテナンス作業は継続可能。
+  enabled: "true"
