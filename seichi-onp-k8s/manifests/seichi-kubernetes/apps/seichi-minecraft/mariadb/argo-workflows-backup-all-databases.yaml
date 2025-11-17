@@ -26,6 +26,8 @@ spec:
   templates:
     - name: default
       steps:
+        - - name: check-maintenance-mode
+            template: check-maintenance-mode
         - - name: generate-timestamp
             template: get-timestamp
         - - name: list-databases
@@ -39,6 +41,19 @@ spec:
                 - name: timestamp
                   value: "{{steps.generate-timestamp.outputs.result}}"
             withParam: "{{steps.list-databases.outputs.result}}"
+
+    - name: check-maintenance-mode
+      script:
+        image: bitnami/kubectl:1.34.2
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+          MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
+          if [ "$MAINTENANCE_ENABLED" = "true" ]; then
+            echo "メンテナンスモードが有効です。バックアップワークフローをスキップします。"
+            exit 1
+          fi
+          echo "メンテナンスモードは無効です。バックアップを続行します。"
 
     - name: get-timestamp
       script:
