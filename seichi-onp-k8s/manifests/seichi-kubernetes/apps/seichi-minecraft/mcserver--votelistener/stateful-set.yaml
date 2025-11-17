@@ -180,7 +180,7 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=votelistener,namespace=seichi-minecraft"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:50822a6fe3361ac462c271c8340ab6d3ebfbf93975514fa83f514ff09382ca23
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:d5bf04cf1534713f3573c7d72b2f600c53db68af72fd59cd8c4425239cc38866
           name: minecraft
           ports:
             - containerPort: 25565
