@@ -37,7 +37,7 @@ spec:
   project: cluster-wide-apps
   source:
     repoURL: https://github.com/parca-dev/parca-agent
-    targetRevision: v0.43.0
+    targetRevision: v0.44.0
     path: .
     directory:
       include: kubernetes-manifest.yaml
