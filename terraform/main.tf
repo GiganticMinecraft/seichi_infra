@@ -6,7 +6,7 @@ terraform {
     }
     github = {
       source  = "integrations/github"
-      version = "6.8.1"
+      version = "6.8.3"
     }
     random = {
       source  = "hashicorp/random"
@@ -14,7 +14,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "3.1.0"
+      version = "3.1.1"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
