@@ -60,6 +60,9 @@ spec:
               value: "https://bugsink-dsn.onp-k8s.admin.seichi.click"
             - name: ALLOWED_HOSTS
               value: "bugsink.onp-k8s.admin.seichi.click,bugsink-dsn.onp-k8s.admin.seichi.click,bugsink.seichi-minecraft"
+            # https://github.com/bugsink/bugsink/blob/bddc2e8f640e82b7d1f861f1b8b363535d8a22a1/bugsink/conf_templates/singleserver.py.template#L41
+            - name: TIME_ZONE
+              value: "Asia/Tokyo"
           resources:
             limits:
               cpu: 200m
