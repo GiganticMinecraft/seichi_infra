@@ -17,7 +17,8 @@ spec:
   port: 3306
 
   storage:
-    size: 500Gi
+    # FIXME: Revert to 500Gi
+    size: 580Gi
     storageClassName: synology-iscsi-storage
     resizeInUseVolumes: true
     waitForVolumeResize: true
