@@ -17,7 +17,7 @@ spec:
   port: 3306
 
   storage:
-    size: 600Gi
+    size: 500Gi
     storageClassName: synology-iscsi-storage
     resizeInUseVolumes: true
     waitForVolumeResize: true
