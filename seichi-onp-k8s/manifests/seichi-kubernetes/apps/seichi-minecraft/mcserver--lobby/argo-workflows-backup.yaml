@@ -43,7 +43,7 @@ spec:
 
     - name: check-maintenance-mode
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           set -e
@@ -63,14 +63,14 @@ spec:
 
     - name: patch-statefulset-to-0
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--lobby -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
 
     - name: wait-for-scale-to-0
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
@@ -90,23 +90,23 @@ spec:
         command: ["/bin/sh", "-c"]
         source: |
           set -e
-          
+
           echo "Updating package lists..."
           apt update
-          
+
           echo "Installing packages..."
           apt install -y curl
-          
+
           echo "Adding Proxmox restore Client repository..."
           echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
           curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
-          
+
           echo "Updating package lists..."
           apt update
-          
+
           echo "Installing proxmox-backup-client version 4.0.14-1..."
           apt install -y proxmox-backup-client=4.0.14-1
-          
+
           echo "Running backup..."
           proxmox-backup-client backup "${BACKUP_NAME}" \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
@@ -154,7 +154,7 @@ spec:
 
     - name: patch-statefulset-to-1
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--lobby -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
@@ -162,7 +162,7 @@ spec:
     - name: wait-for-scale-to-1
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for StatefulSet to scale up..."

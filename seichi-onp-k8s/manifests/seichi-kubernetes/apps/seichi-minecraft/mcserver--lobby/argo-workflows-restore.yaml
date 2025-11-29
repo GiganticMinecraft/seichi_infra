@@ -17,10 +17,10 @@ spec:
     parameters:
       - name: RESTORE_TARGET_BACKUP_ID_PBS
         description: "リストア元として使用するPBSバックアップID (デフォルトはargo-workflowでバックアップしたIDなので別のバックアップを使用したい時のみ変更する)"
-        value: "mcserver--lobby"  # 初期値は argo-workflows-backup.yaml で指定したID
+        value: "mcserver--lobby" # 初期値は argo-workflows-backup.yaml で指定したID
       - name: RESTORE_TARGET_DATE_PBS
         description: "リストアするPBSバックアップの日付 (例: 2024-02-10T12:00:00Z)"
-        value: ""  # 初期値を空にしておく
+        value: "" # 初期値を空にしておく
   templates:
     - name: default
       steps:
@@ -43,17 +43,17 @@ spec:
         command: [sh]
         source: |
           echo $(date +%Y%m%d-%H%M%S)
-  
+
     - name: patch-statefulset-to-0
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--lobby -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
 
     - name: wait-for-scale-to-0
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for statefulset to scale down..."
@@ -73,23 +73,23 @@ spec:
         command: ["/bin/sh", "-c"]
         source: |
           set -e
-          
+
           echo "Updating package lists..."
           apt update
-          
+
           echo "Installing packages..."
           apt install -y curl
-          
+
           echo "Adding Proxmox restore Client repository..."
           echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
           curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
-          
+
           echo "Updating package lists..."
           apt update
-          
+
           echo "Installing proxmox-backup-client version 4.0.14-1..."
           apt install -y proxmox-backup-client=4.0.14-1
-          
+
           echo "Deleting RESTORE_TARGET_DIR before restore..."
           rm -vrf ${RESTORE_TARGET_DIR}/*
           ls -a ${RESTORE_TARGET_DIR}/ | egrep -v '^.$' | egrep -v '^..$' | xargs -I {} rm -vrf ${RESTORE_TARGET_DIR}/{}
@@ -144,10 +144,10 @@ spec:
           # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
           - name: pbs-tmpfs
             mountPath: /root/.cache
-  
+
     - name: patch-statefulset-to-1
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           kubectl patch statefulset mcserver--lobby -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
@@ -155,7 +155,7 @@ spec:
     - name: wait-for-scale-to-1
       activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
       script:
-        image: bitnami/kubectl:1.33.4
+        image: bitnami/kubectl:latest
         command: ["/bin/sh", "-c"]
         source: |
           echo "Waiting for StatefulSet to scale up..."
@@ -167,6 +167,6 @@ spec:
   volumes:
     - name: restore-target-volume
       persistentVolumeClaim:
-        claimName:  mcserver--lobby-data-mcserver--lobby-0
+        claimName: mcserver--lobby-data-mcserver--lobby-0
     - name: pbs-tmpfs
       emptyDir: {}
