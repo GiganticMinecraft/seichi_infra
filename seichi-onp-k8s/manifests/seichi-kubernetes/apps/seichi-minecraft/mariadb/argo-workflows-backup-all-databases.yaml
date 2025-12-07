@@ -57,7 +57,7 @@ spec:
 
     - name: get-timestamp
       script:
-        image: alpine:3.22
+        image: alpine:3.23
         command: [sh]
         source: |
           date +%Y%m%d-%H%M%S
