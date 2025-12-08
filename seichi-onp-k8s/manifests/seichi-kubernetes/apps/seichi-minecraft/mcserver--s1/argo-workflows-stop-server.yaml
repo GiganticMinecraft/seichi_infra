@@ -9,6 +9,7 @@ spec:
   serviceAccountName: mcserver--s1-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
+  activeDeadlineSeconds: 600 # 10分でタイムアウト（image pullの失敗等での長時間ハングを防ぐ）
   entrypoint: default
   templates:
     - name: default
