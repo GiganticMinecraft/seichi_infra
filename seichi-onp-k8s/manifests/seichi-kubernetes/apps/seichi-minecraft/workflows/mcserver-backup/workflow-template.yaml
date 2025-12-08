@@ -7,6 +7,7 @@ spec:
   serviceAccountName: mcserver--backup-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
+  activeDeadlineSeconds: 14400 # 4時間でタイムアウト（image pullの失敗等での長時間ハングを防ぐ）
   entrypoint: mcserver-backup-entrypoint
   arguments:
     # NOTE: Argo Workflows の Example やドキュメントには spec.arguments.parameters で指定する parameter には必ず value を指定しているように見えるが、
