@@ -333,7 +333,7 @@ spec:
         - resources:
             limits:
               memory: 128Mi
-          image: nginx:1.29.3
+          image: nginx:1.29.4
           name: dynmap
           ports:
             - containerPort: 80
