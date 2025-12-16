@@ -15,7 +15,7 @@ data:
   BungeeSemaphore-config.yml: |
     synchronized-server-regex: "^(deb-s\\d+)$"
     redis:
-      host: seichi-debug-bungeesemaphore-valkey-primary.seichi-debug-gateway
+      host: seichi-debug-bungeesemaphore-valkey.seichi-debug-gateway
       port: 6379
 
     locale:
@@ -28,7 +28,7 @@ data:
   RedisBungee-config.yml: |
     server-id: ""
     use-random-id-string: true
-    redis-server: seichi-debug-redisbungee-valkey-primary.seichi-debug-gateway
+    redis-server: seichi-debug-redisbungee-valkey.seichi-debug-gateway
     redis-port: 6379
     redis-password: ""
     max-redis-connections: 8
