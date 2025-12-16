@@ -7,67 +7,80 @@ spec:
   project: seichi-debug-gateway
   source:
     chart: valkey
-    repoURL: 'registry-1.docker.io/bitnamicharts'
-    path: 'valkey'
-    targetRevision: 5.0.13
+    repoURL: 'https://valkey-io.github.io/valkey-helm'
+    targetRevision: 0.9.0
     helm:
       releaseName: seichi-debug-redisbungee-valkey
       values: |
-        architecture: standalone
-        auth:
-          enabled: false
-        commonConfiguration: |-
+        image:
+          registry: "mirror.gcr.io"
+          repository: valkey/valkey
+          tag: "9.0.1"
+        deploymentStrategy: Recreate
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+        valkeyConfig: |
           notify-keyspace-events "Eg$x"
-        primary:
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "1Gi"
-          extraFlags:
-            # https://github.com/GiganticMinecraft/seichi_infra/issues/468
-            - "--maxmemory 2048mb"
+          maxmemory 2048mb
+        dataStorage:
+          enabled: true
+          requestedSize: 8Gi
         metrics:
           enabled: true
+          exporter:
+            image:
+              registry: mirror.gcr.io
+              repository: oliver006/redis_exporter
+              tag: "v1.80.1"
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "128Mi"
+              limits:
+                cpu: "150m"
+                memory: "192Mi"
           serviceMonitor:
             enabled: true
             additionalLabels:
               release: prometheus
           prometheusRule:
             enabled: true
-            additionalLabels:
+            extraLabels:
               release: prometheus
             rules:
               - alert: ValkeyDown
-                expr: valkey_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
+                expr: redis_up{service="{{ include "valkey.fullname" . }}-metrics"} == 0
                 for: 2m
                 labels:
                   severity: error
                 annotations:
-                  summary: Valkey&reg; instance {{ "{{ $labels.instance }}" }} down
-                  description: Valkey&reg; instance {{ "{{ $labels.instance }}" }} is down
+                  summary: Valkey instance {{ "{{ $labels.instance }}" }} down
+                  description: Valkey instance {{ "{{ $labels.instance }}" }} is down
               - alert: ValkeyMemoryHigh
                 expr: >
-                  valkey_memory_used_bytes{service="{{ template "common.names.fullname" . }}-metrics"} * 100
+                  redis_memory_used_bytes{service="{{ include "valkey.fullname" . }}-metrics"} * 100
                   /
-                  valkey_memory_max_bytes{service="{{ template "common.names.fullname" . }}-metrics"}
-                  > 90
+                  redis_memory_max_bytes{service="{{ include "valkey.fullname" . }}-metrics"}
+                  > 90 <= 100
                 for: 2m
                 labels:
                   severity: error
                 annotations:
-                  summary: Valkey&reg; instance {{ "{{ $labels.instance }}" }} is using too much memory
+                  summary: Valkey instance {{ "{{ $labels.instance }}" }} is using too much memory
                   description: |
-                    Valkey&reg; instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
+                    Valkey instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
               - alert: ValkeyKeyEviction
                 expr: |
-                  increase(Valkey_evicted_keys_total{service="{{ template "common.names.fullname" . }}-metrics"}[5m]) > 0
+                  increase(redis_evicted_keys_total{service="{{ include "valkey.fullname" . }}-metrics"}[5m]) > 0
                 for: 1s
                 labels:
                   severity: error
                 annotations:
-                  summary: Valkey&reg; instance {{ "{{ $labels.instance }}" }} has evicted keys
+                  summary: Valkey instance {{ "{{ $labels.instance }}" }} has evicted keys
                   description: |
-                    Valkey&reg; instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
+                    Valkey instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
   destination:
     server: https://kubernetes.default.svc
     namespace: seichi-debug-gateway
