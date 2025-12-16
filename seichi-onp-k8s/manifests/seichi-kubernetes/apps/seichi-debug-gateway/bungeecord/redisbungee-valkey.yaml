@@ -9,7 +9,7 @@ spec:
     chart: valkey
     repoURL: 'registry-1.docker.io/bitnamicharts'
     path: 'valkey'
-    targetRevision: 5.0.13
+    targetRevision: 5.0.12
     helm:
       releaseName: seichi-debug-redisbungee-valkey
       values: |
