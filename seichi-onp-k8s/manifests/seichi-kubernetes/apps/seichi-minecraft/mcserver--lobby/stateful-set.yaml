@@ -45,6 +45,22 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: remove-unexpected-line
+          image: busybox:1.37.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - sh
+            - -c
+            - |
+              cd /data/plugins/LunaChat/
+              grep -n 'd7731155-' uuidcache.yml
+              sed -i.bak '/^d7731155-$/d' uuidcache.yml
+              echo 'diff'
+              diff -s uuidcache.yml uuidcache.yml.bak
+              rm uuidcache.yml.bak
+          volumeMounts:
+            - name: mcserver--lobby-data
+              mountPath: /data
 
       containers:
         - resources:
