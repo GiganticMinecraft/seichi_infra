@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/api:sha-c18a7a4"
+          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/api:sha-20d7a09"
           ports:
             - containerPort: 8080
           env:
@@ -52,7 +52,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
         - name: discord
-          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/discord:sha-c18a7a4"
+          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/discord:sha-20d7a09"
           env:
             - name: DISCORD_BOT_TOKEN
               valueFrom:
