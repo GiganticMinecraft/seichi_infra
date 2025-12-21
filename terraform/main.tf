@@ -447,3 +447,37 @@ variable "proxmox_backup_client__fingerprint" {
 }
 
 # endregion
+
+#region tailscale-approval-bot secrets
+
+variable "tailscale_approval_bot__tailnet" {
+  description = "Tailscale tailnet name for approval bot"
+  type        = string
+  sensitive   = true
+}
+
+variable "tailscale_approval_bot__api_key" {
+  description = "Tailscale API key for approval bot"
+  type        = string
+  sensitive   = true
+}
+
+variable "tailscale_approval_bot__discord_bot_token" {
+  description = "Discord bot token for approval bot"
+  type        = string
+  sensitive   = true
+}
+
+variable "tailscale_approval_bot__discord_guild_id" {
+  description = "Discord guild ID for approval bot"
+  type        = string
+  sensitive   = true
+}
+
+variable "tailscale_approval_bot__discord_channel_id" {
+  description = "Discord channel ID for approval bot notifications"
+  type        = string
+  sensitive   = true
+}
+
+#endregion

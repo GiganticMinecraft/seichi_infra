@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailscale-approval-bot
+  namespace: seichi-minecraft
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: tailscale-approval-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tailscale-approval-bot
+  template:
+    metadata:
+      labels:
+        app: tailscale-approval-bot
+    spec:
+      containers:
+        - name: api
+          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/api:sha-c18a7a4"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TAILSCALE_TAILNET
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-approval-bot-secrets
+                  key: TAILSCALE_TAILNET
+            - name: TAILSCALE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-approval-bot-secrets
+                  key: TAILSCALE_API_KEY
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 10m
+            limits:
+              memory: 64Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        - name: discord
+          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/discord:sha-c18a7a4"
+          env:
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-approval-bot-secrets
+                  key: DISCORD_BOT_TOKEN
+            - name: DISCORD_GUILD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-approval-bot-secrets
+                  key: DISCORD_GUILD_ID
+            - name: DISCORD_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-approval-bot-secrets
+                  key: DISCORD_CHANNEL_ID
+            - name: API_URL
+              value: "http://localhost:8080"
+            - name: POLL_INTERVAL
+              value: "24h"
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 10m
+            limits:
+              memory: 64Mi
