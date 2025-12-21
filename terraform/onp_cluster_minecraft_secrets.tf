@@ -261,6 +261,25 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
 
 }
 
+resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "tailscale-approval-bot-secrets"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    TAILSCALE_TAILNET  = var.tailscale_approval_bot__tailnet
+    TAILSCALE_API_KEY  = var.tailscale_approval_bot__api_key
+    DISCORD_BOT_TOKEN  = var.tailscale_approval_bot__discord_bot_token
+    DISCORD_GUILD_ID   = var.tailscale_approval_bot__discord_guild_id
+    DISCORD_CHANNEL_ID = var.tailscale_approval_bot__discord_channel_id
+  }
+
+  type = "Opaque"
+}
+
 resource "helm_release" "onp_minecraft_pbs_credentials" {
   depends_on = [
     kubernetes_namespace.onp_seichi_debug_minecraft,
