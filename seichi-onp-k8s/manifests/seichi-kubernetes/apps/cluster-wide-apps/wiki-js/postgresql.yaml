@@ -63,7 +63,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: synology-csi-default
+        storageClassName: synology-iscsi-storage
         resources:
           requests:
             storage: 50Gi
