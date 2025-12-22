@@ -1,0 +1,20 @@
+apiVersion: v1
+entries:
+  raw-resources:
+  - apiVersion: v2
+    created: "2023-10-02T21:44:43.276387607Z"
+    description: A Helm chart for raw Kubernetes resources
+    digest: 8634fcb31b8c576f5052d8b3dcb758020ef4c96aee5701cfb758df77b42db118
+    name: raw-resources
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/raw-resources-0.3.0/raw-resources-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    created: "2023-10-02T21:02:57.729124666Z"
+    description: A Helm chart for raw Kubernetes resources
+    digest: 1559b617405064994ba96bb25f4bad1037103149bad4c293d02f8c4bbe3a09d0
+    name: raw-resources
+    urls:
+    - https://github.com/GiganticMinecraft/seichi_infra/releases/download/raw-resources-0.2.0/raw-resources-0.2.0.tgz
+    version: 0.2.0
+generated: "2023-10-02T21:44:43.276407807Z"
