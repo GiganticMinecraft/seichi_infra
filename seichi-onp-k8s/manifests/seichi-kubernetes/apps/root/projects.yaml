@@ -59,8 +59,6 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: "parca"
       server: https://kubernetes.default.svc
-    - namespace: "wiki-js"
-      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"

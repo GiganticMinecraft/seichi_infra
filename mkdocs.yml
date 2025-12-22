@@ -1,0 +1,58 @@
+site_name: seichi_infra ドキュメント
+site_url: https://giganticminecraft.github.io/seichi_infra/
+repo_url: https://github.com/GiganticMinecraft/seichi_infra
+repo_name: GiganticMinecraft/seichi_infra
+
+theme:
+  name: material
+  language: ja
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: ダークモードに切り替え
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: ライトモードに切り替え
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - content.code.copy
+
+docs_dir: docs
+
+nav:
+  - Home: README.md
+  - Runbooks:
+      - Proxmoxバージョンアップ: runbooks/proxmox-upgrade.md
+      - Kubernetesクラスターバージョンアップ: runbooks/k8s-cluster-upgrade.md
+      - Kubernetes証明書更新: runbooks/k8s-cert-renewal.md
+      - Cloudflare証明書更新: runbooks/cloudflare-cert-renewal.md
+      - Minecraftメンテナンスモード: runbooks/maintenance-mode.md
+  - Guides:
+      - 開発者向けデプロイガイド: guides/deployment.md
+      - Kubernetesクラスタ構築: guides/cluster-setup.md
+      - Terraform運用: guides/terraform.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: ja
