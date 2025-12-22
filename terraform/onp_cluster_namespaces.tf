@@ -70,8 +70,3 @@ resource "kubernetes_namespace" "parca" {
   }
 }
 
-resource "kubernetes_namespace" "wiki_js" {
-  metadata {
-    name = "wiki-js"
-  }
-}

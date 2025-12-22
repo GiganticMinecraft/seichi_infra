@@ -6,7 +6,7 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
 
 ## ドキュメント・Runbook
 
-運用手順書やナレッジは [Wiki.js](https://wiki.onp-k8s.admin.seichi.click) で管理しています。
+運用手順書やナレッジは [GitHub Pages](https://giganticminecraft.github.io/seichi_infra/) で公開しています。
 
 ## 開発者向けデプロイガイド
 

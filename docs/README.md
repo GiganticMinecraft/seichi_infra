@@ -2,7 +2,7 @@
 
 整地鯖インフラの運用ドキュメント。
 
-Wiki.jsと同期して https://wiki.onp-k8s.admin.seichi.click で閲覧可能。
+https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 
 ## Runbooks（運用手順書）
 
