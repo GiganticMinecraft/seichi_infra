@@ -206,6 +206,22 @@ variable "onp_k8s_grafana_github_oauth_app_secret" {
 
 #endregion
 
+#region on-premise Wiki.js to GitHub integration
+
+variable "onp_k8s_wikijs_github_oauth_app_id" {
+  description = "The OAuth app id for Wiki.js-GitHub integration on On-Premise Kubernetes cluster"
+  type        = string
+  sensitive   = true
+}
+
+variable "onp_k8s_wikijs_github_oauth_app_secret" {
+  description = "The OAuth app secret for Wiki.js-GitHub integration on On-Premise Kubernetes cluster"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region on-premise Synology CSI Driver Secret
 
 variable "onp_k8s_synology_csi_config" {

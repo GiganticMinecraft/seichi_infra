@@ -112,6 +112,12 @@ spec:
             external-hostname: bugsink-dsn.onp-k8s.admin.seichi.click
             internal-authority: "bugsink-dsn-proxy.seichi-minecraft:80"
 
+          # Wiki.js - ドキュメント・Runbook管理
+          # Wiki.js側でGitHub-SSO認証が掛かっているため、Cloudflare のレイヤではアクセス制御はしていない。
+          - name: wikijs
+            external-hostname: wiki.onp-k8s.admin.seichi.click
+            internal-authority: "wikijs.wiki-js:3000"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"

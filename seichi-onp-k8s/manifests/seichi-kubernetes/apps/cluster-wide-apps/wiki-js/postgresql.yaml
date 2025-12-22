@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wikijs-postgresql
+  labels:
+    app: wikijs-postgresql
+spec:
+  serviceName: wikijs-postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wikijs-postgresql
+  template:
+    metadata:
+      labels:
+        app: wikijs-postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: mirror.gcr.io/library/postgres:18-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: wikijs
+            - name: POSTGRES_USER
+              value: wikijs
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wikijs-postgresql-secret
+                  key: password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgresql-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - wikijs
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - wikijs
+            initialDelaySeconds: 5
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: synology-csi-default
+        resources:
+          requests:
+            storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wikijs-postgresql
+spec:
+  selector:
+    app: wikijs-postgresql
+  ports:
+    - port: 5432
+      targetPort: 5432

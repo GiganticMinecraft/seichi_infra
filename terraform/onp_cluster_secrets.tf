@@ -305,3 +305,41 @@ resource "kubernetes_secret" "babyrite_discord_token" {
     BABYRITE_DISCORD_TOKEN = var.discord_bot__babyrite__discord_token
   }
 }
+
+# Wiki.js
+
+resource "random_password" "wikijs_postgresql_password" {
+  length  = 32
+  special = false
+}
+
+resource "kubernetes_secret" "wikijs_postgresql_secret" {
+  depends_on = [kubernetes_namespace.wiki_js]
+
+  metadata {
+    name      = "wikijs-postgresql-secret"
+    namespace = "wiki-js"
+  }
+
+  data = {
+    password = random_password.wikijs_postgresql_password.result
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "wikijs_github_oauth_secret" {
+  depends_on = [kubernetes_namespace.wiki_js]
+
+  metadata {
+    name      = "wikijs-github-oauth-secret"
+    namespace = "wiki-js"
+  }
+
+  data = {
+    client-id     = var.onp_k8s_wikijs_github_oauth_app_id
+    client-secret = var.onp_k8s_wikijs_github_oauth_app_secret
+  }
+
+  type = "Opaque"
+}
