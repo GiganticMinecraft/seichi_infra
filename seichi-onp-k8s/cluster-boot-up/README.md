@@ -21,9 +21,9 @@
 
 ### VM 環境
 
-VM環境は `Proxmox Virtual Environment 8.2.4` を利用しています。
+VM環境は `Proxmox Virtual Environment 9.1.2` を利用しています。
 
- - ベアメタル3ノード
+ - ベアメタル9ノード
 
  - クラスタ構成済みであること
 
