@@ -6,7 +6,7 @@
   "reviewers": ["outductor"],
   "ignoreDeps": [
     "docker-registry1.mariadb.com/library/mariadb"
-  ]
+  ],
   "packageRules": [
     {
       "managers": ["gomod"],
