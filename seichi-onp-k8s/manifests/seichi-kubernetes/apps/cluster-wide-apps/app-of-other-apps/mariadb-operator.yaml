@@ -32,7 +32,7 @@ spec:
   source:
     chart: mariadb-operator
     repoURL: https://mariadb-operator.github.io/mariadb-operator
-    targetRevision: 25.10.2
+    targetRevision: 25.10.3
     helm:
       releaseName: mariadb-operator
       values: |
