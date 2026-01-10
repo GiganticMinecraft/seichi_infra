@@ -42,6 +42,13 @@
       "groupName": "itzg/minecraft-server images",
       "schedule": ["at any time"],
       "automerge": true
+    },
+    {
+      "matchPackageNames": [
+        "mariadb-operator",
+        "mariadb-operator-crds"
+      ],
+      "groupName": "mariadb-operator"
     }
   ],
   "postUpdateOptions": [
