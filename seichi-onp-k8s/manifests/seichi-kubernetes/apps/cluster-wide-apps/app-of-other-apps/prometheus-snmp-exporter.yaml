@@ -28,7 +28,8 @@ spec:
               target: 192.168.19.253
               module:
                 - if_mib
-              auth: seichi_prod_v2
+              auth:
+                - seichi_prod_v2
               labels:
                 release: prometheus
               interval: 30s
@@ -39,7 +40,8 @@ spec:
               target: 192.168.1.1
               module:
                 - if_mib
-              auth: seichi_prod_v2
+              auth:
+                - seichi_prod_v2
               labels:
                 release: prometheus
               interval: 30s
@@ -50,7 +52,8 @@ spec:
               target: 192.168.16.240
               module:
                 - synology
-              auth: synology_v2
+              auth:
+                - synology_v2
               labels:
                 release: prometheus
               interval: 30s
@@ -61,7 +64,8 @@ spec:
               target: 192.168.16.230
               module:
                 - synology
-              auth: synology_v2
+              auth:
+                - synology_v2
               labels:
                 release: prometheus
               interval: 30s
