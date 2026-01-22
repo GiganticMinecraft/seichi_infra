@@ -46,7 +46,8 @@ spec:
 
   port: 3306
 
-  ephemeralStorage: true
+  storage:
+    ephemeral: true
 
   myCnf: |
     [mariadb]
