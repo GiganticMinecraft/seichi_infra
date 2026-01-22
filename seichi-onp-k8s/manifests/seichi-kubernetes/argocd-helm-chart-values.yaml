@@ -57,6 +57,7 @@ configs:
             - https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
           secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
     admin.enabled: false
+    accounts.mcp-service: apiKey
   rbac:
     create: true
     # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
@@ -67,6 +68,7 @@ configs:
     # See https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md for additional information.
     policy.csv: |
       g, GiganticMinecraft:admin-team, role:admin
+      g, mcp-service, role:readonly
     # policy.default is the name of the default role which Argo CD will falls back to, when
     # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
     # but will see no apps, projects, etc...
