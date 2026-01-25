@@ -1,0 +1,477 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-slow-queries-dashboard
+  namespace: seichi-minecraft
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "MariaDB"
+data:
+  mariadb-slow-queries.json: |
+    {
+      "annotations": { "list": [] },
+      "description": "MariaDB Slow Query Analysis using performance_schema",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "options": {
+            "code": { "language": "plaintext", "showLineNumbers": false },
+            "content": "## Slow Query Analysis\n\nこのダッシュボードは `performance_schema` から直接クエリ統計を取得しています。データはMariaDB再起動でリセットされます。",
+            "mode": "markdown"
+          },
+          "type": "text"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 2 },
+          "id": 1,
+          "panels": [],
+          "title": "Top Slow Queries by Total Time",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 1 },
+                  { "color": "orange", "value": 10 },
+                  { "color": "red", "value": 60 }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "total_time_sec" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
+                  { "id": "unit", "value": "s" }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "avg_time_sec" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
+                  { "id": "unit", "value": "s" },
+                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.1 }, { "color": "orange", "value": 1 }, { "color": "red", "value": 10 }] } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "max_time_sec" },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "orange", "value": 10 }, { "color": "red", "value": 60 }] } },
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "query_text" },
+                "properties": [
+                  { "id": "custom.width", "value": 500 }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 3 },
+          "id": 2,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+            "showHeader": true,
+            "sortBy": [{ "desc": true, "displayName": "total_time_sec" }]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_TIMER_WAIT/1000000000000, 2) as total_time_sec,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  SUM_ROWS_EXAMINED as rows_examined,\n  SUM_ROWS_SENT as rows_sent\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_TIMER_WAIT > 0\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY SUM_TIMER_WAIT DESC\nLIMIT 20",
+              "refId": "A"
+            }
+          ],
+          "title": "Top 20 Queries by Total Execution Time",
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
+          "id": 3,
+          "panels": [],
+          "title": "Slowest Queries by Average Time",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 0.1 },
+                  { "color": "orange", "value": 1 },
+                  { "color": "red", "value": 10 }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "avg_time_sec" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
+                  { "id": "unit", "value": "s" }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "max_time_sec" },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "query_text" },
+                "properties": [
+                  { "id": "custom.width", "value": 500 }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 16 },
+          "id": 4,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+            "showHeader": true,
+            "sortBy": [{ "desc": true, "displayName": "avg_time_sec" }]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as avg_rows_examined\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 5\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY AVG_TIMER_WAIT DESC\nLIMIT 15",
+              "refId": "A"
+            }
+          ],
+          "title": "Top 15 Slowest Queries (by Average Time, min 5 executions)",
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
+          "id": 5,
+          "panels": [],
+          "title": "Query Statistics by Database",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } },
+              "mappings": [],
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
+          "id": 6,
+          "options": {
+            "displayLabels": ["name", "percent"],
+            "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value"] },
+            "pieType": "pie",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  ROUND(SUM(SUM_TIMER_WAIT)/1000000000000, 2) as total_time_sec\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\nGROUP BY SCHEMA_NAME\nORDER BY total_time_sec DESC\nLIMIT 10",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Query Time by Database",
+          "type": "piechart"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } },
+              "mappings": [],
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
+          "id": 7,
+          "options": {
+            "displayLabels": ["name", "percent"],
+            "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value"] },
+            "pieType": "pie",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  SUM(COUNT_STAR) as query_count\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\nGROUP BY SCHEMA_NAME\nORDER BY query_count DESC\nLIMIT 10",
+              "refId": "A"
+            }
+          ],
+          "title": "Query Count by Database",
+          "type": "piechart"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 35 },
+          "id": 8,
+          "panels": [],
+          "title": "Currently Running Queries",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 5 },
+                  { "color": "red", "value": 30 }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "time_sec" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
+                  { "id": "unit", "value": "s" }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "query_text" },
+                "properties": [
+                  { "id": "custom.width", "value": 600 }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 36 },
+          "id": 9,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+            "showHeader": true,
+            "sortBy": [{ "desc": true, "displayName": "time_sec" }]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  ID as process_id,\n  USER as user,\n  DB as db_name,\n  COMMAND as command,\n  TIME as time_sec,\n  STATE as state,\n  LEFT(INFO, 300) as query_text\nFROM information_schema.PROCESSLIST\nWHERE COMMAND != 'Sleep'\n  AND INFO IS NOT NULL\n  AND INFO NOT LIKE '%PROCESSLIST%'\nORDER BY TIME DESC",
+              "refId": "A"
+            }
+          ],
+          "title": "Currently Running Queries (excluding Sleep)",
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 44 },
+          "id": 10,
+          "panels": [],
+          "title": "Full Scans & Problem Queries",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 10000 },
+                  { "color": "red", "value": 100000 }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "rows_examined_per_query" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "query_text" },
+                "properties": [
+                  { "id": "custom.width", "value": 500 }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 45 },
+          "id": 11,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+            "showHeader": true,
+            "sortBy": [{ "desc": true, "displayName": "rows_examined_per_query" }]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as rows_examined_per_query,\n  ROUND(SUM_ROWS_SENT/COUNT_STAR, 0) as rows_sent_per_query,\n  ROUND((SUM_ROWS_EXAMINED - SUM_ROWS_SENT)/NULLIF(SUM_ROWS_SENT, 0), 1) as examine_to_send_ratio\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 10\n  AND SUM_ROWS_EXAMINED > 1000\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY SUM_ROWS_EXAMINED/COUNT_STAR DESC\nLIMIT 15",
+              "refId": "A"
+            }
+          ],
+          "title": "Queries Examining Most Rows (potential full scans)",
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 55 },
+          "id": 12,
+          "panels": [],
+          "title": "Query Errors",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 1 },
+                  { "color": "red", "value": 10 }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "error_count" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "query_text" },
+                "properties": [
+                  { "id": "custom.width", "value": 500 }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 56 },
+          "id": 13,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+            "showHeader": true,
+            "sortBy": [{ "desc": true, "displayName": "error_count" }]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  SUM_ERRORS as error_count,\n  SUM_WARNINGS as warning_count,\n  ROUND(SUM_ERRORS/COUNT_STAR * 100, 2) as error_rate_pct\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_ERRORS > 0\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY SUM_ERRORS DESC\nLIMIT 15",
+              "refId": "A"
+            }
+          ],
+          "title": "Queries with Errors",
+          "type": "table"
+        }
+      ],
+      "refresh": "1m",
+      "schemaVersion": 38,
+      "tags": ["mariadb", "mysql", "slow-query", "performance"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": false, "text": "MariaDB", "value": "MariaDB" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "MariaDB Datasource",
+            "multi": false,
+            "name": "mariadb_ds",
+            "options": [],
+            "query": "mysql",
+            "queryValue": "",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          }
+        ]
+      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": {},
+      "timezone": "Asia/Tokyo",
+      "title": "MariaDB Slow Query Analysis",
+      "uid": "mariadb-slow-queries",
+      "version": 1,
+      "weekStart": ""
+    }
