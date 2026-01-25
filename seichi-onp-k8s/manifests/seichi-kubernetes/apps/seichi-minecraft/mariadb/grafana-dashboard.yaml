@@ -249,12 +249,12 @@ data:
           "id": 32,
           "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_innodb_row_ops_total{instance=~\"$instance\", operation=\"read\"}[5m])", "legendFormat": "Reads", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_innodb_row_ops_total{instance=~\"$instance\", operation=\"inserted\"}[5m])", "legendFormat": "Inserts", "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_innodb_row_ops_total{instance=~\"$instance\", operation=\"updated\"}[5m])", "legendFormat": "Updates", "refId": "C" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_innodb_row_ops_total{instance=~\"$instance\", operation=\"deleted\"}[5m])", "legendFormat": "Deletes", "refId": "D" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(mysql_global_status_handlers_total{instance=~\"$instance\", handler=~\"read_.*\"}[5m]))", "legendFormat": "Reads", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_handlers_total{instance=~\"$instance\", handler=\"write\"}[5m])", "legendFormat": "Writes", "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_handlers_total{instance=~\"$instance\", handler=\"update\"}[5m])", "legendFormat": "Updates", "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(mysql_global_status_handlers_total{instance=~\"$instance\", handler=\"delete\"}[5m])", "legendFormat": "Deletes", "refId": "D" }
           ],
-          "title": "InnoDB Row Operations",
+          "title": "Handler Row Operations",
           "type": "timeseries"
         },
         {
