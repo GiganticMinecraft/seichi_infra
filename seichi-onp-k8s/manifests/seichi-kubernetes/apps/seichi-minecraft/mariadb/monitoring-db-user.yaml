@@ -27,6 +27,7 @@ spec:
     - "SELECT"
     - "SHOW DATABASES"
     - "SHOW VIEW"
+    - "PROCESS"
   database: "*"
   table: "*"
   username: "monitoring"
