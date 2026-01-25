@@ -115,6 +115,11 @@ spec:
                   isDefault: false
                   jsonData:
                     minStep: '15s'
+                - name: Parca
+                  type: parca
+                  access: proxy
+                  url: http://parca.parca:7070
+                  isDefault: false
                 - name: Tempo
                   type: tempo
                   access: proxy
