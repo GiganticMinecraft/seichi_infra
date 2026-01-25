@@ -41,7 +41,7 @@ data:
           "id": 1,
           "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^version$/", "values": false }, "textMode": "value" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_runtime_info{job=~\"mcserver-metrics--$server\"}", "format": "table", "instant": true, "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_runtime_info{job=~\"mcserver--$server\"}", "format": "table", "instant": true, "refId": "A" }
           ],
           "title": "JVM Version",
           "type": "stat"
@@ -61,7 +61,7 @@ data:
           "id": 2,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "time() - process_start_time_seconds{job=~\"mcserver-metrics--$server\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "time() - process_start_time_seconds{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
           "title": "Uptime",
           "type": "stat"
@@ -81,7 +81,7 @@ data:
           "id": 3,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_current{job=~\"mcserver-metrics--$server\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_current{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
           "title": "Threads",
           "type": "stat"
@@ -101,7 +101,7 @@ data:
           "id": 4,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_currently_loaded{job=~\"mcserver-metrics--$server\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_currently_loaded{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
           "title": "Loaded Classes",
           "type": "stat"
@@ -123,7 +123,7 @@ data:
           "id": 5,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver-metrics--$server\", area=\"heap\"} / jvm_memory_max_bytes{job=~\"mcserver-metrics--$server\", area=\"heap\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver--$server\", area=\"heap\"} / jvm_memory_max_bytes{job=~\"mcserver--$server\", area=\"heap\"}", "refId": "A" }
           ],
           "title": "Heap Usage",
           "type": "stat"
@@ -143,7 +143,7 @@ data:
           "id": 6,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "increase(jvm_gc_collection_seconds_count{job=~\"mcserver-metrics--$server\", gc=\"G1 Young Generation\"}[1m])", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "increase(jvm_gc_collection_seconds_count{job=~\"mcserver--$server\", gc=\"G1 Young Generation\"}[1m])", "refId": "A" }
           ],
           "title": "GC/min (Young)",
           "type": "stat"
@@ -195,9 +195,9 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver-metrics--$server\", area=\"heap\"}", "legendFormat": "Used", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_committed_bytes{job=~\"mcserver-metrics--$server\", area=\"heap\"}", "legendFormat": "Committed", "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_max_bytes{job=~\"mcserver-metrics--$server\", area=\"heap\"}", "legendFormat": "Max", "refId": "C" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver--$server\", area=\"heap\"}", "legendFormat": "Used", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_committed_bytes{job=~\"mcserver--$server\", area=\"heap\"}", "legendFormat": "Committed", "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_max_bytes{job=~\"mcserver--$server\", area=\"heap\"}", "legendFormat": "Max", "refId": "C" }
           ],
           "title": "Heap Memory",
           "type": "timeseries"
@@ -239,8 +239,8 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver-metrics--$server\", area=\"nonheap\"}", "legendFormat": "Used", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_committed_bytes{job=~\"mcserver-metrics--$server\", area=\"nonheap\"}", "legendFormat": "Committed", "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver--$server\", area=\"nonheap\"}", "legendFormat": "Used", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_committed_bytes{job=~\"mcserver--$server\", area=\"nonheap\"}", "legendFormat": "Committed", "refId": "B" }
           ],
           "title": "Non-Heap Memory",
           "type": "timeseries"
@@ -282,7 +282,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_pool_used_bytes{job=~\"mcserver-metrics--$server\", pool=~\"G1.*\"}", "legendFormat": "{{pool}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_pool_used_bytes{job=~\"mcserver--$server\", pool=~\"G1.*\"}", "legendFormat": "{{pool}}", "refId": "A" }
           ],
           "title": "G1 Memory Pools",
           "type": "timeseries"
@@ -324,7 +324,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_pool_used_bytes{job=~\"mcserver-metrics--$server\", pool=~\"CodeHeap.*|Metaspace|Compressed.*\"}", "legendFormat": "{{pool}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_pool_used_bytes{job=~\"mcserver--$server\", pool=~\"CodeHeap.*|Metaspace|Compressed.*\"}", "legendFormat": "{{pool}}", "refId": "A" }
           ],
           "title": "Non-Heap Memory Pools",
           "type": "timeseries"
@@ -374,7 +374,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_gc_collection_seconds_sum{job=~\"mcserver-metrics--$server\"}[5m])", "legendFormat": "{{gc}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_gc_collection_seconds_sum{job=~\"mcserver--$server\"}[5m])", "legendFormat": "{{gc}}", "refId": "A" }
           ],
           "title": "GC Time Rate (seconds/second)",
           "type": "timeseries"
@@ -416,7 +416,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_gc_collection_seconds_count{job=~\"mcserver-metrics--$server\"}[5m])", "legendFormat": "{{gc}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_gc_collection_seconds_count{job=~\"mcserver--$server\"}[5m])", "legendFormat": "{{gc}}", "refId": "A" }
           ],
           "title": "GC Collections Rate",
           "type": "timeseries"
@@ -458,7 +458,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_gc_collection_seconds_sum{job=~\"mcserver-metrics--$server\"}", "legendFormat": "{{gc}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_gc_collection_seconds_sum{job=~\"mcserver--$server\"}", "legendFormat": "{{gc}}", "refId": "A" }
           ],
           "title": "GC Total Time",
           "type": "timeseries"
@@ -500,7 +500,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_memory_pool_allocated_bytes_total{job=~\"mcserver-metrics--$server\", pool=~\"G1.*\"}[5m])", "legendFormat": "{{pool}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_memory_pool_allocated_bytes_total{job=~\"mcserver--$server\", pool=~\"G1.*\"}[5m])", "legendFormat": "{{pool}}", "refId": "A" }
           ],
           "title": "Memory Allocation Rate",
           "type": "timeseries"
@@ -550,9 +550,9 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_current{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Current", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_daemon{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Daemon", "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_peak{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Peak", "refId": "C" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_current{job=~\"mcserver--$server\"}", "legendFormat": "Current", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_daemon{job=~\"mcserver--$server\"}", "legendFormat": "Daemon", "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_peak{job=~\"mcserver--$server\"}", "legendFormat": "Peak", "refId": "C" }
           ],
           "title": "Thread Count",
           "type": "timeseries"
@@ -594,7 +594,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_state{job=~\"mcserver-metrics--$server\"}", "legendFormat": "{{state}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_state{job=~\"mcserver--$server\"}", "legendFormat": "{{state}}", "refId": "A" }
           ],
           "title": "Thread States",
           "type": "timeseries"
@@ -614,7 +614,7 @@ data:
           "id": 32,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_deadlocked{job=~\"mcserver-metrics--$server\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_deadlocked{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
           "title": "Deadlocked Threads",
           "type": "stat"
@@ -634,7 +634,7 @@ data:
           "id": 33,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_started_total{job=~\"mcserver-metrics--$server\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_started_total{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
           "title": "Total Threads Started",
           "type": "stat"
@@ -684,9 +684,9 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_currently_loaded{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Currently Loaded", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_loaded_total{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Total Loaded", "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_unloaded_total{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Total Unloaded", "refId": "C" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_currently_loaded{job=~\"mcserver--$server\"}", "legendFormat": "Currently Loaded", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_loaded_total{job=~\"mcserver--$server\"}", "legendFormat": "Total Loaded", "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_unloaded_total{job=~\"mcserver--$server\"}", "legendFormat": "Total Unloaded", "refId": "C" }
           ],
           "title": "Class Loading",
           "type": "timeseries"
@@ -728,7 +728,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_compilation_time_seconds_total{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Compilation Time", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_compilation_time_seconds_total{job=~\"mcserver--$server\"}", "legendFormat": "Compilation Time", "refId": "A" }
           ],
           "title": "JIT Compilation Time",
           "type": "timeseries"
@@ -778,7 +778,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(process_cpu_seconds_total{job=~\"mcserver-metrics--$server\"}[5m])", "legendFormat": "CPU Usage", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(process_cpu_seconds_total{job=~\"mcserver--$server\"}[5m])", "legendFormat": "CPU Usage", "refId": "A" }
           ],
           "title": "CPU Usage",
           "type": "timeseries"
@@ -820,8 +820,8 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_resident_memory_bytes{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Resident", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_virtual_memory_bytes{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Virtual", "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_resident_memory_bytes{job=~\"mcserver--$server\"}", "legendFormat": "Resident", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_virtual_memory_bytes{job=~\"mcserver--$server\"}", "legendFormat": "Virtual", "refId": "B" }
           ],
           "title": "Process Memory",
           "type": "timeseries"
@@ -863,8 +863,8 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_open_fds{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Open FDs", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_max_fds{job=~\"mcserver-metrics--$server\"}", "legendFormat": "Max FDs", "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_open_fds{job=~\"mcserver--$server\"}", "legendFormat": "Open FDs", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_max_fds{job=~\"mcserver--$server\"}", "legendFormat": "Max FDs", "refId": "B" }
           ],
           "title": "File Descriptors",
           "type": "timeseries"
@@ -906,7 +906,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_buffer_pool_used_bytes{job=~\"mcserver-metrics--$server\"}", "legendFormat": "{{pool}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_buffer_pool_used_bytes{job=~\"mcserver--$server\"}", "legendFormat": "{{pool}}", "refId": "A" }
           ],
           "title": "Buffer Pools",
           "type": "timeseries"
@@ -936,16 +936,16 @@ data:
             "allValue": ".*",
             "current": {},
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(jvm_memory_used_bytes{job=~\"mcserver-metrics--.*\"}, job)",
+            "definition": "label_values(jvm_memory_used_bytes{job=~\"mcserver--.*\"}, job)",
             "hide": 0,
             "includeAll": true,
             "label": "Server",
             "multi": true,
             "name": "server",
             "options": [],
-            "query": { "query": "label_values(jvm_memory_used_bytes{job=~\"mcserver-metrics--.*\"}, job)", "refId": "StandardVariableQuery" },
+            "query": { "query": "label_values(jvm_memory_used_bytes{job=~\"mcserver--.*\"}, job)", "refId": "StandardVariableQuery" },
             "refresh": 2,
-            "regex": "/mcserver-metrics--(.+)/",
+            "regex": "/mcserver--(.+)/",
             "skipUrlSync": false,
             "sort": 1,
             "type": "query"
