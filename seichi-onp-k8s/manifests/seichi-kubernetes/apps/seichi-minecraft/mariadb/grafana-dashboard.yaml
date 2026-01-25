@@ -361,7 +361,7 @@ data:
           },
           {
             "allValue": ".*",
-            "current": { "selected": false, "text": "All", "value": "$__all" },
+            "current": { "selected": true, "text": "mariadb-0.mariadb-internal.seichi-minecraft.svc.cluster.local", "value": "mariadb-0.mariadb-internal.seichi-minecraft.svc.cluster.local" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
             "definition": "label_values(mysql_up, instance)",
             "hide": 0,
