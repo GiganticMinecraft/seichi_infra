@@ -18,6 +18,17 @@ RUN wget \
   https://github.com/grafana/pyroscope-java/releases/download/${PYROSCOPE_VERSION}/pyroscope.jar
 
 ##---
+# Parca perf-map-agent をダウンロードする stage
+# JVMのJITコンパイルされたコードのシンボル情報をParcaに提供するために使用
+FROM busybox:1.37.0 AS parca-perf-map-agent-downloader
+ARG PERF_MAP_AGENT_VERSION=v0.0.2
+RUN wget \
+  -O /root/perf-map-agent.tar.gz \
+  https://github.com/parca-dev/perf-map-agent/releases/download/${PERF_MAP_AGENT_VERSION}/perf-map-agent-x86_64.tar.gz && \
+  tar -xzf /root/perf-map-agent.tar.gz -C /root && \
+  mv /root/out/amd64/libperfmap.so /root/libperfmap.so
+
+##---
 # 最終 stage
 #
 # MCSERVER_BASE_IMAGE は、 build args を通して
@@ -31,15 +42,19 @@ COPY --link ./jmx-exporter-config.yaml /jmx-exporter/jmx-exporter-config.yaml
 # Pyroscope agent をイメージに移す
 COPY --link --from=pyroscope-agent-downloader /root/pyroscope.jar /pyroscope/pyroscope.jar
 
+# Parca perf-map-agent をイメージに移す
+COPY --link --from=parca-perf-map-agent-downloader /root/libperfmap.so /parca/libperfmap.so
+
 # ---
 # サーバー群に共通する環境変数
 #   必要であれば各サーバーの image が (ENV を各々定義することによって) オーバーライドすべき
 
 ENV TYPE="PAPER"
 
-# JVM_OPTS で JMX exporter と Pyroscope agent を Java Agent として利用するよう指定する
-# Pyroscope設定はJAVA_TOOL_OPTIONSで行うため、ここではJMX exporterのみ
-ENV JVM_OPTS="-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml"
+# JVM_OPTS で JMX exporter と Parca perf-map-agent を Java Agent として利用するよう指定する
+# -XX:+PreserveFramePointer: フレームポインタを保持してプロファイリングを有効化
+# -agentpath: Parca用のperf-map-agentを読み込み、JITコンパイルされたコードのシンボル情報を提供
+ENV JVM_OPTS="-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so"
 
 # TODO: 2025/10/9 SIGSEGVが発生する問題があるため、一旦コメントアウト
 #
