@@ -101,7 +101,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_TIMER_WAIT/1000000000000, 2) as total_time_sec,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  SUM_ROWS_EXAMINED as rows_examined,\n  SUM_ROWS_SENT as rows_sent\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_TIMER_WAIT > 0\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY SUM_TIMER_WAIT DESC\nLIMIT 20",
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_TIMER_WAIT/1000000000000, 2) as total_time_sec,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  SUM_ROWS_EXAMINED as rows_examined,\n  SUM_ROWS_SENT as rows_sent\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_TIMER_WAIT > 0\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name}'\nORDER BY SUM_TIMER_WAIT DESC\nLIMIT 20",
               "refId": "A"
             }
           ],
@@ -173,7 +173,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as avg_rows_examined\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 5\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY AVG_TIMER_WAIT DESC\nLIMIT 15",
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as avg_rows_examined\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 5\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name}'\nORDER BY AVG_TIMER_WAIT DESC\nLIMIT 15",
               "refId": "A"
             }
           ],
@@ -214,7 +214,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  ROUND(SUM(SUM_TIMER_WAIT)/1000000000000, 2) as total_time_sec\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\nGROUP BY SCHEMA_NAME\nORDER BY total_time_sec DESC\nLIMIT 10",
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  ROUND(SUM(SUM_TIMER_WAIT)/1000000000000, 2) as total_time_sec\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name}'\nGROUP BY SCHEMA_NAME\nORDER BY total_time_sec DESC\nLIMIT 10",
               "refId": "A"
             }
           ],
@@ -247,7 +247,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  SUM(COUNT_STAR) as query_count\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\nGROUP BY SCHEMA_NAME\nORDER BY query_count DESC\nLIMIT 10",
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  SUM(COUNT_STAR) as query_count\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name}'\nGROUP BY SCHEMA_NAME\nORDER BY query_count DESC\nLIMIT 10",
               "refId": "A"
             }
           ],
@@ -311,7 +311,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  ID as process_id,\n  USER as user,\n  DB as db_name,\n  COMMAND as command,\n  TIME as time_sec,\n  STATE as state,\n  LEFT(INFO, 300) as query_text\nFROM information_schema.PROCESSLIST\nWHERE COMMAND != 'Sleep'\n  AND INFO IS NOT NULL\n  AND INFO NOT LIKE '%PROCESSLIST%'\nORDER BY TIME DESC",
+              "rawSql": "SELECT \n  ID as process_id,\n  USER as user,\n  DB as db_name,\n  COMMAND as command,\n  TIME as time_sec,\n  STATE as state,\n  LEFT(INFO, 300) as query_text\nFROM information_schema.PROCESSLIST\nWHERE COMMAND != 'Sleep'\n  AND INFO IS NOT NULL\n  AND INFO NOT LIKE '%PROCESSLIST%'\n  AND (DB LIKE '${db_name}' OR DB IS NULL)\nORDER BY TIME DESC",
               "refId": "A"
             }
           ],
@@ -374,7 +374,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as rows_examined_per_query,\n  ROUND(SUM_ROWS_SENT/COUNT_STAR, 0) as rows_sent_per_query,\n  ROUND((SUM_ROWS_EXAMINED - SUM_ROWS_SENT)/NULLIF(SUM_ROWS_SENT, 0), 1) as examine_to_send_ratio\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 10\n  AND SUM_ROWS_EXAMINED > 1000\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY SUM_ROWS_EXAMINED/COUNT_STAR DESC\nLIMIT 15",
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as rows_examined_per_query,\n  ROUND(SUM_ROWS_SENT/COUNT_STAR, 0) as rows_sent_per_query,\n  ROUND((SUM_ROWS_EXAMINED - SUM_ROWS_SENT)/NULLIF(SUM_ROWS_SENT, 0), 1) as examine_to_send_ratio\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 10\n  AND SUM_ROWS_EXAMINED > 1000\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name}'\nORDER BY SUM_ROWS_EXAMINED/COUNT_STAR DESC\nLIMIT 15",
               "refId": "A"
             }
           ],
@@ -437,7 +437,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  SUM_ERRORS as error_count,\n  SUM_WARNINGS as warning_count,\n  ROUND(SUM_ERRORS/COUNT_STAR * 100, 2) as error_rate_pct\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_ERRORS > 0\n  AND SCHEMA_NAME IS NOT NULL\nORDER BY SUM_ERRORS DESC\nLIMIT 15",
+              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  SUM_ERRORS as error_count,\n  SUM_WARNINGS as warning_count,\n  ROUND(SUM_ERRORS/COUNT_STAR * 100, 2) as error_rate_pct\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_ERRORS > 0\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name}'\nORDER BY SUM_ERRORS DESC\nLIMIT 15",
               "refId": "A"
             }
           ],
@@ -464,6 +464,24 @@ data:
             "regex": "",
             "skipUrlSync": false,
             "type": "datasource"
+          },
+          {
+            "allValue": "%",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+            "definition": "SELECT DISTINCT SCHEMA_NAME FROM performance_schema.events_statements_summary_by_digest WHERE SCHEMA_NAME IS NOT NULL ORDER BY SCHEMA_NAME",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Database",
+            "multi": false,
+            "name": "db_name",
+            "options": [],
+            "query": "SELECT DISTINCT SCHEMA_NAME FROM performance_schema.events_statements_summary_by_digest WHERE SCHEMA_NAME IS NOT NULL ORDER BY SCHEMA_NAME",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 1,
+            "type": "query"
           }
         ]
       },
