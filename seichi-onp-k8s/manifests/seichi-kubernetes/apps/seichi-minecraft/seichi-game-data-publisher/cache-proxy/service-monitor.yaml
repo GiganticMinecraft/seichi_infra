@@ -4,6 +4,7 @@ metadata:
   name: seichi-game-data-publisher-cache-proxy
   labels:
     app: seichi-game-data-publisher-cache-proxy
+    release: prometheus
 spec:
   selector:
     matchLabels:
