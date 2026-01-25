@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: jvm-metrics-grafana-dashboard
+  name: minecraft-server-grafana-dashboard
   namespace: seichi-minecraft
   labels:
     grafana_dashboard: "1"
   annotations:
     grafana_folder: "Minecraft"
 data:
-  jvm-metrics-dashboard.json: |
+  minecraft-server-dashboard.json: |
     {
       "annotations": {
         "list": []
       },
-      "description": "JVM metrics dashboard for Minecraft servers (JMX Exporter)",
+      "description": "Minecraft Server Dashboard - Game metrics and JVM performance",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 1,
@@ -22,9 +22,9 @@ data:
         {
           "collapsed": false,
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
-          "id": 100,
+          "id": 1,
           "panels": [],
-          "title": "Overview",
+          "title": "Server Overview",
           "type": "row"
         },
         {
@@ -33,17 +33,80 @@ data:
             "defaults": {
               "color": { "mode": "thresholds" },
               "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "yellow", "value": 15 }, { "color": "green", "value": 19 } ] },
+              "unit": "none",
+              "min": 0,
+              "max": 20
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 6, "x": 0, "y": 1 },
-          "id": 1,
-          "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^version$/", "values": false }, "textMode": "value" },
+          "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+          "id": 2,
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_runtime_info{job=~\"mcserver--$server\"}", "format": "table", "instant": true, "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_tps{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
-          "title": "JVM Version",
+          "title": "TPS",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+          "id": 3,
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(mc_players_online_total{job=~\"mcserver--$server\"})", "refId": "A" }
+          ],
+          "title": "Online Players",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 5000 }, { "color": "red", "value": 10000 } ] },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+          "id": 4,
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(mc_entities_total{job=~\"mcserver--$server\"})", "refId": "A" }
+          ],
+          "title": "Total Entities",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 3000 }, { "color": "red", "value": 5000 } ] },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+          "id": 5,
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(mc_loaded_chunks_total{job=~\"mcserver--$server\"})", "refId": "A" }
+          ],
+          "title": "Loaded Chunks",
           "type": "stat"
         },
         {
@@ -57,53 +120,13 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 4, "x": 6, "y": 1 },
-          "id": 2,
+          "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+          "id": 6,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
             { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "time() - process_start_time_seconds{job=~\"mcserver--$server\"}", "refId": "A" }
           ],
           "title": "Uptime",
-          "type": "stat"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "thresholds" },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 3, "w": 3, "x": 10, "y": 1 },
-          "id": 3,
-          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_current{job=~\"mcserver--$server\"}", "refId": "A" }
-          ],
-          "title": "Threads",
-          "type": "stat"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "thresholds" },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 3, "w": 3, "x": 13, "y": 1 },
-          "id": 4,
-          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_currently_loaded{job=~\"mcserver--$server\"}", "refId": "A" }
-          ],
-          "title": "Loaded Classes",
           "type": "stat"
         },
         {
@@ -119,8 +142,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 4, "x": 16, "y": 1 },
-          "id": 5,
+          "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+          "id": 7,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
             { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_used_bytes{job=~\"mcserver--$server\", area=\"heap\"} / jvm_memory_max_bytes{job=~\"mcserver--$server\", area=\"heap\"}", "refId": "A" }
@@ -129,31 +152,282 @@ data:
           "type": "stat"
         },
         {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "id": 10,
+          "panels": [],
+          "title": "Server Performance",
+          "type": "row"
+        },
+        {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "line" }
+              },
               "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "short"
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "yellow", "value": 15 }, { "color": "green", "value": 19 } ] },
+              "unit": "none",
+              "min": 0,
+              "max": 21
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 4, "x": 20, "y": 1 },
-          "id": 6,
-          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "id": 11,
+          "options": {
+            "legend": { "calcs": ["mean", "min"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "increase(jvm_gc_collection_seconds_count{job=~\"mcserver--$server\", gc=\"G1 Young Generation\"}[1m])", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_tps{job=~\"mcserver--$server\"}", "legendFormat": "{{job}}", "refId": "A" }
           ],
-          "title": "GC/min (Young)",
-          "type": "stat"
+          "title": "TPS (Ticks Per Second)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "line" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 50000000 }, { "color": "red", "value": 60000000 } ] },
+              "unit": "ns"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "id": 12,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_tick_duration_average{job=~\"mcserver--$server\"}", "legendFormat": "{{job}} (avg)", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_tick_duration_max{job=~\"mcserver--$server\"}", "legendFormat": "{{job}} (max)", "refId": "B" }
+          ],
+          "title": "Tick Duration",
+          "type": "timeseries"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 },
-          "id": 200,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+          "id": 20,
           "panels": [],
-          "title": "Memory",
+          "title": "Players & World",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+          "id": 21,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_players_online_total{job=~\"mcserver--$server\"}", "legendFormat": "{{job}} - {{world}}", "refId": "A" }
+          ],
+          "title": "Online Players (per world)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+          "id": 22,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_entities_total{job=~\"mcserver--$server\"}", "legendFormat": "{{job}} - {{world}}", "refId": "A" }
+          ],
+          "title": "Entities (per world)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+          "id": 23,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_loaded_chunks_total{job=~\"mcserver--$server\"}", "legendFormat": "{{job}} - {{world}}", "refId": "A" }
+          ],
+          "title": "Loaded Chunks (per world)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+          "id": 24,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "mc_world_size{job=~\"mcserver--$server\"}", "legendFormat": "{{job}} - {{world}}", "refId": "A" }
+          ],
+          "title": "World Size",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+          "id": 100,
+          "panels": [],
+          "title": "JVM Memory",
           "type": "row"
         },
         {
@@ -188,8 +462,8 @@ data:
               { "matcher": { "id": "byName", "options": "Max" }, "properties": [ { "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } }, { "id": "custom.fillOpacity", "value": 0 } ] }
             ]
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
-          "id": 10,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+          "id": 101,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -232,8 +506,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
-          "id": 11,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+          "id": 102,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -275,8 +549,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
-          "id": 12,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+          "id": 103,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -308,31 +582,31 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "normal" },
+                "stacking": { "group": "A", "mode": "none" },
                 "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
               "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "bytes"
+              "unit": "Bps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
-          "id": 13,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+          "id": 104,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_memory_pool_used_bytes{job=~\"mcserver--$server\", pool=~\"CodeHeap.*|Metaspace|Compressed.*\"}", "legendFormat": "{{pool}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_memory_pool_allocated_bytes_total{job=~\"mcserver--$server\", pool=~\"G1.*\"}[5m])", "legendFormat": "{{pool}}", "refId": "A" }
           ],
-          "title": "Non-Heap Memory Pools",
+          "title": "Memory Allocation Rate",
           "type": "timeseries"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
-          "id": 300,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 48 },
+          "id": 200,
           "panels": [],
           "title": "Garbage Collection",
           "type": "row"
@@ -367,8 +641,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
-          "id": 20,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 49 },
+          "id": 201,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -409,8 +683,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
-          "id": 21,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 49 },
+          "id": 202,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -422,95 +696,11 @@ data:
           "type": "timeseries"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
-              },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
-          "id": 22,
-          "options": {
-            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "multi", "sort": "desc" }
-          },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_gc_collection_seconds_sum{job=~\"mcserver--$server\"}", "legendFormat": "{{gc}}", "refId": "A" }
-          ],
-          "title": "GC Total Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
-              },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "Bps"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
-          "id": 23,
-          "options": {
-            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "multi", "sort": "desc" }
-          },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(jvm_memory_pool_allocated_bytes_total{job=~\"mcserver--$server\", pool=~\"G1.*\"}[5m])", "legendFormat": "{{pool}}", "refId": "A" }
-          ],
-          "title": "Memory Allocation Rate",
-          "type": "timeseries"
-        },
-        {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 38 },
-          "id": 400,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 57 },
+          "id": 300,
           "panels": [],
-          "title": "Threads",
+          "title": "Threads & Process",
           "type": "row"
         },
         {
@@ -543,8 +733,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 39 },
-          "id": 30,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 58 },
+          "id": 301,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -578,190 +768,6 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "normal" },
-                "thresholdsStyle": { "mode": "off" }
-              },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 39 },
-          "id": 31,
-          "options": {
-            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "multi", "sort": "desc" }
-          },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_state{job=~\"mcserver--$server\"}", "legendFormat": "{{state}}", "refId": "A" }
-          ],
-          "title": "Thread States",
-          "type": "timeseries"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "thresholds" },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 47 },
-          "id": 32,
-          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_deadlocked{job=~\"mcserver--$server\"}", "refId": "A" }
-          ],
-          "title": "Deadlocked Threads",
-          "type": "stat"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "thresholds" },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 47 },
-          "id": 33,
-          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_started_total{job=~\"mcserver--$server\"}", "refId": "A" }
-          ],
-          "title": "Total Threads Started",
-          "type": "stat"
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 51 },
-          "id": 500,
-          "panels": [],
-          "title": "Classes & Compilation",
-          "type": "row"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
-              },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 52 },
-          "id": 40,
-          "options": {
-            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "multi", "sort": "desc" }
-          },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_currently_loaded{job=~\"mcserver--$server\"}", "legendFormat": "Currently Loaded", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_loaded_total{job=~\"mcserver--$server\"}", "legendFormat": "Total Loaded", "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_classes_unloaded_total{job=~\"mcserver--$server\"}", "legendFormat": "Total Unloaded", "refId": "C" }
-          ],
-          "title": "Class Loading",
-          "type": "timeseries"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
-              },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 52 },
-          "id": 41,
-          "options": {
-            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "multi", "sort": "desc" }
-          },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_compilation_time_seconds_total{job=~\"mcserver--$server\"}", "legendFormat": "Compilation Time", "refId": "A" }
-          ],
-          "title": "JIT Compilation Time",
-          "type": "timeseries"
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 60 },
-          "id": 600,
-          "panels": [],
-          "title": "Process",
-          "type": "row"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
-                "showPoints": "never",
-                "spanNulls": false,
                 "stacking": { "group": "A", "mode": "none" },
                 "thresholdsStyle": { "mode": "off" }
               },
@@ -771,8 +777,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 61 },
-          "id": 50,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 58 },
+          "id": 302,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -804,26 +810,25 @@ data:
                 "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
+                "stacking": { "group": "A", "mode": "normal" },
                 "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
               "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "bytes"
+              "unit": "short"
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 61 },
-          "id": 51,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 66 },
+          "id": 303,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_resident_memory_bytes{job=~\"mcserver--$server\"}", "legendFormat": "Resident", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "process_virtual_memory_bytes{job=~\"mcserver--$server\"}", "legendFormat": "Virtual", "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_threads_state{job=~\"mcserver--$server\"}", "legendFormat": "{{state}}", "refId": "A" }
           ],
-          "title": "Process Memory",
+          "title": "Thread States",
           "type": "timeseries"
         },
         {
@@ -856,8 +861,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 69 },
-          "id": 52,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 66 },
+          "id": 304,
           "options": {
             "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "multi", "sort": "desc" }
@@ -868,53 +873,11 @@ data:
           ],
           "title": "File Descriptors",
           "type": "timeseries"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 20,
-                "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
-              },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
-              "unit": "bytes"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 69 },
-          "id": 53,
-          "options": {
-            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "multi", "sort": "desc" }
-          },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "jvm_buffer_pool_used_bytes{job=~\"mcserver--$server\"}", "legendFormat": "{{pool}}", "refId": "A" }
-          ],
-          "title": "Buffer Pools",
-          "type": "timeseries"
         }
       ],
       "refresh": "30s",
       "schemaVersion": 38,
-      "tags": ["jvm", "minecraft", "jmx"],
+      "tags": ["minecraft", "jvm", "paper"],
       "templating": {
         "list": [
           {
@@ -955,8 +918,8 @@ data:
       "time": { "from": "now-1h", "to": "now" },
       "timepicker": {},
       "timezone": "Asia/Tokyo",
-      "title": "JVM Metrics - Minecraft Servers",
-      "uid": "jvm-minecraft-servers",
+      "title": "Minecraft Servers",
+      "uid": "minecraft-servers",
       "version": 1,
       "weekStart": ""
     }
