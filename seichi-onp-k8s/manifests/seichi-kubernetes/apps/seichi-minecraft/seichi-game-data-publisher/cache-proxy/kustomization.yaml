@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - "deployment.yaml"
   - "service.yaml"
+  - "service-monitor.yaml"
+  - "grafana-dashboard.yaml"
 
 configMapGenerator:
   - name: seichi-game-data-publisher-cache-proxy-nginx-conf
