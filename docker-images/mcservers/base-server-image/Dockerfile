@@ -26,7 +26,7 @@ RUN wget \
   -O /root/perf-map-agent.tar.gz \
   https://github.com/parca-dev/perf-map-agent/releases/download/${PERF_MAP_AGENT_VERSION}/perf-map-agent-x86_64.tar.gz && \
   tar -xzf /root/perf-map-agent.tar.gz -C /root && \
-  mv /root/perf-map-agent-x86_64/libperfmap.so /root/libperfmap.so
+  mv /root/out/amd64/libperfmap.so /root/libperfmap.so
 
 ##---
 # 最終 stage
