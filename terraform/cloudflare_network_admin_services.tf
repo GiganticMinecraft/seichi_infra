@@ -1,18 +1,5 @@
 # 整地鯖管理者が、デバッグ目的や監査目的で各種サービスに接続する必要がある際に経由するネットワーク。
-resource "cloudflare_certificate_pack" "advanced_cert_for_admin_network" {
-  zone_id = local.cloudflare_zone_id
-  type    = "advanced"
-  hosts = [
-    local.root_domain,
-    "*.onp-k8s.admin.${local.root_domain}",
-    "*.onp.admin.${local.root_domain}",
-    "*.debug.admin.${local.root_domain}",
-  ]
-  validation_method     = "txt"
-  validity_days         = 365
-  certificate_authority = "digicert"
-  cloudflare_branding   = false
-}
+# NOTE: Certificate Pack は Cloudflare 側で自動管理されているため、Terraform 管理外としています。
 
 resource "cloudflare_access_application" "debug_admin_jmx" {
   zone_id          = local.cloudflare_zone_id
