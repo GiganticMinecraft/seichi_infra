@@ -6,4 +6,8 @@ resource "cloudflare_access_identity_provider" "github_oauth" {
     client_id     = var.github_cloudflare_oauth_client_id
     client_secret = var.github_cloudflare_oauth_client_secret
   }
+
+  lifecycle {
+    ignore_changes = [config[0].client_secret]
+  }
 }
