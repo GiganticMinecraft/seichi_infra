@@ -66,7 +66,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
         - name: world-downloader
-          image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+          image: busybox:1.37.0
           env:
             - name: MINIO_ACCESS_KEY
               valueFrom:
@@ -85,7 +85,9 @@ spec:
             - "sh"
             - "-c"
             - |
-              apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y zip
+              mkdir -p /usr/local/bin
+              wget https://dl.min.io/client/mc/release/linux-amd64/mc -P /usr/local/bin
+              chmod +x /usr/local/bin/mc
 
               MINIO_ENDPOINT="http://seichi-private-plugin-blackhole-minio.minio:9000"
               BUCKET_NAME="seichi-plugins"
