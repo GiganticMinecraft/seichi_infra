@@ -85,10 +85,10 @@ spec:
             - "sh"
             - "-c"
             - |
-              apt update && apt install -y wget
+              apt-get update && apt-get install -y wget unzip
 
               mkdir -p /usr/local/bin
-              wget -P /usr/local/bin https://dl.min.io/client/mc/release/linux-amd64/mc
+              wget -q -P /usr/local/bin https://dl.min.io/client/mc/release/linux-amd64/mc
               chmod +x /usr/local/bin/mc
 
               MINIO_ENDPOINT="http://seichi-private-plugin-blackhole-minio.minio:9000"
