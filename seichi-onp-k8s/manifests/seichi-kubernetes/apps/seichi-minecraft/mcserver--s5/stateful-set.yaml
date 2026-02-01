@@ -65,6 +65,64 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: world-downloader
+          image: busybox:1.37.0
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+          volumeMounts:
+            - name: mcserver--s5-data
+              mountPath: /data
+          command:
+            - "sh"
+            - "-c"
+            - |
+              mkdir -p /usr/local/bin
+              wget -P /usr/local/bin https://dl.min.io/client/mc/release/linux-amd64/mc
+              chmod +x /usr/local/bin/mc
+
+              MINIO_ENDPOINT="http://seichi-private-plugin-blackhole-minio.minio:9000"
+              BUCKET_NAME="seichi-plugins"
+              FILE_PREFIX="world-data/s5/world_SW_3_new/earth_1-1000_osm-based_without-features_1-17-1.zip"
+              DOWNLOAD_DIR="/tmp/downloads"
+              OUTPUT_FILE="/tmp/earth_1-1000_osm-based_without-features_1-17-1.zip"
+              MAX_FILES=4
+              MC_ALIAS="myminio"
+
+              mkdir -p "${DOWNLOAD_DIR}"
+
+              mc alias set "${MC_ALIAS}" "${MINIO_ENDPOINT}" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
+
+              for counter in $(seq 1 "${MAX_FILES}"); do
+                file_num=$(printf "%03d" "${counter}")
+                filename="${FILE_PREFIX}.${file_num}"
+                output_path="${DOWNLOAD_DIR}/$(basename "${filename}")"
+
+                echo "ダウンロード中: ${filename}"
+                mc cp "${MC_ALIAS}/${BUCKET_NAME}/${filename}" "${output_path}"
+              done
+
+              echo "結合中..."
+              cat "${DOWNLOAD_DIR}"/earth_1-1000_osm-based_without-features_1-17-1.zip.* > "${OUTPUT_FILE}"
+
+              echo "解凍中..."
+              unzip "${OUTPUT_FILE}" -d /tmp/
+
+              echo "移動中..."
+              mv /tmp/earth_1-1000_osm-based_without-features_1-17-1 /data/world_SW_3_new
+
+              chown -R 1000:1000 /data/world_SW_3_new
+
+              echo "ファイル一覧:"
+              ls -l /data/world_SW_3_new
 
       containers:
         - resources:
