@@ -91,7 +91,7 @@ spec:
 
               MINIO_ENDPOINT="http://seichi-private-plugin-blackhole-minio.minio:9000"
               BUCKET_NAME="seichi-plugins"
-              FILE_PREFIX="world-data/s5/world_SW_3_new/earth_1-1000_osm-based_without-features_1-17-1.zip"
+              FILE_PREFIX="world-data/s5/SW_3_new/earth_1-1000_osm-based_without-features_1-17-1.zip"
               DOWNLOAD_DIR="/tmp/downloads"
               OUTPUT_FILE="/tmp/earth_1-1000_osm-based_without-features_1-17-1.zip"
               MAX_FILES=4
