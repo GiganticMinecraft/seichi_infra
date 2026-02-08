@@ -88,5 +88,9 @@ spec:
         - "--collect.perf_schema.eventsstatements"
         - "--collect.perf_schema.eventsstatements.digest_text_limit=200"
         - "--collect.perf_schema.eventsstatements.limit=250"
+        - "--collect.perf_schema.memory_events"
+        - "--collect.perf_schema.tableiowaits"
+        - "--collect.perf_schema.indexiowaits"
+        - "--collect.info_schema.tables"
     serviceMonitor:
       prometheusRelease: prometheus
