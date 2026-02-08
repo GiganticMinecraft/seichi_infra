@@ -11,38 +11,177 @@ data:
   mariadb-slow-queries.json: |
     {
       "annotations": { "list": [] },
-      "description": "MariaDB Slow Query Analysis using performance_schema",
+      "description": "MariaDB Slow Query Analysis using Prometheus metrics from mysqld-exporter perf_schema collector",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 1,
       "links": [],
       "panels": [
         {
-          "gridPos": { "h": 2, "w": 24, "x": 0, "y": 0 },
-          "id": 100,
-          "options": {
-            "code": { "language": "plaintext", "showLineNumbers": false },
-            "content": "## Slow Query Analysis\n\nこのダッシュボードは `performance_schema` から直接クエリ統計を取得しています。データはMariaDB再起動でリセットされます。",
-            "mode": "markdown"
-          },
-          "type": "text"
-        },
-        {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 2 },
-          "id": 1,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
           "panels": [],
-          "title": "Top Slow Queries by Total Time",
+          "title": "Overview",
           "type": "row"
         },
         {
-          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "queries/sec",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 },
+          "id": 1,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "topk(10, sum by (digest_text) (rate(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__rate_interval])))",
+              "legendFormat": "{{digest_text}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Query Execution Rate (Top 10)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "seconds/sec",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 },
+          "id": 2,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "topk(10, sum by (digest_text) (rate(mysql_perf_schema_events_statements_seconds_total{instance=~\"$instance\"}[$__rate_interval])))",
+              "legendFormat": "{{digest_text}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Query Time Rate (Top 10)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "slow queries/sec",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+          "id": 3,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "rate(mysql_global_status_slow_queries{instance=~\"$instance\"}[$__rate_interval])",
+              "legendFormat": "Slow Queries",
+              "refId": "A"
+            }
+          ],
+          "title": "Slow Query Count",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+          "id": 10,
+          "panels": [],
+          "title": "Top Queries by Total Time",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "custom": {
                 "align": "auto",
                 "cellOptions": { "type": "auto" },
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -57,38 +196,51 @@ data:
             },
             "overrides": [
               {
-                "matcher": { "id": "byName", "options": "total_time_sec" },
+                "matcher": { "id": "byName", "options": "Value #A" },
                 "properties": [
-                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
-                  { "id": "unit", "value": "s" }
-                ]
-              },
-              {
-                "matcher": { "id": "byName", "options": "avg_time_sec" },
-                "properties": [
+                  { "id": "displayName", "value": "total_time_sec" },
                   { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
                   { "id": "unit", "value": "s" },
-                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.1 }, { "color": "orange", "value": 1 }, { "color": "red", "value": 10 }] } }
+                  { "id": "decimals", "value": 2 }
                 ]
               },
               {
-                "matcher": { "id": "byName", "options": "max_time_sec" },
+                "matcher": { "id": "byName", "options": "Value #B" },
                 "properties": [
-                  { "id": "unit", "value": "s" },
-                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "orange", "value": 10 }, { "color": "red", "value": 60 }] } },
-                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                  { "id": "displayName", "value": "exec_count" },
+                  { "id": "decimals", "value": 0 }
                 ]
               },
               {
-                "matcher": { "id": "byName", "options": "query_text" },
+                "matcher": { "id": "byName", "options": "Value #C" },
+                "properties": [
+                  { "id": "displayName", "value": "rows_examined" },
+                  { "id": "decimals", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Value #D" },
+                "properties": [
+                  { "id": "displayName", "value": "rows_sent" },
+                  { "id": "decimals", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "digest_text" },
                 "properties": [
                   { "id": "custom.width", "value": 500 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Time" },
+                "properties": [
+                  { "id": "custom.hidden", "value": true }
                 ]
               }
             ]
           },
-          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 3 },
-          "id": 2,
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 10 },
+          "id": 11,
           "options": {
             "cellHeight": "sm",
             "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
@@ -97,33 +249,71 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "topk(20, sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_seconds_total{instance=~\"$instance\"}[$__range])))",
               "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_TIMER_WAIT/1000000000000, 2) as total_time_sec,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  SUM_ROWS_EXAMINED as rows_examined,\n  SUM_ROWS_SENT as rows_sent\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_TIMER_WAIT > 0\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name:raw}'\nORDER BY SUM_TIMER_WAIT DESC\nLIMIT 20",
+              "instant": true,
               "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range]))",
+              "format": "table",
+              "instant": true,
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_rows_examined_total{instance=~\"$instance\"}[$__range]))",
+              "format": "table",
+              "instant": true,
+              "refId": "C"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_rows_sent_total{instance=~\"$instance\"}[$__range]))",
+              "format": "table",
+              "instant": true,
+              "refId": "D"
             }
           ],
           "title": "Top 20 Queries by Total Execution Time",
+          "transformations": [
+            { "id": "merge", "options": {} },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "schema": 0,
+                  "digest_text": 1,
+                  "Value #A": 2,
+                  "Value #B": 3,
+                  "Value #C": 4,
+                  "Value #D": 5
+                },
+                "renameByName": {}
+              }
+            }
+          ],
           "type": "table"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
-          "id": 3,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "id": 20,
           "panels": [],
           "title": "Slowest Queries by Average Time",
           "type": "row"
         },
         {
-          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "custom": {
                 "align": "auto",
                 "cellOptions": { "type": "auto" },
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -138,29 +328,37 @@ data:
             },
             "overrides": [
               {
-                "matcher": { "id": "byName", "options": "avg_time_sec" },
+                "matcher": { "id": "byName", "options": "Value #A" },
                 "properties": [
+                  { "id": "displayName", "value": "avg_time_sec" },
                   { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
-                  { "id": "unit", "value": "s" }
-                ]
-              },
-              {
-                "matcher": { "id": "byName", "options": "max_time_sec" },
-                "properties": [
                   { "id": "unit", "value": "s" },
-                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                  { "id": "decimals", "value": 3 }
                 ]
               },
               {
-                "matcher": { "id": "byName", "options": "query_text" },
+                "matcher": { "id": "byName", "options": "Value #B" },
+                "properties": [
+                  { "id": "displayName", "value": "exec_count" },
+                  { "id": "decimals", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "digest_text" },
                 "properties": [
                   { "id": "custom.width", "value": 500 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Time" },
+                "properties": [
+                  { "id": "custom.hidden", "value": true }
                 ]
               }
             ]
           },
-          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 16 },
-          "id": 4,
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 23 },
+          "id": 21,
           "options": {
             "cellHeight": "sm",
             "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
@@ -169,27 +367,49 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "topk(15, sum by (schema, digest_text) (rate(mysql_perf_schema_events_statements_seconds_total{instance=~\"$instance\"}[$__range])) / sum by (schema, digest_text) (rate(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range])))",
               "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(AVG_TIMER_WAIT/1000000000000, 3) as avg_time_sec,\n  ROUND(MAX_TIMER_WAIT/1000000000000, 3) as max_time_sec,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as avg_rows_examined\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 5\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name:raw}'\nORDER BY AVG_TIMER_WAIT DESC\nLIMIT 15",
+              "instant": true,
               "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range]))",
+              "format": "table",
+              "instant": true,
+              "refId": "B"
             }
           ],
-          "title": "Top 15 Slowest Queries (by Average Time, min 5 executions)",
+          "title": "Top 15 Slowest Queries (by Average Time)",
+          "transformations": [
+            { "id": "merge", "options": {} },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "schema": 0,
+                  "digest_text": 1,
+                  "Value #A": 2,
+                  "Value #B": 3
+                },
+                "renameByName": {}
+              }
+            }
+          ],
           "type": "table"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
-          "id": 5,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 33 },
+          "id": 30,
           "panels": [],
-          "title": "Query Statistics by Database",
+          "title": "Database Stats",
           "type": "row"
         },
         {
-          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -199,8 +419,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
-          "id": 6,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 34 },
+          "id": 31,
           "options": {
             "displayLabels": ["name", "percent"],
             "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value"] },
@@ -210,11 +430,10 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema) (increase(mysql_perf_schema_events_statements_seconds_total{instance=~\"$instance\"}[$__range]))",
               "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  ROUND(SUM(SUM_TIMER_WAIT)/1000000000000, 2) as total_time_sec\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name:raw}'\nGROUP BY SCHEMA_NAME\nORDER BY total_time_sec DESC\nLIMIT 10",
+              "instant": true,
               "refId": "A"
             }
           ],
@@ -222,7 +441,7 @@ data:
           "type": "piechart"
         },
         {
-          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -232,8 +451,8 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
-          "id": 7,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 34 },
+          "id": 32,
           "options": {
             "displayLabels": ["name", "percent"],
             "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value"] },
@@ -243,11 +462,10 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema) (increase(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range]))",
               "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  SUM(COUNT_STAR) as query_count\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name:raw}'\nGROUP BY SCHEMA_NAME\nORDER BY query_count DESC\nLIMIT 10",
+              "instant": true,
               "refId": "A"
             }
           ],
@@ -256,14 +474,15 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 35 },
-          "id": 8,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 42 },
+          "id": 40,
           "panels": [],
           "title": "Currently Running Queries",
           "type": "row"
         },
         {
           "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "description": "このパネルは information_schema.PROCESSLIST からリアルタイムに取得しています。Grafana の時間範囲には依存しません。",
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -297,8 +516,8 @@ data:
               }
             ]
           },
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 36 },
-          "id": 9,
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 43 },
+          "id": 41,
           "options": {
             "cellHeight": "sm",
             "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
@@ -311,7 +530,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT \n  ID as process_id,\n  USER as user,\n  DB as db_name,\n  COMMAND as command,\n  TIME as time_sec,\n  STATE as state,\n  LEFT(INFO, 300) as query_text\nFROM information_schema.PROCESSLIST\nWHERE COMMAND != 'Sleep'\n  AND INFO IS NOT NULL\n  AND INFO NOT LIKE '%PROCESSLIST%'\n  AND (DB LIKE '${db_name:raw}' OR DB IS NULL)\nORDER BY TIME DESC",
+              "rawSql": "SELECT \n  ID as process_id,\n  USER as user,\n  DB as db_name,\n  COMMAND as command,\n  TIME as time_sec,\n  STATE as state,\n  LEFT(INFO, 300) as query_text\nFROM information_schema.PROCESSLIST\nWHERE COMMAND != 'Sleep'\n  AND INFO IS NOT NULL\n  AND INFO NOT LIKE '%PROCESSLIST%'\nORDER BY TIME DESC",
               "refId": "A"
             }
           ],
@@ -320,20 +539,20 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 44 },
-          "id": 10,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 51 },
+          "id": 50,
           "panels": [],
           "title": "Full Scans & Problem Queries",
           "type": "row"
         },
         {
-          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "custom": {
                 "align": "auto",
                 "cellOptions": { "type": "auto" },
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -347,21 +566,36 @@ data:
             },
             "overrides": [
               {
-                "matcher": { "id": "byName", "options": "rows_examined_per_query" },
+                "matcher": { "id": "byName", "options": "Value #A" },
                 "properties": [
-                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                  { "id": "displayName", "value": "rows_examined_per_query" },
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
+                  { "id": "decimals", "value": 0 }
                 ]
               },
               {
-                "matcher": { "id": "byName", "options": "query_text" },
+                "matcher": { "id": "byName", "options": "Value #B" },
+                "properties": [
+                  { "id": "displayName", "value": "no_index_used" },
+                  { "id": "decimals", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "digest_text" },
                 "properties": [
                   { "id": "custom.width", "value": 500 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Time" },
+                "properties": [
+                  { "id": "custom.hidden", "value": true }
                 ]
               }
             ]
           },
-          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 45 },
-          "id": 11,
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 52 },
+          "id": 51,
           "options": {
             "cellHeight": "sm",
             "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
@@ -370,33 +604,55 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "topk(15, sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_rows_examined_total{instance=~\"$instance\"}[$__range])) / sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range])))",
               "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  ROUND(SUM_ROWS_EXAMINED/COUNT_STAR, 0) as rows_examined_per_query,\n  ROUND(SUM_ROWS_SENT/COUNT_STAR, 0) as rows_sent_per_query,\n  ROUND((SUM_ROWS_EXAMINED - SUM_ROWS_SENT)/NULLIF(SUM_ROWS_SENT, 0), 1) as examine_to_send_ratio\nFROM performance_schema.events_statements_summary_by_digest\nWHERE COUNT_STAR >= 10\n  AND SUM_ROWS_EXAMINED > 1000\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name:raw}'\nORDER BY SUM_ROWS_EXAMINED/COUNT_STAR DESC\nLIMIT 15",
+              "instant": true,
               "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_no_index_used_total{instance=~\"$instance\"}[$__range]))",
+              "format": "table",
+              "instant": true,
+              "refId": "B"
             }
           ],
           "title": "Queries Examining Most Rows (potential full scans)",
+          "transformations": [
+            { "id": "merge", "options": {} },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "schema": 0,
+                  "digest_text": 1,
+                  "Value #A": 2,
+                  "Value #B": 3
+                },
+                "renameByName": {}
+              }
+            }
+          ],
           "type": "table"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 55 },
-          "id": 12,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 62 },
+          "id": 60,
           "panels": [],
           "title": "Query Errors",
           "type": "row"
         },
         {
-          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "custom": {
                 "align": "auto",
                 "cellOptions": { "type": "auto" },
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -410,21 +666,44 @@ data:
             },
             "overrides": [
               {
-                "matcher": { "id": "byName", "options": "error_count" },
+                "matcher": { "id": "byName", "options": "Value #A" },
                 "properties": [
-                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } }
+                  { "id": "displayName", "value": "error_count" },
+                  { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "color-background" } },
+                  { "id": "decimals", "value": 0 }
                 ]
               },
               {
-                "matcher": { "id": "byName", "options": "query_text" },
+                "matcher": { "id": "byName", "options": "Value #B" },
+                "properties": [
+                  { "id": "displayName", "value": "exec_count" },
+                  { "id": "decimals", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Value #C" },
+                "properties": [
+                  { "id": "displayName", "value": "error_rate_pct" },
+                  { "id": "unit", "value": "percent" },
+                  { "id": "decimals", "value": 2 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "digest_text" },
                 "properties": [
                   { "id": "custom.width", "value": 500 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Time" },
+                "properties": [
+                  { "id": "custom.hidden", "value": true }
                 ]
               }
             ]
           },
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 56 },
-          "id": 13,
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 63 },
+          "id": 61,
           "options": {
             "cellHeight": "sm",
             "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
@@ -433,15 +712,45 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_errors_total{instance=~\"$instance\"}[$__range])) > 0",
               "format": "table",
-              "rawQuery": true,
-              "rawSql": "SELECT \n  SCHEMA_NAME as db_name,\n  LEFT(DIGEST_TEXT, 200) AS query_text,\n  COUNT_STAR as exec_count,\n  SUM_ERRORS as error_count,\n  SUM_WARNINGS as warning_count,\n  ROUND(SUM_ERRORS/COUNT_STAR * 100, 2) as error_rate_pct\nFROM performance_schema.events_statements_summary_by_digest\nWHERE SUM_ERRORS > 0\n  AND SCHEMA_NAME IS NOT NULL\n  AND SCHEMA_NAME LIKE '${db_name:raw}'\nORDER BY SUM_ERRORS DESC\nLIMIT 15",
+              "instant": true,
               "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range]))",
+              "format": "table",
+              "instant": true,
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_errors_total{instance=~\"$instance\"}[$__range])) / sum by (schema, digest_text) (increase(mysql_perf_schema_events_statements_total{instance=~\"$instance\"}[$__range])) * 100",
+              "format": "table",
+              "instant": true,
+              "refId": "C"
             }
           ],
           "title": "Queries with Errors",
+          "transformations": [
+            { "id": "merge", "options": {} },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "schema": 0,
+                  "digest_text": 1,
+                  "Value #A": 2,
+                  "Value #B": 3,
+                  "Value #C": 4
+                },
+                "renameByName": {}
+              }
+            }
+          ],
           "type": "table"
         }
       ],
@@ -450,6 +759,39 @@ data:
       "tags": ["mariadb", "mysql", "slow-query", "performance"],
       "templating": {
         "list": [
+          {
+            "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "queryValue": "",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(mysql_up, instance)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Instance",
+            "multi": false,
+            "name": "instance",
+            "options": [],
+            "query": { "query": "label_values(mysql_up, instance)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 1,
+            "type": "query"
+          },
           {
             "current": { "selected": false, "text": "MariaDB", "value": "MariaDB" },
             "hide": 0,
@@ -464,24 +806,6 @@ data:
             "regex": "",
             "skipUrlSync": false,
             "type": "datasource"
-          },
-          {
-            "allValue": "%",
-            "current": { "selected": true, "text": "All", "value": "$__all" },
-            "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
-            "definition": "SELECT DISTINCT SCHEMA_NAME FROM performance_schema.events_statements_summary_by_digest WHERE SCHEMA_NAME IS NOT NULL ORDER BY SCHEMA_NAME",
-            "hide": 0,
-            "includeAll": true,
-            "label": "Database",
-            "multi": false,
-            "name": "db_name",
-            "options": [],
-            "query": "SELECT DISTINCT SCHEMA_NAME FROM performance_schema.events_statements_summary_by_digest WHERE SCHEMA_NAME IS NOT NULL ORDER BY SCHEMA_NAME",
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
-            "sort": 1,
-            "type": "query"
           }
         ]
       },
