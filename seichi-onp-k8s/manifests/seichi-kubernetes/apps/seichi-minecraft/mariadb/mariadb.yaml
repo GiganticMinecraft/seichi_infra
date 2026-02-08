@@ -83,5 +83,10 @@ spec:
 
   metrics:
     enabled: true
+    exporter:
+      args:
+        - "--collect.perf_schema.eventsstatements"
+        - "--collect.perf_schema.eventsstatements.digest_text_limit=200"
+        - "--collect.perf_schema.eventsstatements.limit=250"
     serviceMonitor:
       prometheusRelease: prometheus
