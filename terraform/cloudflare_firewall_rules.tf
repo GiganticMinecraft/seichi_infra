@@ -1,6 +1,6 @@
 import {
   to = cloudflare_ruleset.custom_firewall_rules
-  id = "77c10fdfa7c65de4d14903ed8879ebcb/59aa12fc3a7d403db8419a634c223d41"
+  id = "zone/77c10fdfa7c65de4d14903ed8879ebcb/59aa12fc3a7d403db8419a634c223d41"
 }
 
 resource "cloudflare_ruleset" "custom_firewall_rules" {
