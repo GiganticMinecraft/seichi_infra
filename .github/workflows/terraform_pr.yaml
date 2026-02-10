@@ -14,7 +14,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
-          terraform_version: 1.2.1
+          terraform_version: 1.14.4
 
       - name: Terraform fmt
         run: terraform fmt -check
