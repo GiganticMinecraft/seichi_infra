@@ -5,31 +5,43 @@ resource "cloudflare_pages_project" "seichi_portal" {
   name              = "seichi-portal"
   production_branch = "main"
 
-  deployment_configs {
-    preview {
+  deployment_configs = {
+    preview = {
       compatibility_date = "2023-03-19"
     }
-    production {
+    production = {
       compatibility_date = "2023-03-19"
-      environment_variables = {
-        NEXT_PUBLIC_BACKEND_API_URL     = var.cloudflare_pages__seichi_portal__next_public_backend_api_url
-        NEXT_PUBLIC_MS_APP_CLIENT_ID    = var.cloudflare_pages__seichi_portal__next_public_ms_app_client_id
-        NEXT_PUBLIC_MS_APP_REDIRECT_URL = "https://portal.${local.root_domain}"
-        NODE_ENV                        = "production"
+      env_vars = {
+        NEXT_PUBLIC_BACKEND_API_URL = {
+          type  = "plain_text"
+          value = var.cloudflare_pages__seichi_portal__next_public_backend_api_url
+        }
+        NEXT_PUBLIC_MS_APP_CLIENT_ID = {
+          type  = "plain_text"
+          value = var.cloudflare_pages__seichi_portal__next_public_ms_app_client_id
+        }
+        NEXT_PUBLIC_MS_APP_REDIRECT_URL = {
+          type  = "plain_text"
+          value = "https://portal.${local.root_domain}"
+        }
+        NODE_ENV = {
+          type  = "plain_text"
+          value = "production"
+        }
       }
     }
   }
 
-  source {
+  source = {
     type = "github"
-    config {
-      owner                         = local.github_org_name
-      repo_name                     = "seichi-portal-frontend"
-      production_branch             = "main"
-      preview_branch_includes       = ["*"]
-      deployments_enabled           = true
-      pr_comments_enabled           = true
-      production_deployment_enabled = true
+    config = {
+      owner                          = local.github_org_name
+      repo_name                      = "seichi-portal-frontend"
+      production_branch              = "main"
+      preview_branch_includes        = ["*"]
+      deployments_enabled            = true
+      pr_comments_enabled            = true
+      production_deployments_enabled = true
     }
   }
 }
@@ -55,25 +67,25 @@ resource "cloudflare_pages_project" "seichi_playguide" {
     root_dir        = "/"
   }
 
-  deployment_configs {
-    preview {
+  deployment_configs = {
+    preview = {
       compatibility_date = "2025-05-24"
     }
-    production {
+    production = {
       compatibility_date = "2025-05-24"
     }
   }
 
-  source {
+  source = {
     type = "github"
-    config {
-      owner                         = local.github_org_name
-      repo_name                     = "seichi-playguide"
-      production_branch             = "main"
-      preview_branch_includes       = ["*"]
-      deployments_enabled           = true
-      pr_comments_enabled           = true
-      production_deployment_enabled = true
+    config = {
+      owner                          = local.github_org_name
+      repo_name                      = "seichi-playguide"
+      production_branch              = "main"
+      preview_branch_includes        = ["*"]
+      deployments_enabled            = true
+      pr_comments_enabled            = true
+      production_deployments_enabled = true
     }
   }
 }
