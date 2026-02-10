@@ -40,7 +40,7 @@ resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
 
   data = {
     DISCORDSRV_TOKEN           = var.minecraft__gt_seichi_discordsrv_bot_token
-    GAME_DB_PASSWORD           = var.minecraft__prod_game_db__password
+    GAME_DB_PASSWORD           = random_password.minecraft__prod_mariadb_mcserver_password.result
     VOTELISTENER_DEFUALT_TOKEN = var.minecraft__prod_votelistener_default_token
   }
 
