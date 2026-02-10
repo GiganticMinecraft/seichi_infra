@@ -69,6 +69,9 @@ resource "cloudflare_ruleset" "custom_firewall_rules" {
     action_parameters {
       products = ["waf"]
     }
+    logging {
+      enabled = true
+    }
     enabled = true
   }
 
@@ -78,6 +81,9 @@ resource "cloudflare_ruleset" "custom_firewall_rules" {
     description = "Let phpMyAdmin requests bypass WAF rules"
     action_parameters {
       products = ["waf"]
+    }
+    logging {
+      enabled = true
     }
     enabled = true
   }
