@@ -1,27 +1,27 @@
-resource "cloudflare_filter" "minio_api_requests" {
+resource "cloudflare_ruleset" "waf_bypass_rules" {
   zone_id     = local.cloudflare_zone_id
-  description = "MinIO API requests"
-  expression  = "http.host eq \"minio-console.onp-k8s.admin.seichi.click\""
-}
+  name        = "WAF Bypass Rules"
+  description = "WAFルールをバイパスするカスタムファイアウォールルール"
+  kind        = "zone"
+  phase       = "http_request_firewall_custom"
 
-resource "cloudflare_firewall_rule" "bypass_waf_on_minio_api_requests" {
-  zone_id     = local.cloudflare_zone_id
-  description = "Let MinIO API requests bypass WAF rules"
-  filter_id   = cloudflare_filter.minio_api_requests.id
-  action      = "bypass"
-  products    = toset(["waf"])
-}
+  rules {
+    action      = "skip"
+    expression  = "http.host eq \"minio-console.onp-k8s.admin.seichi.click\""
+    description = "Let MinIO API requests bypass WAF rules"
+    action_parameters {
+      products = ["waf"]
+    }
+    enabled = true
+  }
 
-resource "cloudflare_filter" "phpmyadmin_api_requests" {
-  zone_id     = local.cloudflare_zone_id
-  description = "phpMyAdmin API requests"
-  expression  = "http.host eq \"phpmyadmin.onp-k8s.admin.seichi.click\""
-}
-
-resource "cloudflare_firewall_rule" "bypass_waf_on_phpmyadmin_requests" {
-  zone_id     = local.cloudflare_zone_id
-  description = "Let phpMyAdmin requests bypass WAF rules"
-  filter_id   = cloudflare_filter.phpmyadmin_api_requests.id
-  action      = "bypass"
-  products    = toset(["waf"])
+  rules {
+    action      = "skip"
+    expression  = "http.host eq \"phpmyadmin.onp-k8s.admin.seichi.click\""
+    description = "Let phpMyAdmin requests bypass WAF rules"
+    action_parameters {
+      products = ["waf"]
+    }
+    enabled = true
+  }
 }
