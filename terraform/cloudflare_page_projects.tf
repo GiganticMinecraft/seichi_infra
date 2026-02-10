@@ -49,7 +49,7 @@ resource "cloudflare_pages_project" "seichi_portal" {
 resource "cloudflare_pages_domain" "seichi_portal_domain" {
   account_id   = local.cloudflare_account_id
   project_name = cloudflare_pages_project.seichi_portal.name
-  domain       = "portal.${local.root_domain}"
+  name         = "portal.${local.root_domain}"
 }
 
 #endregion
@@ -61,7 +61,7 @@ resource "cloudflare_pages_project" "seichi_playguide" {
   name              = "seichi-playguide"
   production_branch = "main"
 
-  build_config {
+  build_config = {
     build_command   = "npx vitepress build"
     destination_dir = ".vitepress/dist"
     root_dir        = "/"
@@ -93,7 +93,7 @@ resource "cloudflare_pages_project" "seichi_playguide" {
 resource "cloudflare_pages_domain" "seichi_playguide_domain" {
   account_id   = local.cloudflare_account_id
   project_name = cloudflare_pages_project.seichi_playguide.name
-  domain       = "playguide.${local.root_domain}"
+  name         = "playguide.${local.root_domain}"
 }
 
 #endregion
