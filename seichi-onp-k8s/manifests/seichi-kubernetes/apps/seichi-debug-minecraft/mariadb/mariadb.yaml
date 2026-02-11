@@ -26,6 +26,18 @@ spec:
           value: database--seichiassist-with-flyway-for-debug
         - name: DOWNLOAD_TARGET_DIR_PATH
           value: /docker-entrypoint-initdb.d
+    - name: fix-sql-dump-permissions
+      image: busybox:1.37.0
+      command:
+        - sh
+        - -c
+      args:
+        - |
+          set -eu
+          if [ -d /docker-entrypoint-initdb.d ]; then
+            find /docker-entrypoint-initdb.d -type d -exec chmod 755 {} +
+            find /docker-entrypoint-initdb.d -type f -exec chmod 644 {} +
+          fi
 
   tls:
     enabled: false
