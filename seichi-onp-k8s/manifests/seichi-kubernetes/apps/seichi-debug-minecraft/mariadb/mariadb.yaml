@@ -23,9 +23,7 @@ spec:
             latest_key=""
             latest_filename=""
 
-            while IFS= read -r object_path; do
-              [ -z "${object_path}" ] && continue
-
+            for object_path in $(mc find "${search_root}" --name 'backup.*.sql' || true); do
               object_name="${object_path##*/}"
               case "${object_name}" in
                 backup.????-??-??T??:??:??Z.sql)
@@ -35,9 +33,7 @@ spec:
                   fi
                   ;;
               esac
-            done <<EOF
-            $(mc find "${search_root}" --name 'backup.*.sql' || true)
-            EOF
+            done
 
             if [ -z "${latest_key}" ]; then
               echo "No backup SQL file found for prefix: ${prefix}" >&2
