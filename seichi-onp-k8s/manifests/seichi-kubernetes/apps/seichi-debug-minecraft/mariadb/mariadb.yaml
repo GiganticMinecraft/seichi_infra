@@ -20,12 +20,24 @@ spec:
             prefix="$1"
             output_file="$2"
             search_root="myminio/${BUCKET_NAME}/${prefix}"
-            latest_key="$(
-              mc find "${search_root}" --name 'backup.*.sql' \
-                | grep -E '/backup\.[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\.sql$' \
-                | sort \
-                | tail -n 1 || true
-            )"
+            latest_key=""
+            latest_filename=""
+
+            while IFS= read -r object_path; do
+              [ -z "${object_path}" ] && continue
+
+              object_name="${object_path##*/}"
+              case "${object_name}" in
+                backup.????-??-??T??:??:??Z.sql)
+                  if [ -z "${latest_filename}" ] || [ "${object_name}" \> "${latest_filename}" ]; then
+                    latest_filename="${object_name}"
+                    latest_key="${object_path}"
+                  fi
+                  ;;
+              esac
+            done <<EOF
+            $(mc find "${search_root}" --name 'backup.*.sql' || true)
+            EOF
 
             if [ -z "${latest_key}" ]; then
               echo "No backup SQL file found for prefix: ${prefix}" >&2
