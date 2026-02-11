@@ -19,14 +19,15 @@ spec:
           copy_latest_sql() {
             prefix="$1"
             output_file="$2"
-            search_root="myminio/${BUCKET_NAME}/${prefix}"
+            search_root="myminio/${BUCKET_NAME}/${prefix}/"
+            prefix_marker="/${prefix}/"
             latest_key=""
             latest_filename=""
 
             for object_path in $(mc find "${search_root}" --name 'backup.*.sql' || true); do
               object_name="${object_path##*/}"
-              case "${object_name}" in
-                backup.????-??-??T??:??:??Z.sql)
+              case "${object_path}" in
+                *"${prefix_marker}"backup.????-??-??T??:??:??Z.sql)
                   if [ -z "${latest_filename}" ] || [ "${object_name}" \> "${latest_filename}" ]; then
                     latest_filename="${object_name}"
                     latest_key="${object_path}"
