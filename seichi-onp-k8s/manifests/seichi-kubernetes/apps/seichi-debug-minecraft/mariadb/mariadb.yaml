@@ -115,3 +115,4 @@ spec:
   volumes:
     # 本番サーバーからもってきた sqldump をマウントするためのボリューム
     - name: sqldump-volume
+      emptyDir: {}
