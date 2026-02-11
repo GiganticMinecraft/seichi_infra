@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.25-trixie AS builder
+FROM golang:1.26-trixie AS builder
 # Build
 ARG GOOS=linux
 ARG GOARCH=amd64
