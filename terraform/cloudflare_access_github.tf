@@ -1,13 +1,17 @@
-resource "cloudflare_access_identity_provider" "github_oauth" {
+moved {
+  from = cloudflare_access_identity_provider.github_oauth
+  to   = cloudflare_zero_trust_access_identity_provider.github_oauth
+}
+resource "cloudflare_zero_trust_access_identity_provider" "github_oauth" {
   zone_id = local.cloudflare_zone_id
   name    = "GitHub OAuth"
   type    = "github"
-  config {
+  config = {
     client_id     = var.github_cloudflare_oauth_client_id
     client_secret = var.github_cloudflare_oauth_client_secret
   }
 
   lifecycle {
-    ignore_changes = [config[0].client_secret]
+    ignore_changes = [config.client_secret]
   }
 }
