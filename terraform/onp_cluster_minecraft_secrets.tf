@@ -127,6 +127,21 @@ resource "kubernetes_secret" "argo_events_github_access_token" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "seichiassist_downloader_develop_release_notify_webhook" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichiassist-downloader-develop-release-notify-webhook"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    DISCORD_WEBHOOK_URL = var.seichiassist_downloader_develop_release_notify_webhook_url
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "onp_minecraft_prod_bugsink_admin_password" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 

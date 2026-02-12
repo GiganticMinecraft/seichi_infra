@@ -274,6 +274,12 @@ variable "minecraft__debug_s1_seichiassist_webhook_url" {
   sensitive   = true
 }
 
+variable "seichiassist_downloader_develop_release_notify_webhook_url" {
+  description = "Webhook URL for develop release notifications from seichiassist-downloader workflow"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise minecraft config secrets

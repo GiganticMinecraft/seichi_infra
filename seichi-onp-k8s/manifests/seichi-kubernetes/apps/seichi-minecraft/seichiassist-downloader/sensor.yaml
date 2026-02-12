@@ -40,6 +40,7 @@ spec:
               spec:
                 serviceAccountName: seichiassist-downloader-workflow-sa
                 entrypoint: download-seichiassist
+                onExit: notify-discord
                 volumeClaimTemplates:
                   - metadata:
                       name: work
@@ -66,7 +67,10 @@ spec:
                         - name: work
                           mountPath: /work
                       command: [sh, -c]
-                      args: ["wget -P /work https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar"]
+                      args:
+                        [
+                          "wget -P /work https://github.com/GiganticMinecraft/SeichiAssist/releases/download/{{ workflow.parameters.tag-name }}/SeichiAssist.jar",
+                        ]
                   - name: upload-artifact
                     container:
                       image: minio/mc:RELEASE.2025-04-16T18-13-26Z-cpuv1
@@ -86,9 +90,73 @@ spec:
                           mountPath: /work
                       command: [sh, -c]
                       args: [
-                        "mc alias set myminio http://seichi-private-plugin-blackhole-minio.minio:9000/ ${MINIO_ACCESS_KEY} ${MINIO_ACCESS_SECRET} && \
-                        mc cp /work/SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar"
-                      ]
+                          "mc alias set myminio http://seichi-private-plugin-blackhole-minio.minio:9000/ ${MINIO_ACCESS_KEY} ${MINIO_ACCESS_SECRET} && \
+                          mc cp /work/SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar",
+                        ]
+                  - name: notify-discord
+                    steps:
+                      - - name: notify-succeeded-on-develop
+                          when: "'{{workflow.parameters.target-branch}}' == 'develop' && '{{workflow.status}}' == 'Succeeded'"
+                          template: send-discord-embed
+                          arguments:
+                            parameters:
+                              - name: embed-status
+                                value: 成功
+                              - name: embed-title
+                                value: "デバッグサーバー向けの SeichiAssist がリリースされました"
+                              - name: embed-color
+                                value: "5763719"
+                      - - name: notify-failed-on-develop
+                          when: "'{{workflow.parameters.target-branch}}' == 'develop' && ('{{workflow.status}}' == 'Failed' || '{{workflow.status}}' == 'Error')"
+                          template: send-discord-embed
+                          arguments:
+                            parameters:
+                              - name: embed-status
+                                value: 失敗
+                              - name: embed-title
+                                value: "デバッグサーバー向けの SeichiAssist のリリースが行われましたが、配置に失敗しました"
+                              - name: embed-color
+                                value: "15548997"
+                  - name: send-discord-embed
+                    inputs:
+                      parameters:
+                        - name: embed-status
+                        - name: embed-title
+                        - name: embed-color
+                    container:
+                      image: curlimages/curl:8.16.0
+                      env:
+                        - name: DISCORD_WEBHOOK_URL
+                          valueFrom:
+                            secretKeyRef:
+                              name: seichiassist-downloader-develop-release-notify-webhook
+                              key: DISCORD_WEBHOOK_URL
+                        - name: ARGO_WORKFLOWS_BASE_URL
+                          value: "https://argo-workflows.onp-k8s.admin.seichi.click"
+                      command: [sh, -ceu]
+                      args:
+                        - |
+                          payload=$(cat <<EOF
+                          {
+                            "embeds": [
+                              {
+                                "title": "{{inputs.parameters.embed-title}}",
+                                "color": {{inputs.parameters.embed-color}},
+                                "fields": [
+                                  { "name": "status", "value": "{{inputs.parameters.embed-status}}", "inline": true },
+                                  { "name": "branch", "value": "{{workflow.parameters.target-branch}}", "inline": true },
+                                  { "name": "tag", "value": "{{workflow.parameters.tag-name}}", "inline": true },
+                                  { "name": "workflow", "value": "[{{workflow.name}}](${ARGO_WORKFLOWS_BASE_URL}/workflows/{{workflow.namespace}}/{{workflow.name}})", "inline": false }
+                                ]
+                              }
+                            ]
+                          }
+                          EOF
+                          )
+                          curl -fSs -X POST \
+                            -H "Content-Type: application/json" \
+                            --data "${payload}" \
+                            "${DISCORD_WEBHOOK_URL}"
           parameters:
             - src:
                 dependencyName: from-seichiassist-downloader
