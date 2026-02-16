@@ -124,7 +124,7 @@ spec:
                         - name: embed-title
                         - name: embed-color
                     container:
-                      image: curlimages/curl:8.16.0
+                      image: curlimages/curl:8.18.0
                       env:
                         - name: DISCORD_WEBHOOK_URL
                           valueFrom:
