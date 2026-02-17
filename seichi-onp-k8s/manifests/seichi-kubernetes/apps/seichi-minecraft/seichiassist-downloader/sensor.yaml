@@ -152,10 +152,10 @@ spec:
                           template: send-discord-embed
                           arguments:
                             parameters:
-                              - name: embed-status
-                                value: 成功
                               - name: embed-title
-                                value: "デバッグサーバー向けの SeichiAssist がリリースされました"
+                                value: "SeichiAssist がデバッグサーバーに配置されました"
+                              - name: embed-description
+                                value: "新しいバージョンのプラグインが配置され、サーバーが再起動されました。"
                               - name: embed-color
                                 value: "5763719"
                       - - name: notify-failed-on-develop
@@ -163,17 +163,17 @@ spec:
                           template: send-discord-embed
                           arguments:
                             parameters:
-                              - name: embed-status
-                                value: 失敗
                               - name: embed-title
-                                value: "デバッグサーバー向けの SeichiAssist のリリースが行われましたが、配置に失敗しました"
+                                value: "SeichiAssist のデバッグサーバーへの配置に失敗しました"
+                              - name: embed-description
+                                value: ""
                               - name: embed-color
                                 value: "15548997"
                   - name: send-discord-embed
                     inputs:
                       parameters:
-                        - name: embed-status
                         - name: embed-title
+                        - name: embed-description
                         - name: embed-color
                     container:
                       image: curlimages/curl:8.18.0
@@ -183,8 +183,6 @@ spec:
                             secretKeyRef:
                               name: seichiassist-downloader-develop-release-notify-webhook
                               key: DISCORD_WEBHOOK_URL
-                        - name: ARGO_WORKFLOWS_BASE_URL
-                          value: "https://argo-workflows.onp-k8s.admin.seichi.click"
                       command: [sh, -ceu]
                       args:
                         - |
@@ -193,12 +191,11 @@ spec:
                             "embeds": [
                               {
                                 "title": "{{inputs.parameters.embed-title}}",
+                                "description": "{{inputs.parameters.embed-description}}",
                                 "color": {{inputs.parameters.embed-color}},
                                 "fields": [
-                                  { "name": "status", "value": "{{inputs.parameters.embed-status}}", "inline": true },
-                                  { "name": "branch", "value": "{{workflow.parameters.target-branch}}", "inline": true },
                                   { "name": "tag", "value": "{{workflow.parameters.tag-name}}", "inline": true },
-                                  { "name": "workflow", "value": "[{{workflow.name}}](${ARGO_WORKFLOWS_BASE_URL}/workflows/{{workflow.namespace}}/{{workflow.name}})", "inline": false }
+                                  { "name": "リリースページ", "value": "[{{workflow.parameters.tag-name}}](https://github.com/GiganticMinecraft/SeichiAssist/releases/tag/{{workflow.parameters.tag-name}})", "inline": false }
                                 ]
                               }
                             ]
