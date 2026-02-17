@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: seichiassist-downloader-debug-restart-role
+  namespace: seichi-debug-minecraft
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: seichiassist-downloader-debug-restart-binding
+  namespace: seichi-debug-minecraft
+subjects:
+  - kind: ServiceAccount
+    name: seichiassist-downloader-workflow-sa
+    namespace: seichi-minecraft
+roleRef:
+  kind: Role
+  name: seichiassist-downloader-debug-restart-role
+  apiGroup: rbac.authorization.k8s.io
