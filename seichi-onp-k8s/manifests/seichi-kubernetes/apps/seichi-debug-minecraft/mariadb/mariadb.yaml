@@ -79,7 +79,7 @@ spec:
             find /docker-entrypoint-initdb.d -type d -exec chmod 755 {} +
             find /docker-entrypoint-initdb.d -type f -exec chmod 644 {} +
           fi
-    - name: copy-debug-migrations
+    - name: add-debug-migrations
       image: busybox:1.37.0
       command:
         - sh
@@ -87,12 +87,10 @@ spec:
       args:
         - |
           set -eu
-          cp /debug-migrations/*.sql /docker-entrypoint-initdb.d/
-      volumeMounts:
-        - mountPath: /docker-entrypoint-initdb.d
-          name: sqldump-volume
-        - mountPath: /debug-migrations
-          name: debug-migrations
+          cat > /docker-entrypoint-initdb.d/40-debug-server-migrations.sql << 'EOSQL'
+          USE seichiassist;
+          UPDATE item_migration_in_server_world_levels SET server_id = 'deb-s1' WHERE server_id = 's1';
+          EOSQL
 
   tls:
     enabled: false
@@ -180,6 +178,3 @@ spec:
     # 本番サーバーからもってきた sqldump をマウントするためのボリューム
     - name: sqldump-volume
       emptyDir: {}
-    - name: debug-migrations
-      configMap:
-        name: debug-db-migrations
