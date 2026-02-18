@@ -79,6 +79,20 @@ spec:
             find /docker-entrypoint-initdb.d -type d -exec chmod 755 {} +
             find /docker-entrypoint-initdb.d -type f -exec chmod 644 {} +
           fi
+    - name: copy-debug-migrations
+      image: busybox:1.37.0
+      command:
+        - sh
+        - -c
+      args:
+        - |
+          set -eu
+          cp /debug-migrations/*.sql /docker-entrypoint-initdb.d/
+      volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: sqldump-volume
+        - mountPath: /debug-migrations
+          name: debug-migrations
 
   tls:
     enabled: false
@@ -166,3 +180,6 @@ spec:
     # 本番サーバーからもってきた sqldump をマウントするためのボリューム
     - name: sqldump-volume
       emptyDir: {}
+    - name: debug-migrations
+      configMap:
+        name: debug-db-migrations

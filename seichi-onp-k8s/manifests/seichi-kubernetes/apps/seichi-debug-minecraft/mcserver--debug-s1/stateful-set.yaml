@@ -65,6 +65,57 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: world-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: mc-worlds
+            - name: BUCKET_PREFIX_NAME
+              value: s1
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-worlds
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /downloaded-worlds
+        - name: world-extractor
+          image: alpine:3.21
+          command:
+            - "sh"
+            - "-ce"
+            - |
+              apk add --no-cache zstd
+              echo "Extracting world data..."
+              for f in /downloaded-worlds/*.tar.zst; do
+                [ -e "${f}" ] || { echo "No tar.zst files found"; exit 1; }
+                echo "Extracting: ${f}"
+                tar --use-compress-program=unzstd -xf "${f}" -C /downloaded-worlds
+              done
+              echo "Moving extracted files to top-level..."
+              for dir in /downloaded-worlds/host-vmfilebk--*; do
+                [ -d "${dir}" ] || continue
+                mv "${dir}"/* /downloaded-worlds/
+                rmdir "${dir}"
+              done
+              chown -R 1000:1000 /downloaded-worlds/
+              echo "Cleaning up tar.zst files..."
+              rm -f /downloaded-worlds/*.tar.zst
+              echo "World data extraction complete."
+              ls -la /downloaded-worlds/
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /downloaded-worlds
 
       containers:
         - resources:
@@ -303,12 +354,16 @@ spec:
             - name: worldedit-schematica-volume
               mountPath: /worldedit-schematica
 
-            # - name: mcserver--debug-s1-data
-            #   mountPath: /data
+            - name: world-download-volume
+              mountPath: /data
 
       volumes:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
+          emptyDir: {}
+
+        # MinIOからダウンロードしたワールドデータを展開してMinecraftに受け渡すためのvolume
+        - name: world-download-volume
           emptyDir: {}
 
         # WorldEditがSchematicaを保存・読み取るするためのvolume
