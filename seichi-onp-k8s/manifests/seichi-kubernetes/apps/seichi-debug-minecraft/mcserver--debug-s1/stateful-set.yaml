@@ -168,6 +168,9 @@ spec:
                   name: mariadb
                   key: coreprotect-password
 
+            - name: CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME
+              value: debug-s1
+
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
               value: mariadb
 
