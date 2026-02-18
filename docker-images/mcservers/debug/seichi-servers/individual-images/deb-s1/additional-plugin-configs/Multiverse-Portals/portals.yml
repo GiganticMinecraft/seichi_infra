@@ -1,0 +1,261 @@
+portals:
+  world_2->world_SW:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -20.0,64.0,-19.0:-20.0,65.0,-19.0
+    world: world_2
+    destination: world_SW
+  world_2->world_SW_2:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -18.0,64.0,-19.0:-18.0,65.0,-19.0
+    world: world_2
+    destination: world_SW_2
+  world_2->world_SW_3:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -16.0,64.0,-19.0:-16.0,65.0,-19.0
+    world: world_2
+    destination: world_SW_3
+  world_2->world_SW_4:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -14.0,64.0,-19.0:-14.0,65.0,-19.0
+    world: world_2
+    destination: world_SW_4
+  world_2->world_SW_nether:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -12.0,64.0,-19.0:-12.0,65.0,-19.0
+    world: world_2
+    destination: world_SW_nether
+  world_2->world_SW_the_end:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -10.0,64.0,-19.0:-10.0,65.0,-19.0
+    world: world_2
+    destination: world_SW_the_end
+  world_2->world_build:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -12.0,64.0,3.0:-12.0,65.0,3.0
+    world: world_2
+    destination: world_build
+  world_build->world_2:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1520.0,63.0,1518.0:-1519.0,72.0,1519.0
+    world: world_build
+    destination: world_2
+  world_build->world_dot:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1520.0,63.0,1495.0:-1519.0,72.0,1496.0
+    world: world_build
+    destination: world_dot
+  world_dot->world_2:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -5.0,4.0,-20.0:-4.0,13.0,-19.0
+    world: world_dot
+    destination: world_2
+  world_build-spawn->world_build-staff:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1497.0,63.0,1518.0:-1496.0,72.0,1519.0
+    world: world_build
+    destination: e:world_build:-1571.3413976555328,64.0625,1292.5375133085488:12.599992:-178.95123
+  world_build-spawn->world_build-wonderland:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1537.0,63.0,1496.0:-1537.0,72.0,1498.0
+    world: world_build
+    destination: e:world_build:-2467.5,73.0,6544.5:28.800018:-178.94714
+  world_build-spawn->world_build-fantasyland:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1537.0,63.0,1492.0:-1537.0,72.0,1494.0
+    world: world_build
+    destination: e:world_build:-8002.58402507707,66.0,4016.9579483223297:12.599957:-359.09875
+  world_build-spawn->world_build-kinoko:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1537.0,63.0,1488.0:-1537.0,72.0,1490.0
+    world: world_build
+    destination: e:world_build:-4192.5,63.0,5077.5:16.799936:-88.49936
+  world_build-spawn->world_build-world_tree:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1537.0,63.0,1484.0:-1537.0,72.0,1486.0
+    world: world_build
+    destination: e:world_build:-3061.5439167225168,74.0,3000.806308525215:0.9000037:-267.59933
+  world_build-spawn->world_build-steampank:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1531.0,63.0,1478.0:-1529.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:-4507.44177926672,106.0,202.68822281434495:5.3999786:-179.09991
+  world_build-spawn->world_build-iceland:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1527.0,63.0,1478.0:-1525.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:-6217.5,70.0,-2737.5:8.700081:-177.15015
+  world_build-spawn->world_build-wind_valley:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1523.0,63.0,1478.0:-1521.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:-3471.5,150.0,-5236.5:-2.6999905:-270.7503
+  world_build-spawn->world_build-kyoto:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1519.0,63.0,1478.0:-1517.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:-232.50198020314474,63.0,-742.3100289346768:2.0998983:-267.74927
+  world_build-spawn->world_build-factory:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1499.0,63.0,1478.0:-1497.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:2797.490011022892,64.0,-4592.208075492689:-5.849882:-359.2501
+  world_build-spawn->world_build-town:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1495.0,63.0,1478.0:-1493.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:4700.477602022467,64.0,-4270.793180124514:-12.89999:-179.09941
+  world_build-spawn->world_build-city:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1491.0,63.0,1478.0:-1489.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:5197.442759719183,73.0,-5497.30213723083:-2.2499678:-178.19966
+  world_build-spawn->world_build-mesa:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1487.0,63.0,1478.0:-1485.0,72.0,1478.0
+    world: world_build
+    destination: e:world_build:3471.5,88.0,66.5:0.45006487:-266.09976
+  world_build-spawn->world_build-taj_mahal:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1479.0,63.0,1484.0:-1479.0,72.0,1486.0
+    world: world_build
+    destination: e:world_build:1387.6884738548856,70.0,2917.499464455359:14.550071:-91.20015
+  world_build-spawn->world_build-sea_city:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1479.0,63.0,1488.0:-1479.0,72.0,1490.0
+    world: world_build
+    destination: e:world_build:2272.5,63.0,5542.5:-1.6499683:-181.20016
+  world_build-spawn->world_build-harbor:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1479.0,63.0,1492.0:-1479.0,72.0,1494.0
+    world: world_build
+    destination: e:world_build:746.5,63.0,6758.5:9.449991:-172.04955
