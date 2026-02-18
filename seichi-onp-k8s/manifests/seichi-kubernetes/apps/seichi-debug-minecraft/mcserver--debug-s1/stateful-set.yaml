@@ -100,7 +100,7 @@ spec:
               for f in /downloaded-worlds/*.tar.zst; do
                 [ -e "${f}" ] || { echo "No tar.zst files found"; exit 1; }
                 echo "Extracting: ${f}"
-                tar --use-compress-program=unzstd -xf "${f}" -C /downloaded-worlds
+                unzstd -c "${f}" | tar -xf - -C /downloaded-worlds
               done
               echo "Moving extracted files to top-level..."
               for dir in /downloaded-worlds/host-vmfilebk--*; do
