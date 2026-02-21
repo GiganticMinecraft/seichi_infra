@@ -38,7 +38,7 @@ spec:
 
           echo "=== Installing proxmox-backup-client ==="
           apt update
-          apt install -y curl zstd
+          apt install -y curl zstd python3
 
           echo "Adding Proxmox Backup Client repository..."
           echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
