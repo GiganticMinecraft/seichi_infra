@@ -116,14 +116,14 @@ spec:
             FILENAME="${WORLD_NAME}-${TIMESTAMP}.tar.zst"
 
             echo "--- Compressing ${WORLD_NAME} ---"
-            tar cf - -C "$WORLD_DIR" . | zstd -o "/tmp/${FILENAME}"
-            echo "Compressed file size: $(du -h /tmp/${FILENAME} | cut -f1)"
+            tar cf - -C "$WORLD_DIR" . | zstd -o "/restore/tmp-${FILENAME}"
+            echo "Compressed file size: $(du -h /restore/tmp-${FILENAME} | cut -f1)"
 
             echo "--- Uploading ${WORLD_NAME} ---"
-            /usr/local/bin/mc cp "/tmp/${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+            /usr/local/bin/mc cp "/restore/tmp-${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
             echo "Uploaded: mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
 
-            rm -f "/tmp/${FILENAME}"
+            rm -f "/restore/tmp-${FILENAME}"
           done
 
           echo "=== All worlds uploaded ==="
@@ -169,9 +169,6 @@ spec:
           - name: work-volume
             mountPath: /restore
             subPath: restore
-          - name: work-volume
-            mountPath: /tmp
-            subPath: tmp
           # /root/.cache が overlayfs 配下だとスクリプトがこけるので O_TMPFILE フラグ付きの openat(2) が実行可能なファイルシステムをマウントする
           # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
           - name: work-volume
