@@ -11,20 +11,21 @@ spec:
     secondsAfterCompletion: 86400
   activeDeadlineSeconds: 7200 # 2時間でタイムアウト（リストア+圧縮+アップロードに時間がかかる可能性）
   entrypoint: default
-  arguments:
-    parameters:
-      - name: server-names
-        value: '["s1", "s2"]'
   templates:
     - name: default
       steps:
-        - - name: restore-and-upload
+        - - name: restore-and-upload-s1
             template: restore-and-upload
             arguments:
               parameters:
                 - name: server-name
-                  value: "{{item}}"
-            withParam: "{{workflow.parameters.server-names}}"
+                  value: "s1"
+        - - name: restore-and-upload-s2
+            template: restore-and-upload
+            arguments:
+              parameters:
+                - name: server-name
+                  value: "s2"
 
     - name: restore-and-upload
       inputs:
