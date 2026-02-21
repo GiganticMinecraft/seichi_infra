@@ -1,0 +1,141 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: upload-world-to-minio
+  namespace: seichi-debug-minecraft
+  annotations:
+    workflows.argoproj.io/description: "最新PBSバックアップからワールドデータを抽出し、MinIOにアップロードするワークフロー"
+spec:
+  serviceAccountName: upload-world-to-minio-workflow-sa
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  activeDeadlineSeconds: 7200 # 2時間でタイムアウト（リストア+圧縮+アップロードに時間がかかる可能性）
+  entrypoint: default
+  arguments:
+    parameters:
+      - name: server-names
+        value: '["s1", "s2"]'
+  templates:
+    - name: default
+      steps:
+        - - name: restore-and-upload
+            template: restore-and-upload
+            arguments:
+              parameters:
+                - name: server-name
+                  value: "{{item}}"
+            withParam: "{{workflow.parameters.server-names}}"
+
+    - name: restore-and-upload
+      inputs:
+        parameters:
+          - name: server-name
+      script:
+        image: debian:13
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+
+          echo "=== Installing proxmox-backup-client ==="
+          apt update
+          apt install -y curl zstd
+
+          echo "Adding Proxmox Backup Client repository..."
+          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
+          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
+
+          apt update
+          apt install -y proxmox-backup-client=4.0.14-1
+
+          echo "=== Finding latest {{inputs.parameters.server-name}} snapshot ==="
+          LATEST_SNAPSHOT=$(proxmox-backup-client snapshot list \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
+            --output-format json \
+            | python3 -c "
+          import json, sys
+          snapshots = json.load(sys.stdin)
+          s1_snapshots = [s for s in snapshots if s['backup-id'] == 'mcserver--{{inputs.parameters.server-name}}']
+          if not s1_snapshots:
+              print('No mcserver--{{inputs.parameters.server-name}} snapshots found', file=sys.stderr)
+              sys.exit(1)
+          latest = max(s1_snapshots, key=lambda s: s['backup-time'])
+          print(f\"host/mcserver--{{inputs.parameters.server-name}}/{latest['backup-time']}\")
+          ")
+          echo "Latest snapshot: ${LATEST_SNAPSHOT}"
+
+          echo "=== Restoring from PBS ==="
+          proxmox-backup-client restore "${LATEST_SNAPSHOT}" \
+            data.pxar /restore \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+
+          echo "=== Restore contents ==="
+          ls -la /restore/
+
+          echo "=== Installing MinIO client ==="
+          curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
+          chmod +x /usr/local/bin/mc
+
+          echo "=== Configuring MinIO client ==="
+          /usr/local/bin/mc alias set myminio "http://seichi-private-plugin-blackhole-minio.minio:9000" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
+
+          echo "=== Compressing and uploading ==="
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          FILENAME="backup-${TIMESTAMP}.tar.zst"
+
+          tar cf - -C /restore . | zstd -o "/tmp/${FILENAME}"
+          echo "Compressed file size: $(du -h /tmp/${FILENAME} | cut -f1)"
+
+          /usr/local/bin/mc cp "/tmp/${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+
+          echo "=== Upload complete ==="
+          echo "Uploaded: mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+        env:
+          - name: TZ
+            value: "Asia/Tokyo"
+          - name: PBS_USER
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: user
+          - name: PBS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: host
+          - name: PBS_DATASTORE
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: datastore
+          - name: PBS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: password
+          - name: PBS_FINGERPRINT
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: fingerprint
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-access-secret
+                key: MINIO_ACCESS_KEY
+          - name: MINIO_ACCESS_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: minio-access-secret
+                key: MINIO_ACCESS_SECRET
+        volumeMounts:
+          - name: restore-volume
+            mountPath: /restore
+          # /root/.cache が overlayfs 配下だとスクリプトがこけるので O_TMPFILE フラグ付きの openat(2) が実行可能なファイルシステムをマウントする
+          # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
+          - name: pbs-tmpfs
+            mountPath: /root/.cache
+  volumes:
+    - name: restore-volume
+      emptyDir: {}
+    - name: pbs-tmpfs
+      emptyDir: {}
