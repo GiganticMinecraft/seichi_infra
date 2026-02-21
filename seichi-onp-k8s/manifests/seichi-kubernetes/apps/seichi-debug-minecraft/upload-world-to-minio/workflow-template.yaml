@@ -36,6 +36,7 @@ spec:
         source: |
           set -e
 
+          rm -rf /work/restore /work/pbs-cache
           mkdir -p /work/restore /work/pbs-cache
 
           echo "=== Installing proxmox-backup-client ==="
