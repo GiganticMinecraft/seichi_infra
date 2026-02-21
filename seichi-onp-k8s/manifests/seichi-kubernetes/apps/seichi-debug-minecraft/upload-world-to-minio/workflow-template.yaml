@@ -78,17 +78,36 @@ spec:
           echo "=== Configuring MinIO client ==="
           /usr/local/bin/mc alias set myminio "http://seichi-private-plugin-blackhole-minio.minio:9000" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
 
-          echo "=== Compressing and uploading ==="
+          echo "=== Finding world directories (containing playerdata/) ==="
+          WORLD_DIRS=$(find /restore -type d -name playerdata | while read -r pd; do dirname "$pd"; done)
+
+          if [ -z "$WORLD_DIRS" ]; then
+            echo "ERROR: No world directories (containing playerdata/) found in backup"
+            exit 1
+          fi
+
+          echo "Found world directories:"
+          echo "$WORLD_DIRS"
+
+          echo "=== Compressing and uploading each world ==="
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          FILENAME="backup-${TIMESTAMP}.tar.zst"
 
-          tar cf - -C /restore . | zstd -o "/tmp/${FILENAME}"
-          echo "Compressed file size: $(du -h /tmp/${FILENAME} | cut -f1)"
+          echo "$WORLD_DIRS" | while read -r WORLD_DIR; do
+            WORLD_NAME=$(basename "$WORLD_DIR")
+            FILENAME="${WORLD_NAME}-${TIMESTAMP}.tar.zst"
 
-          /usr/local/bin/mc cp "/tmp/${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+            echo "--- Compressing ${WORLD_NAME} ---"
+            tar cf - -C "$WORLD_DIR" . | zstd -o "/tmp/${FILENAME}"
+            echo "Compressed file size: $(du -h /tmp/${FILENAME} | cut -f1)"
 
-          echo "=== Upload complete ==="
-          echo "Uploaded: mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+            echo "--- Uploading ${WORLD_NAME} ---"
+            /usr/local/bin/mc cp "/tmp/${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+            echo "Uploaded: mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+
+            rm -f "/tmp/${FILENAME}"
+          done
+
+          echo "=== All worlds uploaded ==="
         env:
           - name: TZ
             value: "Asia/Tokyo"
