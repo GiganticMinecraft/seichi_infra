@@ -36,6 +36,8 @@ spec:
         source: |
           set -e
 
+          mkdir -p /work/restore /work/pbs-cache
+
           echo "=== Installing proxmox-backup-client ==="
           apt update
           apt install -y curl zstd python3
@@ -66,16 +68,16 @@ spec:
 
           echo "=== Restoring from PBS ==="
           proxmox-backup-client restore "${LATEST_SNAPSHOT}" \
-            data.pxar /restore \
+            data.pxar /work/restore \
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
 
           echo "=== Restore contents ==="
-          ls -la /restore/
+          ls -la /work/restore/
 
           echo "=== Removing non-world data to free disk space ==="
           # ワールドデータ（playerdata/ を含むディレクトリ）以外を削除する
-          WORLD_DIRS=$(find /restore -type d -name playerdata -exec dirname {} \;)
-          find /restore -mindepth 1 -maxdepth 1 -print0 | while IFS= read -r -d '' entry; do
+          WORLD_DIRS=$(find /work/restore -type d -name playerdata -exec dirname {} \;)
+          find /work/restore -mindepth 1 -maxdepth 1 -print0 | while IFS= read -r -d '' entry; do
             IS_WORLD=false
             for wd in $WORLD_DIRS; do
               case "$wd" in
@@ -88,7 +90,7 @@ spec:
             fi
           done
           echo "Remaining contents after cleanup:"
-          ls -la /restore/
+          ls -la /work/restore/
 
           echo "=== Installing MinIO client ==="
           curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
@@ -98,7 +100,7 @@ spec:
           /usr/local/bin/mc alias set myminio "http://seichi-private-plugin-blackhole-minio.minio:9000" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
 
           echo "=== Finding world directories (containing playerdata/) ==="
-          WORLD_DIRS=$(find /restore -type d -name playerdata | while read -r pd; do dirname "$pd"; done)
+          WORLD_DIRS=$(find /work/restore -type d -name playerdata | while read -r pd; do dirname "$pd"; done)
 
           if [ -z "$WORLD_DIRS" ]; then
             echo "ERROR: No world directories (containing playerdata/) found in backup"
@@ -116,14 +118,14 @@ spec:
             FILENAME="${WORLD_NAME}-${TIMESTAMP}.tar.zst"
 
             echo "--- Compressing ${WORLD_NAME} ---"
-            tar cf - -C "$WORLD_DIR" . | zstd -o "/restore/tmp-${FILENAME}"
-            echo "Compressed file size: $(du -h /restore/tmp-${FILENAME} | cut -f1)"
+            tar cf - -C "$WORLD_DIR" . | zstd -o "/work/tmp-${FILENAME}"
+            echo "Compressed file size: $(du -h /work/tmp-${FILENAME} | cut -f1)"
 
             echo "--- Uploading ${WORLD_NAME} ---"
-            /usr/local/bin/mc cp "/restore/tmp-${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+            /usr/local/bin/mc cp "/work/tmp-${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
             echo "Uploaded: mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
 
-            rm -f "/restore/tmp-${FILENAME}"
+            rm -f "/work/tmp-${FILENAME}"
           done
 
           echo "=== All worlds uploaded ==="
@@ -167,8 +169,7 @@ spec:
                 key: MINIO_ACCESS_SECRET
         volumeMounts:
           - name: work-volume
-            mountPath: /restore
-            subPath: restore
+            mountPath: /work
           # /root/.cache が overlayfs 配下だとスクリプトがこけるので O_TMPFILE フラグ付きの openat(2) が実行可能なファイルシステムをマウントする
           # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
           - name: work-volume
