@@ -177,12 +177,12 @@ spec:
           - name: work-volume
             mountPath: /root/.cache
             subPath: pbs-cache
-      # NOTE: 本当はエフェメラルボリュームにしたかったが、ワールドデータが巨大すぎてできなかったので PVC を使用している
-      volumeClaimTemplates:
-        - metadata:
-            name: work-volume
-          spec:
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 40Gi
+  # NOTE: 本当はエフェメラルボリュームにしたかったが、ワールドデータが巨大すぎてできなかったので PVC を使用している
+  volumeClaimTemplates:
+    - metadata:
+        name: work-volume
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 40Gi
