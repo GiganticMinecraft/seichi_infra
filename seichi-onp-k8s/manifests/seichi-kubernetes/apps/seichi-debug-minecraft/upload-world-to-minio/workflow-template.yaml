@@ -166,14 +166,23 @@ spec:
                 name: minio-access-secret
                 key: MINIO_ACCESS_SECRET
         volumeMounts:
-          - name: restore-volume
+          - name: work-volume
             mountPath: /restore
+            subPath: restore
+          - name: work-volume
+            mountPath: /tmp
+            subPath: tmp
           # /root/.cache が overlayfs 配下だとスクリプトがこけるので O_TMPFILE フラグ付きの openat(2) が実行可能なファイルシステムをマウントする
           # refs: https://gist.github.com/unchama/0922fce3c490e46b6f9e822f4377853e
-          - name: pbs-tmpfs
+          - name: work-volume
             mountPath: /root/.cache
-  volumes:
-    - name: restore-volume
-      emptyDir: {}
-    - name: pbs-tmpfs
-      emptyDir: {}
+            subPath: pbs-cache
+      # NOTE: 本当はエフェメラルボリュームにしたかったが、ワールドデータが巨大すぎてできなかったので PVC を使用している
+      volumeClaimTemplates:
+        - metadata:
+            name: work-volume
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 40Gi
