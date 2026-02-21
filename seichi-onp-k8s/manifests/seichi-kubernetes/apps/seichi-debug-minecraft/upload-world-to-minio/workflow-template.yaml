@@ -52,14 +52,15 @@ spec:
             --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
             --output-format json \
             | python3 -c "
-          import json, sys
+          import json, sys, datetime
           snapshots = json.load(sys.stdin)
           s1_snapshots = [s for s in snapshots if s['backup-id'] == 'mcserver--{{inputs.parameters.server-name}}']
           if not s1_snapshots:
               print('No mcserver--{{inputs.parameters.server-name}} snapshots found', file=sys.stderr)
               sys.exit(1)
           latest = max(s1_snapshots, key=lambda s: s['backup-time'])
-          print(f\"host/mcserver--{{inputs.parameters.server-name}}/{latest['backup-time']}\")
+          ts = datetime.datetime.fromtimestamp(latest['backup-time'], tz=datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          print(f\"host/mcserver--{{inputs.parameters.server-name}}/{ts}\")
           ")
           echo "Latest snapshot: ${LATEST_SNAPSHOT}"
 
