@@ -68,30 +68,14 @@ spec:
           ")
           echo "Latest snapshot: ${LATEST_SNAPSHOT}"
 
-          echo "=== Restoring from PBS ==="
+          echo "=== Restoring world directories from PBS ==="
           proxmox-backup-client restore "${LATEST_SNAPSHOT}" \
             data.pxar /work/restore \
-            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
+            --pattern '/world_*/**' \
+            --pattern '/world_*'
 
           echo "=== Restore contents ==="
-          ls -la /work/restore/
-
-          echo "=== Removing non-world data to free disk space ==="
-          # ワールドデータ（playerdata/ を含むディレクトリ）以外を削除する
-          WORLD_DIRS=$(find /work/restore -type d -name playerdata -exec dirname {} \;)
-          find /work/restore -mindepth 1 -maxdepth 1 -print0 | while IFS= read -r -d '' entry; do
-            IS_WORLD=false
-            for wd in $WORLD_DIRS; do
-              case "$wd" in
-                "$entry"|"$entry"/*) IS_WORLD=true; break ;;
-              esac
-            done
-            if [ "$IS_WORLD" = false ]; then
-              echo "Removing: $entry"
-              rm -rf "$entry"
-            fi
-          done
-          echo "Remaining contents after cleanup:"
           ls -la /work/restore/
 
           echo "=== Installing MinIO client ==="
