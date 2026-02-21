@@ -72,6 +72,24 @@ spec:
           echo "=== Restore contents ==="
           ls -la /restore/
 
+          echo "=== Removing non-world data to free disk space ==="
+          # ワールドデータ（playerdata/ を含むディレクトリ）以外を削除する
+          WORLD_DIRS=$(find /restore -type d -name playerdata -exec dirname {} \;)
+          find /restore -mindepth 1 -maxdepth 1 -print0 | while IFS= read -r -d '' entry; do
+            IS_WORLD=false
+            for wd in $WORLD_DIRS; do
+              case "$wd" in
+                "$entry"|"$entry"/*) IS_WORLD=true; break ;;
+              esac
+            done
+            if [ "$IS_WORLD" = false ]; then
+              echo "Removing: $entry"
+              rm -rf "$entry"
+            fi
+          done
+          echo "Remaining contents after cleanup:"
+          ls -la /restore/
+
           echo "=== Installing MinIO client ==="
           curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
           chmod +x /usr/local/bin/mc
