@@ -20,12 +20,26 @@ spec:
               parameters:
                 - name: server-name
                   value: "s1"
+        - - name: cleanup-after-s1
+            template: cleanup
         - - name: restore-and-upload-s2
             template: restore-and-upload
             arguments:
               parameters:
                 - name: server-name
                   value: "s2"
+
+    - name: cleanup
+      script:
+        image: debian:13
+        command: ["/bin/sh", "-c"]
+        source: |
+          echo "=== Cleaning up work directory ==="
+          rm -rf /work/restore /work/pbs-cache /work/*.tar.zst
+          echo "Cleanup complete"
+        volumeMounts:
+          - name: work-volume
+            mountPath: /work
 
     - name: restore-and-upload
       inputs:
@@ -85,23 +99,17 @@ spec:
           echo "=== Configuring MinIO client ==="
           /usr/local/bin/mc alias set myminio "http://seichi-private-plugin-blackhole-minio.minio:9000" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
 
-          echo "=== Finding world directories (containing playerdata/) ==="
-          WORLD_DIRS=$(find /work/restore -type d -name playerdata | while read -r pd; do dirname "$pd"; done)
-
-          if [ -z "$WORLD_DIRS" ]; then
-            echo "ERROR: No world directories (containing playerdata/) found in backup"
-            exit 1
-          fi
-
-          echo "Found world directories:"
-          echo "$WORLD_DIRS"
-
           echo "=== Compressing and uploading each world ==="
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          WORLD_NAMES="world_2 world_2_the_end world_SW world_SW_2 world_SW_3 world_SW_4 world_SW_nether world_SW_the_end"
 
-          echo "$WORLD_DIRS" | while read -r WORLD_DIR; do
-            WORLD_NAME=$(basename "$WORLD_DIR")
-            FILENAME="${WORLD_NAME}-${TIMESTAMP}.tar.zst"
+          for WORLD_NAME in $WORLD_NAMES; do
+            WORLD_DIR="/work/restore/${WORLD_NAME}"
+            if [ ! -d "$WORLD_DIR" ]; then
+              echo "WARNING: ${WORLD_NAME} not found in backup, skipping"
+              continue
+            fi
+
+            FILENAME="${WORLD_NAME}.tar.zst"
 
             echo "--- Compressing ${WORLD_NAME} ---"
             tar cf - -C "$WORLD_DIR" . | zstd -o "/work/tmp-${FILENAME}"
