@@ -70,10 +70,10 @@ spec:
         - resources:
             requests:
               cpu: 8
-              memory: 22Gi
+              memory: 26Gi
             limits:
               cpu: 10
-              memory: 22Gi
+              memory: 26Gi
           env:
             - name: MEMORY
               value: 16G
@@ -99,8 +99,9 @@ spec:
 
             - name: JVM_XX_OPTS
               value: >-
-                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError 
+                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
 
             - name: ENABLE_JMX
               value: "true"

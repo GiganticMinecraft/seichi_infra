@@ -60,6 +60,12 @@ spec:
             - name: EULA
               value: "TRUE"
 
+            - name: JVM_XX_OPTS
+              value: >-
+                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
+                -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
+
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
               # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
