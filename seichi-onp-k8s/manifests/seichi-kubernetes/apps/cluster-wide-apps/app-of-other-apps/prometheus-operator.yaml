@@ -43,7 +43,7 @@ spec:
               isDefaultDatasource: false
             dashboards:
               enabled: true
-              defaultFolderName: "General"
+              defaultFolderName: ""
               label: grafana_dashboard
               labelValue: "1"
               folderAnnotation: grafana_folder
@@ -52,7 +52,6 @@ spec:
                 foldersFromFilesStructure: true
           defaultDashboardsTimezone: Asia/Tokyo
           plugins:
-            - grafana-piechart-panel
             - isovalent-hubble-datasource
             - grafana-sentry-datasource
           grafana.ini:
