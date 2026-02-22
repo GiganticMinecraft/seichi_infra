@@ -99,14 +99,10 @@ spec:
               echo "Extracting world data..."
               for f in /downloaded-worlds/*.tar.zst; do
                 [ -e "${f}" ] || { echo "No tar.zst files found"; exit 1; }
-                echo "Extracting: ${f}"
-                unzstd -c "${f}" | tar -xf - -C /downloaded-worlds
-              done
-              echo "Moving extracted files to top-level..."
-              for dir in /downloaded-worlds/host-vmfilebk--*; do
-                [ -d "${dir}" ] || continue
-                mv "${dir}"/* /downloaded-worlds/
-                rmdir "${dir}"
+                BASENAME=$(basename "${f}" .tar.zst)
+                mkdir -p "/downloaded-worlds/${BASENAME}"
+                echo "Extracting: ${f} -> /downloaded-worlds/${BASENAME}"
+                unzstd -c "${f}" | tar -xf - -C "/downloaded-worlds/${BASENAME}"
               done
               chown -R 1000:1000 /downloaded-worlds/
               echo "Cleaning up tar.zst files..."
