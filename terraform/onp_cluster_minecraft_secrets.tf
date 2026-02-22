@@ -24,6 +24,7 @@ resource "kubernetes_secret" "onp_minecraft_debug_seichiassist_webhook_secrets" 
 
   data = {
     SEICHIASSIST_DEBUG_S1_WEBHOOK_URL = var.minecraft__debug_s1_seichiassist_webhook_url
+    SEICHIASSIST_DEBUG_S2_WEBHOOK_URL = var.minecraft__debug_s2_seichiassist_webhook_url
   }
 
   type = "Opaque"

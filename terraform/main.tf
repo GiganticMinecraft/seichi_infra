@@ -274,6 +274,12 @@ variable "minecraft__debug_s1_seichiassist_webhook_url" {
   sensitive   = true
 }
 
+variable "minecraft__debug_s2_seichiassist_webhook_url" {
+  description = "Webhook URL for SeichiAssist on s2 server in debug env"
+  type        = string
+  sensitive   = true
+}
+
 variable "seichiassist_downloader_develop_release_notify_webhook_url" {
   description = "Webhook URL for develop release notifications from seichiassist-downloader workflow"
   type        = string
