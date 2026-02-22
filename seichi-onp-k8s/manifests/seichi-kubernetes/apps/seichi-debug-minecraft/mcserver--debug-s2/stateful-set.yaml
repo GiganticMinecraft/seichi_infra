@@ -90,7 +90,7 @@ spec:
             - name: world-download-volume
               mountPath: /downloaded-worlds
         - name: world-extractor
-          image: alpine:3.21
+          image: alpine:3.23
           command:
             - "sh"
             - "-ce"
