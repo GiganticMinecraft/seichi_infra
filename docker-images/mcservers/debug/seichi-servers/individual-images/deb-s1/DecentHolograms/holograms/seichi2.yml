@@ -1,0 +1,18 @@
+location: world_2:-17.443:66.000:-16.557
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [整地２]'
+    height: 0.3
+  - content: '&a&l 保護あり'
+    height: 0.3
+  - content: 保護上限：256グリッド×2
+    height: 0.3
+  - content: '&c&l 初心者向け'
+    height: 0.3
+  actions: {}

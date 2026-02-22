@@ -1,0 +1,12 @@
+location: world_build:-1516.922:66.200:1517.192
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [Spawn行き]'
+    height: 0.3
+  actions: {}

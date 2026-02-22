@@ -1,0 +1,16 @@
+location: world_build:-1498.710:67.000:1516.345
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [staff credit]'
+    height: 0.3
+  - content: '&a&l 建築ワールドの創設に'
+    height: 0.3
+  - content: '&a&l ご協力下さったメンバーの展示場です'
+    height: 0.3
+  actions: {}

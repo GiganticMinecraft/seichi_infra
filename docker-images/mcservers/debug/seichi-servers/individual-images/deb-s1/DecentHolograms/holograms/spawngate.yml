@@ -1,0 +1,12 @@
+location: world_dot:-1.922:7.200:-16.777
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [spawn行き]'
+    height: 0.3
+  actions: {}

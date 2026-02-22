@@ -1,0 +1,16 @@
+location: world_build:-1533.743:66.200:1493.744
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [ファンタジーランド]'
+    height: 0.3
+  - content: '&a&l メルヘンテーマパークのある'
+    height: 0.3
+  - content: '&a&l 区画整理された街'
+    height: 0.3
+  actions: {}

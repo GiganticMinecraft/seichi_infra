@@ -1,0 +1,18 @@
+location: world_build:-1516.927:66.200:1498.206
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [ドット絵ワールド]'
+    height: 0.3
+  - content: '&a&l 建築ワールドではドット絵は禁止です'
+    height: 0.3
+  - content: '&a&l こちらにドット絵専用ワールドを'
+    height: 0.3
+  - content: '&a&l ご用意しています'
+    height: 0.3
+  actions: {}

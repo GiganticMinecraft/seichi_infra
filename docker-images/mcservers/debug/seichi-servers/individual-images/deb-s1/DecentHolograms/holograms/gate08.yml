@@ -1,0 +1,16 @@
+location: world_build:-1517.566:66.200:1481.072
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [ギガンティック☆京都]'
+    height: 0.3
+  - content: '&a&l 大きな湿地帯がある'
+    height: 0.3
+  - content: '&a&l 和風の街'
+    height: 0.3
+  actions: {}

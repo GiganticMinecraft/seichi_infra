@@ -1,0 +1,16 @@
+location: world_build:-1525.511:66.200:1480.870
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [アイスランド]'
+    height: 0.3
+  - content: '&a&l 雪の大陸'
+    height: 0.3
+  - content: '&a&l 美しく巨大な城と樹氷'
+    height: 0.3
+  actions: {}

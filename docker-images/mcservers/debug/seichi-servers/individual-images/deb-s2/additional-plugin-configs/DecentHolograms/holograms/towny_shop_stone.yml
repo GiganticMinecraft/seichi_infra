@@ -1,0 +1,16 @@
+location: world_towny:-4.436:67.200:21.523
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&e&l 鉱石・鉱物換金所'
+    height: 0.3
+  - content: '&b&l 販売するアイテムを持った状態で'
+    height: 0.3
+  - content: '&b&l 左クリックで販売できます'
+    height: 0.3
+  actions: {}

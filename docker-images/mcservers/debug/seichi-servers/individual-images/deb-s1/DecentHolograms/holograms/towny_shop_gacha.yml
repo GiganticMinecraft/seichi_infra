@@ -1,0 +1,16 @@
+location: world_towny:-4.345:67.000:-4.306
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&e&l ガチャ券換金所'
+    height: 0.3
+  - content: '&b&l 販売するアイテムを持った状態で'
+    height: 0.3
+  - content: '&b&l 左クリックで販売、右クリックで購入できます'
+    height: 0.3
+  actions: {}

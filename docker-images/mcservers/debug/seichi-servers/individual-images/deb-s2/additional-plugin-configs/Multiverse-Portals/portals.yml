@@ -1,0 +1,61 @@
+portals:
+  world_2->world_SW:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -10.0,63.0,-16.0:-9.0,63.0,-15.0
+    world: world_2
+    destination: world_SW
+  world_2->world_SW_2:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -8.0,63.0,-20.0:-7.0,63.0,-19.0
+    world: world_2
+    destination: world_SW_2
+  world_2->world_SW_3:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -5.0,63.0,-23.0:-4.0,63.0,-22.0
+    world: world_2
+    destination: world_SW_3
+  world_2->world_SW_4:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: -1.0,63.0,-25.0:0.0,63.0,-24.0
+    world: world_2
+    destination: world_SW_4
+  world_2->world_SW_nether:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: 23.0,63.0,-1.0:24.0,63.0,0.0
+    world: world_2
+    destination: world_SW_nether
+  world_2->world_SW_the_end:
+    entryfee:
+      amount: 0.0
+    safeteleport: true
+    teleportnonplayers: false
+    handlerscript: ''
+    owner: Lucky3028
+    location: 21.0,63.0,3.0:22.0,63.0,4.0
+    world: world_2
+    destination: world_SW_the_end
