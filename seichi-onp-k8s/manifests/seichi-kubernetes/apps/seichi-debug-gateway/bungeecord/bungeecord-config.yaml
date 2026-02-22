@@ -20,6 +20,10 @@ spec:
           address: mcserver--debug-s1.seichi-debug-minecraft:25565
           restricted: false
           motd: ''
+        debug-s2:
+          address: mcserver--debug-s2.seichi-debug-minecraft:25565
+          restricted: false
+          motd: ''
 
       listeners:
         - priorities:
