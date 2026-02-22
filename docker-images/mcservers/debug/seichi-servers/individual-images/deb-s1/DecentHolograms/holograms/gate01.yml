@@ -1,0 +1,16 @@
+location: world_build:-1534.013:66.200:1497.546
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [ワンダーランド]'
+    height: 0.3
+  - content: '&a&l 深い森の中にある'
+    height: 0.3
+  - content: '&a&l 物語のワンシーンのような地区'
+    height: 0.3
+  actions: {}

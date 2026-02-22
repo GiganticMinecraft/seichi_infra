@@ -1,0 +1,16 @@
+location: world_build:4700.479:67.200:-4272.325
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [南口|ギガンティックタウン]'
+    height: 0.3
+  - content: '&a&l ここから南は'
+    height: 0.3
+  - content: '&a&l現代都市区域です'
+    height: 0.3
+  actions: {}

@@ -1,0 +1,16 @@
+location: world_build:-1533.471:66.200:1485.517
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [世界樹]'
+    height: 0.3
+  - content: '&a&l ジャングルバイオーム'
+    height: 0.3
+  - content: '&a&l 海に面した深い森'
+    height: 0.3
+  actions: {}

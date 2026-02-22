@@ -1,0 +1,16 @@
+location: world_build:-1485.787:66.200:1481.461
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [メサの街]'
+    height: 0.3
+  - content: '&a&l メサバイオーム'
+    height: 0.3
+  - content: '&a&l 大きな湖のほとりに佇む美しい町'
+    height: 0.3
+  actions: {}

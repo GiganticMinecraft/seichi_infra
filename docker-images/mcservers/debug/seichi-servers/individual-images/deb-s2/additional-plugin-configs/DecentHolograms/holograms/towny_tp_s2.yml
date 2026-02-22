@@ -1,0 +1,14 @@
+location: world_towny:16.539:67.000:38.424
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l アドミンタウンの'
+    height: 0.3
+  - content: '&d&l 南端&b&lにワープします'
+    height: 0.3
+  actions: {}

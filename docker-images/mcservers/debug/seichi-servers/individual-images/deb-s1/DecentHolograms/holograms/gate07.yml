@@ -1,0 +1,16 @@
+location: world_build:-1521.543:66.200:1481.318
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [風の谷]'
+    height: 0.3
+  - content: '&a&l 山岳の地形を生かした'
+    height: 0.3
+  - content: '&a&l 風車の谷'
+    height: 0.3
+  actions: {}

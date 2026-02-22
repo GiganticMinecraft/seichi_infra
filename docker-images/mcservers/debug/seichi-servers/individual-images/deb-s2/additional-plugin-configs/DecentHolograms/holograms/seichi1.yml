@@ -1,0 +1,18 @@
+location: world_2:-7.329:66.000:-14.599
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [整地１]'
+    height: 0.3
+  - content: '&a&l 保護なし'
+    height: 0.3
+  - content: 金曜朝６時リセット
+    height: 0.3
+  - content: '&c&l 初心者向け'
+    height: 0.3
+  actions: {}

@@ -1,0 +1,16 @@
+location: world_build:-1529.673:66.200:1481.381
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [スチームパンク]'
+    height: 0.3
+  - content: '&a&l 鉱業をイメージした'
+    height: 0.3
+  - content: '&a&l 海に面した山岳地帯'
+    height: 0.3
+  actions: {}

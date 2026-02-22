@@ -1,0 +1,16 @@
+location: world_build:-1533.483:66.200:1489.580
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [きのこ島]'
+    height: 0.3
+  - content: '&a&l きのこバイオーム'
+    height: 0.3
+  - content: '&a&l 諸島、小島有り'
+    height: 0.3
+  actions: {}

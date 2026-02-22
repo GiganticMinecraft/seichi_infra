@@ -1,0 +1,18 @@
+location: world_build:4700.512:68.000:-4314.628
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [北口|ギガンティックシティ]'
+    height: 0.3
+  - content: '&a&lここから北は'
+    height: 0.3
+  - content: '&a&l高層ビル街です'
+    height: 0.3
+  - content: '&a&l※読み込み負荷が高くなります※'
+    height: 0.3
+  actions: {}

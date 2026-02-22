@@ -1,0 +1,12 @@
+location: world_2:24.486:67.500:-18.626
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l 林檎交換人'
+    height: 0.3
+  actions: {}

@@ -1,0 +1,14 @@
+location: world_2:-2.591:66.000:-20.579
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [整地３]'
+    height: 0.3
+  - content: '&a&l 保護なし'
+    height: 0.3
+  actions: {}
