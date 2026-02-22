@@ -1,0 +1,381 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mcserver--debug-s2
+  namespace: seichi-debug-minecraft
+  labels:
+    app: mcserver--debug-s2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcserver--debug-s2
+  template:
+    metadata:
+      labels:
+        app: mcserver--debug-s2
+        mcserver: debug-s2
+    spec:
+      initContainers:
+        - name: mod-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: deb-1-18-2
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
+        - name: seichiassist-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: seichiassist
+            - name: BUCKET_PREFIX_NAME
+              value: develop
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
+        - name: world-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: mc-worlds
+            - name: BUCKET_PREFIX_NAME
+              value: s2
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-worlds
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /downloaded-worlds
+        - name: world-extractor
+          image: alpine:3.21
+          command:
+            - "sh"
+            - "-ce"
+            - |
+              apk add --no-cache zstd
+              echo "Extracting world data..."
+              for f in /downloaded-worlds/*.tar.zst; do
+                [ -e "${f}" ] || { echo "No tar.zst files found"; exit 1; }
+                BASENAME=$(basename "${f}" .tar.zst)
+                mkdir -p "/downloaded-worlds/${BASENAME}"
+                echo "Extracting: ${f} -> /downloaded-worlds/${BASENAME}"
+                unzstd -c "${f}" | tar -xf - -C "/downloaded-worlds/${BASENAME}"
+              done
+              chown -R 1000:1000 /downloaded-worlds/
+              echo "Cleaning up tar.zst files..."
+              rm -f /downloaded-worlds/*.tar.zst
+              echo "World data extraction complete."
+              ls -la /downloaded-worlds/
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /downloaded-worlds
+
+      containers:
+        - resources:
+            requests:
+              cpu: 3
+              memory: 6Gi
+            limits:
+              cpu: 3
+              memory: 6Gi
+          env:
+            - name: MEMORY
+              value: 4G
+            - name: EULA
+              value: "TRUE"
+
+            - name: JVM_OPTS
+              # base image 側で JVM_OPTS に対して jmx exporter の設定を追加しているが、上書きが必要なためここで設定する
+              # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
+              # ref: https://docs.papermc.io/paper/aikars-flags
+              value: >-
+                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
+                -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
+                -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M
+                -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4
+                -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90
+                -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem
+                -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs
+                -Daikars.new.flags=true
+
+            - name: ENABLE_JMX
+              value: "true"
+            - name: JMX_PORT
+              value: "32000"
+
+            - name: COPY_CONFIG_DEST
+              # /config をサーバーディレクトリにコピーするようにする
+              # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
+              value: /data
+
+            - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: DISCORDSRV_TOKEN
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_USER
+              value: mcserver
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: mcserver-password
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_URL_WEBHOOK_NOTIFICATION
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--seichiassist-webhook--config-secrets
+                  key: SEICHIASSIST_DEBUG_S2_WEBHOOK_URL
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
+              value: seichi-debug-redisbungee-valkey.seichi-debug-gateway
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT
+              value: "6379"
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_HOST
+              value: seichi-debug-bungeesemaphore-valkey.seichi-debug-gateway
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_PORT
+              value: "6379"
+
+            - name: CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT
+              value: "9225"
+
+            - name: CFG_REPLACEMENT__WORLDEDIT_SCHEMATICS_DIRECTORY
+              value: /worldedit-schematica
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
+              value: coreprotect
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_DATABASE_NAME
+              value: coreprotect__mc_debug_s2
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: coreprotect-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME
+              value: debug-s2
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER
+              value: luckperms
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: luckperms-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
+              value: luckperms
+
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                mv import world_SW NORMAL
+                mv import world_SW_2 NORMAL
+                mv import world_SW_nether NETHER
+                mv import world_SW_the_end END
+                gamerule keepInventory true
+                mv gamerule keepInventory true world_SW
+                mv gamerule keepInventory true world_SW_2
+                mv gamerule keepInventory true world_SW_nether
+                mv gamerule keepInventory true world_SW_the_end
+                mv gamerule disableRaids true world_2
+                mv gamerule disableRaids true world_SW
+                mv gamerule disableRaids true world_SW_2
+                mv gamerule disableRaids true world_SW_nether
+                mv gamerule disableRaids true world_SW_the_end
+                mv gamerule doInsomnia false world_2
+                mv gamerule doInsomnia false world_SW
+                mv gamerule doInsomnia false world_SW_2
+                mv gamerule doInsomnia false world_SW_nether
+                mv gamerule doInsomnia false world_SW_the_end
+                mvm set difficulty peaceful world_2
+                rg addmember -w world_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_2 __global__ build -g members allow
+                rg addmember -w world_SW_2 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_SW_2 __global__ build -g members allow
+                rg addmember -w world_SW_4 __global__ b66cc3f6-a045-42ad-b4b8-320f20caf140
+                rg flag -w world_SW_4 __global__ build -g members allow
+                rg flag -w world_2 __global__ block-trampling deny
+                rg flag -w world_SW __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_2 __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_4 __global__ deny-spawn PHANTOM
+                rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
+                mv reload
+
+            # /downloaded-plugins: minio からダウンロードしたプラグインを配置
+            # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
+            # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
+            - name: COPY_PLUGINS_SRC
+              value: |-
+                /downloaded-plugins
+                /plugins
+
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_2:sha-c0c19af
+          name: minecraft
+          ports:
+            - containerPort: 25565
+              name: minecraft
+            - containerPort: 18321
+              name: jmx-metrics
+            - containerPort: 9225
+              name: mc-metrics
+            - containerPort: 32000
+              name: jmx-remote
+
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            # 最大120秒待つ
+            failureThreshold: 6
+            periodSeconds: 20
+
+          readinessProbe:
+            exec:
+              command:
+                - mc-monitor
+                - status
+                - --host
+                - localhost
+                - --port
+                - "25565"
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+
+          volumeMounts:
+            # itzg/minecraft-server は /config に設定ファイルをマウントしておけばコピーをしてくれる。
+            # 環境変数の置き換えはPrefix等の設定が必要なので、必要になったら設定するように。
+            # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
+
+            # 普通にマウントすると、auto-update (常に最新のvolume内容がコンテナ内から見える) の挙動を
+            # 提供するために symlink による一時ディレクトリがマウントされることになるが、
+            # itzg/minecraft-server が利用するファイル同期の仕組み (itzg/mc-image-helper) は
+            # symlink を展開してしまうため、設定ファイルのパスが壊れてしまう。
+            #
+            # subPathを利用してマウントすればsymlinkが作られることを回避できるためそのようにしている。
+            # 参考: https://stackoverflow.com/a/63114800
+            # 参考: https://stackoverflow.com/a/50687707
+
+            # /plugins, /data/plugins ディレクトリには直接マウントしないこと。
+            #
+            # itzg/minecraft-server は /plugins ディレクトリにプラグインを配置することで
+            # /data/plugins ディレクトリに自動で配置してくれる。
+            # しかし、この Pod のベースとなっている seichi_minecraft_server_base は、
+            # /plugins ディレクトリに必要なプラグインの設定ファイルを展開している。
+            # そのため、/plugins ディレクトリにボリュームを直接マウントすると、既存の設定ファイルがすべて上書き(削除)されてしまう。
+            #
+            # また、/data/plugins ディレクトリにマウントしていない理由は、
+            # バックアップファイルからサーバーデータをリストアした場合、既存のデータが /data/plugins ディレクトリにも配置される。
+            # しかし、この Pod が起動したときに /data/plugins ディレクトリに mod-downloader-volume をマウントしてしまうと、
+            # 復元したはずのデータがすべて削除されることによって、
+            # /data/plugins/[プラグイン名] ディレクトリ以下にデータを保存するプラグインのデータ整合性が失われるリスクがある。
+            # これを回避するため、別のディレクトリにマウントしたうえで /data/plugins ディレクトリに mod-donwloader からダウンロードしたプラグインを配置する必要がある。
+            # itzg/minecraft-server の機能で COPY_PLUGINS_SRC という環境変数で指定したディレクトリをにプラグインを配置することで、
+            # これを実現するため、Pod 起動時に /data/plugins ディレクトリにプラグインを配置することができ、
+            # そこに指定した /downloaded-plugins ディレクトリにマウントすることとしている。
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
+
+            - name: worldedit-schematica-volume
+              mountPath: /worldedit-schematica
+
+            - name: world-download-volume
+              mountPath: /data
+
+      volumes:
+        # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
+        - name: mod-downloader-volume
+          emptyDir: {}
+
+        # MinIOからダウンロードしたワールドデータを展開してMinecraftに受け渡すためのvolume
+        - name: world-download-volume
+          emptyDir: {}
+
+        # WorldEditがSchematicaを保存・読み取るするためのvolume
+        - name: worldedit-schematica-volume
+          emptyDir: {}
+
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mcserver--debug-s2-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 30Gi
