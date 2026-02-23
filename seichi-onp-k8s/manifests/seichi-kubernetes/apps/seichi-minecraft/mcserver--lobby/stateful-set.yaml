@@ -57,10 +57,6 @@ spec:
           env:
             - name: MEMORY
               value: 6G
-            - name: JVM_OPTS
-              value: >-
-                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
-                -javaagent:/otel/opentelemetry-javaagent.jar
             - name: EULA
               value: "TRUE"
 
@@ -167,15 +163,6 @@ spec:
 
             - name: REMOVE_OLD_MODS
               value: "TRUE"
-
-            - name: PYROSCOPE_APPLICATION_NAME
-              value: "mcserver.lobby"
-
-            - name: PYROSCOPE_LABELS
-              value: "server=lobby,namespace=seichi-minecraft"
-
-            - name: OTEL_SERVICE_NAME
-              value: "mcserver-lobby"
 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:73ea0f03604acd871f6db5e345d63fc0b5d12c9db7c8e768a0e28f8a6b7cd664
           name: minecraft

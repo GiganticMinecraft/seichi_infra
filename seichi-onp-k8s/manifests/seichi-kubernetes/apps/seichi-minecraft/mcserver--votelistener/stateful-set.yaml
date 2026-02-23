@@ -87,11 +87,8 @@ spec:
               # base image 側で JVM_OPTS に対して jmx exporter の設定を追加しているが、上書きが必要なためここで設定する
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
               # ref: https://docs.papermc.io/paper/aikars-flags
-              # -XX:+PreserveFramePointer と -agentpath: Parca用のプロファイリングを有効化
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
-                -javaagent:/otel/opentelemetry-javaagent.jar
-                -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
                 -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M

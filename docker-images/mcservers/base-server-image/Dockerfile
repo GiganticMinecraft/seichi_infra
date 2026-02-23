@@ -10,34 +10,6 @@ RUN wget \
   https://github.com/prometheus/jmx_exporter/releases/download/${JMX_EXPORTER_VERSION}/jmx_prometheus_javaagent-${JMX_EXPORTER_VERSION}.jar
 
 ##---
-# Pyroscope agent をダウンロードする stage
-FROM busybox:1.37.0 AS pyroscope-agent-downloader
-ARG PYROSCOPE_VERSION=v2.1.2
-RUN wget \
-  -O /root/pyroscope.jar \
-  https://github.com/grafana/pyroscope-java/releases/download/${PYROSCOPE_VERSION}/pyroscope.jar
-
-##---
-# OpenTelemetry Java Agent をダウンロードする stage
-# アプリケーションの分散トレーシングを自動計装するために使用
-FROM busybox:1.37.0 AS otel-agent-downloader
-ARG OTEL_AGENT_VERSION=v2.25.0
-RUN wget \
-  -O /root/opentelemetry-javaagent.jar \
-  https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OTEL_AGENT_VERSION}/opentelemetry-javaagent.jar
-
-##---
-# Parca perf-map-agent をダウンロードする stage
-# JVMのJITコンパイルされたコードのシンボル情報をParcaに提供するために使用
-FROM busybox:1.37.0 AS parca-perf-map-agent-downloader
-ARG PERF_MAP_AGENT_VERSION=v0.0.2
-RUN wget \
-  -O /root/perf-map-agent.tar.gz \
-  https://github.com/parca-dev/perf-map-agent/releases/download/${PERF_MAP_AGENT_VERSION}/perf-map-agent-x86_64.tar.gz && \
-  tar -xzf /root/perf-map-agent.tar.gz -C /root && \
-  mv /root/out/amd64/libperfmap.so /root/libperfmap.so
-
-##---
 # 最終 stage
 #
 # MCSERVER_BASE_IMAGE は、 build args を通して
@@ -48,70 +20,14 @@ FROM ${MCSERVER_BASE_IMAGE}
 COPY --link --from=jmx-prometheus-exporter-downloader /root/jmx_prometheus_javaagent.jar /jmx-exporter/jmx_prometheus_javaagent.jar
 COPY --link ./jmx-exporter-config.yaml /jmx-exporter/jmx-exporter-config.yaml
 
-# Pyroscope agent をイメージに移す
-COPY --link --from=pyroscope-agent-downloader /root/pyroscope.jar /pyroscope/pyroscope.jar
-
-# Parca perf-map-agent をイメージに移す
-COPY --link --from=parca-perf-map-agent-downloader /root/libperfmap.so /parca/libperfmap.so
-
-# OpenTelemetry Java Agent をイメージに移す
-COPY --link --from=otel-agent-downloader /root/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
-
 # ---
 # サーバー群に共通する環境変数
 #   必要であれば各サーバーの image が (ENV を各々定義することによって) オーバーライドすべき
 
 ENV TYPE="PAPER"
 
-# JVM_OPTS で JMX exporter, OpenTelemetry Java Agent, Parca perf-map-agent を Java Agent として利用するよう指定する
-# -javaagent (jmx): JVM メトリクスを Prometheus 形式でエクスポート
-# -javaagent (otel): 分散トレーシングの自動計装
-# -XX:+PreserveFramePointer: フレームポインタを保持してプロファイリングを有効化
-# -agentpath: Parca用のperf-map-agentを読み込み、JITコンパイルされたコードのシンボル情報を提供
-ENV JVM_OPTS="-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml -javaagent:/otel/opentelemetry-javaagent.jar -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so"
-
-# TODO: 2025/10/9 SIGSEGVが発生する問題があるため、一旦コメントアウト
-#
-# Pyroscope agent の設定
-# JAVA_TOOL_OPTIONS は JVM_OPTS とは独立して適用される
-# ENV JAVA_TOOL_OPTIONS="-javaagent:/pyroscope/pyroscope.jar -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
-
-# Pyroscope 設定（環境変数で管理）
-ENV PYROSCOPE_SERVER_ADDRESS="http://pyroscope.monitoring:4040"
-ENV PYROSCOPE_FORMAT="jfr"
-ENV PYROSCOPE_PROFILING_INTERVAL="10ms"
-ENV PYROSCOPE_PROFILER_EVENT="cpu"
-ENV PYROSCOPE_PROFILER_ALLOC="512k"
-ENV PYROSCOPE_PROFILER_LOCK="10ms"
-
-# Pyroscope のアプリケーション名とラベルは各サーバーで設定される
-ENV PYROSCOPE_APPLICATION_NAME=""
-ENV PYROSCOPE_LABELS=""
-
-# OpenTelemetry 設定（環境変数で管理）
-# OTEL_SERVICE_NAME は各サーバーのマニフェストで設定される
-ENV OTEL_SERVICE_NAME=""
-ENV OTEL_EXPORTER_OTLP_ENDPOINT="http://k8s-monitoring-alloy-receiver.monitoring:4318"
-ENV OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
-ENV OTEL_TRACES_EXPORTER="otlp"
-ENV OTEL_METRICS_EXPORTER="none"
-ENV OTEL_LOGS_EXPORTER="none"
-# デフォルトの自動計装を無効にし、必要なもののみ有効にする
-ENV OTEL_INSTRUMENTATION_COMMON_DEFAULT_ENABLED="false"
-ENV OTEL_INSTRUMENTATION_NETTY_ENABLED="true"
-ENV OTEL_INSTRUMENTATION_JDBC_ENABLED="true"
-# Log4j2 MDC に trace_id/span_id を注入する計装を有効にする
-ENV OTEL_INSTRUMENTATION_LOG4J_CONTEXT_DATA_ENABLED="true"
-# サンプリングレート 10%
-ENV OTEL_TRACES_SAMPLER="parentbased_traceidratio"
-ENV OTEL_TRACES_SAMPLER_ARG="0.1"
-
-# itzg/minecraft-server の GENERATE_LOG4J2_CONFIG 機能を使って
-# OTel trace_id/span_id 入りのログパターンを生成する
-# 参考: https://docker-minecraft-server.readthedocs.io/en/latest/configuration/misc-options/
-ENV GENERATE_LOG4J2_CONFIG="true"
-ENV LOG_CONSOLE_FORMAT="[%d{HH:mm:ss}] [%t/%level] [trace_id=%X{trace_id} span_id=%X{span_id}]: %msg{nolookups}%n"
-ENV LOG_FILE_FORMAT="[%d{HH:mm:ss}] [%t/%level] [trace_id=%X{trace_id} span_id=%X{span_id}]: %msg{nolookups}%n"
+# JVM_OPTS で JMX exporter を Java Agent として利用するよう指定する
+ENV JVM_OPTS="-javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml"
 
 # 設定ファイル内の ${CFG_REPLACEMENT__*} の形をした部分を置き換えるようにする
 #   https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs

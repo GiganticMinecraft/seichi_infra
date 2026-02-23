@@ -60,10 +60,6 @@ spec:
           env:
             - name: MEMORY
               value: 2048m
-            - name: JVM_OPTS
-              value: >-
-                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
-                -javaagent:/otel/opentelemetry-javaagent.jar
             - name: EULA
               value: "TRUE"
 
@@ -92,15 +88,6 @@ spec:
               value: |-
                 /downloaded-plugins
                 /plugins
-
-            - name: PYROSCOPE_APPLICATION_NAME
-              value: "mcserver.kagawa"
-
-            - name: PYROSCOPE_LABELS
-              value: "server=kagawa,namespace=seichi-minecraft"
-
-            - name: OTEL_SERVICE_NAME
-              value: "mcserver-kagawa"
 
           ports:
             - containerPort: 25565
