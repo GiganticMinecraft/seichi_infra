@@ -76,7 +76,7 @@ spec:
               memory: 4Gi
           env:
             - name: MEMORY
-              value: 1G
+              value: 2G
             - name: EULA
               value: "TRUE"
             - name: ONLINE_MODE
@@ -90,6 +90,7 @@ spec:
               # -XX:+PreserveFramePointer と -agentpath: Parca用のプロファイリングを有効化
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/otel/opentelemetry-javaagent.jar
                 -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
@@ -188,6 +189,9 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=votelistener,namespace=seichi-minecraft"
 
+            - name: OTEL_SERVICE_NAME
+              value: "mcserver-votelistener"
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:5c247f9c1aa4a9dd280610665284ede302b67d14607e7250ead39fcb4c8efd47
           name: minecraft
           ports:
@@ -272,6 +276,7 @@ spec:
             - name: mcserver--votelistener-data
               mountPath: /data
 
+
       volumes:
         # メンテナンスモードの状態を保持するConfigMap
         - name: maintenance-mode
@@ -285,6 +290,7 @@ spec:
         # WorldEditがSchematicaを保存・読み取るするためのvolume
         - name: worldedit-schematica-volume
           emptyDir: {}
+
 
   volumeClaimTemplates:
     - apiVersion: v1

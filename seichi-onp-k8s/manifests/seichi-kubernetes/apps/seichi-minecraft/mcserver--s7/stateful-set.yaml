@@ -65,7 +65,7 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        
+
       containers:
         - resources:
             requests:
@@ -87,6 +87,7 @@ spec:
               # -XX:+PreserveFramePointer と -agentpath: Parca用のプロファイリングを有効化
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/otel/opentelemetry-javaagent.jar
                 -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
@@ -245,6 +246,9 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=s7,namespace=seichi-minecraft"
 
+            - name: OTEL_SERVICE_NAME
+              value: "mcserver-s7"
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7:1.0.0@sha256:53da98b7d7f6ab7439210767fe75c103053da7405cfdaa127b7e0547cd1a120e
           name: minecraft
           ports:
@@ -326,6 +330,7 @@ spec:
 
             - name: mcserver--s7-data
               mountPath: /data
+
 
         - resources:
             limits:

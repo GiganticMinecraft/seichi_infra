@@ -107,6 +107,12 @@ spec:
                   type: loki
                   url: http://loki-gateway
                   isDefault: false
+                  jsonData:
+                    derivedFields:
+                      - datasourceUid: Tempo
+                        matcherRegex: "trace_id=(\\w+)"
+                        name: TraceID
+                        url: "$${__value.raw}"
                 - name: Pyroscope
                   type: grafana-pyroscope-datasource
                   access: proxy

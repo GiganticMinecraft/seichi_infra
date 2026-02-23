@@ -87,6 +87,7 @@ spec:
               # -XX:+PreserveFramePointer と -agentpath: Parca用のプロファイリングを有効化
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/otel/opentelemetry-javaagent.jar
                 -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
@@ -230,6 +231,9 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=s1,namespace=seichi-minecraft"
 
+            - name: OTEL_SERVICE_NAME
+              value: "mcserver-s1"
+
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keepInventory true
@@ -350,6 +354,7 @@ spec:
 
             - name: mcserver--s1-data
               mountPath: /data
+
 
         - resources:
             limits:

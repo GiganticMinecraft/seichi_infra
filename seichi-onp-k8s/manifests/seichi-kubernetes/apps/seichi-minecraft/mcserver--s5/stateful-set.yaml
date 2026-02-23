@@ -70,10 +70,10 @@ spec:
         - resources:
             requests:
               cpu: 2
-              memory: 10Gi
+              memory: 12Gi
             limits:
               cpu: 4
-              memory: 10Gi
+              memory: 12Gi
           env:
             - name: MEMORY
               value: 8G
@@ -87,6 +87,7 @@ spec:
               # -XX:+PreserveFramePointer と -agentpath: Parca用のプロファイリングを有効化
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/otel/opentelemetry-javaagent.jar
                 -XX:+PreserveFramePointer -agentpath:/parca/libperfmap.so
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
                 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
@@ -243,6 +244,9 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=s5,namespace=seichi-minecraft"
 
+            - name: OTEL_SERVICE_NAME
+              value: "mcserver-s5"
+
             # /downloaded-plugins: minio からダウンロードしたプラグインを配置
             # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
             # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
@@ -332,6 +336,7 @@ spec:
 
             - name: mcserver--s5-data
               mountPath: /data
+
 
         - resources:
             limits:

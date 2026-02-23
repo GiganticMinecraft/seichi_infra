@@ -50,13 +50,17 @@ spec:
         - resources:
             requests:
               cpu: 2
-              memory: 6Gi
+              memory: 10Gi
             limits:
               cpu: 4
-              memory: 6Gi
+              memory: 10Gi
           env:
             - name: MEMORY
               value: 6G
+            - name: JVM_OPTS
+              value: >-
+                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -javaagent:/otel/opentelemetry-javaagent.jar
             - name: EULA
               value: "TRUE"
 
@@ -170,6 +174,9 @@ spec:
             - name: PYROSCOPE_LABELS
               value: "server=lobby,namespace=seichi-minecraft"
 
+            - name: OTEL_SERVICE_NAME
+              value: "mcserver-lobby"
+
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:dea5bee69a18c3cb7450aae018149ec921473ab01db6300b72417c69d6b42d1e
           name: minecraft
           ports:
@@ -250,6 +257,7 @@ spec:
             - name: mcserver--lobby-data
               mountPath: /data
 
+
       volumes:
         # メンテナンスモードの状態を保持するConfigMap
         - name: maintenance-mode
@@ -263,6 +271,7 @@ spec:
         # WorldEditがSchematicaを保存・読み取るするためのvolume
         - name: worldedit-schematica-volume
           emptyDir: {}
+
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
