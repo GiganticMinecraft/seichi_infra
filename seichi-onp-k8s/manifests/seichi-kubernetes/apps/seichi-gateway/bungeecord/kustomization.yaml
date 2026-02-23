@@ -11,7 +11,11 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/resources/requests/memory
-        value: 1024Mi
+        value: 2Gi
+      - op: add
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          memory: 2560Mi
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: 1024m
