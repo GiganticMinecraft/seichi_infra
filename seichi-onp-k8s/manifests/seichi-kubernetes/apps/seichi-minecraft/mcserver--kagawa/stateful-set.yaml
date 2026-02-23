@@ -66,7 +66,7 @@ spec:
             - name: JVM_XX_OPTS
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
-                -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:HeapDumpPath=/data/
                 -XX:NativeMemoryTracking=summary
 
             - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN

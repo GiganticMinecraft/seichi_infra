@@ -904,7 +904,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "container_memory_working_set_bytes{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"} / container_spec_memory_limit_bytes{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"}", "legendFormat": "{{pod}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "container_memory_working_set_bytes{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"} / on(pod, namespace) group_left() kube_pod_container_resource_limits{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\", resource=\"memory\"}", "legendFormat": "{{pod}}", "refId": "A" }
           ],
           "title": "Container Memory Usage vs Limit",
           "type": "timeseries"
@@ -932,7 +932,7 @@ data:
           },
           "targets": [
             { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "container_memory_working_set_bytes{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"}", "legendFormat": "{{pod}} used", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "container_spec_memory_limit_bytes{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"}", "legendFormat": "{{pod}} limit", "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kube_pod_container_resource_limits{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\", resource=\"memory\"}", "legendFormat": "{{pod}} limit", "refId": "B" }
           ],
           "title": "Container Memory (Working Set vs Limit)",
           "type": "timeseries"
