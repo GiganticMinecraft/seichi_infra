@@ -59,10 +59,6 @@ spec:
           env:
             - name: MEMORY
               value: 3G
-            - name: JVM_OPTS
-              value: >-
-                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
-                -javaagent:/otel/opentelemetry-javaagent.jar
             - name: EULA
               value: "TRUE"
 
@@ -91,15 +87,6 @@ spec:
               value: |-
                 /downloaded-plugins
                 /plugins
-
-            - name: PYROSCOPE_APPLICATION_NAME
-              value: "mcserver.one-day-to-reset"
-
-            - name: PYROSCOPE_LABELS
-              value: "server=one-day-to-reset,namespace=seichi-minecraft"
-
-            - name: OTEL_SERVICE_NAME
-              value: "mcserver-one-day-to-reset"
 
           ports:
             - containerPort: 25565
