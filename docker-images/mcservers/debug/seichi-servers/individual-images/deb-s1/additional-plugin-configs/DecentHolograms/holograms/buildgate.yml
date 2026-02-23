@@ -1,0 +1,18 @@
+location: world_2:-11.562:66.000:1.498
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [建築専用ワールド]'
+    height: 0.3
+  - content: '&a&l 美観景観を重視'
+    height: 0.3
+  - content: '&a&l 高さ無制限・豆腐建築禁止'
+    height: 0.3
+  - content: '&a&l 建売建築有'
+    height: 0.3
+  actions: {}

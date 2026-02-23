@@ -111,6 +111,7 @@ spec:
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
 
             - name: ENABLE_JMX
               value: "true"
@@ -277,7 +278,7 @@ spec:
             - name: OTEL_TRACES_SAMPLER_ARG
               value: "0.1"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7:1.0.0@sha256:3f30d6f133c4f05414ef3afb4e34582601a319306f188119574acd29f2fe1d37
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7:1.0.0@sha256:53da98b7d7f6ab7439210767fe75c103053da7405cfdaa127b7e0547cd1a120e
           name: minecraft
           ports:
             - containerPort: 25565

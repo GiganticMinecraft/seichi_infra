@@ -1,0 +1,20 @@
+location: world_2:-1.678:65.000:1.457
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [放置スペースへのTP]'
+    height: 0.3
+  - content: '&a&l ！スポーンでの放置は大変危険です！'
+    height: 0.3
+  - content: '&a&l ☆放置はこちらで☆'
+    height: 0.3
+  - content: '&a&l 放置中に生じた損害は自己責任'
+    height: 0.3
+  - content: '&a&l ドアを閉めた自宅が最も安全'
+    height: 0.3
+  actions: {}

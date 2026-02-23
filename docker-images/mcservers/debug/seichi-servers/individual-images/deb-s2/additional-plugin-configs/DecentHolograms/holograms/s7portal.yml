@@ -1,0 +1,22 @@
+location: world_2:17.356:66.000:5.418
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&d&l [公共施設鯖]'
+    height: 0.3
+  - content: '&a&l チュートリアル'
+    height: 0.3
+  - content: '&a&l デパート'
+    height: 0.3
+  - content: '&a&l シェアチェスト'
+    height: 0.3
+  - content: '&a&l 食料/苗木配布'
+    height: 0.3
+  - content: プレイヤー%pinger_players_mcserver--s7.seichi-minecraft:25565%人接続中
+    height: 0.3
+  actions: {}

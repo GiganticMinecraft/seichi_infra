@@ -60,6 +60,9 @@ spec:
                           template: download-release
                       - - name: upload
                           template: upload-artifact
+                      - - name: restart-debug-server
+                          when: "'{{workflow.parameters.target-branch}}' == 'develop'"
+                          template: restart-debug-server
                   - name: download-release
                     container:
                       image: alpine:3.23
@@ -93,6 +96,61 @@ spec:
                           "mc alias set myminio http://seichi-private-plugin-blackhole-minio.minio:9000/ ${MINIO_ACCESS_KEY} ${MINIO_ACCESS_SECRET} && \
                           mc cp /work/SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar",
                         ]
+                  - name: restart-debug-server
+                    steps:
+                      - - name: patch-statefulset-to-0
+                          template: patch-debug-statefulset-to-0
+                      - - name: wait-for-scale-to-0
+                          template: wait-for-debug-scale-to-0
+                      - - name: patch-statefulset-to-1
+                          template: patch-debug-statefulset-to-1
+                      - - name: wait-for-scale-to-1
+                          template: wait-for-debug-scale-to-1
+                  - name: patch-debug-statefulset-to-0
+                    script:
+                      image: bitnami/kubectl:latest
+                      command: ["/bin/sh", "-c"]
+                      source: |
+                        kubectl patch statefulset mcserver--debug-s1 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
+                        kubectl patch statefulset mcserver--debug-s2 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 0}}'
+                  - name: wait-for-debug-scale-to-0
+                    script:
+                      image: bitnami/kubectl:latest
+                      command: ["/bin/sh", "-c"]
+                      source: |
+                        echo "Waiting for statefulsets to scale down..."
+                        for sts in mcserver--debug-s1 mcserver--debug-s2; do
+                          while true; do
+                            replicas=$(kubectl get statefulset "$sts" -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')
+                            if [ -z "$replicas" ] || [ "$replicas" -eq 0 ]; then
+                              break
+                            fi
+                            echo "$sts still scaling down..."
+                            sleep 5
+                          done
+                          echo "$sts scale-down confirmed!"
+                        done
+                  - name: patch-debug-statefulset-to-1
+                    script:
+                      image: bitnami/kubectl:latest
+                      command: ["/bin/sh", "-c"]
+                      source: |
+                        kubectl patch statefulset mcserver--debug-s1 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
+                        kubectl patch statefulset mcserver--debug-s2 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
+                  - name: wait-for-debug-scale-to-1
+                    activeDeadlineSeconds: 300
+                    script:
+                      image: bitnami/kubectl:latest
+                      command: ["/bin/sh", "-c"]
+                      source: |
+                        echo "Waiting for StatefulSets to scale up..."
+                        for sts in mcserver--debug-s1 mcserver--debug-s2; do
+                          while [ "$(kubectl get statefulset "$sts" -n seichi-debug-minecraft -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
+                            echo "$sts still scaling up..."
+                            sleep 5
+                          done
+                          echo "$sts scale-up confirmed!"
+                        done
                   - name: notify-discord
                     steps:
                       - - name: notify-succeeded-on-develop
@@ -100,10 +158,10 @@ spec:
                           template: send-discord-embed
                           arguments:
                             parameters:
-                              - name: embed-status
-                                value: 成功
                               - name: embed-title
-                                value: "デバッグサーバー向けの SeichiAssist がリリースされました"
+                                value: "SeichiAssist がデバッグサーバーに配置されました"
+                              - name: embed-description
+                                value: "新しいバージョンのプラグインが配置され、サーバーが再起動されました。"
                               - name: embed-color
                                 value: "5763719"
                       - - name: notify-failed-on-develop
@@ -111,28 +169,26 @@ spec:
                           template: send-discord-embed
                           arguments:
                             parameters:
-                              - name: embed-status
-                                value: 失敗
                               - name: embed-title
-                                value: "デバッグサーバー向けの SeichiAssist のリリースが行われましたが、配置に失敗しました"
+                                value: "SeichiAssist のデバッグサーバーへの配置に失敗しました"
+                              - name: embed-description
+                                value: ""
                               - name: embed-color
                                 value: "15548997"
                   - name: send-discord-embed
                     inputs:
                       parameters:
-                        - name: embed-status
                         - name: embed-title
+                        - name: embed-description
                         - name: embed-color
                     container:
-                      image: curlimages/curl:8.16.0
+                      image: curlimages/curl:8.18.0
                       env:
                         - name: DISCORD_WEBHOOK_URL
                           valueFrom:
                             secretKeyRef:
                               name: seichiassist-downloader-develop-release-notify-webhook
                               key: DISCORD_WEBHOOK_URL
-                        - name: ARGO_WORKFLOWS_BASE_URL
-                          value: "https://argo-workflows.onp-k8s.admin.seichi.click"
                       command: [sh, -ceu]
                       args:
                         - |
@@ -141,12 +197,11 @@ spec:
                             "embeds": [
                               {
                                 "title": "{{inputs.parameters.embed-title}}",
+                                "description": "{{inputs.parameters.embed-description}}",
                                 "color": {{inputs.parameters.embed-color}},
                                 "fields": [
-                                  { "name": "status", "value": "{{inputs.parameters.embed-status}}", "inline": true },
-                                  { "name": "branch", "value": "{{workflow.parameters.target-branch}}", "inline": true },
                                   { "name": "tag", "value": "{{workflow.parameters.tag-name}}", "inline": true },
-                                  { "name": "workflow", "value": "[{{workflow.name}}](${ARGO_WORKFLOWS_BASE_URL}/workflows/{{workflow.namespace}}/{{workflow.name}})", "inline": false }
+                                  { "name": "リリースページ", "value": "[{{workflow.parameters.tag-name}}](https://github.com/GiganticMinecraft/SeichiAssist/releases/tag/{{workflow.parameters.tag-name}})", "inline": false }
                                 ]
                               }
                             ]

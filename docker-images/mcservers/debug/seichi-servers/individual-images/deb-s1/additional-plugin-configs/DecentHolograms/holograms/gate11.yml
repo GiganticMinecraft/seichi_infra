@@ -1,0 +1,16 @@
+location: world_build:-1489.653:66.200:1481.233
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [ギガンティック☆シティ]'
+    height: 0.3
+  - content: '&a&l 高層ビル街'
+    height: 0.3
+  - content: '&a&l タウンと隣接している'
+    height: 0.3
+  actions: {}

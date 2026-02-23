@@ -1,0 +1,16 @@
+location: world_build:-1481.054:66.200:1489.515
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [海上都市]'
+    height: 0.3
+  - content: '&a&l 海の上に浮かぶ'
+    height: 0.3
+  - content: '&a&l 近未来的なシンボルタワー'
+    height: 0.3
+  actions: {}

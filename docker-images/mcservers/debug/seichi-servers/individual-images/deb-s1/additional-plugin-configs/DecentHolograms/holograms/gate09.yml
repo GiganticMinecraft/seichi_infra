@@ -1,0 +1,16 @@
+location: world_build:-1497.547:66.200:1481.228
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [ギガンティック☆ファクトリー]'
+    height: 0.3
+  - content: '&a&l 工場地帯'
+    height: 0.3
+  - content: '&a&l タウンに向かう鉄道駅'
+    height: 0.3
+  actions: {}

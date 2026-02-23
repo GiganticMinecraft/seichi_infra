@@ -6,7 +6,7 @@ terraform {
     }
     github = {
       source  = "integrations/github"
-      version = "6.11.0"
+      version = "6.11.1"
     }
     random = {
       source  = "hashicorp/random"
@@ -270,6 +270,12 @@ variable "minio_debug_access_secret" {
 
 variable "minecraft__debug_s1_seichiassist_webhook_url" {
   description = "Webhook URL for SeichiAssist on s1 server in debug env"
+  type        = string
+  sensitive   = true
+}
+
+variable "minecraft__debug_s2_seichiassist_webhook_url" {
+  description = "Webhook URL for SeichiAssist on s2 server in debug env"
   type        = string
   sensitive   = true
 }

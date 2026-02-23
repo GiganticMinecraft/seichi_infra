@@ -1,0 +1,18 @@
+location: world_2:7.601:69.000:-9.623
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l ようこそ！&d&lこちらはメインワールドです&b&l'
+    height: 0.3
+  - content: '&a&l このワールドでは建築ができます'
+    height: 0.3
+  - content: '&6このワールドは混み合っております'
+    height: 0.3
+  - content: '&6ほかのサーバーのご利用もご検討ください'
+    height: 0.3
+  actions: {}

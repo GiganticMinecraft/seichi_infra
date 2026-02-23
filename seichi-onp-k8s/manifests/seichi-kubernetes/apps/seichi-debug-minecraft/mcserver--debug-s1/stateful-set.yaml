@@ -65,6 +65,53 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: world-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
+          env:
+            - name: MINIO_ENDPOINT
+              value: seichi-private-plugin-blackhole-minio.minio:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-access-secret
+                  key: MINIO_ACCESS_SECRET
+            - name: BUCKET_NAME
+              value: mc-worlds
+            - name: BUCKET_PREFIX_NAME
+              value: s1
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-worlds
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /downloaded-worlds
+        - name: world-extractor
+          image: alpine:3.23
+          command:
+            - "sh"
+            - "-ce"
+            - |
+              apk add --no-cache zstd
+              echo "Extracting world data..."
+              for f in /downloaded-worlds/*.tar.zst; do
+                [ -e "${f}" ] || { echo "No tar.zst files found"; exit 1; }
+                BASENAME=$(basename "${f}" .tar.zst)
+                mkdir -p "/downloaded-worlds/${BASENAME}"
+                echo "Extracting: ${f} -> /downloaded-worlds/${BASENAME}"
+                unzstd -c "${f}" | tar -xf - -C "/downloaded-worlds/${BASENAME}"
+              done
+              chown -R 1000:1000 /downloaded-worlds/
+              echo "Cleaning up tar.zst files..."
+              rm -f /downloaded-worlds/*.tar.zst
+              echo "World data extraction complete."
+              ls -la /downloaded-worlds/
+          volumeMounts:
+            - name: world-download-volume
+              mountPath: /downloaded-worlds
 
       containers:
         - resources:
@@ -168,6 +215,9 @@ spec:
                   name: mariadb
                   key: coreprotect-password
 
+            - name: CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME
+              value: debug-s1
+
             - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
               value: mariadb
 
@@ -191,23 +241,31 @@ spec:
 
             - name: RCON_CMDS_STARTUP
               value: |-
-                mv create world_SW NORMAL
-                mv create world_SW_2 NORMAL
-                mv create world_SW_nether NETHER
-                mv create world_SW_the_end END
+                mv import world_SW NORMAL
+                mv import world_SW_2 NORMAL
+                mv import world_SW_3 NORMAL
+                mv import world_SW_4 NORMAL
+                mv import world_SW_nether NETHER
+                mv import world_SW_the_end END
                 gamerule keepInventory true
                 mv gamerule keepInventory true world_SW
                 mv gamerule keepInventory true world_SW_2
+                mv gamerule keepInventory true world_SW_3
+                mv gamerule keepInventory true world_SW_4
                 mv gamerule keepInventory true world_SW_nether
                 mv gamerule keepInventory true world_SW_the_end
                 mv gamerule disableRaids true world_2
                 mv gamerule disableRaids true world_SW
                 mv gamerule disableRaids true world_SW_2
+                mv gamerule disableRaids true world_SW_3
+                mv gamerule disableRaids true world_SW_4
                 mv gamerule disableRaids true world_SW_nether
                 mv gamerule disableRaids true world_SW_the_end
                 mv gamerule doInsomnia false world_2
                 mv gamerule doInsomnia false world_SW
                 mv gamerule doInsomnia false world_SW_2
+                mv gamerule doInsomnia false world_SW_3
+                mv gamerule doInsomnia false world_SW_4
                 mv gamerule doInsomnia false world_SW_nether
                 mv gamerule doInsomnia false world_SW_the_end
                 mvm set difficulty peaceful world_2
@@ -222,6 +280,7 @@ spec:
                 rg flag -w world_SW_3 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_4 __global__ deny-spawn PHANTOM
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
+                mv reload
 
             # /downloaded-plugins: minio からダウンロードしたプラグインを配置
             # /plugins: common イメージや各サーバ個別のイメージの中にそれぞれ含まれる設定ファイルを配置
@@ -231,7 +290,7 @@ spec:
                 /downloaded-plugins
                 /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:sha-bdb28e2
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:sha-b62e356
           name: minecraft
           ports:
             - containerPort: 25565
@@ -300,12 +359,16 @@ spec:
             - name: worldedit-schematica-volume
               mountPath: /worldedit-schematica
 
-            # - name: mcserver--debug-s1-data
-            #   mountPath: /data
+            - name: world-download-volume
+              mountPath: /data
 
       volumes:
         # mod-downloaderからプラグインをinitContainerでダウンロードしてMinecraftに受け渡すためのvolume
         - name: mod-downloader-volume
+          emptyDir: {}
+
+        # MinIOからダウンロードしたワールドデータを展開してMinecraftに受け渡すためのvolume
+        - name: world-download-volume
           emptyDir: {}
 
         # WorldEditがSchematicaを保存・読み取るするためのvolume

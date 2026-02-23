@@ -111,6 +111,7 @@ spec:
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
 
             - name: ENABLE_JMX
               value: "true"
@@ -283,7 +284,7 @@ spec:
                /downloaded-plugins
                /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s5:1.0.0@sha256:ff21fbe0d6996973998d5dcbe25a7a60f0ecdba89183f79a234dce6f3a5a4ffd
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s5:1.0.0@sha256:a124b38e3a18a6e8b68f67475da42421a3a63686175642ebd869c0bbcc0b97d6
           name: minecraft
           ports:
             - containerPort: 25565

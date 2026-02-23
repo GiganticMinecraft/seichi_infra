@@ -73,6 +73,12 @@ spec:
             - name: EULA
               value: "TRUE"
 
+            - name: JVM_XX_OPTS
+              value: >-
+                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
+                -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
+
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
               # https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#optional-plugins-mods-and-config-attach-points
@@ -200,7 +206,7 @@ spec:
             - name: OTEL_TRACES_SAMPLER_ARG
               value: "0.1"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:856df3ff03b9096a4410435c7925e70f2405c0aa0c636be84a7f73a6cad5f036
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:dea5bee69a18c3cb7450aae018149ec921473ab01db6300b72417c69d6b42d1e
           name: minecraft
           ports:
             - containerPort: 25565

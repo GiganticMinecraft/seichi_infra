@@ -110,6 +110,12 @@ spec:
                 -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs
                 -Daikars.new.flags=true
 
+            - name: JVM_XX_OPTS
+              value: >-
+                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
+                -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
+
             - name: ENABLE_JMX
               value: "true"
             # 固定化したClusterIPを指定することで、VisualVMによるアクセスが正しく動作するようにする
@@ -215,7 +221,7 @@ spec:
             - name: OTEL_TRACES_SAMPLER_ARG
               value: "0.1"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:366266fa85882d753740a8a4e64d8cb6aa956eaac2387bf0427dfb2d2390d4ec
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:5c247f9c1aa4a9dd280610665284ede302b67d14607e7250ead39fcb4c8efd47
           name: minecraft
           ports:
             - containerPort: 25565

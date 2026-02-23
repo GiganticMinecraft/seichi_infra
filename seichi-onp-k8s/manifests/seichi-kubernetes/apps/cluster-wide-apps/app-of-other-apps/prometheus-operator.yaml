@@ -10,7 +10,7 @@ spec:
   source:
     chart: kube-prometheus-stack
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 81.6.1
+    targetRevision: 82.2.1
     helm:
       releaseName: prometheus
       skipCrds: false
@@ -43,7 +43,7 @@ spec:
               isDefaultDatasource: false
             dashboards:
               enabled: true
-              defaultFolderName: "General"
+              defaultFolderName: ""
               label: grafana_dashboard
               labelValue: "1"
               folderAnnotation: grafana_folder
@@ -52,7 +52,6 @@ spec:
                 foldersFromFilesStructure: true
           defaultDashboardsTimezone: Asia/Tokyo
           plugins:
-            - grafana-piechart-panel
             - isovalent-hubble-datasource
             - grafana-sentry-datasource
           grafana.ini:
@@ -123,7 +122,7 @@ spec:
                 - name: Tempo
                   type: tempo
                   access: proxy
-                  url: http://tempo:3100
+                  url: http://tempo:3200
                   isDefault: false
                   jsonData:
                     tracesToLogsV2:

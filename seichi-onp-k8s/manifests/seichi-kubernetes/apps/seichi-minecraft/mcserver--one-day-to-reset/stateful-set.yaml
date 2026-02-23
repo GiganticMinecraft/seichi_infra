@@ -58,7 +58,7 @@ spec:
             - name: otel-agent
               mountPath: /otel
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:b011f40cca097f601edf40c55ff6132f3795f60bbbe55b568965b832836b90d5
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:12a8376c9bdda85c4e304f10cbd91fbf69553584898b975075f0f911cb520153
           name: minecraft
           resources:
             requests:
@@ -74,6 +74,12 @@ spec:
                 -javaagent:/otel/opentelemetry-javaagent.jar
             - name: EULA
               value: "TRUE"
+
+            - name: JVM_XX_OPTS
+              value: >-
+                -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
+                -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
+                -XX:NativeMemoryTracking=summary
 
             - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
               valueFrom:

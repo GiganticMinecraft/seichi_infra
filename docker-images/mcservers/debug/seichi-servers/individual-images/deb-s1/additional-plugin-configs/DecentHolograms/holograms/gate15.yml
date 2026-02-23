@@ -1,0 +1,16 @@
+location: world_build:-1480.984:66.200:1493.207
+enabled: true
+display-range: 48
+update-range: 48
+update-interval: 20
+facing: 0.0
+down-origin: false
+pages:
+- lines:
+  - content: '&b&l [軍港]'
+    height: 0.3
+  - content: '&a&l 力強く美しい軍艦とドック'
+    height: 0.3
+  - content: '&a&l 観光レストラン'
+    height: 0.3
+  actions: {}
