@@ -100,9 +100,18 @@ ENV OTEL_LOGS_EXPORTER="none"
 ENV OTEL_INSTRUMENTATION_COMMON_DEFAULT_ENABLED="false"
 ENV OTEL_INSTRUMENTATION_NETTY_ENABLED="true"
 ENV OTEL_INSTRUMENTATION_JDBC_ENABLED="true"
+# Log4j2 MDC に trace_id/span_id を注入する計装を有効にする
+ENV OTEL_INSTRUMENTATION_LOG4J_CONTEXT_DATA_ENABLED="true"
 # サンプリングレート 10%
 ENV OTEL_TRACES_SAMPLER="parentbased_traceidratio"
 ENV OTEL_TRACES_SAMPLER_ARG="0.1"
+
+# itzg/minecraft-server の GENERATE_LOG4J2_CONFIG 機能を使って
+# OTel trace_id/span_id 入りのログパターンを生成する
+# 参考: https://docker-minecraft-server.readthedocs.io/en/latest/configuration/misc-options/
+ENV GENERATE_LOG4J2_CONFIG="true"
+ENV LOG_CONSOLE_FORMAT="[%d{HH:mm:ss}] [%t/%level] [trace_id=%X{trace_id} span_id=%X{span_id}]: %msg{nolookups}%n"
+ENV LOG_FILE_FORMAT="[%d{HH:mm:ss}] [%t/%level] [trace_id=%X{trace_id} span_id=%X{span_id}]: %msg{nolookups}%n"
 
 # 設定ファイル内の ${CFG_REPLACEMENT__*} の形をした部分を置き換えるようにする
 #   https://github.com/itzg/docker-minecraft-server/tree/9458005b5bd78b8139e13e66c29a449a12dd6218#replacing-variables-inside-configs
