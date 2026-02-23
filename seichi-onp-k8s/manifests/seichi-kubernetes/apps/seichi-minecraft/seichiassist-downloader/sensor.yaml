@@ -53,6 +53,7 @@ spec:
                   parameters:
                     - name: target-branch
                     - name: tag-name
+                    - name: release-body
                 templates:
                   - name: download-seichiassist
                     steps:
@@ -175,6 +176,15 @@ spec:
                                 value: ""
                               - name: embed-color
                                 value: "15548997"
+                      - - name: notify-succeeded-on-master
+                          when: "'{{workflow.parameters.target-branch}}' == 'master' && '{{workflow.status}}' == 'Succeeded'"
+                          template: send-discord-embed-for-master
+                          arguments:
+                            parameters:
+                              - name: embed-title
+                                value: "【アップデートのお知らせ】次回再起動時に SeichiAssist {{workflow.parameters.tag-name}} が適用されます。"
+                              - name: embed-color
+                                value: "5763719"
                   - name: send-discord-embed
                     inputs:
                       parameters:
@@ -212,6 +222,63 @@ spec:
                             -H "Content-Type: application/json" \
                             --data "${payload}" \
                             "${DISCORD_WEBHOOK_URL}"
+                  - name: send-discord-embed-for-master
+                    inputs:
+                      parameters:
+                        - name: embed-title
+                        - name: embed-color
+                    container:
+                      image: alpine:3.23
+                      env:
+                        - name: DISCORD_WEBHOOK_URL
+                          valueFrom:
+                            secretKeyRef:
+                              name: seichiassist-downloader-master-release-notify-webhook
+                              key: DISCORD_WEBHOOK_URL
+                        - name: EMBED_TITLE
+                          value: "{{inputs.parameters.embed-title}}"
+                        - name: EMBED_COLOR
+                          value: "{{inputs.parameters.embed-color}}"
+                      command: [sh, -ceu]
+                      args:
+                        - |
+                          apk add --no-cache curl jq > /dev/null 2>&1
+
+                          cat > /tmp/release-body.txt << '__RELEASE_BODY_BOUNDARY__'
+                          {{workflow.parameters.release-body}}
+                          __RELEASE_BODY_BOUNDARY__
+
+                          # Discord embed description の 4096 文字制限に対応
+                          body=$(head -c 4000 /tmp/release-body.txt)
+                          if [ "$(wc -c < /tmp/release-body.txt)" -gt 4000 ]; then
+                            body="${body}... (以降省略)"
+                          fi
+
+                          TAG_NAME="{{workflow.parameters.tag-name}}"
+
+                          payload=$(jq -n \
+                            --arg title "${EMBED_TITLE}" \
+                            --arg desc "$body" \
+                            --argjson color "${EMBED_COLOR}" \
+                            --arg tag "${TAG_NAME}" \
+                            '{
+                              content: "<@&959293755133935657>",
+                              allowed_mentions: { roles: ["959293755133935657"] },
+                              embeds: [{
+                                title: $title,
+                                description: $desc,
+                                color: $color,
+                                fields: [
+                                  { name: "tag", value: $tag, inline: true },
+                                  { name: "リリースページ", value: ("[\($tag)](https://github.com/GiganticMinecraft/SeichiAssist/releases/tag/\($tag))"), inline: false }
+                                ]
+                              }]
+                            }')
+
+                          curl -fSs -X POST \
+                            -H "Content-Type: application/json" \
+                            --data "${payload}" \
+                            "${DISCORD_WEBHOOK_URL}"
           parameters:
             - src:
                 dependencyName: from-seichiassist-downloader
@@ -221,6 +288,10 @@ spec:
                 dependencyName: from-seichiassist-downloader
                 dataKey: body.release.tag_name
               dest: spec.arguments.parameters.1.value
+            - src:
+                dependencyName: from-seichiassist-downloader
+                dataKey: body.release.body
+              dest: spec.arguments.parameters.2.value
             - src:
                 dependencyName: from-seichiassist-downloader
                 dataKey: body.release.tag_name
