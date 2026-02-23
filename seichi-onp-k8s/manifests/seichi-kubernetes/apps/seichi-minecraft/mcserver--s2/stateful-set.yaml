@@ -134,7 +134,7 @@ spec:
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PORT
               value: "3306"
-            
+
             - name: CFG_REPLACEMENT__SEICHIASSIST_DB_USER
               value: mcserver
 
@@ -221,7 +221,7 @@ spec:
                 secretKeyRef:
                   name: mariadb
                   key: litebans-password
-                  
+
             - name: REMOVE_OLD_MODS
               value: "TRUE"
 
@@ -270,10 +270,10 @@ spec:
             # Note: Docker の COPY 命令は、同名ディレクトリが存在する場合は、再帰的に中身がマージされ、同名ファイルは上書きされる
             - name: COPY_PLUGINS_SRC
               value: |-
-               /downloaded-plugins
-               /plugins
+                /downloaded-plugins
+                /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s2:1.0.0@sha256:bcc106efd7012085a36c5293bd9d6571bbaddb97403bd15eff979cfce50fe09d
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s2:1.0.0@sha256:0cf1e03ebaf528ef8c561df48a7ff6ccac1185e65b0d83f14f2b77f32d5bd089
           name: minecraft
           ports:
             - containerPort: 25565
@@ -354,7 +354,6 @@ spec:
 
             - name: mcserver--s2-data
               mountPath: /data
-
 
         - resources:
             limits:

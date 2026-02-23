@@ -273,7 +273,7 @@ spec:
                 /downloaded-plugins
                 /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:1.0.0@sha256:ef3c71116d9011bfb2a9e92e7c9ab1d9b699b226b836f13295ce475d22b3a1bd
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s1:1.0.0@sha256:008f5172de85c1db41f573296a129b585f23391e7637324c38f497085a8a34aa
           name: minecraft
           ports:
             - containerPort: 25565
@@ -354,7 +354,6 @@ spec:
 
             - name: mcserver--s1-data
               mountPath: /data
-
 
         - resources:
             limits:
