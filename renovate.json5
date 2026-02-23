@@ -1,96 +1,122 @@
 {
-  "extends": [
-    "config:base"
+  extends: [
+    'config:recommended',
   ],
-  "timezone": "Asia/Tokyo",
-  "reviewers": ["outductor"],
-  "ignoreDeps": [
-    "docker-registry1.mariadb.com/library/mariadb"
+  timezone: 'Asia/Tokyo',
+  reviewers: [
+    'outductor',
   ],
-  "packageRules": [
+  ignoreDeps: [
+    'docker-registry1.mariadb.com/library/mariadb',
+  ],
+  packageRules: [
     {
-      "managers": ["gomod"],
-      "packageNames": ["go"],
-      "supportPolicy": ["active"]
-    },
-    {
-      "managers": ["terraform"],
-      "matchPackageNames": ["*"],
-      "groupName": "terraform packages",
-      "enabled": true,
-      "schedule": ["at any time"]
-    },
-    {
-      "matchManagers": ["dockerfile", "kubernetes"],
-      "matchPackageNames": [
-        "ghcr.io/giganticminecraft/seichi_minecraft_server_*",
+      matchManagers: [
+        'gomod',
       ],
-      "groupName": "seichi_minecraft_server images",
-      "enabled": true,
-      "schedule": ["at any time"],
-      "automerge": true,
-      // 07:00～08:00(JST) の間は ArgoCD の自動 Sync が有効になっていることから、
-      // この時間帯に自動マージがされると、Sync されてサーバが再起動されてしまうため、その時間帯を避けて自動マージする
-      // ref: https://github.com/GiganticMinecraft/seichi_infra/blob/7fb9a41ce385675aed955c42c833caafcbaf387e/seichi-onp-k8s/manifests/seichi-kubernetes/apps/root/projects.yaml#L217-L231
-      "automergeSchedule": ["* 0-7 * * *", "* 8-23 * * *"]
+      matchPackageNames: [
+        'go',
+      ],
     },
     {
-      "matchManagers": ["regex"],
-      "matchPackageNames": [
-        "itzg/minecraft-server*"
+      matchManagers: [
+        'terraform',
       ],
-      "groupName": "itzg/minecraft-server images",
-      "schedule": ["at any time"],
-      "automerge": true
+      matchPackageNames: [
+        '*',
+      ],
+      groupName: 'terraform packages',
+      enabled: true,
+      schedule: [
+        'at any time',
+      ],
     },
     {
-      "matchPackageNames": [
-        "mariadb-operator",
-        "mariadb-operator-crds"
+      matchManagers: [
+        'dockerfile',
+        'kubernetes',
       ],
-      "groupName": "mariadb-operator"
-    }
+      matchPackageNames: [
+        'ghcr.io/giganticminecraft/seichi_minecraft_server_*',
+      ],
+      groupName: 'seichi_minecraft_server images',
+      enabled: true,
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+      automergeSchedule: [
+        '* 0-7 * * *',
+        '* 8-23 * * *',
+      ],
+    },
+    {
+      matchManagers: [
+        'custom.regex',
+      ],
+      matchPackageNames: [
+        'itzg/minecraft-server*',
+      ],
+      groupName: 'itzg/minecraft-server images',
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+    },
+    {
+      matchPackageNames: [
+        'mariadb-operator',
+        'mariadb-operator-crds',
+      ],
+      groupName: 'mariadb-operator',
+    },
   ],
-  "postUpdateOptions": [
-    "gomodTidy",
-    "gomodUpdateImportPaths"
+  postUpdateOptions: [
+    'gomodTidy',
+    'gomodUpdateImportPaths',
   ],
-  "argocd": {
-    "fileMatch": [
-      "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$"
-    ]
+  argocd: {
+    managerFilePatterns: [
+      '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$/',
+    ],
   },
-  "kubernetes": {
-    "fileMatch": [
-      "^helm-charts/[^/]+/templates/.+\\.yaml$",
-      "^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$",
-      "^seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/.+\\.yaml$"
-    ]
+  kubernetes: {
+    managerFilePatterns: [
+      '/^helm-charts/[^/]+/templates/.+\\.yaml$/',
+      '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/.+\\.yaml$/',
+      '/^seichi-onp-k8s/manifests/seichi-kubernetes/app-templates/.+\\.yaml$/',
+    ],
   },
-  "regexManagers": [
+  customManagers: [
     {
-      "fileMatch": ["^.github/workflows/build_mcserver_base_images.yaml$"],
-      "matchStrings": [
-        "- mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\\"(?<currentDigest>sha256:[a-f0-9]+)\\\""
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.github/workflows/build_mcserver_base_images.yaml$/',
       ],
-      "depNameTemplate": "itzg/minecraft-server",
-      "extractVersionTemplate": "^(?<version>\\d+\\.\\d+\\.\\d+)-.*",
-      "datasourceTemplate": "docker"
+      matchStrings: [
+        '- mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\"(?<currentDigest>sha256:[a-f0-9]+)\\"',
+      ],
+      depNameTemplate: 'itzg/minecraft-server',
+      extractVersionTemplate: '^(?<version>\\d+\\.\\d+\\.\\d+)-.*',
+      datasourceTemplate: 'docker',
     },
     {
-      "fileMatch": ["^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml"],
-      "matchStrings": [
-        "https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<currentValue>[\\d.]+)/components.yaml"
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/metrics-server/kustomization.yaml/',
       ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "kubernetes-sigs/metrics-server",
-      "versioningTemplate": "semver"
-    }
+      matchStrings: [
+        'https://github.com/kubernetes-sigs/metrics-server/releases/download/v(?<currentValue>[\\d.]+)/components.yaml',
+      ],
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: 'kubernetes-sigs/metrics-server',
+      versioningTemplate: 'semver',
+    },
   ],
-  "terraform": {
-    "enabled": true,
-    "fileMatch": [
-      "^terraform/.*\\.tf$"
-    ]
-  }
+  terraform: {
+    enabled: true,
+    managerFilePatterns: [
+      '/^terraform/.*\\.tf$/',
+    ],
+  },
 }
