@@ -76,7 +76,7 @@ spec:
               memory: 4Gi
           env:
             - name: MEMORY
-              value: 1G
+              value: 2G
             - name: EULA
               value: "TRUE"
             - name: ONLINE_MODE
