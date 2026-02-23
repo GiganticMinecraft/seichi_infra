@@ -448,9 +448,6 @@ spec:
               mountPath: /plugins/LuckPerms/yaml-storage/users/b7c16b91-57ca-4bbb-95f7-9e9144474799.yml
               subPath: user-_megatron_.yml
             - name: common-luckperms-permission-configs
-              mountPath: /plugins/LuckPerms/yaml-storage/users/bb991c6b-aafb-405c-b2af-57cd5828962d.yml
-              subPath: user-m1sk9.yml
-            - name: common-luckperms-permission-configs
               mountPath: /plugins/LuckPerms/yaml-storage/users/d22fe904-d76a-4ec7-a0a8-48f0146d8549.yml
               subPath: user-specialboywaka.yml
             - name: common-luckperms-permission-configs

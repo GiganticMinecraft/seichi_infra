@@ -386,13 +386,6 @@ data:
     primary-group: admin
     parents:
     - admin
-  user-m1sk9.yml: |
-    uuid: bb991c6b-aafb-405c-b2af-57cd5828962d
-    name: m1sk9
-    primary-group: worldguard-bypass
-    parents:
-    - admin
-    - worldguard-bypass
   user-specialboywaka.yml: |
     uuid: d22fe904-d76a-4ec7-a0a8-48f0146d8549
     name: specialboywaka
