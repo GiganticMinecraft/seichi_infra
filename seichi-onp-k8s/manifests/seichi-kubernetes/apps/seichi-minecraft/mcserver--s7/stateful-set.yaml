@@ -65,15 +65,6 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        - name: otel-agent
-          image: busybox:1.37
-          command:
-            - sh
-            - -c
-            - wget -O /otel/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.12.0/opentelemetry-javaagent.jar
-          volumeMounts:
-            - name: otel-agent
-              mountPath: /otel
 
       containers:
         - resources:
@@ -257,26 +248,6 @@ spec:
 
             - name: OTEL_SERVICE_NAME
               value: "mcserver-s7"
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://k8s-monitoring-alloy-receiver.monitoring:4318"
-            - name: OTEL_EXPORTER_OTLP_PROTOCOL
-              value: "http/protobuf"
-            - name: OTEL_TRACES_EXPORTER
-              value: "otlp"
-            - name: OTEL_METRICS_EXPORTER
-              value: "none"
-            - name: OTEL_LOGS_EXPORTER
-              value: "none"
-            - name: OTEL_INSTRUMENTATION_COMMON_DEFAULT_ENABLED
-              value: "false"
-            - name: OTEL_INSTRUMENTATION_NETTY_ENABLED
-              value: "true"
-            - name: OTEL_INSTRUMENTATION_JDBC_ENABLED
-              value: "true"
-            - name: OTEL_TRACES_SAMPLER
-              value: "parentbased_traceidratio"
-            - name: OTEL_TRACES_SAMPLER_ARG
-              value: "0.1"
 
           image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_s7:1.0.0@sha256:53da98b7d7f6ab7439210767fe75c103053da7405cfdaa127b7e0547cd1a120e
           name: minecraft
@@ -360,8 +331,6 @@ spec:
             - name: mcserver--s7-data
               mountPath: /data
 
-            - name: otel-agent
-              mountPath: /otel
 
         - resources:
             limits:
@@ -399,9 +368,6 @@ spec:
 
         # WorldEditがSchematicaを保存・読み取るするためのvolume
         - name: worldedit-schematica-volume
-          emptyDir: {}
-
-        - name: otel-agent
           emptyDir: {}
 
         # DynMapをホストするためのnginxの設定ファイル
