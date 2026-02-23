@@ -21,7 +21,7 @@ RUN wget \
 # OpenTelemetry Java Agent をダウンロードする stage
 # アプリケーションの分散トレーシングを自動計装するために使用
 FROM busybox:1.37.0 AS otel-agent-downloader
-ARG OTEL_AGENT_VERSION=v2.12.0
+ARG OTEL_AGENT_VERSION=v2.25.0
 RUN wget \
   -O /root/opentelemetry-javaagent.jar \
   https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OTEL_AGENT_VERSION}/opentelemetry-javaagent.jar
