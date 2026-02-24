@@ -169,12 +169,12 @@ spec:
                 spec:
                   resources:
                     requests:
-                      storage: 150Gi
+                      storage: 300Gi
             resources:
               requests:
                 memory: 2Gi
-            retention: 60d
-            retentionSize: "135GB"
+            retention: 180d
+            retentionSize: "270GB"
             additionalScrapeConfigs:
             - job_name: 'containerd'
               scheme: http
