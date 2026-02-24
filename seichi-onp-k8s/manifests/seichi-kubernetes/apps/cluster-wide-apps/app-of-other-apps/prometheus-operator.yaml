@@ -114,11 +114,6 @@ spec:
                   isDefault: false
                   jsonData:
                     minStep: '15s'
-                - name: Parca
-                  type: parca
-                  access: proxy
-                  url: http://parca.parca:7070
-                  isDefault: false
                 - name: Tempo
                   type: tempo
                   access: proxy
@@ -174,11 +169,12 @@ spec:
                 spec:
                   resources:
                     requests:
-                      storage: 150Gi
+                      storage: 300Gi
             resources:
               requests:
                 memory: 2Gi
-            retention: 60d
+            retention: 180d
+            retentionSize: "270GB"
             additionalScrapeConfigs:
             - job_name: 'containerd'
               scheme: http
@@ -192,8 +188,35 @@ spec:
                 replacement: '${1}:1338'
               - source_labels: [__meta_kubernetes_node_name]
                 target_label: node
+              metric_relabel_configs:
+              - source_labels: [__name__]
+                regex: 'grpc_.*'
+                action: drop
+        additionalPrometheusRulesMap:
+          resource-usage:
+            groups:
+              - name: resource-usage
+                interval: 1m
+                rules:
+                  - record: namespace:container_memory_working_set_bytes:sum
+                    expr: sum by (namespace) (container_memory_working_set_bytes{container!=""})
+                  - record: namespace:container_cpu_usage_seconds:sum_rate5m
+                    expr: sum by (namespace) (rate(container_cpu_usage_seconds_total{container!=""}[5m]))
+                  - record: node:node_memory_utilisation:ratio
+                    expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+                  - record: node:node_cpu_utilisation:avg5m
+                    expr: 1 - avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
         alertmanager:
           enabled: false
+        kubeApiServer:
+          serviceMonitor:
+            metricRelabelings:
+              - sourceLabels: [__name__]
+                regex: 'apiserver_request_body_size_bytes_bucket'
+                action: drop
+              - sourceLabels: [__name__]
+                regex: 'apiserver_watch_(cache_read_wait|list_duration|events_sizes)_seconds_bucket'
+                action: drop
         kubeProxy:
           enabled: false
         kubeEtcd:
