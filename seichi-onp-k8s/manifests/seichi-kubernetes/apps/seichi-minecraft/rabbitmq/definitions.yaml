@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seichi-portal-rabbitmq-definitions
+  namespace: seichi-minecraft
+data:
+  definitions.json: |
+    {
+      "vhosts": [
+        {
+          "name": "/"
+        }
+      ],
+      "exchanges": [
+        {
+          "name": "seichi_portal",
+          "vhost": "/",
+          "type": "direct",
+          "durable": true
+        }
+      ],
+      "queues": [
+        {
+          "name": "seichi_portal",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false,
+          "internal": false,
+          "arguments": {}
+        }
+      ],
+      "bindings": [
+        {
+          "source": "seichi_portal",
+          "vhost": "/",
+          "destination": "seichi_portal",
+          "destination_type": "queue",
+          "routing_key": "seichi_portal",
+          "arguments": {}
+        }
+      ]
+    }

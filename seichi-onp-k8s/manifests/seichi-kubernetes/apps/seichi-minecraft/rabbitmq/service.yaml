@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: seichi-portal-rabbitmq
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-rabbitmq
+spec:
+  selector:
+    app: seichi-portal-rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: management
+      port: 15672
+      targetPort: management
+    - name: prometheus
+      port: 15692
+      targetPort: prometheus

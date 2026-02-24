@@ -43,3 +43,22 @@ spec:
               value: "9000"
             - name: ENV_NAME
               value: production
+            - name: REDIS_HOST
+              value: seichi-portal-valkey
+            - name: REDIS_PORT
+              value: "6379"
+            - name: MEILISEARCH_HOST
+              value: http://seichi-portal-meilisearch:7700
+            - name: RABBITMQ_USER
+              value: seichi-portal
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-rabbitmq-credentials
+                  key: password
+            - name: RABBITMQ_HOST
+              value: seichi-portal-rabbitmq
+            - name: RABBITMQ_PORT
+              value: "5672"
+            - name: RABBITMQ_ROUTING_KEY
+              value: seichi_portal
