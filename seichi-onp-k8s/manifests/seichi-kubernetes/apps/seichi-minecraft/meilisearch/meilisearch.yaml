@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: seichi-portal-meilisearch
+  namespace: argocd
+spec:
+  project: seichi-minecraft
+  source:
+    chart: meilisearch
+    repoURL: 'https://meilisearch.github.io/meilisearch-kubernetes'
+    targetRevision: 0.25.1
+    helm:
+      releaseName: seichi-portal-meilisearch
+      values: |
+        image:
+          repository: getmeili/meilisearch
+          tag: "v1.36.0"
+        environment:
+          MEILI_ENV: production
+          MEILI_NO_ANALYTICS: "true"
+        persistence:
+          enabled: true
+          size: 10Gi
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: seichi-minecraft
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
