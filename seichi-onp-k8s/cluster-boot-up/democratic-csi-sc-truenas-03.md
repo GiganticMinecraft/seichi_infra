@@ -67,7 +67,7 @@ TF_VAR_ONP_K8S_DEMOCRATIC_CSI_SC_TRUENAS_03_DRIVER_CONFIG
 **Secret の値:** 下記 YAML の `<TRUENAS_API_KEY>` を手順 1 で取得した値に置き換えたもの。
 
 ```yaml
-driver: freenas-scale-api-iscsi
+driver: freenas-api-iscsi
 httpConnection:
   protocol: https
   host: 192.168.16.234

@@ -20,7 +20,7 @@ spec:
           # NOTE: existingConfigSecret 使用時も driver フィールドの指定が必要
           # ref. https://github.com/democratic-csi/charts/blob/master/stable/democratic-csi/values.yaml
           config:
-            driver: freenas-scale-api-iscsi
+            driver: freenas-api-iscsi
 
         storageClasses:
           - name: sc-truenas-03-iscsi
