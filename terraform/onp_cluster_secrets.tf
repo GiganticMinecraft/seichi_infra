@@ -121,6 +121,23 @@ resource "kubernetes_secret" "onp_synology_csi" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_democratic_csi_sc_truenas_03" {
+  depends_on = [kubernetes_namespace.onp_democratic_csi]
+
+  metadata {
+    name      = "democratic-csi-driver-config"
+    namespace = "democratic-csi"
+  }
+
+  data = {
+    # democratic-csi はこのキー名でマウントされたファイルを読む
+    # ref. https://github.com/democratic-csi/charts/blob/master/stable/democratic-csi/templates/controller.yaml
+    "driver-config-file.yaml" = var.onp_k8s_democratic_csi_sc_truenas_03_driver_config
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "cloudflared_tunnel_credential" {
   depends_on = [kubernetes_namespace.cloudflared_tunnel_exits]
 
