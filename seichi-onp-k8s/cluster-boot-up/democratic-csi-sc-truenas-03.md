@@ -70,7 +70,7 @@ zfs:
 iscsi:
   targetPortal: 192.168.16.234:3260
   namePrefix: csi-
-  nameSuffix: "-seichi"
+  nameSuffix: "-seichi-onp-k8s"
   targetGroups:
     - targetGroupPortalGroup: 1
       targetGroupInitiatorGroup: 1
