@@ -216,6 +216,16 @@ variable "onp_k8s_synology_csi_config" {
 
 #endregion
 
+#region on-premise democratic-csi (sc-truenas-03) Driver Secret
+
+variable "onp_k8s_democratic_csi_sc_truenas_03_driver_config" {
+  description = "democratic-csi driver config for sc-truenas-03 (TrueNAS Scale at 192.168.16.234)"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region on-premise Cloudflared tunnel secret
 
 # オンプレ k8s で走る cloudflared の認証情報。
