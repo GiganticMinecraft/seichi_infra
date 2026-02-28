@@ -34,7 +34,11 @@ spec:
         volumeSnapshotClasses:
           - name: sc-truenas-03-iscsi-vsc
             deletionPolicy: Delete
-            parameters: {}
+            parameters:
+              # chart テンプレートが parameters キーを無条件でレンダリングするため、
+              # 空 map を渡すと parameters: null になりバリデーションエラーになる。
+              # 回避策として最低1エントリが必要。
+              fsType: ext4
   destination:
     server: https://kubernetes.default.svc
     namespace: democratic-csi
