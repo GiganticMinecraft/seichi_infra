@@ -27,14 +27,26 @@ democratic-csi CSI ドライバー
 
 GitHub Secret を作成する前に、TrueNAS Scale WebUI で以下が設定済みであること。
 
+> [!NOTE]
+> sc-truenas-03 には Proxmox 向けの iSCSI 設定が既に存在する。
+> Proxmox 用の Initiator Group (ID: 1) は Proxmox ホストの IQN を明示指定しているため、
+> k8s 用には **別の Initiator Group (ID: 2) を新設**して共存させること。
+> Portal Group (ID: 1, 192.168.16.234:3260) は共用してよい。
+
 | 項目 | 設定値 |
 |------|--------|
-| iSCSI サービス | 有効化済み |
-| iSCSI ポータル IP | 192.168.16.234:3260 |
-| iSCSI ポータル Group ID | 1 |
-| iSCSI Initiator Group | 全許可、Group ID: 1 |
-| ZFS データセット (volumes) | `pool-01/dataset-seichi-onp-k8s-01/volumes` |
-| ZFS データセット (snapshots) | `pool-01/dataset-seichi-onp-k8s-01/snapshots` |
+| iSCSI サービス | 有効化済み（Proxmox 用として既存） |
+| iSCSI ポータル Group ID | 1（Proxmox と共用、変更不要） |
+| iSCSI Initiator Group | **全許可、Group ID: 2 を新設**（Proxmox 用の Group ID: 1 とは別） |
+| ZFS データセット (volumes) | `pool-01/dataset-seichi-onp-k8s-01/volumes`（作成済み） |
+| ZFS データセット (snapshots) | `pool-01/dataset-seichi-onp-k8s-01/snapshots`（作成済み） |
+
+Initiator Group ID: 2 の新設手順（TrueNAS Scale WebUI）:
+
+1. **Shares > iSCSI > Initiators** を開く
+2. **Add** をクリック
+3. **Initiators** フィールドは空のまま（= 全許可）にして保存
+4. 採番された ID が `2` であることを確認する
 
 ## セットアップ手順
 
@@ -73,7 +85,7 @@ iscsi:
   nameSuffix: "-seichi-onp-k8s"
   targetGroups:
     - targetGroupPortalGroup: 1
-      targetGroupInitiatorGroup: 1
+      targetGroupInitiatorGroup: 2
       targetGroupAuthType: None
   extentInsecureTpc: true
   extentDisablePhysicalBlocksize: true
