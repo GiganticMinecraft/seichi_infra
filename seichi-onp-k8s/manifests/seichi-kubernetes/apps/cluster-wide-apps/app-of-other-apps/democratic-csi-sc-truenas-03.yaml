@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: democratic-csi-truenas-iscsi
+  name: democratic-csi-sc-truenas-03
   namespace: argocd
 spec:
   project: cluster-wide-apps
@@ -10,20 +10,20 @@ spec:
     repoURL: https://democratic-csi.github.io/charts
     targetRevision: 0.15.1
     helm:
-      releaseName: democratic-csi-truenas-iscsi
+      releaseName: democratic-csi-sc-truenas-03
       values: |
         csiDriver:
-          name: "org.democratic-csi.truenas-iscsi"
+          name: "org.democratic-csi.sc-truenas-03"
 
         driver:
-          existingConfigSecret: democratic-csi-driver-config
+          existingConfigSecret: democratic-csi-driver-config-sc-truenas-03
           # NOTE: existingConfigSecret 使用時も driver フィールドの指定が必要
           # ref. https://github.com/democratic-csi/charts/blob/master/stable/democratic-csi/values.yaml
           config:
             driver: freenas-scale-api-iscsi
 
         storageClasses:
-          - name: truenas-iscsi-storage
+          - name: sc-truenas-03-iscsi
             defaultClass: false
             reclaimPolicy: Delete
             volumeBindingMode: Immediate
@@ -32,7 +32,7 @@ spec:
               fsType: ext4
 
         volumeSnapshotClasses:
-          - name: truenas-iscsi-vsc
+          - name: sc-truenas-03-iscsi-vsc
             deletionPolicy: Delete
   destination:
     server: https://kubernetes.default.svc

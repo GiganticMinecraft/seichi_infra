@@ -125,7 +125,7 @@ resource "kubernetes_secret" "onp_democratic_csi_sc_truenas_03" {
   depends_on = [kubernetes_namespace.onp_democratic_csi]
 
   metadata {
-    name      = "democratic-csi-driver-config"
+    name      = "democratic-csi-driver-config-sc-truenas-03"
     namespace = "democratic-csi"
   }
 

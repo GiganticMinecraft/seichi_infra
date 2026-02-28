@@ -18,7 +18,7 @@ Terraform variable
   onp_k8s_democratic_csi_sc_truenas_03_driver_config
         ↓ terraform/onp_cluster_secrets.tf が apply
 Kubernetes Secret
-  democratic-csi/democratic-csi-driver-config
+  democratic-csi/democratic-csi-driver-config-sc-truenas-03
         ↓ ArgoCD が参照
 democratic-csi CSI ドライバー
 ```
@@ -84,16 +84,16 @@ iscsi:
 ### 3. Secret が反映されたことを確認する
 
 Secret 登録後、main ブランチへのマージをトリガーに `terraform apply` が自動実行され、
-`democratic-csi` namespace に `democratic-csi-driver-config` Secret が作成される。
+`democratic-csi` namespace に `democratic-csi-driver-config-sc-truenas-03` Secret が作成される。
 
 以下のコマンドで確認する。
 
 ```bash
-ssh seichi-onp-k8s-cp-1 "kubectl get secret democratic-csi-driver-config -n democratic-csi"
+ssh seichi-onp-k8s-cp-1 "kubectl get secret democratic-csi-driver-config-sc-truenas-03 -n democratic-csi"
 ```
 
-Secret が作成されると ArgoCD が `democratic-csi-truenas-iscsi` Application を自動デプロイし、
-`truenas-iscsi-storage` StorageClass が利用可能になる。
+Secret が作成されると ArgoCD が `democratic-csi-sc-truenas-03` Application を自動デプロイし、
+`sc-truenas-03-iscsi` StorageClass が利用可能になる。
 
 ## API Key のローテーション
 
