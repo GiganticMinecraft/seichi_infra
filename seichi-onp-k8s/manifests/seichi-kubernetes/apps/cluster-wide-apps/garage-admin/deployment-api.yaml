@@ -33,6 +33,8 @@ spec:
               value: "https://garage-admin.onp.admin.seichi.click"
             - name: GITHUB_ORG
               value: "GiganticMinecraft"
+            - name: GITHUB_TEAM_SLUG
+              value: "onp-admin-grafana"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://alloy.monitoring.svc.cluster.local:4318"
             - name: GARAGE_ADMIN_TOKEN
