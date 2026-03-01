@@ -20,6 +20,7 @@ spec:
     #  - metrics-server
     #  - metallb
     #  - minio
+    #  - garage
     #  - monitoring
     #  - synology-csi
     #  - seichi-gateway-operator
@@ -38,6 +39,8 @@ spec:
     - namespace: "metallb-system"
       server: https://kubernetes.default.svc
     - namespace: "minio"
+      server: https://kubernetes.default.svc
+    - namespace: "garage"
       server: https://kubernetes.default.svc
     - namespace: "monitoring"
       server: https://kubernetes.default.svc
