@@ -230,8 +230,21 @@ resource "kubernetes_secret" "garage_thanos_credentials" {
   }
 
   data = {
-    "AWS_ACCESS_KEY_ID"     = var.garage_thanos_access_key_id
-    "AWS_SECRET_ACCESS_KEY" = var.garage_thanos_secret_access_key
+    # Thanos sidecar は objstore.yml キーで S3 設定を読み込む
+    "objstore.yml" = yamlencode({
+      type = "S3"
+      config = {
+        bucket       = "thanos"
+        endpoint     = "garage.garage.svc.cluster.local:3900"
+        region       = "seichi-cloud"
+        access_key   = var.garage_thanos_access_key_id
+        secret_key   = var.garage_thanos_secret_access_key
+        insecure     = true
+        http_config  = {
+          idle_conn_timeout = "90s"
+        }
+      }
+    })
   }
 
   type = "Opaque"
