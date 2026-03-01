@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: garage-admin-ui
+  labels:
+    app: garage-admin-ui
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: garage-admin-ui
+  template:
+    metadata:
+      labels:
+        app: garage-admin-ui
+    spec:
+      containers:
+        - name: garage-admin-ui
+          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          startupProbe:
+            tcpSocket:
+              port: 80
+            failureThreshold: 6
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 30

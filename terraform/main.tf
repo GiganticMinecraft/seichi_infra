@@ -293,6 +293,46 @@ variable "garage_backup_secret_access_key" {
 
 #endregion
 
+#region Garage Admin Console secrets
+
+variable "garage_admin_github_client_id" {
+  description = "GitHub OAuth Client ID for Garage Admin Console"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_admin_github_client_secret" {
+  description = "GitHub OAuth Client Secret for Garage Admin Console"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_admin_session_secret" {
+  description = "Session cookie encryption key for Garage Admin Console"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_admin_api_token" {
+  description = "Garage Admin API bearer token for Garage Admin Console"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_admin_s3_access_key_id" {
+  description = "Garage S3 access key ID for Garage Admin Console (object browse/upload/download)"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_admin_s3_secret_access_key" {
+  description = "Garage S3 secret access key for Garage Admin Console"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region seichi-debug-minecraft secrets
 
 variable "minecraft__debug_s1_seichiassist_webhook_url" {
