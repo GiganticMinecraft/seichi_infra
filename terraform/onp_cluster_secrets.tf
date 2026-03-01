@@ -234,6 +234,22 @@ resource "kubernetes_secret" "garage_backup_s3_credentials" {
   type = "Opaque"
 }
 
+# Garage Admin API token (shared between Garage daemon and Admin Console)
+resource "kubernetes_secret" "garage_admin_api_token" {
+  depends_on = [kubernetes_namespace.garage]
+
+  metadata {
+    name      = "garage-admin-api-token"
+    namespace = "garage"
+  }
+
+  data = {
+    "token" = var.garage_admin_api_token
+  }
+
+  type = "Opaque"
+}
+
 # Garage Admin Console secrets
 resource "kubernetes_secret" "garage_admin_github_oauth" {
   metadata {

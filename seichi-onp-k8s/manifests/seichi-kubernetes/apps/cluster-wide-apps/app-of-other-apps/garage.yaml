@@ -57,6 +57,13 @@ spec:
             cpu: 1000m
             memory: 2Gi
 
+        environment:
+          - name: GARAGE_ADMIN_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: garage-admin-api-token
+                key: token
+
         monitoring:
           metrics:
             enabled: true
