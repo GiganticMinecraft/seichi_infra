@@ -1,0 +1,82 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: garage
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: cluster-wide-apps
+  source:
+    repoURL: https://github.com/deuxfleurs-org/garage.git
+    targetRevision: v2.2.0
+    path: script/helm/garage
+    helm:
+      releaseName: garage
+      values: |
+        garage:
+          dbEngine: "lmdb"
+          blockSize: "1048576"
+          replicationFactor: "2"
+          consistencyMode: "consistent"
+          compressionLevel: "1"
+          rpcBindAddr: "[::]:3901"
+          kubernetesSkipCrd: false
+          s3:
+            api:
+              region: "seichi-cloud"
+              rootDomain: ".s3.garage.svc.cluster.local"
+            web:
+              rootDomain: ".web.garage.svc.cluster.local"
+              index: "index.html"
+
+        persistence:
+          enabled: true
+          meta:
+            storageClass: "synology-iscsi-storage"
+            size: 100Gi
+          data:
+            storageClass: "sc-truenas-03-iscsi"
+            size: 4Ti
+
+        deployment:
+          kind: StatefulSet
+          replicaCount: 3
+          podManagementPolicy: OrderedReady
+
+        image:
+          repository: dxflrs/amd64_garage
+          tag: "v2.2.0"
+          pullPolicy: IfNotPresent
+
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+
+        monitoring:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+              labels:
+                release: prometheus
+              interval: 30s
+              scrapeTimeout: 10s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: garage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/volumeClaimTemplates
