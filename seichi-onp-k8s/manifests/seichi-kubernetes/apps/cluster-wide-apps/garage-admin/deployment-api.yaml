@@ -36,7 +36,7 @@ spec:
             - name: GITHUB_TEAM_SLUG
               value: "onp-admin-grafana"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://alloy.monitoring.svc.cluster.local:4318"
+              value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
             - name: GARAGE_ADMIN_TOKEN
               valueFrom:
                 secretKeyRef:
