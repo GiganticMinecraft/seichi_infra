@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: garage-admin-ui
-          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:sha-b9b4529
+          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:sha-a985456
           ports:
             - containerPort: 80
           resources:
