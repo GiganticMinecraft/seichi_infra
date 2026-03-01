@@ -162,8 +162,19 @@ spec:
                   secureJsonData:
                     password: ${MARIADB_MONITORING_PASSWORD}
         prometheus:
+          thanosService:
+            enabled: true
+          thanosServiceMonitor:
+            enabled: true
+            labels:
+              release: prometheus
           prometheusSpec:
             enableOTLPReceiver: true
+            thanos:
+              objectStorageConfig:
+                existingSecret:
+                  name: garage-thanos-credentials
+                  key: objstore.yml
             storageSpec:
               volumeClaimTemplate:
                 spec:
