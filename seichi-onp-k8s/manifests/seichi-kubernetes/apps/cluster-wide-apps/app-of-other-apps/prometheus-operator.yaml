@@ -170,6 +170,7 @@ spec:
               release: prometheus
           prometheusSpec:
             enableOTLPReceiver: true
+            enableRemoteWriteReceiver: true
             thanos:
               objectStorageConfig:
                 existingSecret:
