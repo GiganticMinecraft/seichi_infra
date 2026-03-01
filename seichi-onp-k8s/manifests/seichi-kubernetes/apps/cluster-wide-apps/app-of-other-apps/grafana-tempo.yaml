@@ -16,6 +16,17 @@ spec:
     targetRevision: 1.24.4
     helm:
       values: |
+        tempo:
+          metricsGenerator:
+            enabled: true
+            remoteWriteUrl: "http://prometheus-kube-prometheus-prometheus.monitoring:9090/api/v1/write"
+          overrides:
+            defaults:
+              metrics_generator:
+                processors:
+                  - local-blocks
+                  - service-graphs
+                  - span-metrics
         persistence:
           enabled: true
           accessModes:
