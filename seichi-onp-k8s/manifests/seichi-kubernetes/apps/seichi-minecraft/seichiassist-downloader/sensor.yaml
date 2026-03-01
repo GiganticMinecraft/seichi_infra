@@ -77,25 +77,24 @@ spec:
                         ]
                   - name: upload-artifact
                     container:
-                      image: minio/mc:RELEASE.2025-04-16T18-13-26Z-cpuv1
+                      image: amazon/aws-cli:latest
                       env:
-                        - name: MINIO_ACCESS_KEY
+                        - name: AWS_ACCESS_KEY_ID
                           valueFrom:
                             secretKeyRef:
-                              name: minio-access-secret
-                              key: MINIO_ACCESS_KEY
-                        - name: MINIO_ACCESS_SECRET
+                              name: garage-s3-credentials
+                              key: AWS_ACCESS_KEY_ID
+                        - name: AWS_SECRET_ACCESS_KEY
                           valueFrom:
                             secretKeyRef:
-                              name: minio-access-secret
-                              key: MINIO_ACCESS_SECRET
+                              name: garage-s3-credentials
+                              key: AWS_SECRET_ACCESS_KEY
                       volumeMounts:
                         - name: work
                           mountPath: /work
                       command: [sh, -c]
                       args: [
-                          "mc alias set myminio http://seichi-private-plugin-blackhole-minio.minio:9000/ ${MINIO_ACCESS_KEY} ${MINIO_ACCESS_SECRET} && \
-                          mc cp /work/SeichiAssist.jar myminio/seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar",
+                          "aws --endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud s3 cp /work/SeichiAssist.jar s3://seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar",
                         ]
                   - name: restart-debug-server
                     steps:

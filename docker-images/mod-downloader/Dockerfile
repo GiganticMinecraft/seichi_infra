@@ -20,9 +20,10 @@ LABEL org.opencontainers.image.url="https://github.com/GiganticMinecraft/seichi_
 LABEL org.opencontainers.image.source="https://github.com/GiganticMinecraft/seichi_infra/blob/main/docker-images/mod-downloader/Dockerfile"
 
 COPY --link --from=builder /mod-downloader /bin/
-ENV MINIO_ENDPOINT=""
-ENV MINIO_ACCESS_KEY=""
-ENV MINIO_ACCESS_SECRET=""
+ENV S3_ENDPOINT=""
+ENV S3_ACCESS_KEY=""
+ENV S3_SECRET_KEY=""
+ENV S3_REGION="seichi-cloud"
 ENV BUCKET_NAME=""
 ENV BUCKET_PREFIX_NAME=""
 ENV DOWNLOAD_TARGET_DIR_PATH=""

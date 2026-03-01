@@ -64,19 +64,6 @@ resource "cloudflare_ruleset" "custom_firewall_rules" {
 
   rules {
     action      = "skip"
-    expression  = "http.host eq \"minio-console.onp-k8s.admin.seichi.click\""
-    description = "Let MinIO API requests bypass WAF rules"
-    action_parameters {
-      products = ["waf"]
-    }
-    logging {
-      enabled = true
-    }
-    enabled = true
-  }
-
-  rules {
-    action      = "skip"
     expression  = "http.host eq \"phpmyadmin.onp-k8s.admin.seichi.click\""
     description = "Let phpMyAdmin requests bypass WAF rules"
     action_parameters {

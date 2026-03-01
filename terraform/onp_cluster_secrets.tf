@@ -156,54 +156,6 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "minio_root_user" {
-  depends_on = [kubernetes_namespace.minio]
-
-  metadata {
-    name      = "minio-root-user"
-    namespace = "minio"
-  }
-
-  data = {
-    "rootUser"     = "root"
-    "rootPassword" = var.minio_root_password
-  }
-
-  type = "Opaque"
-}
-
-resource "kubernetes_secret" "minio_prod_access_secret" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
-
-  metadata {
-    name      = "minio-access-secret"
-    namespace = "seichi-minecraft"
-  }
-
-  data = {
-    "MINIO_ACCESS_KEY"    = var.minio_prod_access_key
-    "MINIO_ACCESS_SECRET" = var.minio_prod_access_secret
-  }
-
-  type = "Opaque"
-}
-
-resource "kubernetes_secret" "minio_debug_access_secret" {
-  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
-
-  metadata {
-    name      = "minio-access-secret"
-    namespace = "seichi-debug-minecraft"
-  }
-
-  data = {
-    "MINIO_ACCESS_KEY"    = var.minio_debug_access_key
-    "MINIO_ACCESS_SECRET" = var.minio_debug_access_secret
-  }
-
-  type = "Opaque"
-}
-
 # Garage S3-compatible object storage credentials
 resource "kubernetes_secret" "garage_loki_credentials" {
   depends_on = [kubernetes_namespace.onp_monitoring]
@@ -261,6 +213,22 @@ resource "kubernetes_secret" "garage_seichi_minecraft_credentials" {
   data = {
     "AWS_ACCESS_KEY_ID"     = var.garage_seichi_minecraft_access_key_id
     "AWS_SECRET_ACCESS_KEY" = var.garage_seichi_minecraft_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "garage_backup_s3_credentials" {
+  depends_on = [kubernetes_namespace.garage]
+
+  metadata {
+    name      = "garage-backup-s3-credentials"
+    namespace = "garage"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_backup_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_backup_secret_access_key
   }
 
   type = "Opaque"

@@ -4,7 +4,7 @@ metadata:
   name: upload-world-to-minio
   namespace: seichi-debug-minecraft
   annotations:
-    workflows.argoproj.io/description: "最新PBSバックアップからワールドデータを抽出し、MinIOにアップロードするワークフロー"
+    workflows.argoproj.io/description: "最新PBSバックアップからワールドデータを抽出し、Garageにアップロードするワークフロー"
 spec:
   serviceAccountName: upload-world-to-minio-workflow-sa
   ttlStrategy:
@@ -92,12 +92,12 @@ spec:
           echo "=== Restore contents ==="
           ls -la /work/restore/
 
-          echo "=== Installing MinIO client ==="
-          curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
-          chmod +x /usr/local/bin/mc
-
-          echo "=== Configuring MinIO client ==="
-          /usr/local/bin/mc alias set myminio "http://seichi-private-plugin-blackhole-minio.minio:9000" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
+          echo "=== Installing AWS CLI ==="
+          apt install -y unzip
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+          unzip -q /tmp/awscliv2.zip -d /tmp
+          /tmp/aws/install
+          rm -rf /tmp/awscliv2.zip /tmp/aws
 
           echo "=== Compressing and uploading each world ==="
           WORLD_NAMES="world_2 world_2_the_end world_SW world_SW_2 world_SW_3 world_SW_4 world_SW_nether world_SW_the_end"
@@ -116,7 +116,7 @@ spec:
             echo "Compressed file size: $(du -h /work/tmp-${FILENAME} | cut -f1)"
 
             echo "--- Uploading ${WORLD_NAME} ---"
-            /usr/local/bin/mc cp "/work/tmp-${FILENAME}" "myminio/mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
+            aws --endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud s3 cp "/work/tmp-${FILENAME}" "s3://mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
             echo "Uploaded: mc-worlds/{{inputs.parameters.server-name}}/${FILENAME}"
 
             rm -f "/work/tmp-${FILENAME}"
@@ -151,16 +151,16 @@ spec:
               secretKeyRef:
                 name: pbs-credentials
                 key: fingerprint
-          - name: MINIO_ACCESS_KEY
+          - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: minio-access-secret
-                key: MINIO_ACCESS_KEY
-          - name: MINIO_ACCESS_SECRET
+                name: garage-s3-credentials
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: minio-access-secret
-                key: MINIO_ACCESS_SECRET
+                name: garage-s3-credentials
+                key: AWS_SECRET_ACCESS_KEY
         volumeMounts:
           - name: work-volume
             mountPath: /work

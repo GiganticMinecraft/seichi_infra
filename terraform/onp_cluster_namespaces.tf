@@ -64,12 +64,6 @@ resource "kubernetes_namespace" "cloudflared_tunnel_exits" {
   }
 }
 
-resource "kubernetes_namespace" "minio" {
-  metadata {
-    name = "minio"
-  }
-}
-
 resource "kubernetes_namespace" "garage" {
   metadata {
     name = "garage"

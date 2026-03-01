@@ -6,7 +6,7 @@ metadata:
 spec:
   initContainers:
     - name: fetch-latest-mariadb-backups
-      image: minio/mc:RELEASE.2025-04-16T18-13-26Z-cpuv1
+      image: amazon/aws-cli:latest
       command:
         - sh
         - -c
@@ -14,23 +14,22 @@ spec:
         - |
           set -eu
 
-          mc alias set myminio "${MINIO_ENDPOINT}" "${MINIO_ACCESS_KEY}" "${MINIO_ACCESS_SECRET}"
+          export AWS_ACCESS_KEY_ID="${S3_ACCESS_KEY}"
+          export AWS_SECRET_ACCESS_KEY="${S3_SECRET_KEY}"
+          S3_OPTS="--endpoint-url ${S3_ENDPOINT} --region seichi-cloud"
 
           copy_latest_sql() {
             prefix="$1"
             output_file="$2"
-            search_root="myminio/${BUCKET_NAME}/${prefix}/"
-            prefix_marker="/${prefix}/"
             latest_key=""
             latest_filename=""
 
-            for object_path in $(mc find "${search_root}" --name 'backup.*.sql' || true); do
-              object_name="${object_path##*/}"
-              case "${object_path}" in
-                *"${prefix_marker}"backup.????-??-??T??:??:??Z.sql)
-                  if [ -z "${latest_filename}" ] || [ "${object_name}" \> "${latest_filename}" ]; then
-                    latest_filename="${object_name}"
-                    latest_key="${object_path}"
+            for object_key in $(aws s3 ls ${S3_OPTS} "s3://${BUCKET_NAME}/${prefix}/" | awk '{print $NF}'); do
+              case "${object_key}" in
+                backup.????-??-??T??:??:??Z.sql)
+                  if [ -z "${latest_filename}" ] || [ "${object_key}" \> "${latest_filename}" ]; then
+                    latest_filename="${object_key}"
+                    latest_key="${prefix}/${object_key}"
                   fi
                   ;;
               esac
@@ -41,30 +40,25 @@ spec:
               exit 1
             fi
 
-            case "${latest_key}" in
-              myminio/*) source_path="${latest_key}" ;;
-              *) source_path="myminio/${BUCKET_NAME}/${latest_key}" ;;
-            esac
-
-            mc cp "${source_path}" "/docker-entrypoint-initdb.d/${output_file}"
+            aws s3 cp ${S3_OPTS} "s3://${BUCKET_NAME}/${latest_key}" "/docker-entrypoint-initdb.d/${output_file}"
           }
 
           copy_latest_sql database--flyway 10-flyway.sql
           copy_latest_sql database--seichiassist 20-seichiassist.sql
           copy_latest_sql database--luckperms 30-luckperms.sql
       env:
-        - name: MINIO_ENDPOINT
-          value: http://seichi-private-plugin-blackhole-minio.minio:9000
-        - name: MINIO_ACCESS_KEY
+        - name: S3_ENDPOINT
+          value: http://garage.garage.svc.cluster.local:3900
+        - name: S3_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: minio-access-secret
-              key: MINIO_ACCESS_KEY
-        - name: MINIO_ACCESS_SECRET
+              name: garage-s3-credentials
+              key: AWS_ACCESS_KEY_ID
+        - name: S3_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: minio-access-secret
-              key: MINIO_ACCESS_SECRET
+              name: garage-s3-credentials
+              key: AWS_SECRET_ACCESS_KEY
         - name: BUCKET_NAME
           value: mariadb-backups
     - name: fix-sql-dump-permissions

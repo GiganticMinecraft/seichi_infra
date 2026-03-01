@@ -7,9 +7,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getsentry/sentry-go"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func init() {
@@ -18,10 +21,7 @@ func init() {
 
 func main() {
 	err := sentry.Init(sentry.ClientOptions{
-		Dsn: "https://4e29bb46d28a81476f9d565fb4e312a6@sentry.onp.admin.seichi.click//4",
-		// Set TracesSampleRate to 1.0 to capture 100%
-		// of transactions for performance monitoring.
-		// We recommend adjusting this value in production,
+		Dsn:              "https://4e29bb46d28a81476f9d565fb4e312a6@sentry.onp.admin.seichi.click//4",
 		TracesSampleRate: 1.0,
 	})
 	if err != nil {
@@ -30,62 +30,108 @@ func main() {
 
 	downloadTargetDirPath := os.Getenv("DOWNLOAD_TARGET_DIR_PATH")
 	err = os.MkdirAll(downloadTargetDirPath, 0600)
-
 	if err != nil {
 		sentry.CaptureException(err)
 		log.Fatalln(err)
 		return
 	}
 
-	endpoint := os.Getenv("MINIO_ENDPOINT")
-	accessKeyID := os.Getenv("MINIO_ACCESS_KEY")
-	secretAccessKey := os.Getenv("MINIO_ACCESS_SECRET")
-	useSSL := false
+	endpoint := os.Getenv("S3_ENDPOINT")
+	accessKeyID := os.Getenv("S3_ACCESS_KEY")
+	secretAccessKey := os.Getenv("S3_SECRET_KEY")
+	region := os.Getenv("S3_REGION")
+	if region == "" {
+		region = "seichi-cloud"
+	}
 
-	// Initialize minio client object.
-	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
+	// Backward compatibility: fall back to MINIO_* env vars if S3_* are not set
+	if endpoint == "" {
+		endpoint = os.Getenv("MINIO_ENDPOINT")
+	}
+	if accessKeyID == "" {
+		accessKeyID = os.Getenv("MINIO_ACCESS_KEY")
+	}
+	if secretAccessKey == "" {
+		secretAccessKey = os.Getenv("MINIO_ACCESS_SECRET")
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.Background(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")),
+	)
+	if err != nil {
+		sentry.CaptureException(err)
+		log.Fatalln(err)
+		return
+	}
+
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.BaseEndpoint = aws.String("http://" + endpoint)
+		o.UsePathStyle = true
 	})
-	if err != nil {
-		sentry.CaptureException(err)
-		log.Fatalln(err)
-		return
-	}
 
 	bucketName := os.Getenv("BUCKET_NAME")
 	prefixName := os.Getenv("BUCKET_PREFIX_NAME")
 
 	ctx, cancel := context.WithCancel(context.Background())
-
 	defer cancel()
 
-	objectCh := minioClient.ListObjects(ctx, bucketName, minio.ListObjectsOptions{
-		Prefix:    prefixName,
-		Recursive: true,
+	downloader := manager.NewDownloader(client)
+
+	paginator := s3.NewListObjectsV2Paginator(client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(bucketName),
+		Prefix: aws.String(prefixName),
 	})
-	for object := range objectCh {
-		if object.Err != nil {
-			slog.Error("Error:", "error", object.Err)
+
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			slog.Error("Error listing objects:", "error", err)
 			sentry.CaptureException(err)
 			return
 		}
-		// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
-		filePathToSave := downloadTargetDirPath + strings.TrimPrefix(object.Key, prefixName)
-		slog.Info("Downloading object:", "objectKey", object.Key)
-		err = minioClient.FGetObject(context.Background(), bucketName, object.Key, filePathToSave, minio.GetObjectOptions{})
-		if err != nil {
-			slog.Error("Error downloading object:", "objectKey", object.Key, "error", err)
-			sentry.CaptureException(err)
-			return
-		}
-		// 保存したファイルの所有権をitzg/minecraftに渡す ref. https://github.com/itzg/docker-minecraft-server/issues/1583
-		err := os.Chown(filePathToSave, 1000, 1000)
-		if err != nil {
-			slog.Error("Error changing file ownership:", "filePath", filePathToSave, "error", err)
-			sentry.CaptureException(err)
-		} else {
-			slog.Info("File ownership changed successfully", "filePath", filePathToSave)
+
+		for _, object := range page.Contents {
+			key := aws.ToString(object.Key)
+			// キー名が最初からprefix付きで返ってくるので、ディレクトリ指定の際にはTrimする必要がある
+			filePathToSave := downloadTargetDirPath + strings.TrimPrefix(key, prefixName)
+
+			slog.Info("Downloading object:", "objectKey", key)
+
+			// Ensure parent directory exists
+			if dir := filePathToSave[:strings.LastIndex(filePathToSave, "/")]; dir != "" {
+				if err := os.MkdirAll(dir, 0755); err != nil {
+					slog.Error("Error creating directory:", "dir", dir, "error", err)
+					sentry.CaptureException(err)
+					return
+				}
+			}
+
+			f, err := os.Create(filePathToSave)
+			if err != nil {
+				slog.Error("Error creating file:", "filePath", filePathToSave, "error", err)
+				sentry.CaptureException(err)
+				return
+			}
+
+			_, err = downloader.Download(ctx, f, &s3.GetObjectInput{
+				Bucket: aws.String(bucketName),
+				Key:    aws.String(key),
+			})
+			f.Close()
+			if err != nil {
+				slog.Error("Error downloading object:", "objectKey", key, "error", err)
+				sentry.CaptureException(err)
+				return
+			}
+
+			// 保存したファイルの所有権をitzg/minecraftに渡す ref. https://github.com/itzg/docker-minecraft-server/issues/1583
+			if err := os.Chown(filePathToSave, 1000, 1000); err != nil {
+				slog.Error("Error changing file ownership:", "filePath", filePathToSave, "error", err)
+				sentry.CaptureException(err)
+			} else {
+				slog.Info("File ownership changed successfully", "filePath", filePathToSave)
+			}
 		}
 	}
 
