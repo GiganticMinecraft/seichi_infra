@@ -234,13 +234,13 @@ resource "kubernetes_secret" "garage_thanos_credentials" {
     "objstore.yml" = yamlencode({
       type = "S3"
       config = {
-        bucket       = "thanos"
-        endpoint     = "garage.garage.svc.cluster.local:3900"
-        region       = "seichi-cloud"
-        access_key   = var.garage_thanos_access_key_id
-        secret_key   = var.garage_thanos_secret_access_key
-        insecure     = true
-        http_config  = {
+        bucket     = "thanos"
+        endpoint   = "garage.garage.svc.cluster.local:3900"
+        region     = "seichi-cloud"
+        access_key = var.garage_thanos_access_key_id
+        secret_key = var.garage_thanos_secret_access_key
+        insecure   = true
+        http_config = {
           idle_conn_timeout = "90s"
         }
       }
