@@ -96,7 +96,7 @@ spec:
               }
 
               output {
-                logs   = [otelcol.processor.attributes.localtempo.input]
+                logs   = [otelcol.receiver.loki.localtempo.receiver]
                 traces = [otelcol.processor.attributes.localtempo.input]
               }
             }
