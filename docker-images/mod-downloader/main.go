@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/getsentry/sentry-go"
 )
@@ -76,7 +76,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	downloader := manager.NewDownloader(client)
+	tm := transfermanager.New(client)
 
 	paginator := s3.NewListObjectsV2Paginator(client, &s3.ListObjectsV2Input{
 		Bucket: aws.String(bucketName),
@@ -114,11 +114,14 @@ func main() {
 				return
 			}
 
-			_, err = downloader.Download(ctx, f, &s3.GetObjectInput{
-				Bucket: aws.String(bucketName),
-				Key:    aws.String(key),
+			_, err = tm.DownloadObject(ctx, &transfermanager.DownloadObjectInput{
+				Bucket:   aws.String(bucketName),
+				Key:      aws.String(key),
+				WriterAt: f,
 			})
-			f.Close()
+			if closeErr := f.Close(); closeErr != nil {
+				slog.Error("Error closing file:", "filePath", filePathToSave, "error", closeErr)
+			}
 			if err != nil {
 				slog.Error("Error downloading object:", "objectKey", key, "error", err)
 				sentry.CaptureException(err)
