@@ -234,6 +234,49 @@ resource "kubernetes_secret" "garage_backup_s3_credentials" {
   type = "Opaque"
 }
 
+# Garage Admin Console secrets
+resource "kubernetes_secret" "garage_admin_github_oauth" {
+  metadata {
+    name      = "garage-admin-github-oauth"
+    namespace = "cluster-wide-apps"
+  }
+
+  data = {
+    "GITHUB_CLIENT_ID"     = var.garage_admin_github_client_id
+    "GITHUB_CLIENT_SECRET" = var.garage_admin_github_client_secret
+    "SESSION_SECRET"       = var.garage_admin_session_secret
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "garage_admin_token" {
+  metadata {
+    name      = "garage-admin-token"
+    namespace = "cluster-wide-apps"
+  }
+
+  data = {
+    "GARAGE_ADMIN_TOKEN" = var.garage_admin_api_token
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "garage_admin_s3" {
+  metadata {
+    name      = "garage-admin-s3"
+    namespace = "cluster-wide-apps"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_admin_s3_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_admin_s3_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
 resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない

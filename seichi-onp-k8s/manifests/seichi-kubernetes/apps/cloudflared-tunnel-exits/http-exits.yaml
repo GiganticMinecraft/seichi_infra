@@ -101,6 +101,11 @@ spec:
             external-hostname: bugsink-dsn.onp-k8s.admin.seichi.click
             internal-authority: "bugsink-dsn-proxy.seichi-minecraft:80"
 
+          # Garage Admin Console (GitHub OAuth 認証付き)
+          - name: garage-admin
+            external-hostname: garage-admin.onp.admin.seichi.click
+            internal-authority: "garage-admin-ui.cluster-wide-apps:80"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"

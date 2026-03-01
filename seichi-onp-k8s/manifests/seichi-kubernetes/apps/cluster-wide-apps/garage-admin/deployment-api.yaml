@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: garage-admin-api
+  labels:
+    app: garage-admin-api
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: garage-admin-api
+  template:
+    metadata:
+      labels:
+        app: garage-admin-api
+    spec:
+      containers:
+        - name: garage-admin-api
+          image: ghcr.io/giganticminecraft/garage-admin-console-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: GARAGE_ADMIN_ENDPOINT
+              value: "http://garage.garage.svc.cluster.local:3903"
+            - name: GARAGE_S3_ENDPOINT
+              value: "http://garage.garage.svc.cluster.local:3900"
+            - name: GARAGE_S3_REGION
+              value: "seichi-cloud"
+            - name: BASE_URL
+              value: "https://garage-admin.onp.admin.seichi.click"
+            - name: GITHUB_ORG
+              value: "GiganticMinecraft"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://alloy.monitoring.svc.cluster.local:4318"
+            - name: GARAGE_ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: garage-admin-token
+                  key: GARAGE_ADMIN_TOKEN
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: garage-admin-github-oauth
+                  key: GITHUB_CLIENT_ID
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: garage-admin-github-oauth
+                  key: GITHUB_CLIENT_SECRET
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: garage-admin-github-oauth
+                  key: SESSION_SECRET
+            - name: GARAGE_S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-admin-s3
+                  key: AWS_ACCESS_KEY_ID
+            - name: GARAGE_S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-admin-s3
+                  key: AWS_SECRET_ACCESS_KEY
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            failureThreshold: 6
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            periodSeconds: 30
