@@ -204,6 +204,55 @@ resource "kubernetes_secret" "minio_debug_access_secret" {
   type = "Opaque"
 }
 
+# Garage S3-compatible object storage credentials
+resource "kubernetes_secret" "garage_loki_credentials" {
+  depends_on = [kubernetes_namespace.onp_monitoring]
+
+  metadata {
+    name      = "garage-loki-credentials"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_loki_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_loki_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "garage_thanos_credentials" {
+  depends_on = [kubernetes_namespace.onp_monitoring]
+
+  metadata {
+    name      = "garage-thanos-credentials"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_thanos_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_thanos_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "garage_seichi_minecraft_credentials" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "garage-s3-credentials"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_seichi_minecraft_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_seichi_minecraft_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
 resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない

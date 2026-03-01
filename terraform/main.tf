@@ -276,6 +276,46 @@ variable "minio_debug_access_secret" {
 
 #endregion
 
+#region on-premise Garage (S3-compatible object storage)
+
+variable "garage_loki_access_key_id" {
+  description = "Garage access key ID for Loki"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_loki_secret_access_key" {
+  description = "Garage secret access key for Loki"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_thanos_access_key_id" {
+  description = "Garage access key ID for Thanos"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_thanos_secret_access_key" {
+  description = "Garage secret access key for Thanos"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_seichi_minecraft_access_key_id" {
+  description = "Garage access key ID for seichi-minecraft (plugins, backups, worlds)"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_seichi_minecraft_secret_access_key" {
+  description = "Garage secret access key for seichi-minecraft"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region seichi-debug-minecraft secrets
 
 variable "minecraft__debug_s1_seichiassist_webhook_url" {
