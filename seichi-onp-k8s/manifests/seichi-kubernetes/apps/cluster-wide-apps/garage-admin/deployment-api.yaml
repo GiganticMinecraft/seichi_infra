@@ -24,7 +24,7 @@ spec:
             - containerPort: 8080
           env:
             - name: GARAGE_ADMIN_ENDPOINT
-              value: "http://garage.garage.svc.cluster.local:3903"
+              value: "http://garage-metrics.garage.svc.cluster.local:3903"
             - name: GARAGE_S3_ENDPOINT
               value: "http://garage.garage.svc.cluster.local:3900"
             - name: GARAGE_S3_REGION
