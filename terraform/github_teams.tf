@@ -53,12 +53,6 @@ resource "github_team" "onp_admin_raritan" {
   privacy     = "closed"
 }
 
-resource "github_team" "onp_admin_minio" {
-  name        = "onp-admin-minio"
-  description = "オンプレミス環境のminioに接続できるTeam"
-  privacy     = "closed"
-}
-
 resource "github_team" "prod_seichi_minecraft_readonly_services_access" {
   name        = "prod-seichi-minecraft-readonly-services-access"
   description = "本番環境の read-only なサービスにアクセスできる Team"

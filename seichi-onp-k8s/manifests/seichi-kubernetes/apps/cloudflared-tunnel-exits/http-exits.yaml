@@ -36,12 +36,6 @@ spec:
             external-hostname: raritan.onp.admin.seichi.click
             internal-authority: "10.123.0.200:80"
 
-          # プライベートなminecraft pluginをアップロードするためのMinIO。
-          # 肝心のオブジェクトストレージは seichi-private-plugin-blackhole-minio.minio:9000 にClusterIPでアクセスすればよい。
-          - name: minio-console
-            external-hostname: minio-console.onp-k8s.admin.seichi.click
-            internal-authority: "seichi-private-plugin-blackhole-minio-console.minio:9001"
-
           # Cilium HubbleのUI
           - name: hubble-ui
             external-hostname: hubble-ui.onp-k8s.admin.seichi.click

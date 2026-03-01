@@ -1,0 +1,137 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: backup--garage-to-pbs
+  namespace: garage
+spec:
+  schedule: "0 10 * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  workflowSpec:
+    workflowTemplateRef:
+      name: backup--garage-to-pbs
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: backup--garage-to-pbs
+  namespace: garage
+  annotations:
+    workflows.argoproj.io/description: "GarageのデータをS3 API経由でダンプし、Proxmox Backup Serverにバックアップするワークフロー"
+spec:
+  serviceAccountName: garage-workflow-sa
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  activeDeadlineSeconds: 14400
+  entrypoint: default
+  templates:
+    - name: default
+      steps:
+        - - name: run-backup
+            template: run-backup
+
+    - name: run-backup
+      script:
+        image: debian:13
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+
+          echo "=== Installing dependencies ==="
+          apt-get update
+          apt-get install -y curl unzip
+
+          # AWS CLI のインストール
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+          unzip -q /tmp/awscliv2.zip -d /tmp
+          /tmp/aws/install
+          rm -rf /tmp/awscliv2.zip /tmp/aws
+
+          # Proxmox Backup Client のインストール
+          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
+          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
+          apt-get update
+          apt-get install -y proxmox-backup-client
+
+          echo "=== Dumping all Garage buckets via S3 API ==="
+          date
+
+          S3_OPTS="--endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud"
+          DUMP_DIR="/data/garage-dump"
+          mkdir -p "$DUMP_DIR"
+
+          # バケット一覧を取得してそれぞれ sync
+          BUCKETS=$(aws $S3_OPTS s3 ls | awk '{print $3}')
+          echo "Found buckets: $BUCKETS"
+
+          for bucket in $BUCKETS; do
+            echo "--- Syncing bucket: $bucket ---"
+            mkdir -p "$DUMP_DIR/$bucket"
+            aws $S3_OPTS s3 sync "s3://$bucket" "$DUMP_DIR/$bucket" --delete
+            echo "Bucket $bucket synced at $(date)"
+          done
+
+          echo "=== S3 dump complete ==="
+          du -sh "$DUMP_DIR"/*
+          date
+
+          echo "=== Running PBS backup ==="
+          proxmox-backup-client backup "${BACKUP_NAME}" \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}" \
+            --backup-id "${BACKUP_ID}"
+
+          echo "=== Backup complete ==="
+          date
+        env:
+          - name: TZ
+            value: "Asia/Tokyo"
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: garage-backup-s3-credentials
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: garage-backup-s3-credentials
+                key: AWS_SECRET_ACCESS_KEY
+          - name: BACKUP_NAME
+            value: "data.pxar:/data/garage-dump"
+          - name: BACKUP_ID
+            value: "garage"
+          - name: PBS_USER
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: user
+          - name: PBS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: host
+          - name: PBS_DATASTORE
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: datastore
+          - name: PBS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: password
+          - name: PBS_FINGERPRINT
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: fingerprint
+        volumeMounts:
+          - name: dump-volume
+            mountPath: /data
+          - name: pbs-tmpfs
+            mountPath: /root/.cache
+  volumes:
+    - name: dump-volume
+      emptyDir:
+        sizeLimit: 200Gi
+    - name: pbs-tmpfs
+      emptyDir: {}

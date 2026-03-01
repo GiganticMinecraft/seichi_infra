@@ -24,18 +24,18 @@ spec:
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6292501
           env:
-            - name: MINIO_ENDPOINT
-              value: seichi-private-plugin-blackhole-minio.minio:9000
-            - name: MINIO_ACCESS_KEY
+            - name: S3_ENDPOINT
+              value: garage.garage.svc.cluster.local:3900
+            - name: S3_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-access-secret
-                  key: MINIO_ACCESS_KEY
-            - name: MINIO_ACCESS_SECRET
+                  name: garage-s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: S3_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-access-secret
-                  key: MINIO_ACCESS_SECRET
+                  name: garage-s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
             - name: BUCKET_NAME
               value: seichi-plugins
             - name: BUCKET_PREFIX_NAME

@@ -1,0 +1,126 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: restore--garage-from-pbs
+  namespace: garage
+  annotations:
+    workflows.argoproj.io/description: "Proxmox Backup ServerからデータをリストアしてGarageにS3 API経由でアップロードするワークフロー"
+    workflows.argoproj.io/parameters: |
+      RESTORE_TARGET_DATE: "リストアするバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+spec:
+  serviceAccountName: garage-workflow-sa
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+  activeDeadlineSeconds: 14400
+  entrypoint: default
+  arguments:
+    parameters:
+      - name: RESTORE_TARGET_DATE
+        description: "リストアするバックアップの日付 (例: 2024-02-10T12:00:00Z)"
+        value: ""
+  templates:
+    - name: default
+      steps:
+        - - name: run-restore
+            template: run-restore
+
+    - name: run-restore
+      script:
+        image: debian:13
+        command: ["/bin/sh", "-c"]
+        source: |
+          set -e
+
+          echo "=== Installing dependencies ==="
+          apt-get update
+          apt-get install -y curl unzip
+
+          # AWS CLI のインストール
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+          unzip -q /tmp/awscliv2.zip -d /tmp
+          /tmp/aws/install
+          rm -rf /tmp/awscliv2.zip /tmp/aws
+
+          # Proxmox Backup Client のインストール
+          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
+          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
+          apt-get update
+          apt-get install -y proxmox-backup-client
+
+          echo "=== Restoring from PBS ==="
+          RESTORE_DIR="/data/garage-restore"
+          mkdir -p "$RESTORE_DIR"
+
+          proxmox-backup-client restore "host/${BACKUP_ID}/{{workflow.parameters.RESTORE_TARGET_DATE}}" \
+            "${RESTORE_ARCHIVE_NAME}" "${RESTORE_DIR}" \
+            --repository "${PBS_USER}@${PBS_HOST}:${PBS_DATASTORE}"
+
+          echo "=== PBS restore complete ==="
+          ls -la "$RESTORE_DIR"
+          date
+
+          echo "=== Uploading restored data to Garage via S3 API ==="
+          S3_OPTS="--endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud"
+
+          for bucket_dir in "$RESTORE_DIR"/*/; do
+            bucket=$(basename "$bucket_dir")
+            echo "--- Syncing bucket: $bucket ---"
+            aws $S3_OPTS s3 sync "$bucket_dir" "s3://$bucket"
+            echo "Bucket $bucket restored at $(date)"
+          done
+
+          echo "=== Restore complete ==="
+          date
+        env:
+          - name: TZ
+            value: "Asia/Tokyo"
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: garage-backup-s3-credentials
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: garage-backup-s3-credentials
+                key: AWS_SECRET_ACCESS_KEY
+          - name: RESTORE_ARCHIVE_NAME
+            value: "data.pxar"
+          - name: BACKUP_ID
+            value: "garage"
+          - name: PBS_USER
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: user
+          - name: PBS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: host
+          - name: PBS_DATASTORE
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: datastore
+          - name: PBS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: password
+          - name: PBS_FINGERPRINT
+            valueFrom:
+              secretKeyRef:
+                name: pbs-credentials
+                key: fingerprint
+        volumeMounts:
+          - name: restore-volume
+            mountPath: /data
+          - name: pbs-tmpfs
+            mountPath: /root/.cache
+  volumes:
+    - name: restore-volume
+      emptyDir:
+        sizeLimit: 200Gi
+    - name: pbs-tmpfs
+      emptyDir: {}

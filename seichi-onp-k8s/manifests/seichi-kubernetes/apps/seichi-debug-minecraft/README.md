@@ -9,8 +9,8 @@ graph LR
         DB_BACKUP[("本番 DB バックアップ")]
     end
 
-    subgraph minio_ns["Namespace: minio"]
-        MINIO[("MinIO")]
+    subgraph garage_ns["Namespace: garage"]
+        GARAGE[("Garage")]
     end
 
     subgraph debug["Namespace: seichi-debug-minecraft"]
@@ -22,12 +22,12 @@ graph LR
     end
 
     PBS -->|"スナップショット"| CRON
-    CRON -->|"ワールドデータ<br/>アップロード"| MINIO
-    DB_BACKUP -->|"SQLダンプ<br/>アップロード"| MINIO
+    CRON -->|"ワールドデータ<br/>アップロード"| GARAGE
+    DB_BACKUP -->|"SQLダンプ<br/>アップロード"| GARAGE
 
-    MINIO -->|"ワールドDL"| S1
-    MINIO -->|"ワールドDL"| S2
-    MINIO -->|"SQLダンプ復元"| MDB
+    GARAGE -->|"ワールドDL"| S1
+    GARAGE -->|"ワールドDL"| S2
+    GARAGE -->|"SQLダンプ復元"| MDB
 ```
 
 ## SeichiAssist の自動更新フロー
@@ -40,7 +40,7 @@ graph LR
 
     subgraph infra["インフラ基盤"]
         DL[["SeichiAssist<br/>Downloader"]]
-        MINIO[("MinIO")]
+        GARAGE[("Garage")]
     end
 
     subgraph runtime["実行環境"]
@@ -49,12 +49,12 @@ graph LR
     end
 
     REPO -->|"push (develop)"| DL
-    DL -->|"jar アップロード"| MINIO
+    DL -->|"jar アップロード"| GARAGE
     DL -.->|"Rollout Restart<br/>(RBAC経由)"| S1
     DL -.->|"Rollout Restart<br/>(RBAC経由)"| S2
     
-    MINIO -->|"再起動時に<br/>最新jarをDL"| S1
-    MINIO -->|"再起動時に<br/>最新jarをDL"| S2
+    GARAGE -->|"再起動時に<br/>最新jarをDL"| S1
+    GARAGE -->|"再起動時に<br/>最新jarをDL"| S2
 ```
 
 ## サーバー本体の更新フロー

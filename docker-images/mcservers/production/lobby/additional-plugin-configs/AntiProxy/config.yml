@@ -1,5 +1,5 @@
 # NOTE: AntiProxy に設定するホワイト/ブラックリストの設定では、グローバル IP を指定することになるが、
-# さすがにそれを seichi_infra で管理するのはまずいので、MinIO に乗せて管理することとする。
+# さすがにそれを seichi_infra で管理するのはまずいので、Garage (S3互換ストレージ) に乗せて管理することとする。
 
 Options:
   UseLightweight: true

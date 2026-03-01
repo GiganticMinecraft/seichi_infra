@@ -241,41 +241,6 @@ variable "onp_k8s_cloudflared_tunnel_credential" {
 
 #endregion
 
-#region on-premise MinIO
-
-variable "minio_root_password" {
-  description = "MinIO root password"
-  type        = string
-  sensitive   = true
-}
-
-variable "minio_prod_access_key" {
-  description = "MinIO access key in production environment"
-  type        = string
-  sensitive   = true
-}
-
-variable "minio_prod_access_secret" {
-  description = "MinIO access secret in production environment"
-  type        = string
-  sensitive   = true
-}
-
-
-variable "minio_debug_access_key" {
-  description = "MinIO access key in debug environment"
-  type        = string
-  sensitive   = true
-}
-
-variable "minio_debug_access_secret" {
-  description = "MinIO access secret in debug environment"
-  type        = string
-  sensitive   = true
-}
-
-#endregion
-
 #region on-premise Garage (S3-compatible object storage)
 
 variable "garage_loki_access_key_id" {
@@ -310,6 +275,18 @@ variable "garage_seichi_minecraft_access_key_id" {
 
 variable "garage_seichi_minecraft_secret_access_key" {
   description = "Garage secret access key for seichi-minecraft"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_backup_access_key_id" {
+  description = "Garage access key ID for PBS backup (requires access to all buckets)"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_backup_secret_access_key" {
+  description = "Garage secret access key for PBS backup"
   type        = string
   sensitive   = true
 }

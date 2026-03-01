@@ -4,7 +4,7 @@ metadata:
   name: upload-world-to-minio-weekly
   namespace: seichi-debug-minecraft
   annotations:
-    workflows.argoproj.io/description: "毎週月曜日 AM 1:00 (JST) にワールドデータをMinIOにアップロード"
+    workflows.argoproj.io/description: "毎週月曜日 AM 1:00 (JST) にワールドデータをGarageにアップロード"
 spec:
   schedule: "0 1 * * 1"
   timezone: "Asia/Tokyo"

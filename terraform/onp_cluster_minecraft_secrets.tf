@@ -264,12 +264,12 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   type = "Opaque"
 }
 
-resource "helm_release" "onp_minecraft_debug_minio_secrets" {
+resource "helm_release" "onp_minecraft_debug_garage_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
 
   repository = "https://giganticminecraft.github.io/seichi_infra/"
   chart      = "raw-resources"
-  name       = "seichi-debug-minecraft-minio-secrets"
+  name       = "seichi-debug-minecraft-garage-secrets"
   namespace  = "kube-system"
   version    = "0.3.0"
 
@@ -280,12 +280,12 @@ resource "helm_release" "onp_minecraft_debug_minio_secrets" {
       apiVersion: clustersecret.io/v1
       metadata:
         namespace: clustersecret
-        name: minio-secrets
+        name: garage-s3-credentials
       matchNamespace:
         - seichi-debug-minecraft-on-seichiassist-pr-*
       data:
-        MINIO_ACCESS_KEY: ${base64encode(var.minio_debug_access_key)}
-        MINIO_ACCESS_SECRET: ${base64encode(var.minio_debug_access_secret)}
+        AWS_ACCESS_KEY_ID: ${base64encode(var.garage_seichi_minecraft_access_key_id)}
+        AWS_SECRET_ACCESS_KEY: ${base64encode(var.garage_seichi_minecraft_secret_access_key)}
     EOS
     ]
   }]
@@ -334,7 +334,7 @@ resource "helm_release" "onp_minecraft_pbs_credentials" {
       matchNamespace:
         - seichi-minecraft
         - seichi-debug-minecraft
-        - minio
+        - garage
       data:
         user: ${base64encode(var.proxmox_backup_client__user)}
         host: ${base64encode(var.proxmox_backup_client__host)}

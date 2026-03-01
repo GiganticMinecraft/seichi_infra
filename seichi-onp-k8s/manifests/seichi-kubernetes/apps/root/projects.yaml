@@ -19,7 +19,6 @@ spec:
     #  - keda(event driven autoscaler, 時間によってPodを0にスケールダウンさせるために使用)
     #  - metrics-server
     #  - metallb
-    #  - minio
     #  - garage
     #  - monitoring
     #  - synology-csi
@@ -37,8 +36,6 @@ spec:
     - namespace: "keda"
       server: https://kubernetes.default.svc
     - namespace: "metallb-system"
-      server: https://kubernetes.default.svc
-    - namespace: "minio"
       server: https://kubernetes.default.svc
     - namespace: "garage"
       server: https://kubernetes.default.svc
@@ -65,21 +62,6 @@ spec:
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
-  syncWindows:
-    # minioのみ 朝10時〜実行しているバックアップの際に kubectl patch で replicas に干渉しているので
-    # selfHeal の実行される時間を制限しておく (デバッグでの実行も想定し長めに指定)
-    - kind: allow
-      schedule: "00 7 * * *" # 7:00 から
-      duration: 1h           # 1時間 selfHeal を有効化
-      timeZone: "Asia/Tokyo"
-      applications: ["minio"]
-      manualSync: true
-    - kind: deny
-      schedule: "00 8 * * *" # 毎日 8:00 から
-      duration: 23h          # 23時間 selfHeal を無効化
-      timeZone: "Asia/Tokyo"
-      applications: ["minio"]
-      manualSync: true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
