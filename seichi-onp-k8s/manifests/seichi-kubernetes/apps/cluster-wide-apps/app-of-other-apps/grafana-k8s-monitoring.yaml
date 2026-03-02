@@ -62,6 +62,11 @@ spec:
             otlp:
               http:
                 enabled: true
+          traces:
+            filters:
+              span:
+                - 'resource.attributes["service.name"] == "garage" and name == "GET /metrics"'
+                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, ".* /loki.*")'
 
         autoInstrumentation:
           enabled: true
