@@ -30,7 +30,7 @@ spec:
 
           - name: localTempo
             type: otlp
-            url: http://tempo:4318/v1/traces
+            url: http://tempo:4317
             metrics:
               enabled: true
             logs:
