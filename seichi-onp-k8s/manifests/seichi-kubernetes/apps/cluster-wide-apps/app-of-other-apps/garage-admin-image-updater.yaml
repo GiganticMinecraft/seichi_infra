@@ -1,0 +1,21 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: garage-admin
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  applicationRefs:
+    - namePattern: "garage-admin"
+      images:
+        - alias: frontend
+          imageName: ghcr.io/giganticminecraft/garage-admin-console-frontend
+          commonUpdateSettings:
+            updateStrategy: latest
+            allowTags: "regexp:^sha-"
+        - alias: backend
+          imageName: ghcr.io/giganticminecraft/garage-admin-console-backend
+          commonUpdateSettings:
+            updateStrategy: latest
+            allowTags: "regexp:^sha-"
