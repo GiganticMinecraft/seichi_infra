@@ -37,6 +37,10 @@ spec:
               port: 80
             failureThreshold: 6
             periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 5
           livenessProbe:
             tcpSocket:
               port: 80
