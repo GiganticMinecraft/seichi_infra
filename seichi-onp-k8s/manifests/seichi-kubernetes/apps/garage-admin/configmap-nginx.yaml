@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: garage-admin-ui-nginx-conf
+data:
+  nginx.conf: |
+    load_module modules/ngx_otel_module.so;
+
+    events {}
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        otel_exporter {
+            endpoint tempo.monitoring.svc.cluster.local:4317;
+        }
+
+        otel_service_name garage-admin-console-frontend;
+
+        sendfile on;
+        keepalive_timeout 65;
+
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;
+
+        server {
+            listen 80;
+            root /usr/share/nginx/html;
+            index index.html;
+
+            otel_trace on;
+            otel_trace_context propagate;
+
+            # K8s CoreDNS resolver for dynamic upstream resolution
+            resolver kube-dns.kube-system.svc.cluster.local valid=30s;
+
+            # SPA entry point - always revalidate to get latest asset references
+            location = /index.html {
+                add_header Cache-Control "no-cache";
+            }
+
+            location / {
+                try_files $uri $uri/ /index.html;
+            }
+
+            # Faro telemetry collection → Alloy
+            location = /collect {
+                limit_except POST {
+                    deny all;
+                }
+                set $faro_backend "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:12347";
+                proxy_pass $faro_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+            # Backend API proxy
+            location /api/ {
+                set $api_backend "http://garage-admin-api.garage-admin.svc.cluster.local:8080";
+                proxy_pass $api_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+            # Static assets cache (Vite hashed filenames)
+            location /assets/ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+            }
+        }
+    }
