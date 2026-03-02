@@ -11,12 +11,10 @@ spec:
     - namePattern: "garage-admin"
       images:
         - alias: frontend
-          imageName: ghcr.io/giganticminecraft/garage-admin-console-frontend
+          imageName: ghcr.io/giganticminecraft/garage-admin-console-frontend:latest
           commonUpdateSettings:
-            updateStrategy: latest
-            allowTags: "regexp:^sha-"
+            updateStrategy: digest
         - alias: backend
-          imageName: ghcr.io/giganticminecraft/garage-admin-console-backend
+          imageName: ghcr.io/giganticminecraft/garage-admin-console-backend:latest
           commonUpdateSettings:
-            updateStrategy: latest
-            allowTags: "regexp:^sha-"
+            updateStrategy: digest
