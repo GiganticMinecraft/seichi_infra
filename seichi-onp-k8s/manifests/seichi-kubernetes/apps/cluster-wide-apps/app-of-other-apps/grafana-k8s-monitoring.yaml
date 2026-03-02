@@ -31,6 +31,8 @@ spec:
           - name: localTempo
             type: otlp
             url: http://tempo:4317
+            tls:
+              insecure: true
             metrics:
               enabled: true
             logs:
