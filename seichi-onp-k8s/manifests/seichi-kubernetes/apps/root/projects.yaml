@@ -216,3 +216,24 @@ spec:
       timeZone: "Asia/Tokyo"
       applications: ["*"]
       manualSync: true        # 手動でのsyncを許可
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: garage-admin
+  namespace: argocd
+spec:
+  description: The project of Garage Admin Console
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: garage-admin
+      server: https://kubernetes.default.svc
+    # Application 及び ApplicationSet リソースは
+    # argocd namespace に置かないとArgoCDに認識されないため、
+    # argocd namespace へのデプロイも許可する。
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
