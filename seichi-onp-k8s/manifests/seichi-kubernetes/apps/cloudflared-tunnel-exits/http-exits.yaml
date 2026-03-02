@@ -104,7 +104,7 @@ spec:
           # Garage Admin Console (GitHub OAuth 認証付き)
           - name: garage-admin
             external-hostname: garage-admin.onp.admin.seichi.click
-            internal-authority: "garage-admin-ui.cluster-wide-apps:80"
+            internal-authority: "garage-admin-ui.garage-admin:80"
 
   template:
     metadata:

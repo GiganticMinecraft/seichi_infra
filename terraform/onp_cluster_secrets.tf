@@ -252,9 +252,11 @@ resource "kubernetes_secret" "garage_admin_api_token" {
 
 # Garage Admin Console secrets
 resource "kubernetes_secret" "garage_admin_github_oauth" {
+  depends_on = [kubernetes_namespace.garage_admin]
+
   metadata {
     name      = "garage-admin-github-oauth"
-    namespace = "cluster-wide-apps"
+    namespace = "garage-admin"
   }
 
   data = {
@@ -267,9 +269,11 @@ resource "kubernetes_secret" "garage_admin_github_oauth" {
 }
 
 resource "kubernetes_secret" "garage_admin_token" {
+  depends_on = [kubernetes_namespace.garage_admin]
+
   metadata {
     name      = "garage-admin-token"
-    namespace = "cluster-wide-apps"
+    namespace = "garage-admin"
   }
 
   data = {
@@ -280,9 +284,11 @@ resource "kubernetes_secret" "garage_admin_token" {
 }
 
 resource "kubernetes_secret" "garage_admin_s3" {
+  depends_on = [kubernetes_namespace.garage_admin]
+
   metadata {
     name      = "garage-admin-s3"
-    namespace = "cluster-wide-apps"
+    namespace = "garage-admin"
   }
 
   data = {

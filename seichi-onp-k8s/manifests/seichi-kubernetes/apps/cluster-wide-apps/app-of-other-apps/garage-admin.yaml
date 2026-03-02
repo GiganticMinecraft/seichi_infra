@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: garage-admin
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: frontend=ghcr.io/giganticminecraft/garage-admin-console-frontend, backend=ghcr.io/giganticminecraft/garage-admin-console-backend
+    argocd-image-updater.argoproj.io/frontend.update-strategy: latest
+    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^sha-
+    argocd-image-updater.argoproj.io/backend.update-strategy: latest
+    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^sha-
+    argocd-image-updater.argoproj.io/write-back-method: argocd
+spec:
+  project: garage-admin
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/garage-admin
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: garage-admin
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
