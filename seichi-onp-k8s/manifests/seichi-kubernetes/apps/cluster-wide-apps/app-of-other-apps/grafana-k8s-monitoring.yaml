@@ -103,7 +103,7 @@ spec:
               }
 
               output {
-                logs   = [otelcol.receiver.loki.localtempo.receiver]
+                logs   = [loki.write.localloki.receiver]
                 traces = [otelcol.processor.attributes.localtempo.input]
               }
             }
