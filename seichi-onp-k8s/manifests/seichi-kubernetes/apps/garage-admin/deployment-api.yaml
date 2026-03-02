@@ -80,6 +80,11 @@ spec:
               port: 8080
             failureThreshold: 6
             periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /api/health
