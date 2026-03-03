@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  labels:
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/name: mariadb
+spec:
+  clusterIP: None
+  ports:
+    - name: mariadb
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+  selector:
+    app.kubernetes.io/instance: mariadb
+    app.kubernetes.io/name: mariadb
