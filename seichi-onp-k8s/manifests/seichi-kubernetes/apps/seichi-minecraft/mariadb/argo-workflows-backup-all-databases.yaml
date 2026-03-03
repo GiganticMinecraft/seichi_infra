@@ -42,11 +42,13 @@ spec:
                 - name: timestamp
                   value: "{{steps.generate-timestamp.outputs.result}}"
             withParam: "{{steps.list-databases.outputs.result}}"
+        - - name: cleanup-old-backups
+            template: cleanup-old-backups
 
     - name: check-maintenance-mode
       script:
-        image: bitnami/kubectl:latest
-        command: ["/bin/sh", "-c"]
+        image: alpine/kubectl:1.34.5
+        command: [sh]
         source: |
           set -e
           MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
@@ -58,35 +60,20 @@ spec:
 
     - name: get-timestamp
       script:
-        image: alpine:3.23
+        image: alpine/kubectl:1.34.5
         command: [sh]
         source: |
           date +%Y%m%d-%H%M%S
 
     - name: list-databases
       script:
-        image: python:3.14-slim
+        image: alpine/kubectl:1.34.5
         command: [sh]
         source: |
-          pip install --quiet --no-cache-dir kubernetes
-          python3 <<EOF
-          from kubernetes import client, config
-          import os, json, sys
-
-          config.load_incluster_config()
-          api = client.CustomObjectsApi()
-          namespace = os.getenv("TARGET_NAMESPACE", "default")
-
-          dbs = api.list_namespaced_custom_object(
-              group="k8s.mariadb.com",
-              version="v1alpha1",
-              namespace=namespace,
-              plural="databases"
-          )
-
-          names = [db["metadata"]["name"] for db in dbs.get("items", [])]
-          sys.stdout.write(json.dumps(names))
-          EOF
+          kubectl get databases.k8s.mariadb.com -n "$TARGET_NAMESPACE" -o jsonpath='{.items[*].metadata.name}' \
+            | tr ' ' '\n' \
+            | awk 'NF {printf "%s\"%s\"", (NR>1 ? "," : ""), $0} END {print ""}' \
+            | awk '{print "[" $0 "]"}'
         env:
           - name: TARGET_NAMESPACE
             valueFrom:
@@ -99,81 +86,87 @@ spec:
           - name: name
           - name: timestamp
       script:
-        image: python:3.14-slim
+        image: alpine/kubectl:1.34.5
         command: [sh]
         source: |
-          pip install --quiet --no-cache-dir kubernetes
-          python3 <<EOF
-          from kubernetes import client, config
-          import os, sys
+          set -e
+          NAME="{{inputs.parameters.name}}"
+          TIMESTAMP="{{inputs.parameters.timestamp}}"
+          NAMESPACE="$TARGET_NAMESPACE"
 
-          config.load_incluster_config()
-          namespace = os.getenv("TARGET_NAMESPACE", "default")
-          name = "{{inputs.parameters.name}}"
-          timestamp = "{{inputs.parameters.timestamp}}"
+          MARIA_DB_REF=$(kubectl get databases.k8s.mariadb.com "$NAME" -n "$NAMESPACE" -o jsonpath='{.spec.mariaDbRef.name}')
+          DB_NAME=$(kubectl get databases.k8s.mariadb.com "$NAME" -n "$NAMESPACE" -o jsonpath='{.spec.name}')
 
-          api = client.CustomObjectsApi()
+          if [ -z "$MARIA_DB_REF" ] || [ -z "$DB_NAME" ]; then
+            echo "spec.mariaDbRef.name or spec.name が定義されていません！"
+            exit 1
+          fi
 
-          # 対象のDatabase CRを取得
-          db_cr = api.get_namespaced_custom_object(
-              group="k8s.mariadb.com",
-              version="v1alpha1",
-              namespace=namespace,
-              plural="databases",
-              name=name
-          )
+          BACKUP_NAME="${NAME}-backup--${TIMESTAMP}"
+          echo "Backup作成中: ${BACKUP_NAME} for MariaDB instance '${MARIA_DB_REF}', DB '${DB_NAME}'"
 
-          # MariaDBインスタンス名とDB名を抽出
-          maria_db_ref = db_cr.get("spec", {}).get("mariaDbRef", {}).get("name")
-          db_name = db_cr.get("spec", {}).get("name")
+          cat <<MANIFEST | kubectl apply -f -
+          apiVersion: k8s.mariadb.com/v1alpha1
+          kind: Backup
+          metadata:
+            name: ${BACKUP_NAME}
+            namespace: ${NAMESPACE}
+          spec:
+            mariaDbRef:
+              name: ${MARIA_DB_REF}
+            databases:
+              - ${DB_NAME}
+            storage:
+              s3:
+                bucket: mariadb-backups
+                prefix: "database--${NAME}"
+                endpoint: garage.garage.svc.cluster.local:3900
+                region: seichi-cloud
+                accessKeyIdSecretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+                secretAccessKeySecretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+          MANIFEST
 
-          if not maria_db_ref or not db_name:
-              raise Exception(f"spec.mariaDbRef.name or spec.name が定義されていません！")
+          echo "成功: ${BACKUP_NAME}"
+        env:
+          - name: TARGET_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
 
-          backup_name = f"{name}-backup--{timestamp}"
-          backup = {
-              "apiVersion": "k8s.mariadb.com/v1alpha1",
-              "kind": "Backup",
-              "metadata": {
-                  "name": backup_name,
-                  "namespace": namespace
-              },
-              "spec": {
-                  "mariaDbRef": {
-                      "name": maria_db_ref
-                  },
-                  "databases": [db_name],
-                  "storage": {
-                      "s3": {
-                          "bucket": "mariadb-backups",
-                          "prefix": f"database--{name}",
-                          "endpoint": "garage.garage.svc.cluster.local:3900",
-                          "accessKeyIdSecretKeyRef": {
-                              "name": "garage-s3-credentials",
-                              "key": "AWS_ACCESS_KEY_ID"
-                          },
-                          "secretAccessKeySecretKeyRef": {
-                              "name": "garage-s3-credentials",
-                              "key": "AWS_SECRET_ACCESS_KEY"
-                          }
-                      }
-                  }
+    - name: cleanup-old-backups
+      script:
+        image: alpine/kubectl:1.34.5
+        command: [sh]
+        source: |
+          set -e
+          NAMESPACE="$TARGET_NAMESPACE"
+          RETENTION_DAYS=3
+          CUTOFF=$(date -u -d "${RETENTION_DAYS} days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+            || date -u -v-${RETENTION_DAYS}d +%Y-%m-%dT%H:%M:%SZ)
+
+          echo "=== ${RETENTION_DAYS}日より古いBackup CRを削除します (cutoff: ${CUTOFF}) ==="
+
+          kubectl get backups.k8s.mariadb.com -n "$NAMESPACE" \
+            -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.creationTimestamp}{"\n"}{end}' \
+          | while IFS="$(printf '\t')" read -r NAME CREATED; do
+            if [ -z "$NAME" ] || [ -z "$CREATED" ]; then
+              continue
+            fi
+            if [ "$CREATED" \< "$CUTOFF" ]; then
+              kubectl delete backups.k8s.mariadb.com "$NAME" -n "$NAMESPACE" && {
+                DELETED=$((DELETED + 1))
+                echo "削除: ${NAME} (created: ${CREATED})"
+              } || {
+                echo "削除失敗: ${NAME}"
               }
-          }
+            fi
+          done
 
-          print(f"Backup作成中: {backup_name} for MariaDB instance '{maria_db_ref}', DB '{db_name}'")
-          try:
-              api.create_namespaced_custom_object(
-                  group="k8s.mariadb.com",
-                  version="v1alpha1",
-                  namespace=namespace,
-                  plural="backups",
-                  body=backup
-              )
-              print(f"✅ 成功: {backup_name}")
-          except client.exceptions.ApiException as e:
-              print(f"❌ 失敗: {backup_name} → {e.reason}")
-          EOF
+          echo "=== クリーンアップ完了 ==="
         env:
           - name: TARGET_NAMESPACE
             valueFrom:

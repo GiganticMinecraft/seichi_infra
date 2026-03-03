@@ -21,6 +21,8 @@ spec:
               release: prometheus
           workflowDefaults:
             spec:
+              podGC:
+                strategy: OnWorkflowSuccess
               ttlStrategy:
                 secondsAfterCompletion: 592200
         server:

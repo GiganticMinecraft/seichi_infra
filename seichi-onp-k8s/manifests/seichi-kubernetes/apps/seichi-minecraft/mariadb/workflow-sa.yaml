@@ -18,7 +18,7 @@ rules:
     verbs: ["get", "list"]
   - apiGroups: ["k8s.mariadb.com"]
     resources: ["backups"]
-    verbs: ["create"]
+    verbs: ["create", "list", "delete"]
   - apiGroups: ["k8s.mariadb.com"]
     resources: ["restores"]
     verbs: ["create", "get", "list"]
