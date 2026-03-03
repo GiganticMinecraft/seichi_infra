@@ -284,13 +284,6 @@ resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
   type = "Opaque"
 }
 
-# ClusterSecret が同期済みの Secret が既にクラスタ上に存在するため import が必要。
-# import 完了後にこの import ブロックは削除してよい。
-import {
-  to = kubernetes_secret.pbs_credentials
-  id = "seichi-minecraft/pbs-credentials"
-}
-
 # pbs-credentials: seichi-minecraft に配置し、seichi-debug-minecraft と garage に複製
 resource "kubernetes_secret" "pbs_credentials" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
