@@ -319,13 +319,6 @@ resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
 }
 
-# ClusterSecret が同期済みの Secret が既にクラスタ上に存在するため import が必要。
-# import 完了後にこの import ブロックは削除してよい。
-import {
-  to = kubernetes_secret.mariadb_monitoring_password
-  id = "seichi-minecraft/mariadb-monitoring-password"
-}
-
 # mariadb-monitoring-password: seichi-minecraft に配置し、monitoring と PR namespaces に複製
 resource "kubernetes_secret" "mariadb_monitoring_password" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
