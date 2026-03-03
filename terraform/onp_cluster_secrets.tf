@@ -205,7 +205,7 @@ resource "kubernetes_secret" "garage_seichi_minecraft_credentials" {
     name      = "garage-s3-credentials"
     namespace = "seichi-minecraft"
     annotations = {
-      "replicator.v1.mittwald.de/replicate-to" = "seichi-debug-minecraft-on-seichiassist-pr-.*"
+      "replicator.v1.mittwald.de/replicate-to" = "seichi-debug-minecraft,seichi-debug-minecraft-on-seichiassist-pr-.*"
     }
   }
 
