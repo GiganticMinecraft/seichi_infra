@@ -1,0 +1,228 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: truenas-k8s-storage-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Infrastructure"
+data:
+  truenas-k8s-storage-dashboard.json: |
+    {
+      "annotations": {
+        "list": []
+      },
+      "description": "Kubernetes PVC storage backed by TrueNAS zvol",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "panels": [],
+          "title": "Overview",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 6, "x": 0, "y": 1 },
+          "id": 1,
+          "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "count(truenas_zvol_volsize_bytes{zvol=~\".*pvc-.*\"})", "refId": "A" }
+          ],
+          "title": "PVC Count",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 6, "x": 6, "y": 1 },
+          "id": 2,
+          "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(truenas_dataset_used_bytes{type=\"volume\", dataset=~\".*pvc-.*\"})", "refId": "A" }
+          ],
+          "title": "Total PVC Used",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 6, "x": 12, "y": 1 },
+          "id": 3,
+          "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(truenas_zvol_volsize_bytes{zvol=~\".*pvc-.*\"})", "refId": "A" }
+          ],
+          "title": "Total PVC Provisioned",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 80 }, { "color": "red", "value": 90 }] },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 5, "w": 6, "x": 18, "y": 1 },
+          "id": 4,
+          "options": { "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(truenas_dataset_used_bytes{type=\"volume\", dataset=~\".*pvc-.*\"}) / sum(truenas_zvol_volsize_bytes{zvol=~\".*pvc-.*\"}) * 100", "refId": "A" }
+          ],
+          "title": "Overall Usage %",
+          "type": "gauge"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+          "id": 200,
+          "panels": [],
+          "title": "PVC Details",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "Kubernetes PVC zvol details. Each PVC is backed by a TrueNAS zvol.",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+            },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "Used" }, "properties": [{ "id": "unit", "value": "bytes" }] },
+              { "matcher": { "id": "byName", "options": "Volume Size" }, "properties": [{ "id": "unit", "value": "bytes" }] },
+              { "matcher": { "id": "byName", "options": "Usage %" }, "properties": [{ "id": "unit", "value": "percent" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 80 }, { "color": "red", "value": 90 }] } }, { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "gauge" } }] }
+            ]
+          },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 7 },
+          "id": 5,
+          "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Used" }] },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_used_bytes{type=\"volume\", dataset=~\".*pvc-.*\"}", "format": "table", "instant": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_zvol_volsize_bytes{zvol=~\".*pvc-.*\"}", "format": "table", "instant": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_used_bytes{type=\"volume\", dataset=~\".*pvc-.*\"} / truenas_zvol_volsize_bytes * 100", "format": "table", "instant": true, "refId": "C" }
+          ],
+          "title": "PVC Volumes",
+          "transformations": [
+            { "id": "seriesToColumns", "options": { "byField": "dataset" } },
+            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "__name__ 3": true, "container": true, "container 1": true, "container 2": true, "container 3": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "endpoint 3": true, "instance": true, "instance 1": true, "instance 2": true, "instance 3": true, "job": true, "job 1": true, "job 2": true, "job 3": true, "namespace": true, "namespace 1": true, "namespace 2": true, "namespace 3": true, "pod": true, "pod 1": true, "pod 2": true, "pod 3": true, "service": true, "service 1": true, "service 2": true, "service 3": true, "type": true, "zvol": true }, "renameByName": { "Value #A": "Used", "Value #B": "Volume Size", "Value #C": "Usage %", "dataset": "PVC" } } }
+          ],
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 },
+          "id": 300,
+          "panels": [],
+          "title": "PVC Usage",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 80 }, { "color": "red", "value": 90 }] },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 18 },
+          "id": 6,
+          "options": { "displayMode": "gradient", "minVizHeight": 16, "minVizWidth": 0, "namePlacement": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_used_bytes{type=\"volume\", dataset=~\".*pvc-.*\"} / truenas_zvol_volsize_bytes * 100", "legendFormat": "{{dataset}}", "refId": "A" }
+          ],
+          "title": "PVC Usage %",
+          "type": "bargauge"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+              "mappings": [],
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 26 },
+          "id": 7,
+          "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_used_bytes{type=\"volume\", dataset=~\".*pvc-.*\"}", "legendFormat": "{{dataset}}", "refId": "A" }
+          ],
+          "title": "PVC Used (trend)",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "30s",
+      "schemaVersion": 38,
+      "tags": ["truenas", "kubernetes", "storage"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "queryValue": "",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          }
+        ]
+      },
+      "time": { "from": "now-6h", "to": "now" },
+      "timezone": "Asia/Tokyo",
+      "title": "TrueNAS - Kubernetes Storage",
+      "uid": "truenas-k8s-storage",
+      "version": 1
+    }
