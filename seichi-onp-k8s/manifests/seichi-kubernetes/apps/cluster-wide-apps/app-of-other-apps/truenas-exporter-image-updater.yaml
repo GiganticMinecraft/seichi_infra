@@ -1,0 +1,16 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: truenas-exporter
+  namespace: argocd
+spec:
+  namespace: argocd
+  writeBackConfig:
+    method: argocd
+  applicationRefs:
+    - namePattern: "truenas-exporter"
+      images:
+        - alias: exporter
+          imageName: ghcr.io/giganticminecraft/truenas-exporter:latest
+          commonUpdateSettings:
+            updateStrategy: digest
