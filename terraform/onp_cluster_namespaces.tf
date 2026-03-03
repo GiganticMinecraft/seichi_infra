@@ -34,12 +34,6 @@ resource "kubernetes_namespace" "onp_argo" {
   }
 }
 
-resource "kubernetes_namespace" "onp_clustersecret" {
-  metadata {
-    name = "clustersecret"
-  }
-}
-
 resource "kubernetes_namespace" "onp_monitoring" {
   metadata {
     name = "monitoring"

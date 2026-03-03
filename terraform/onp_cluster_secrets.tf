@@ -1,16 +1,12 @@
-# 複数 Namespace 間で共有する秘匿値があるので、ClusterSecret controller を利用する
-resource "helm_release" "onp_cluster_clustersecret" {
-  depends_on = [kubernetes_namespace.onp_clustersecret]
-
-  # https://github.com/zakkg3/ClusterSecret/tree/bab429d98b9da19debf97259fdba01211fa8dd43#using-the-official-helm-chart
-  repository = "https://charts.clustersecret.com/"
-  chart      = "cluster-secret"
-  name       = "clustersecret"
+# 複数 Namespace 間で共有する秘匿値があるので、kubernetes-replicator を利用する
+resource "helm_release" "kubernetes_replicator" {
+  repository = "https://helm.mittwald.de"
+  chart      = "kubernetes-replicator"
+  name       = "kubernetes-replicator"
   namespace  = "kube-system"
-  version    = "0.7.0"
+  version    = "2.12.3"
 
   reset_values    = true
-  recreate_pods   = true
   cleanup_on_fail = true
 }
 
@@ -208,6 +204,9 @@ resource "kubernetes_secret" "garage_seichi_minecraft_credentials" {
   metadata {
     name      = "garage-s3-credentials"
     namespace = "seichi-minecraft"
+    annotations = {
+      "replicator.v1.mittwald.de/replicate-to" = "seichi-debug-minecraft-on-seichiassist-pr-.*"
+    }
   }
 
   data = {
@@ -320,79 +319,49 @@ resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
 }
 
-resource "helm_release" "onp_minecraft_mariadb_monitoring_password" {
-  depends_on = [helm_release.onp_cluster_clustersecret]
-
-  # ClusterSecret controller も helm_release で入れている (onp_cluster_clustersecret) ため、
-  # kubernetes_manifest リソースで ClusterSecret を入れようとすると、controller と ClusterSecret 両方を
-  # (クラスタ再作成時等に) 作成する際に plan が失敗し、apply できなくなる。
-  # https://github.com/hashicorp/terraform-provider-kubernetes/issues/1583
-  #
-  # これを回避するため、 values.yaml 内の manifest をそのまま apply するような Helm chart を作成し、
-  # それを経由して ClusterSecret を作成する。こうすると、Terraform は ClusterSecret manifest の diff を取らずに
-  # `onp_minecraft_mariadb_monitoring_password` に対応する Helm release が存在するかどうかだけを見るようになるので、
-  # 上手くいく。
-  repository = "https://giganticminecraft.github.io/seichi_infra/"
-  chart      = "raw-resources"
-  name       = "mariadb-monitoring-password-raw-resource"
-  namespace  = "kube-system"
-  version    = "0.3.0"
-
-  set_list = [{
-    name = "manifests"
-    value = [<<-EOS
-      kind: ClusterSecret
-      apiVersion: clustersecret.io/v1
-      metadata:
-        namespace: clustersecret
-        name: mariadb-monitoring-password
-      matchNamespace:
-        - monitoring
-        - seichi-minecraft
-        - seichi-debug-minecraft-on-seichiassist-pr-*
-      data:
-        monitoring-password: ${base64encode(random_password.minecraft__prod_mariadb_monitoring_password.result)}
-    EOS
-    ]
-  }]
+# ClusterSecret が同期済みの Secret が既にクラスタ上に存在するため import が必要。
+# import 完了後にこの import ブロックは削除してよい。
+import {
+  to = kubernetes_secret.mariadb_monitoring_password
+  id = "seichi-minecraft/mariadb-monitoring-password"
 }
 
-resource "random_password" "minecraft__pr_review_mariadb_root_password" {
-  length  = 16
-  special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
+# mariadb-monitoring-password: seichi-minecraft に配置し、monitoring と PR namespaces に複製
+resource "kubernetes_secret" "mariadb_monitoring_password" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "mariadb-monitoring-password"
+    namespace = "seichi-minecraft"
+    annotations = {
+      "replicator.v1.mittwald.de/replicate-to" = "monitoring,seichi-debug-minecraft-on-seichiassist-pr-.*"
+    }
+  }
+
+  data = {
+    "monitoring-password" = random_password.minecraft__prod_mariadb_monitoring_password.result
+  }
+
+  type = "Opaque"
 }
 
-resource "random_password" "minecraft__pr_review_mariadb_password" {
-  length  = 16
-  special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
-}
+# mariadb-pr-review-password: kube-system に配置し、PR namespaces に複製
+resource "kubernetes_secret" "mariadb_pr_review_password" {
+  metadata {
+    name      = "mariadb-pr-review-password"
+    namespace = "kube-system"
+    annotations = {
+      "replicator.v1.mittwald.de/replicate-to" = "seichi-debug-minecraft-on-seichiassist-pr-.*"
+    }
+  }
 
-resource "helm_release" "onp_minecraft__pr_review_mariadb_password" {
-  depends_on = [helm_release.onp_cluster_clustersecret]
+  data = {
+    "root-password"         = ""
+    "mcserver-password"     = ""
+    "prod-mariadb-password" = var.minecraft__prod_game_db__password
+  }
 
-  repository = "https://giganticminecraft.github.io/seichi_infra/"
-  chart      = "raw-resources"
-  name       = "mariadb-pr-review-password-raw-resource"
-  namespace  = "kube-system"
-  version    = "0.3.0"
-
-  set_list = [{
-    name = "manifests"
-    value = [<<-EOS
-      kind: ClusterSecret
-      apiVersion: clustersecret.io/v1
-      metadata:
-        namespace: clustersecret
-        name: mariadb-pr-review-password
-      matchNamespace:
-        - seichi-debug-minecraft-on-seichiassist-pr-*
-      data:
-        root-password: ""
-        mcserver-password: ""
-        prod-mariadb-password: ${base64encode(var.minecraft__prod_game_db__password)}
-    EOS
-    ]
-  }]
+  type = "Opaque"
 }
 
 resource "kubernetes_secret" "idea_reaction_discord_token" {
