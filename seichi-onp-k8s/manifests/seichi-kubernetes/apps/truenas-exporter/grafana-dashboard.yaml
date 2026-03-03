@@ -13,7 +13,7 @@ data:
       "annotations": {
         "list": []
       },
-      "description": "TrueNAS monitoring dashboard",
+      "description": "TrueNAS NAS infrastructure monitoring",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 1,
@@ -181,11 +181,12 @@ data:
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
           "id": 300,
           "panels": [],
-          "title": "Dataset & Zvol",
+          "title": "Datasets",
           "type": "row"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "ZFS datasets (type=filesystem). Pool root excluded.",
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
@@ -203,36 +204,17 @@ data:
           "id": 8,
           "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Used" }] },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_used_bytes", "format": "table", "instant": true, "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_available_bytes", "format": "table", "instant": true, "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_quota_bytes", "format": "table", "instant": true, "refId": "C" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_compressratio", "format": "table", "instant": true, "refId": "D" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_used_bytes{type=\"filesystem\", dataset!~\"[^/]+\"}", "format": "table", "instant": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_available_bytes{type=\"filesystem\", dataset!~\"[^/]+\"}", "format": "table", "instant": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_quota_bytes{type=\"filesystem\", dataset!~\"[^/]+\"}", "format": "table", "instant": true, "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_compressratio{type=\"filesystem\", dataset!~\"[^/]+\"}", "format": "table", "instant": true, "refId": "D" }
           ],
           "title": "Dataset Usage",
           "transformations": [
             { "id": "seriesToColumns", "options": { "byField": "dataset" } },
-            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "__name__ 3": true, "__name__ 4": true, "instance": true, "instance 1": true, "instance 2": true, "instance 3": true, "instance 4": true, "job": true, "job 1": true, "job 2": true, "job 3": true, "job 4": true, "type 1": true, "type 2": true, "type 3": true, "type 4": true }, "renameByName": { "Value #A": "Used", "Value #B": "Available", "Value #C": "Quota", "Value #D": "Compress Ratio", "dataset": "Dataset", "type": "Type" } } }
+            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "__name__ 3": true, "__name__ 4": true, "container": true, "container 1": true, "container 2": true, "container 3": true, "container 4": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "endpoint 3": true, "endpoint 4": true, "instance": true, "instance 1": true, "instance 2": true, "instance 3": true, "instance 4": true, "job": true, "job 1": true, "job 2": true, "job 3": true, "job 4": true, "namespace": true, "namespace 1": true, "namespace 2": true, "namespace 3": true, "namespace 4": true, "pod": true, "pod 1": true, "pod 2": true, "pod 3": true, "pod 4": true, "service": true, "service 1": true, "service 2": true, "service 3": true, "service 4": true, "type": true, "type 1": true, "type 2": true, "type 3": true, "type 4": true }, "renameByName": { "Value #A": "Used", "Value #B": "Available", "Value #C": "Quota", "Value #D": "Compress Ratio", "dataset": "Dataset" } } }
           ],
           "type": "table"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "mappings": [],
-              "unit": "bytes"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 10, "w": 12, "x": 0, "y": 26 },
-          "id": 9,
-          "options": { "barRadius": 0, "barWidth": 0.8, "fullHighlight": false, "groupWidth": 0.7, "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" }, "orientation": "horizontal", "showValue": "auto", "stacking": "none", "tooltip": { "mode": "single", "sort": "none" }, "xTickLabelRotation": 0 },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "topk(10, truenas_dataset_used_bytes)", "legendFormat": "{{dataset}}", "instant": true, "refId": "A" }
-          ],
-          "title": "Top Datasets by Usage",
-          "type": "barchart"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
@@ -245,38 +227,18 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 10, "w": 12, "x": 12, "y": 26 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 26 },
           "id": 10,
-          "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_compressratio", "legendFormat": "{{dataset}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_dataset_compressratio{type=\"filesystem\", dataset!~\"[^/]+\"}", "legendFormat": "{{dataset}}", "refId": "A" }
           ],
           "title": "Compression Ratio",
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "thresholds" },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
-              "unit": "bytes"
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 36 },
-          "id": 11,
-          "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "truenas_zvol_volsize_bytes", "legendFormat": "{{zvol}}", "refId": "A" }
-          ],
-          "title": "Zvol Sizes",
-          "type": "stat"
-        },
-        {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 42 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
           "id": 400,
           "panels": [],
           "title": "iSCSI",
@@ -292,7 +254,7 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 43 },
+          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 35 },
           "id": 12,
           "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
@@ -312,7 +274,7 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 6, "w": 18, "x": 6, "y": 43 },
+          "gridPos": { "h": 6, "w": 18, "x": 6, "y": 35 },
           "id": 13,
           "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true },
           "targets": [
@@ -320,7 +282,7 @@ data:
           ],
           "title": "Session Details",
           "transformations": [
-            { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "instance": true, "job": true }, "renameByName": { "initiator": "Initiator", "target": "Target" } } }
+            { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "container": true, "endpoint": true, "instance": true, "job": true, "namespace": true, "pod": true, "service": true }, "renameByName": { "initiator": "Initiator", "target": "Target" } } }
           ],
           "type": "table"
         },
@@ -337,7 +299,7 @@ data:
               { "matcher": { "id": "byName", "options": "Enabled" }, "properties": [{ "id": "mappings", "value": [{ "options": { "0": { "color": "red", "text": "No" }, "1": { "color": "green", "text": "Yes" } }, "type": "value" }] }, { "id": "custom.cellOptions", "value": { "type": "color-text" } }] }
             ]
           },
-          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 49 },
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 41 },
           "id": 14,
           "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true },
           "targets": [
@@ -346,13 +308,13 @@ data:
           ],
           "title": "Targets & Extents",
           "transformations": [
-            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true, "Value #A": true }, "renameByName": { "Value #B": "Enabled", "disk": "Disk", "id": "ID", "name": "Name", "name 1": "Target Name", "name 2": "Extent Name" } } }
+            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "container": true, "container 1": true, "container 2": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true, "namespace": true, "namespace 1": true, "namespace 2": true, "pod": true, "pod 1": true, "pod 2": true, "service": true, "service 1": true, "service 2": true, "Value #A": true }, "renameByName": { "Value #B": "Enabled", "disk": "Disk", "id": "ID", "name": "Name", "name 1": "Target Name", "name 2": "Extent Name" } } }
           ],
           "type": "table"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 55 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 47 },
           "id": 500,
           "panels": [],
           "title": "Disks",
@@ -371,7 +333,7 @@ data:
             },
             "overrides": []
           },
-          "gridPos": { "h": 8, "w": 10, "x": 0, "y": 56 },
+          "gridPos": { "h": 8, "w": 10, "x": 0, "y": 48 },
           "id": 15,
           "options": { "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
           "targets": [
@@ -394,7 +356,7 @@ data:
               { "matcher": { "id": "byName", "options": "Temperature" }, "properties": [{ "id": "unit", "value": "celsius" }] }
             ]
           },
-          "gridPos": { "h": 8, "w": 14, "x": 10, "y": 56 },
+          "gridPos": { "h": 8, "w": 14, "x": 10, "y": 48 },
           "id": 16,
           "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": false, "displayName": "Disk" }] },
           "targets": [
@@ -404,7 +366,7 @@ data:
           "title": "Disk Info",
           "transformations": [
             { "id": "seriesToColumns", "options": { "byField": "disk" } },
-            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true, "model 2": true, "serial 2": true }, "renameByName": { "Value #A": "Size", "Value #B": "Temperature", "disk": "Disk", "model": "Model", "model 1": "Model", "serial": "Serial", "serial 1": "Serial" } } }
+            { "id": "organize", "options": { "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "__name__": true, "__name__ 1": true, "__name__ 2": true, "container": true, "container 1": true, "container 2": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true, "model 2": true, "namespace": true, "namespace 1": true, "namespace 2": true, "pod": true, "pod 1": true, "pod 2": true, "serial 2": true, "service": true, "service 1": true, "service 2": true }, "renameByName": { "Value #A": "Size", "Value #B": "Temperature", "disk": "Disk", "model": "Model", "model 1": "Model", "serial": "Serial", "serial 1": "Serial" } } }
           ],
           "type": "table"
         }
