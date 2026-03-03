@@ -53,7 +53,7 @@ func (c *Client) doGet(ctx context.Context, path string, result any) error {
 	if err != nil {
 		return fmt.Errorf("requesting %s: %w", path, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status %d for %s", resp.StatusCode, path)
@@ -89,7 +89,7 @@ func (c *Client) doPost(ctx context.Context, path string, body any, result any) 
 	if err != nil {
 		return fmt.Errorf("requesting %s: %w", path, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status %d for %s", resp.StatusCode, path)
