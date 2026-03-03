@@ -13,7 +13,7 @@ data:
       "annotations": {
         "list": []
       },
-      "description": "Kubernetes PVC storage overview with Pod binding and usage analysis",
+      "description": "Kubernetes PVC storage backed by TrueNAS (StorageClass: sc-truenas-03-iscsi)",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 1,
@@ -41,7 +41,7 @@ data:
           "id": 1,
           "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "count(kubelet_volume_stats_capacity_bytes)", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "count(kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"})", "refId": "A" }
           ],
           "title": "Total PVCs",
           "type": "stat"
@@ -61,7 +61,7 @@ data:
           "id": 2,
           "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(kubelet_volume_stats_used_bytes)", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"})", "refId": "A" }
           ],
           "title": "Total Used",
           "type": "stat"
@@ -81,7 +81,7 @@ data:
           "id": 3,
           "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(kubelet_volume_stats_capacity_bytes)", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(kube_persistentvolume_capacity_bytes * on(persistentvolume) group_left() kube_persistentvolume_info{storageclass=~\"$storageclass\"})", "refId": "A" }
           ],
           "title": "Total Capacity",
           "type": "stat"
@@ -103,7 +103,7 @@ data:
           "id": 4,
           "options": { "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(kubelet_volume_stats_used_bytes) / sum(kubelet_volume_stats_capacity_bytes) * 100", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}) / sum(kube_persistentvolume_capacity_bytes * on(persistentvolume) group_left() kube_persistentvolume_info{storageclass=~\"$storageclass\"}) * 100", "refId": "A" }
           ],
           "title": "Overall Usage %",
           "type": "gauge"
@@ -118,7 +118,7 @@ data:
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "description": "All PVCs with bound Pod, used/capacity, and usage %. Backup Job Pods are excluded from Pod column.",
+          "description": "PVCs with bound Pod, used/capacity, and usage %. Backup Job Pods are excluded from Pod column.",
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
@@ -136,10 +136,10 @@ data:
           "id": 5,
           "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Usage %" }] },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes", "format": "table", "instant": true, "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_capacity_bytes", "format": "table", "instant": true, "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100", "format": "table", "instant": true, "refId": "C" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "max by(namespace, persistentvolumeclaim, pod) (kube_pod_spec_volumes_persistentvolumeclaims_info{pod!~\"backup--.*\"})", "format": "table", "instant": true, "refId": "D" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}", "format": "table", "instant": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_capacity_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}", "format": "table", "instant": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"} / (kubelet_volume_stats_capacity_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}) * 100", "format": "table", "instant": true, "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "max by(namespace, persistentvolumeclaim, pod) (kube_pod_spec_volumes_persistentvolumeclaims_info{pod!~\"backup--.*\"} * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"})", "format": "table", "instant": true, "refId": "D" }
           ],
           "title": "All PVCs",
           "transformations": [
@@ -173,7 +173,7 @@ data:
           "id": 6,
           "options": { "displayMode": "gradient", "minVizHeight": 16, "minVizWidth": 0, "namePlacement": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true, "valueMode": "color" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sort_desc(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100)", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sort_desc(kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"} / (kubelet_volume_stats_capacity_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}) * 100)", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "refId": "A" }
           ],
           "title": "Usage % by PVC",
           "type": "bargauge"
@@ -192,7 +192,7 @@ data:
           "id": 7,
           "options": { "barRadius": 0, "barWidth": 0.8, "fullHighlight": false, "groupWidth": 0.7, "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" }, "orientation": "horizontal", "showValue": "auto", "stacking": "none", "tooltip": { "mode": "single", "sort": "none" }, "xTickLabelRotation": 0 },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sort_desc(kubelet_volume_stats_used_bytes)", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "instant": true, "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sort_desc(kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"})", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "instant": true, "refId": "A" }
           ],
           "title": "Used by PVC",
           "type": "barchart"
@@ -222,7 +222,7 @@ data:
           "id": 8,
           "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "right" }, "tooltip": { "mode": "multi", "sort": "desc" } },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"} / (kubelet_volume_stats_capacity_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}) * 100", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "refId": "A" }
           ],
           "title": "Usage % Over Time",
           "type": "timeseries"
@@ -242,7 +242,7 @@ data:
           "id": 9,
           "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "right" }, "tooltip": { "mode": "multi", "sort": "desc" } },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "kubelet_volume_stats_used_bytes * on(namespace, persistentvolumeclaim) group_left() kube_persistentvolumeclaim_info{storageclass=~\"$storageclass\"}", "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}", "refId": "A" }
           ],
           "title": "Used Over Time",
           "type": "timeseries"
@@ -267,6 +267,23 @@ data:
             "regex": "",
             "skipUrlSync": false,
             "type": "datasource"
+          },
+          {
+            "current": { "selected": false, "text": "sc-truenas-03-iscsi", "value": "sc-truenas-03-iscsi" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_persistentvolumeclaim_info, storageclass)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "StorageClass",
+            "multi": false,
+            "name": "storageclass",
+            "options": [],
+            "query": { "qryType": 1, "query": "label_values(kube_persistentvolumeclaim_info, storageclass)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 1,
+            "type": "query"
           }
         ]
       },
