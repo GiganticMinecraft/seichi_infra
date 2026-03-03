@@ -264,33 +264,6 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
   type = "Opaque"
 }
 
-resource "helm_release" "onp_minecraft_debug_garage_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
-
-  repository = "https://giganticminecraft.github.io/seichi_infra/"
-  chart      = "raw-resources"
-  name       = "seichi-debug-minecraft-garage-secrets"
-  namespace  = "kube-system"
-  version    = "0.3.0"
-
-  set_list = [{
-    name = "manifests"
-    value = [<<-EOS
-      kind: ClusterSecret
-      apiVersion: clustersecret.io/v1
-      metadata:
-        namespace: clustersecret
-        name: garage-s3-credentials
-      matchNamespace:
-        - seichi-debug-minecraft-on-seichiassist-pr-*
-      data:
-        AWS_ACCESS_KEY_ID: ${base64encode(var.garage_seichi_minecraft_access_key_id)}
-        AWS_SECRET_ACCESS_KEY: ${base64encode(var.garage_seichi_minecraft_secret_access_key)}
-    EOS
-    ]
-  }]
-
-}
 
 resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
@@ -311,38 +284,32 @@ resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
   type = "Opaque"
 }
 
-resource "helm_release" "onp_minecraft_pbs_credentials" {
-  depends_on = [
-    kubernetes_namespace.onp_seichi_debug_minecraft,
-    kubernetes_namespace.onp_seichi_minecraft
-  ]
+# ClusterSecret が同期済みの Secret が既にクラスタ上に存在するため import が必要。
+# import 完了後にこの import ブロックは削除してよい。
+import {
+  to = kubernetes_secret.pbs_credentials
+  id = "seichi-minecraft/pbs-credentials"
+}
 
-  repository = "https://giganticminecraft.github.io/seichi_infra/"
-  chart      = "raw-resources"
-  name       = "onp-minecraft-pbs-credentials"
-  namespace  = "kube-system"
-  version    = "0.3.0"
+# pbs-credentials: seichi-minecraft に配置し、seichi-debug-minecraft と garage に複製
+resource "kubernetes_secret" "pbs_credentials" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 
-  set_list = [{
-    name = "manifests"
-    value = [<<-EOS
-      kind: ClusterSecret
-      apiVersion: clustersecret.io/v1
-      metadata:
-        namespace: clustersecret
-        name: pbs-credentials
-      matchNamespace:
-        - seichi-minecraft
-        - seichi-debug-minecraft
-        - garage
-      data:
-        user: ${base64encode(var.proxmox_backup_client__user)}
-        host: ${base64encode(var.proxmox_backup_client__host)}
-        datastore: ${base64encode(var.proxmox_backup_client__datastore)}
-        password: ${base64encode(var.proxmox_backup_client__password)}
-        fingerprint: ${base64encode(var.proxmox_backup_client__fingerprint)}
-    EOS
-    ]
-  }]
+  metadata {
+    name      = "pbs-credentials"
+    namespace = "seichi-minecraft"
+    annotations = {
+      "replicator.v1.mittwald.de/replicate-to" = "seichi-debug-minecraft,garage"
+    }
+  }
 
+  data = {
+    "user"        = var.proxmox_backup_client__user
+    "host"        = var.proxmox_backup_client__host
+    "datastore"   = var.proxmox_backup_client__datastore
+    "password"    = var.proxmox_backup_client__password
+    "fingerprint" = var.proxmox_backup_client__fingerprint
+  }
+
+  type = "Opaque"
 }
