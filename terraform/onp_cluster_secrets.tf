@@ -299,6 +299,22 @@ resource "kubernetes_secret" "garage_admin_s3" {
   type = "Opaque"
 }
 
+# TrueNAS Exporter API key
+resource "kubernetes_secret" "truenas_exporter_api_key" {
+  depends_on = [kubernetes_namespace.onp_monitoring]
+
+  metadata {
+    name      = "truenas-exporter-api-key"
+    namespace = "monitoring"
+  }
+
+  data = {
+    TRUENAS_API_KEY = var.truenas_exporter_api_key
+  }
+
+  type = "Opaque"
+}
+
 resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない

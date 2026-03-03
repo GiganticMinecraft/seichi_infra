@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: truenas-exporter
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: exporter=ghcr.io/giganticminecraft/truenas-exporter
+    argocd-image-updater.argoproj.io/exporter.update-strategy: latest
+    argocd-image-updater.argoproj.io/exporter.allow-tags: regexp:^sha-
+    argocd-image-updater.argoproj.io/write-back-method: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    repoURL: https://github.com/GiganticMinecraft/seichi_infra
+    targetRevision: main
+    path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/truenas-exporter
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m

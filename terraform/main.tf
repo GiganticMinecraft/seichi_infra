@@ -463,6 +463,16 @@ variable "discord_bot__babyrite__discord_token" {
 
 #endregion
 
+#region TrueNAS Exporter
+
+variable "truenas_exporter_api_key" {
+  description = "TrueNAS REST API key for the Prometheus exporter"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region env variables for Bugsink
 
 variable "bugsink_admin_password" {
