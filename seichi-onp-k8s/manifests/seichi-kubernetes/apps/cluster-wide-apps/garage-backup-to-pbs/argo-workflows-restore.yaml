@@ -118,9 +118,15 @@ spec:
             mountPath: /data
           - name: pbs-tmpfs
             mountPath: /root/.cache
+  volumeClaimTemplates:
+    - metadata:
+        name: restore-volume
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: topolvm-provisioner
+        resources:
+          requests:
+            storage: 200Gi
   volumes:
-    - name: restore-volume
-      emptyDir:
-        sizeLimit: 200Gi
     - name: pbs-tmpfs
       emptyDir: {}
