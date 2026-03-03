@@ -29,6 +29,7 @@ spec:
     #  - argo
     #  - trivy-operator
     #  - cilium-secrets
+    #  - topolvm
     #
     # のリソースインストールを行うため、namespaceを明示的に許可する必要がある
     - namespace: "kube-system"
@@ -58,6 +59,8 @@ spec:
     - namespace: "trivy-operator"
       server: https://kubernetes.default.svc
     - namespace: "cilium-secrets"
+      server: https://kubernetes.default.svc
+    - namespace: "topolvm-system"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"

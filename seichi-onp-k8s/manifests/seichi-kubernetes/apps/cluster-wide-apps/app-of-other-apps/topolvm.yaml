@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: topolvm
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: topolvm
+    repoURL: https://topolvm.github.io/topolvm
+    targetRevision: v15.9.0
+    helm:
+      releaseName: topolvm
+      values: |
+        lvmd:
+          managed: true
+          socketName: /run/topolvm/lvmd.sock
+          deviceClasses:
+            - name: "default"
+              volume-group: "topolvm-vg"
+              default: true
+              spare-gb: 10
+
+        storageClasses:
+          - name: "topolvm-provisioner"
+            storageClass:
+              fsType: xfs
+              isDefaultClass: false
+              volumeBindingMode: WaitForFirstConsumer
+              allowVolumeExpansion: true
+
+        controller:
+          replicaCount: 2
+          storageCapacityTracking:
+            enabled: true
+
+        scheduler:
+          enabled: false
+
+        cert-manager:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: topolvm-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
