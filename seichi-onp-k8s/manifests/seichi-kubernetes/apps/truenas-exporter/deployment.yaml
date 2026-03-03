@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: truenas-exporter
+  labels:
+    app: truenas-exporter
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: truenas-exporter
+  template:
+    metadata:
+      labels:
+        app: truenas-exporter
+    spec:
+      containers:
+        - name: truenas-exporter
+          image: ghcr.io/giganticminecraft/truenas-exporter:sha-0000000
+          ports:
+            - containerPort: 9814
+              name: metrics
+          env:
+            - name: TRUENAS_HOST
+              value: "192.168.16.234"
+            - name: TRUENAS_PORT
+              value: "443"
+            - name: TRUENAS_TLS_SKIP_VERIFY
+              value: "true"
+            - name: LISTEN_ADDR
+              value: ":9814"
+            - name: TRUENAS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: truenas-exporter-api-key
+                  key: TRUENAS_API_KEY
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 9814
+            failureThreshold: 6
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 9814
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9814
+            periodSeconds: 30
