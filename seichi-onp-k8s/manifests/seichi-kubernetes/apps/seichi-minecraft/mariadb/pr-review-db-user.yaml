@@ -14,7 +14,7 @@ spec:
 
 ---
 # mariadb-dump に必要な権限: SELECT, SHOW VIEW, LOCK TABLES, TRIGGER
-# 対象DB: flyway_managed_schema, seichiassist, litebans_gigantic_prod, prod_seichi_xconomy
+# 対象DB: flyway_managed_schema, seichiassist, litebans_gigantic_prod
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
@@ -70,26 +70,6 @@ spec:
     - "LOCK TABLES"
     - "TRIGGER"
   database: "litebans_gigantic_prod"
-  table: "*"
-  username: "pr-review"
-  grantOption: false
-
----
-apiVersion: k8s.mariadb.com/v1alpha1
-kind: Grant
-metadata:
-  namespace: seichi-minecraft
-  name: pr-review-xconomy
-spec:
-  mariaDbRef:
-    name: mariadb
-    waitForIt: true
-  privileges:
-    - "SELECT"
-    - "SHOW VIEW"
-    - "LOCK TABLES"
-    - "TRIGGER"
-  database: "prod_seichi_xconomy"
   table: "*"
   username: "pr-review"
   grantOption: false
