@@ -314,6 +314,11 @@ resource "kubernetes_secret" "truenas_exporter_api_key" {
   type = "Opaque"
 }
 
+resource "random_password" "minecraft__prod_mariadb_pr_review_password" {
+  length  = 16
+  special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
+}
+
 resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
@@ -344,14 +349,14 @@ resource "kubernetes_secret" "mariadb_pr_review_password" {
     name      = "mariadb-pr-review-password"
     namespace = "kube-system"
     annotations = {
-      "replicator.v1.mittwald.de/replicate-to" = "seichi-debug-minecraft-on-seichiassist-pr-.*"
+      "replicator.v1.mittwald.de/replicate-to" = "seichi-minecraft,seichi-debug-minecraft-on-seichiassist-pr-.*"
     }
   }
 
   data = {
     "root-password"         = ""
     "mcserver-password"     = ""
-    "prod-mariadb-password" = var.minecraft__prod_game_db__password
+    "prod-mariadb-password" = random_password.minecraft__prod_mariadb_pr_review_password.result
   }
 
   type = "Opaque"

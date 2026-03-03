@@ -1,0 +1,95 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-minecraft
+  name: pr-review
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  passwordSecretKeyRef:
+    name: mariadb-pr-review-password
+    key: prod-mariadb-password
+  maxUserConnections: 10
+
+---
+# mariadb-dump に必要な権限: SELECT, SHOW VIEW, LOCK TABLES, TRIGGER
+# 対象DB: flyway_managed_schema, seichiassist, litebans_gigantic_prod, prod_seichi_xconomy
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: pr-review-flyway
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "SELECT"
+    - "SHOW VIEW"
+    - "LOCK TABLES"
+    - "TRIGGER"
+  database: "flyway_managed_schema"
+  table: "*"
+  username: "pr-review"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: pr-review-seichiassist
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "SELECT"
+    - "SHOW VIEW"
+    - "LOCK TABLES"
+    - "TRIGGER"
+  database: "seichiassist"
+  table: "*"
+  username: "pr-review"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: pr-review-litebans
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "SELECT"
+    - "SHOW VIEW"
+    - "LOCK TABLES"
+    - "TRIGGER"
+  database: "litebans_gigantic_prod"
+  table: "*"
+  username: "pr-review"
+  grantOption: false
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: pr-review-xconomy
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "SELECT"
+    - "SHOW VIEW"
+    - "LOCK TABLES"
+    - "TRIGGER"
+  database: "prod_seichi_xconomy"
+  table: "*"
+  username: "pr-review"
+  grantOption: false
