@@ -75,33 +75,91 @@ spec:
         - name: mariadb-config
           mountPath: /etc/mysql/conf.d
       initContainers:
-      - name: init-0
-        image: docker-registry1.mariadb.com/library/mariadb:11.8
-        imagePullPolicy: IfNotPresent
-        resources:
-          requests:
-            cpu: 2
-            memory: 2Gi
+      - name: fetch-latest-mariadb-backups
+        image: amazon/aws-cli:latest
+        command:
+          - sh
+          - -c
+        args:
+          - |
+            set -eu
+
+            export AWS_ACCESS_KEY_ID="${S3_ACCESS_KEY}"
+            export AWS_SECRET_ACCESS_KEY="${S3_SECRET_KEY}"
+            S3_OPTS="--endpoint-url ${S3_ENDPOINT} --region seichi-cloud"
+
+            copy_latest_sql() {
+              prefix="$1"
+              output_file="$2"
+              latest_key=""
+              latest_filename=""
+
+              for object_key in $(aws s3 ls ${S3_OPTS} "s3://${BUCKET_NAME}/${prefix}/" | awk '{print $NF}'); do
+                case "${object_key}" in
+                  backup.????-??-??T??:??:??Z.sql)
+                    if [ -z "${latest_filename}" ] || [ "${object_key}" \> "${latest_filename}" ]; then
+                      latest_filename="${object_key}"
+                      latest_key="${prefix}/${object_key}"
+                    fi
+                    ;;
+                esac
+              done
+
+              if [ -z "${latest_key}" ]; then
+                echo "No backup SQL file found for prefix: ${prefix}" >&2
+                exit 1
+              fi
+
+              aws s3 cp ${S3_OPTS} "s3://${BUCKET_NAME}/${latest_key}" "/docker-entrypoint-initdb.d/${output_file}"
+            }
+
+            copy_latest_sql database--flyway 10-flyway.sql
+            copy_latest_sql database--seichiassist 20-seichiassist.sql
+            copy_latest_sql database--luckperms 30-luckperms.sql
         env:
-        - name: DB_PASSWORD
+        - name: S3_ENDPOINT
+          value: http://garage.garage.svc.cluster.local:3900
+        - name: S3_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              key: prod-mariadb-password
-              name: mariadb-pr-review-password
+              name: garage-s3-credentials
+              key: AWS_ACCESS_KEY_ID
+        - name: S3_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: garage-s3-credentials
+              key: AWS_SECRET_ACCESS_KEY
+        - name: BUCKET_NAME
+          value: mariadb-backups
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: sqldump-volume
+      - name: fix-sql-dump-permissions
+        image: busybox:1.37.0
         args:
         - sh
         - -c
         - |
-          mariadb-dump -upr-review -p${DB_PASSWORD} -hmariadb.seichi-minecraft.svc.cluster.local --ssl=0 --databases flyway_managed_schema seichiassist --ignore-table=seichiassist.mine_stack > /docker-entrypoint-initdb.d/seichiassist.sql
-          mariadb-dump -upr-review -p${DB_PASSWORD} -hmariadb.seichi-minecraft.svc.cluster.local --ssl=0 seichiassist mine_stack --where 'amount != 0' >> /docker-entrypoint-initdb.d/seichiassist.sql
-
-          echo 'CREATE DATABASE IF NOT EXISTS litebans;' > /docker-entrypoint-initdb.d/litebans.sql
-          mariadb-dump -upr-review -p${DB_PASSWORD} -hmariadb.seichi-minecraft.svc.cluster.local --ssl=0 --no-create-db --databases litebans_gigantic_prod \
-            --ignore-table=litebans_gigantic_prod.litebans_config \
-            --ignore-table=litebans_gigantic_prod.litebans_servers \
-            --ignore-table=litebans_gigantic_prod.litebans_sync \
-            --ignore-table=litebans_gigantic_prod.litebans_warnings >> /docker-entrypoint-initdb.d/litebans.sql
-          sed -i 's/^USE `litebans_gigantic_prod`;/USE `litebans`;/' /docker-entrypoint-initdb.d/litebans.sql
+          set -eu
+          if [ -d /docker-entrypoint-initdb.d ]; then
+            find /docker-entrypoint-initdb.d -type d -exec chmod 755 {} +
+            find /docker-entrypoint-initdb.d -type f -exec chmod 644 {} +
+          fi
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: sqldump-volume
+      - name: add-debug-migrations
+        image: busybox:1.37.0
+        args:
+        - sh
+        - -c
+        - |
+          set -eu
+          cat > /docker-entrypoint-initdb.d/40-debug-server-migrations.sql << 'EOSQL'
+          USE seichiassist;
+          UPDATE item_migration_in_server_world_levels SET server_id = 'deb-s1' WHERE server_id = 's1';
+          UPDATE item_migration_in_server_world_levels SET server_id = 'deb-s2' WHERE server_id = 's2';
+          EOSQL
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
@@ -114,7 +172,7 @@ spec:
         - |
           echo 'CREATE DATABASE IF NOT EXISTS luckperms;' > /docker-entrypoint-initdb.d/create-db.sql
           echo 'CREATE DATABASE IF NOT EXISTS coreprotect__mc_lobby;' >> /docker-entrypoint-initdb.d/create-db.sql
-          echo 'CREATE DATABASE IF NOT EXISTS coreprotect__mc_s1;' >> /docker-entrypoint-initdb.d/create-db.sql
+          echo 'CREATE DATABASE IF NOT EXISTS coreprotect__mc_debug_s1;' >> /docker-entrypoint-initdb.d/create-db.sql
         volumeMounts:
         - mountPath: /docker-entrypoint-initdb.d
           name: sqldump-volume
