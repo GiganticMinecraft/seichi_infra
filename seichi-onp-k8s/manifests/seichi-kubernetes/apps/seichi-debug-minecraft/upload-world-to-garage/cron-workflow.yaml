@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
-  name: upload-world-to-minio-weekly
+  name: upload-world-to-garage-weekly
   namespace: seichi-debug-minecraft
   annotations:
     workflows.argoproj.io/description: "毎週月曜日 AM 1:00 (JST) にワールドデータをGarageにアップロード"
@@ -11,4 +11,4 @@ spec:
   concurrencyPolicy: "Forbid"
   workflowSpec:
     workflowTemplateRef:
-      name: upload-world-to-minio
+      name: upload-world-to-garage
