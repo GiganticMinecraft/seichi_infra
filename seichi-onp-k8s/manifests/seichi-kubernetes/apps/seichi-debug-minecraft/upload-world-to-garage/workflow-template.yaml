@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: upload-world-to-minio
+  name: upload-world-to-garage
   namespace: seichi-debug-minecraft
   annotations:
     workflows.argoproj.io/description: "最新PBSバックアップからワールドデータを抽出し、Garageにアップロードするワークフロー"
 spec:
-  serviceAccountName: upload-world-to-minio-workflow-sa
+  serviceAccountName: upload-world-to-garage-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
   activeDeadlineSeconds: 7200 # 2時間でタイムアウト（リストア+圧縮+アップロードに時間がかかる可能性）
