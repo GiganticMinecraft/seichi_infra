@@ -284,6 +284,21 @@ resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "backup_failure_notify_webhook" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "backup-failure-notify-webhook"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    DISCORD_WEBHOOK_URL = var.backup_failure_notify_webhook_url
+  }
+
+  type = "Opaque"
+}
+
 # pbs-credentials: seichi-minecraft に配置し、seichi-debug-minecraft と garage に複製
 resource "kubernetes_secret" "pbs_credentials" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
