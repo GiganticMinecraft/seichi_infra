@@ -20,15 +20,6 @@ spec:
         app: mcserver--debug-s1
         mcserver: debug-s1
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - seichi-onp-k8s-wk-1 # CPUの多いwk-1だけにスケジュールする
       initContainers:
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6f4c728
@@ -152,7 +143,7 @@ spec:
               value: /data
 
             - name: CFG_REPLACEMENT__SEICHIASSIST_SERVER_ID
-              value: '{{ .Values.SeichiAssistPullRequestNumber }}'
+              value: "{{ .Values.SeichiAssistPullRequestNumber }}"
 
             - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
               valueFrom:
