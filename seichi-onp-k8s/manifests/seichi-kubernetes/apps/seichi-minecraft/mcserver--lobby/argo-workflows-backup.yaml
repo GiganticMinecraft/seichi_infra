@@ -171,6 +171,7 @@ spec:
             sleep 5
           done
           echo "Scale-up confirmed!"
+
   volumes:
     - name: backup-target-volume
       persistentVolumeClaim:

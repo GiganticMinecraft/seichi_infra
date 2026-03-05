@@ -359,6 +359,12 @@ variable "seichiassist_downloader_master_release_notify_webhook_url" {
   sensitive   = true
 }
 
+variable "backup_failure_notify_webhook_url" {
+  description = "Webhook URL for failure notifications from backup workflows"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise minecraft config secrets
