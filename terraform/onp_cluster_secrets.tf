@@ -319,6 +319,11 @@ resource "random_password" "minecraft__prod_mariadb_pr_review_password" {
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
 }
 
+resource "random_password" "minecraft__pr_review_mcserver_password" {
+  length  = 16
+  special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
+}
+
 resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない
@@ -355,7 +360,7 @@ resource "kubernetes_secret" "mariadb_pr_review_password" {
 
   data = {
     "root-password"         = ""
-    "mcserver-password"     = ""
+    "mcserver-password"     = random_password.minecraft__pr_review_mcserver_password.result
     "prod-mariadb-password" = random_password.minecraft__prod_mariadb_pr_review_password.result
   }
 
