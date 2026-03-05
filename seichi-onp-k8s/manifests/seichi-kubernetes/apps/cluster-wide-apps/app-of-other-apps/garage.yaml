@@ -16,7 +16,7 @@ spec:
       values: |
         garage:
           dbEngine: "lmdb"
-          blockSize: "1048576"
+          blockSize: "67108864" # 64MiB
           replicationFactor: "2"
           consistencyMode: "consistent"
           compressionLevel: "1"
