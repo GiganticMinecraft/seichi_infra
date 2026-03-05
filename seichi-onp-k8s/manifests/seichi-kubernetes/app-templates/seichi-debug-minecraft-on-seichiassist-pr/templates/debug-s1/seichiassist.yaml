@@ -169,6 +169,75 @@ spec:
             - name: CFG_REPLACEMENT__LUCKPERMS_SERVER_NAME
               value: "s1"
 
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_USER
+              value: mcserver
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-pr-review-password
+                  key: mcserver-password
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_URL_WEBHOOK_NOTIFICATION
+              value: ""
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_HOST
+              value: seichi-debug-redisbungee-valkey.seichi-debug-gateway
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_REDISBUNGEE_REDIS_PORT
+              value: "6379"
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_HOST
+              value: seichi-debug-bungeesemaphore-valkey.seichi-debug-gateway
+
+            - name: CFG_REPLACEMENT__SEICHIASSIST_BUNGEESEMAPHORE_RESPONDER_REDIS_PORT
+              value: "6379"
+
+            - name: CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT
+              value: "9225"
+
+            - name: CFG_REPLACEMENT__WORLDEDIT_SCHEMATICS_DIRECTORY
+              value: /worldedit-schematica
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
+              value: mcserver
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-pr-review-password
+                  key: mcserver-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER
+              value: mcserver
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-pr-review-password
+                  key: mcserver-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
+              value: luckperms
+
             # rg addmemberコマンドで、`__global__`保護に対してメンバーに追加しているプレイヤーはunchamaさん。
             # MCIDで指定しても、当該プレイヤーがまだログインしたことがない判定だからか追加できないので、UUIDを指定している。
             - name: RCON_CMDS_STARTUP
