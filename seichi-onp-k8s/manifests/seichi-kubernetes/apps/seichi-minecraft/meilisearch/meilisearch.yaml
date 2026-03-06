@@ -8,7 +8,7 @@ spec:
   source:
     chart: meilisearch
     repoURL: 'https://meilisearch.github.io/meilisearch-kubernetes'
-    targetRevision: 0.25.1
+    targetRevision: 0.26.0
     helm:
       releaseName: seichi-portal-meilisearch
       values: |
