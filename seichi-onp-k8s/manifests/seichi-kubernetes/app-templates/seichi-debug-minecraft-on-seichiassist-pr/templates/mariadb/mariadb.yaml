@@ -162,8 +162,7 @@ spec:
               set -eu
               cat > /docker-entrypoint-initdb.d/40-debug-server-migrations.sql << 'EOSQL'
               USE seichiassist;
-              UPDATE item_migration_in_server_world_levels SET server_id = 'deb-s1' WHERE server_id = 's1';
-              UPDATE item_migration_in_server_world_levels SET server_id = 'deb-s2' WHERE server_id = 's2';
+              UPDATE item_migration_in_server_world_levels SET server_id = '{{ .Values.SeichiAssistPullRequestNumber }}' WHERE server_id = 's1';
               EOSQL
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
