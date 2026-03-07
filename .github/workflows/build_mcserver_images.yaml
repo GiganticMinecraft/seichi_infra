@@ -77,7 +77,7 @@ jobs:
       - if: steps.should_build.outputs.should_build == 'true'
         name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - if: steps.should_build.outputs.should_build == 'true'
         name: Login to GitHub Container Registry
