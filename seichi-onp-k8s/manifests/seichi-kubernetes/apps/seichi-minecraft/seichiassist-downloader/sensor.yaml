@@ -93,7 +93,8 @@ spec:
                         - name: work
                           mountPath: /work
                       command: [sh, -c]
-                      args: [
+                      args:
+                        [
                           "aws --endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud s3 cp /work/SeichiAssist.jar s3://seichiassist/{{ workflow.parameters.target-branch }}/SeichiAssist.jar",
                         ]
                   - name: restart-debug-server
@@ -138,7 +139,7 @@ spec:
                         kubectl patch statefulset mcserver--debug-s1 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
                         kubectl patch statefulset mcserver--debug-s2 -n seichi-debug-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
                   - name: wait-for-debug-scale-to-1
-                    activeDeadlineSeconds: 300
+                    activeDeadlineSeconds: 1200
                     script:
                       image: alpine/kubectl:1.35.2
                       command: ["/bin/sh", "-c"]
