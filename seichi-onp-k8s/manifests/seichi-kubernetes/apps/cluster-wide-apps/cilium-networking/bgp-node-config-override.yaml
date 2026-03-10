@@ -2,12 +2,14 @@
 #
 # 各ノードのlocalASNを個別に設定する。
 # CiliumBGPClusterConfigのデフォルト値(65301)をノードごとに上書き。
+#
+# metadata.nameはCiliumBGPNodeConfig(Cilium Operatorが自動生成)の名前と
+# 一致する必要がある。CiliumBGPNodeConfigの名前はノード名と同一。
 apiVersion: cilium.io/v2
 kind: CiliumBGPNodeConfigOverride
 metadata:
-  name: override--seichi-onp-k8s-cp-1
+  name: seichi-onp-k8s-cp-1
 spec:
-  nodeRef: seichi-onp-k8s-cp-1
   bgpInstances:
     - name: router-peer
       localASN: 65201
@@ -15,9 +17,8 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumBGPNodeConfigOverride
 metadata:
-  name: override--seichi-onp-k8s-cp-2
+  name: seichi-onp-k8s-cp-2
 spec:
-  nodeRef: seichi-onp-k8s-cp-2
   bgpInstances:
     - name: router-peer
       localASN: 65202
@@ -25,9 +26,8 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumBGPNodeConfigOverride
 metadata:
-  name: override--seichi-onp-k8s-cp-3
+  name: seichi-onp-k8s-cp-3
 spec:
-  nodeRef: seichi-onp-k8s-cp-3
   bgpInstances:
     - name: router-peer
       localASN: 65203
@@ -35,9 +35,8 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumBGPNodeConfigOverride
 metadata:
-  name: override--seichi-onp-k8s-wk-1
+  name: seichi-onp-k8s-wk-1
 spec:
-  nodeRef: seichi-onp-k8s-wk-1
   bgpInstances:
     - name: router-peer
       localASN: 65301
@@ -45,9 +44,8 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumBGPNodeConfigOverride
 metadata:
-  name: override--seichi-onp-k8s-wk-2
+  name: seichi-onp-k8s-wk-2
 spec:
-  nodeRef: seichi-onp-k8s-wk-2
   bgpInstances:
     - name: router-peer
       localASN: 65302
@@ -55,9 +53,8 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumBGPNodeConfigOverride
 metadata:
-  name: override--seichi-onp-k8s-wk-3
+  name: seichi-onp-k8s-wk-3
 spec:
-  nodeRef: seichi-onp-k8s-wk-3
   bgpInstances:
     - name: router-peer
       localASN: 65303

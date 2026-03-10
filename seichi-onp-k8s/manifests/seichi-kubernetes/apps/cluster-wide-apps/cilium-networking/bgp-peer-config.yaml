@@ -5,9 +5,10 @@ metadata:
   name: peer-config--router
 spec:
   ebgpMultihop: 1
-  connectRetryTimeSeconds: 120
-  holdTimeSeconds: 90
-  keepAliveTimeSeconds: 30
+  timers:
+    connectRetryTimeSeconds: 120
+    holdTimeSeconds: 90
+    keepAliveTimeSeconds: 30
   gracefulRestart:
     enabled: true
     restartTimeSeconds: 120
