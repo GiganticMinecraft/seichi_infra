@@ -37,7 +37,7 @@ resource "kubernetes_secret" "onp_argocd_applicationset_controller_github_app_se
     name      = "argocd-applicationset-controller-github-app-secret"
     namespace = "argocd"
     labels = {
-      # seichi_infra 向けのアクセストークンであると決め打ちする　必要に応じて repo-creds にするなどすると良い
+      # seichi_infra 向けのアクセストークンであると決め打ちする。必要に応じて repo-creds にするなどすると良い
       # repo-creds の詳細: https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials
       "argocd.argoproj.io/secret-type" = "repository"
     }
