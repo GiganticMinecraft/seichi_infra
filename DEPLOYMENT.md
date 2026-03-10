@@ -78,7 +78,7 @@ spec:
 
 [Argo CD](https://argocd.onp-k8s.admin.seichi.click/) は GitHub SSO を経由して Web 上でも動作を確認できます。[こちらの YAML](https://github.com/GiganticMinecraft/seichi_infra/blob/main/seichi-onp-k8s/manifests/seichi-kubernetes/argocd-apps-helm-chart-values.yaml) に最初に読み込む Git リポジトリが記されているので確認すると、[./seichi-onp-k8s/manifests/seichi-kubernetes/apps/root](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/root) には `Application` リソースと `AppProject` リソースがあります。これが、Argo CD で管理対象に入るリポジトリ及びそのパスを示しています。詳しくは [./seichi-onp-k8s/README.md](./seichi-onp-k8s/README.md) あたりにも説明があります。
 
-文字だけでは説明が難しい部分もあるので、一旦は`マニフェストを書いて　Git の所定の場所に配置する`ことと、`Argo CD というツールが自動的にデプロイ処理を請け負ってくれる`ことだけ理解しておけば大丈夫です。
+文字だけでは説明が難しい部分もあるので、一旦は`マニフェストを書いて Git の所定の場所に配置する`ことと、`Argo CD というツールが自動的にデプロイ処理を請け負ってくれる`ことだけ理解しておけば大丈夫です。
 
 ## Minecraftサーバーのメンテナンスモード
 
