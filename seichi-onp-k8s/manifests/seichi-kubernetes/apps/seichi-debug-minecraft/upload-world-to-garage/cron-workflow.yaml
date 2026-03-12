@@ -6,7 +6,8 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "毎週月曜日 AM 1:00 (JST) にワールドデータをGarageにアップロード"
 spec:
-  schedule: "0 1 * * 1"
+  schedules:
+    - "0 1 * * 1"
   timezone: "Asia/Tokyo"
   concurrencyPolicy: "Forbid"
   workflowSpec:

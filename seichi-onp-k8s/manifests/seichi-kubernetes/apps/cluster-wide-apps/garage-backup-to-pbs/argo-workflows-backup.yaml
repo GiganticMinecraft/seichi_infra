@@ -4,7 +4,8 @@ metadata:
   name: backup--garage-to-pbs
   namespace: garage
 spec:
-  schedule: "0 10 * * *"
+  schedules:
+    - "0 10 * * *"
   timezone: Asia/Tokyo
   concurrencyPolicy: "Forbid"
   workflowSpec:
