@@ -13,6 +13,11 @@ jobs:
   build-image:
     name: Build docker image (and publish on main)
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
     strategy:
       matrix:
         include:
@@ -52,6 +57,9 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v4
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
         with:
@@ -70,7 +78,7 @@ jobs:
             type=raw,value=1.0.0-${{ matrix.java_version_component_in_tag }}
 
       - name: Build (and push if on main)
-        id: docker_build
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
@@ -78,8 +86,30 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          sbom: true
+          provenance: true
           cache-from: type=gha
           # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
           cache-to: type=gha,mode=max
           build-args: |
             MCSERVER_BASE_IMAGE=itzg/minecraft-server:${{ matrix.mcserver_base_image_tag }}@${{ matrix.mcserver_base_image_digest }}
+
+      - name: Sign container image with Cosign
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cosign sign --yes \
+            ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+
+      - name: Run Trivy vulnerability scanner
+        if: steps.build.outputs.digest != ''
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.build.outputs.digest != ''
+        with:
+          sarif_file: 'trivy-results.sarif'
