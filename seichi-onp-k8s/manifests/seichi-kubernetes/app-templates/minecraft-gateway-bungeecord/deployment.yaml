@@ -55,7 +55,7 @@ spec:
             - name: MEMORY
               value: 768m
             - name: TYPE
-              value: VELOCITY
+              value: BUNGEECORD
 
             - name: PLUGINS
               # BungeeKick:
