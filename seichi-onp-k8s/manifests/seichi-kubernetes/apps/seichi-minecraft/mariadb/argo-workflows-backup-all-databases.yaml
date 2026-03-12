@@ -4,7 +4,8 @@ metadata:
   name: backup--mariadb-all-databases
   namespace: seichi-minecraft
 spec:
-  schedule: "0 4 * * *"
+  schedules:
+    - "0 4 * * *"
   timezone: Asia/Tokyo
   concurrencyPolicy: "Forbid"
   successfulJobsHistoryLimit: 3
