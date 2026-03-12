@@ -55,7 +55,7 @@ spec:
             - name: MEMORY
               value: 768m
             - name: TYPE
-              value: WATERFALL
+              value: VELOCITY
 
             - name: PLUGINS
               # BungeeKick:
