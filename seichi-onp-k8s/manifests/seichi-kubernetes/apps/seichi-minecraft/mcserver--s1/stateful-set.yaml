@@ -68,6 +68,9 @@ spec:
         - name: regenworld-config-updater
           image: busybox:1.37.0
           imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Asia/Tokyo
           command:
             - sh
             - -c
