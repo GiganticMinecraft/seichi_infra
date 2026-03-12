@@ -21,6 +21,7 @@ config:
       netmask: '255.255.255.0'
   - type: nameserver
     address:
-    - '192.168.100.1'
+    - '10.123.0.195'
+    - '10.123.0.196'
     search:
     - 'local'
