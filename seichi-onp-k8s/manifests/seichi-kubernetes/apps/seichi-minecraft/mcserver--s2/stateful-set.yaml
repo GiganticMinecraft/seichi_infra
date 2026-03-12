@@ -65,45 +65,6 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        - name: regenworld-config-updater
-          image: busybox:1.37.0
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: TZ
-              value: Asia/Tokyo
-          command:
-            - sh
-            - -c
-            - |
-              set -e
-              CONFIG_FILE=/data/plugins/RegenWorld/config.yml
-              if [ ! -f "$CONFIG_FILE" ]; then
-                echo "Config file not found: $CONFIG_FILE, skipping"
-                exit 0
-              fi
-              DAY_OF_WEEK=$(date +%u)
-              DAYS_UNTIL_FRIDAY=$(( (5 - DAY_OF_WEEK + 7) % 7 ))
-              if [ "$DAYS_UNTIL_FRIDAY" -eq 0 ]; then
-                DAYS_UNTIL_FRIDAY=7
-              fi
-              NEXT_FRIDAY_EPOCH=$(( $(date +%s) + DAYS_UNTIL_FRIDAY * 86400 ))
-              NEXT_FRIDAY=$(date -d "@${NEXT_FRIDAY_EPOCH}" '+%Y-%m-%d')
-              NEW_DATE="${NEXT_FRIDAY}T03:00:00+09:00"
-              echo "=== 修正前 ==="
-              cat "$CONFIG_FILE"
-              TMPFILE=$(mktemp)
-              cp "$CONFIG_FILE" "$TMPFILE"
-              sed -i "s|  date: '[^']*'|  date: '${NEW_DATE}'|" "$CONFIG_FILE"
-              echo ""
-              echo "=== 修正後 ==="
-              cat "$CONFIG_FILE"
-              echo ""
-              echo "=== 差分 ==="
-              diff "$TMPFILE" "$CONFIG_FILE" || true
-              rm -f "$TMPFILE"
-          volumeMounts:
-            - name: mcserver--s2-data
-              mountPath: /data
 
       containers:
         - resources:
