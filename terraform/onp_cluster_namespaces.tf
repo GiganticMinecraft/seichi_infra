@@ -69,3 +69,9 @@ resource "kubernetes_namespace" "garage_admin" {
     name = "garage-admin"
   }
 }
+
+resource "kubernetes_namespace" "kyverno" {
+  metadata {
+    name = "kyverno"
+  }
+}
