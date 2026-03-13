@@ -13,12 +13,13 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
     CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -buildvcs=false -ldflags="-s -w" -trimpath -o /mod-downloader
 
-FROM debian:trixie-slim
+FROM scratch
 
 LABEL org.opencontainers.image.authors="outductor <inductor.kela+seichi@gmail.com>"
 LABEL org.opencontainers.image.url="https://github.com/GiganticMinecraft/seichi_infra"
 LABEL org.opencontainers.image.source="https://github.com/GiganticMinecraft/seichi_infra/blob/main/docker-images/mod-downloader/Dockerfile"
 
+COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --link --from=builder /mod-downloader /bin/
 ENV S3_ENDPOINT=""
 ENV S3_ACCESS_KEY=""
