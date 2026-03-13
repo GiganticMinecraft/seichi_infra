@@ -1,0 +1,30 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-ghcr-image-signatures
+  annotations:
+    policies.kyverno.io/title: Verify GHCR Image Signatures
+    policies.kyverno.io/description: >-
+      ghcr.io/giganticminecraft/* のコンテナイメージが
+      GitHub Actions の Cosign keyless signing で署名されていることを検証する。
+      署名されていないイメージのデプロイをブロックする。
+spec:
+  validationFailureAction: Audit
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-giganticminecraft-images
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/giganticminecraft/*"
+          attestors:
+            - entries:
+                - keyless:
+                    subjectRegExp: "https://github\\.com/GiganticMinecraft/.+"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev
