@@ -14,12 +14,28 @@ spec:
       values: |
         admissionController:
           replicas: 3
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
         backgroundController:
           replicas: 2
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
         cleanupController:
           replicas: 2
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
         reportsController:
           replicas: 2
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
