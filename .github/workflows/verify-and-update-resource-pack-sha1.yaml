@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref }}
+          fetch-depth: 0
       - name: Extract resource-pack URL
         id: extract
         run: |
@@ -29,14 +30,28 @@ jobs:
             echo "url=$URL" >> "$GITHUB_OUTPUT"
             echo "resource_pack_url_is_set=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Compute SHA1
+      - name: Check if resource-pack URL changed in this PR
+        id: resource_pack_changed
         if: steps.extract.outputs.resource_pack_url_is_set == 'true'
+        run: |
+          CHANGED=$(git diff "${{ github.event.pull_request.base.sha }}" HEAD \
+            -- docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties \
+            | grep -E '^\+resource-pack(=|-sha1=)' || true)
+          if [ -n "$CHANGED" ]; then
+            echo "resource-pack has changed. Computing SHA1."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "resource-pack has not changed. Skipping SHA1 computation."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Compute SHA1
+        if: steps.resource_pack_changed.outputs.changed == 'true'
         id: sha
         run: |
           SHA1=$(curl -fsSL "${{ steps.extract.outputs.url }}" | sha1sum | cut -d' ' -f1)
           echo "sha1=$SHA1" >> "$GITHUB_OUTPUT"
       - name: Compare with current SHA1
-        if: steps.extract.outputs.resource_pack_url_is_set == 'true'
+        if: steps.resource_pack_changed.outputs.changed == 'true'
         id: compare
         run: |
           CURRENT=$(grep '^resource-pack-sha1=' \
