@@ -115,6 +115,7 @@
       depNameTemplate: 'kubernetes-sigs/metrics-server',
       versioningTemplate: 'semver',
     },
+    // ロビーサーバのserver.propertiesに記載されているリソースパックのURLを更新する
     {
       customType: 'regex',
       managerFilePatterns: [
@@ -126,6 +127,7 @@
       autoReplaceStringTemplate: 'resource-pack=https://github.com/GiganticMinecraft/OriginalResourcePack/releases/download/v{{{newValue}}}/seichi_tex_v{{{newValue}}}.zip',
       datasourceTemplate: 'github-releases',
       depNameTemplate: 'GiganticMinecraft/OriginalResourcePack',
+      // バージョン番号にパッチバージョンを含んでいないので、セマンティックバージョニングの形式だとみなす
       versioningTemplate: 'semver-coerced',
     },
   ],
