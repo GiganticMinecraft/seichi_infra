@@ -115,6 +115,21 @@
       depNameTemplate: 'kubernetes-sigs/metrics-server',
       versioningTemplate: 'semver',
     },
+    // ロビーサーバーのserver.propertiesに記載されているリソースパックのURLを更新する
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^docker-images/mcservers/production/lobby/common-minecraft-server-configs/server\\.properties$/',
+      ],
+      matchStrings: [
+        'resource-pack=https://github\\.com/GiganticMinecraft/OriginalResourcePack/releases/download/v(?<currentValue>[\\d.]+)/seichi_tex_v[\\d.]+\\.zip',
+      ],
+      autoReplaceStringTemplate: 'resource-pack=https://github.com/GiganticMinecraft/OriginalResourcePack/releases/download/v{{{newValue}}}/seichi_tex_v{{{newValue}}}.zip',
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: 'GiganticMinecraft/OriginalResourcePack',
+      // バージョン番号にパッチバージョンを含んでいないので、セマンティックバージョニングの形式だとみなす
+      versioningTemplate: 'semver-coerced',
+    },
   ],
   terraform: {
     enabled: true,

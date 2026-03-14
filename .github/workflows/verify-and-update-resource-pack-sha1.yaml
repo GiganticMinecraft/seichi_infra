@@ -1,0 +1,95 @@
+name: Verify and update Resource Pack sha1sum
+on:
+  pull_request:
+    paths:
+      - 'docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties'
+      - '.github/workflows/verify-and-update-resource-pack-sha1.yaml'
+    branches:
+      - main
+jobs:
+  compute-sha1:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      needs_update: ${{ steps.compare.outputs.needs_update }}
+      sha1: ${{ steps.sha.outputs.sha1 }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Check if resource-pack URL or SHA1 changed in this PR
+        id: resource_pack_changed
+        run: |
+          CHANGED=$(git diff "${{ github.event.pull_request.base.sha }}" HEAD \
+            -- docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties \
+            | grep -E '^\+resource-pack(=|-sha1=)' || true)
+          if [ -n "$CHANGED" ]; then
+            echo "resource-pack has changed. Computing SHA1."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "resource-pack has not changed. Skipping SHA1 computation."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Extract resource-pack URL
+        if: steps.resource_pack_changed.outputs.changed == 'true'
+        id: extract
+        run: |
+          URL=$(grep '^resource-pack=' \
+            docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties \
+            | cut -d= -f2-)
+          if [ -z "$URL" ]; then
+            echo "resource_pack_url_is_set=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=$URL" >> "$GITHUB_OUTPUT"
+            echo "resource_pack_url_is_set=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Compute SHA1
+        if: steps.extract.outputs.resource_pack_url_is_set == 'true'
+        id: sha
+        run: |
+          SHA1=$(curl -fsSL "${{ steps.extract.outputs.url }}" | sha1sum | cut -d' ' -f1)
+          echo "sha1=$SHA1" >> "$GITHUB_OUTPUT"
+      - name: Compare with current SHA1
+        if: steps.resource_pack_changed.outputs.changed == 'true'
+        id: compare
+        run: |
+          CURRENT=$(grep '^resource-pack-sha1=' \
+            docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties \
+            | cut -d= -f2-)
+          NEW="${{ steps.sha.outputs.sha1 }}"
+          echo "Current SHA1: $CURRENT"
+          echo "New SHA1:     $NEW"
+          if [ "$CURRENT" = "$NEW" ]; then
+            echo "SHA1 is up to date. No update needed."
+            echo "needs_update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "SHA1 is outdated. Update needed."
+            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  update-sha1:
+    runs-on: ubuntu-24.04
+    needs: compute-sha1
+    if: needs.compute-sha1.outputs.needs_update == 'true'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update resource-pack-sha1
+        run: |
+          sed -i "s|^resource-pack-sha1=.*|resource-pack-sha1=${{ needs.compute-sha1.outputs.sha1 }}|" \
+            docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties
+      - name: Git as GitHub Actions Bot
+        uses: Lucky3028/git-as-gha@v1.0.1
+      - name: Commit and push
+        run: |
+          VERSION=$(grep -oP 'download/v\K[^/]+' \
+            docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties)
+          git add docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties
+          git commit -m "chore: update resource-pack-sha1 for v${VERSION}"
+          git push
