@@ -115,7 +115,7 @@
       depNameTemplate: 'kubernetes-sigs/metrics-server',
       versioningTemplate: 'semver',
     },
-    // ロビーサーバのserver.propertiesに記載されているリソースパックのURLを更新する
+    // ロビーサーバーのserver.propertiesに記載されているリソースパックのURLを更新する
     {
       customType: 'regex',
       managerFilePatterns: [
