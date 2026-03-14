@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties'
+      - '.github/workflows/verify-and-update-resource-pack-sha1.yaml'
     branches:
       - main
 jobs:
