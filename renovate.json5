@@ -123,7 +123,7 @@
       matchStrings: [
         'resource-pack=https://github\\.com/GiganticMinecraft/OriginalResourcePack/releases/download/v(?<currentValue>[\\d.]+)/seichi_tex_v[\\d.]+\\.zip',
       ],
-      replacementTemplate: 'resource-pack=https://github.com/GiganticMinecraft/OriginalResourcePack/releases/download/v{{newValue}}/seichi_tex_v{{newValue}}.zip',
+      autoReplaceStringTemplate: 'resource-pack=https://github.com/GiganticMinecraft/OriginalResourcePack/releases/download/v{{{newValue}}}/seichi_tex_v{{{newValue}}}.zip',
       datasourceTemplate: 'github-releases',
       depNameTemplate: 'GiganticMinecraft/OriginalResourcePack',
       versioningTemplate: 'semver-coerced',
