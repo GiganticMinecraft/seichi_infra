@@ -74,13 +74,16 @@
       groupName: 'mariadb-operator',
     },
     {
+      matchManagers: [
+        'custom.regex',
+      ],
       matchPackageNames: [
         'GiganticMinecraft/OriginalResourcePack',
       ],
-      commitMessageTopic: 'GiganticMinecraft/OriginalResourcePack',
-      reviewers: [
-        'Lucky3028',
+      schedule: [
+        'at any time',
       ],
+      automerge: true,
     },
   ],
   postUpdateOptions: [
