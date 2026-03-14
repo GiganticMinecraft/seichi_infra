@@ -73,6 +73,18 @@
       ],
       groupName: 'mariadb-operator',
     },
+    {
+      matchManagers: [
+        'custom.regex',
+      ],
+      matchPackageNames: [
+        'GiganticMinecraft/OriginalResourcePack',
+      ],
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+    },
   ],
   postUpdateOptions: [
     'gomodTidy',
