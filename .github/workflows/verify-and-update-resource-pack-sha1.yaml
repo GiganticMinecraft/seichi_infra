@@ -31,7 +31,7 @@ jobs:
             echo "url=$URL" >> "$GITHUB_OUTPUT"
             echo "resource_pack_url_is_set=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Check if resource-pack URL changed in this PR
+      - name: Check if resource-pack URL or SHA1 changed in this PR
         id: resource_pack_changed
         if: steps.extract.outputs.resource_pack_url_is_set == 'true'
         run: |
