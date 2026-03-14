@@ -78,6 +78,9 @@
         'GiganticMinecraft/OriginalResourcePack',
       ],
       commitMessageTopic: 'GiganticMinecraft/OriginalResourcePack',
+      reviewers: [
+        'Lucky3028',
+      ],
     },
   ],
   postUpdateOptions: [
