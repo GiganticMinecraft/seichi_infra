@@ -73,15 +73,6 @@
       ],
       groupName: 'mariadb-operator',
     },
-    {
-      matchPackageNames: [
-        'GiganticMinecraft/OriginalResourcePack',
-      ],
-      commitMessageTopic: 'GiganticMinecraft/OriginalResourcePack',
-      reviewers: [
-        'Lucky3028',
-      ],
-    },
   ],
   postUpdateOptions: [
     'gomodTidy',
