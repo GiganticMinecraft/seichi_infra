@@ -505,6 +505,16 @@ variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
 
 #endregion
 
+# region ArgoCD backup-workflow account token
+
+variable "argocd_backup_workflow_auth_token" {
+  description = "ArgoCD auth token for the backup-workflow account, used to sync apps after backup"
+  type        = string
+  sensitive   = true
+}
+
+# endregion
+
 # region env variables for ArgoEvents
 
 variable "argo_events_github_access_token" {

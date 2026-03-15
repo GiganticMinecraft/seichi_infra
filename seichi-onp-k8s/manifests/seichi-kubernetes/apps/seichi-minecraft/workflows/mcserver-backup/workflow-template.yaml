@@ -86,8 +86,8 @@ spec:
             dependencies:
               - wait-for-scale-to-0
 
-          - name: patch-statefulset-to-1
-            template: patch-statefulset-to-1
+          - name: argocd-sync
+            template: argocd-sync
             inputs:
               parameters:
                 - name: statefulset-name
@@ -98,18 +98,6 @@ spec:
             dependencies:
               - run-backup
               - delete-coreprotect-db
-
-          - name: wait-for-scale-to-1
-            template: wait-for-scale-to-1
-            inputs:
-              parameters:
-                - name: statefulset-name
-            arguments:
-              parameters:
-                - name: statefulset-name
-                  value: "{{inputs.parameters.statefulset-name}}"
-            dependencies:
-              - patch-statefulset-to-1
 
     - name: check-maintenance-mode
       script:
@@ -256,31 +244,26 @@ spec:
           mariadb -hmariadb -ucoreprotect -p"${COREPROTECT_DB_USER_PASSWORD}" -Nse 'SHOW TABLES' -D {{inputs.parameters.coreprotect-db-name}} | 
             while read table; do mariadb -hmariadb -ucoreprotect -p"${COREPROTECT_DB_USER_PASSWORD}" -e "TRUNCATE TABLE $table" -D {{inputs.parameters.coreprotect-db-name}}; done
 
-    - name: patch-statefulset-to-1
+    - name: argocd-sync
       inputs:
         parameters:
           - name: statefulset-name
+      activeDeadlineSeconds: 300 # 5分でタイムアウト
       script:
-        image: alpine/kubectl:1.35.2
+        image: quay.io/argoproj/argocd:v2.14.11
         command: ["/bin/sh", "-c"]
+        env:
+          - name: ARGOCD_SERVER
+            value: "argocd-server.argocd.svc.cluster.local"
+          - name: ARGOCD_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: argocd-auth-token
+                key: token
         source: |
-          kubectl patch statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft --type='merge' -p '{"spec": {"replicas": 1}}'
-
-    - name: wait-for-scale-to-1
-      inputs:
-        parameters:
-          - name: statefulset-name
-      activeDeadlineSeconds: 300 # 5分待っても上がってこない場合は諦める
-      script:
-        image: alpine/kubectl:1.35.2
-        command: ["/bin/sh", "-c"]
-        source: |
-          echo "Waiting for StatefulSet to scale up..."
-          while [ "$(kubectl get statefulset {{inputs.parameters.statefulset-name}} -n seichi-minecraft -o jsonpath='{.status.availableReplicas}')" != "1" ]; do
-            echo "Still scaling up..."
-            sleep 5
-          done
-          echo "Scale-up confirmed!"
+          argocd app sync "seichi-minecraft-{{inputs.parameters.statefulset-name}}" \
+            --plaintext \
+            --timeout 300
 
     - name: notify-on-failure
       steps:
