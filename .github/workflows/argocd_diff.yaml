@@ -13,6 +13,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Install ArgoCD CLI
         run: |
@@ -20,7 +22,59 @@ jobs:
           chmod +x argocd
           sudo mv argocd /usr/local/bin/argocd
 
+      - name: Find affected ArgoCD apps
+        id: find-apps
+        env:
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_SERVER: argocd.onp-k8s.admin.seichi.click
+        run: |
+          # PR で変更されたファイル一覧を取得
+          changed_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "${changed_files}"
+
+          # ArgoCD アプリ一覧と source.path を JSON で取得し、
+          # 変更ファイルに関係するアプリだけを抽出する
+          argocd app list \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            -o json | python3 -c "
+          import json, sys
+
+          changed_files = '''${changed_files}'''.strip().split('\n')
+          data = json.load(sys.stdin)
+          items = data.get('items', data) if isinstance(data, dict) else data
+
+          affected = []
+          for item in items:
+              name = item['metadata']['name']
+              src = item['spec'].get('source', {})
+              path = src.get('path', '')
+              if not path or not path.startswith('seichi-onp-k8s/manifests/seichi-kubernetes/'):
+                  continue
+              # 変更ファイルがアプリの source.path 配下にあるかチェック
+              for f in changed_files:
+                  if f.startswith(path + '/') or f == path:
+                      affected.append(name)
+                      break
+
+          for a in affected:
+              print(a)
+          " > /tmp/affected-apps.txt
+
+          app_count=$(wc -l < /tmp/affected-apps.txt | tr -d ' ')
+          echo "Affected apps (${app_count}):"
+          cat /tmp/affected-apps.txt
+
+          if [ "${app_count}" -eq 0 ]; then
+            echo "has_apps=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_apps=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Get ArgoCD app diff
+        if: steps.find-apps.outputs.has_apps == 'true'
         id: argocd-diff
         env:
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
@@ -28,16 +82,11 @@ jobs:
         run: |
           PR_HEAD_SHA="${{ github.event.pull_request.head.sha }}"
 
-          app_names=$(argocd app list \
-            --server "${ARGOCD_SERVER}" \
-            --grpc-web \
-            --auth-token "${ARGOCD_AUTH_TOKEN}" \
-            --output name)
-
           has_diff=false
           touch /tmp/argocd-diff-output.md
 
-          for app in ${app_names}; do
+          while IFS= read -r app; do
+            [ -z "${app}" ] && continue
             echo "::group::Checking diff for ${app}"
 
             set +e
@@ -72,7 +121,7 @@ jobs:
               echo "</details>" >> /tmp/argocd-diff-output.md
               echo "" >> /tmp/argocd-diff-output.md
             fi
-          done
+          done < /tmp/affected-apps.txt
 
           echo "has_diff=${has_diff}" >> "$GITHUB_OUTPUT"
 
@@ -109,7 +158,7 @@ jobs:
           fi
 
       - name: Remove comment if no diff
-        if: steps.argocd-diff.outputs.has_diff == 'false'
+        if: steps.argocd-diff.outputs.has_diff == 'false' || steps.find-apps.outputs.has_apps == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
