@@ -75,18 +75,27 @@ spec:
             httpGet:
               path: /
               port: 9000
+              httpHeaders:
+                - name: Host
+                  value: bugsink.seichi-minecraft
             failureThreshold: 60
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /
               port: 9000
+              httpHeaders:
+                - name: Host
+                  value: bugsink.seichi-minecraft
             periodSeconds: 10
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /
               port: 9000
+              httpHeaders:
+                - name: Host
+                  value: bugsink.seichi-minecraft
             periodSeconds: 5
             failureThreshold: 3
           resources:
