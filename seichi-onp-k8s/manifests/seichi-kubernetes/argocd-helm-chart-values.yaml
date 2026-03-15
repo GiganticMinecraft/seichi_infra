@@ -58,6 +58,7 @@ configs:
           secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
     admin.enabled: false
     accounts.mcp-service: apiKey
+    accounts.backup-workflow: apiKey
   rbac:
     create: true
     # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
@@ -69,6 +70,8 @@ configs:
     policy.csv: |
       g, GiganticMinecraft:admin-team, role:admin
       g, mcp-service, role:readonly
+      p, backup-workflow, applications, sync, seichi-minecraft/*, allow
+      p, backup-workflow, applications, get, seichi-minecraft/*, allow
     # policy.default is the name of the default role which Argo CD will falls back to, when
     # authorizing API requests (optional). If omitted or empty, users may be still be able to login,
     # but will see no apps, projects, etc...
