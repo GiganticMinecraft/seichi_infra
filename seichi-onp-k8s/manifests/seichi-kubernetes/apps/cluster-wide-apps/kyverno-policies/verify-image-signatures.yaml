@@ -20,6 +20,9 @@ spec:
                 - Pod
       verifyImages:
         - mutateDigest: false
+          verifyDigest: true
+          required: true
+          useCache: true
           imageReferences:
             - "ghcr.io/giganticminecraft/*"
           attestors:
@@ -29,3 +32,4 @@ spec:
                     issuer: "https://token.actions.githubusercontent.com"
                     rekor:
                       url: https://rekor.sigstore.dev
+                  signatureAlgorithm: sha256
