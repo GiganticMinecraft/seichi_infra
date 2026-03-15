@@ -71,6 +71,24 @@ spec:
             # https://github.com/bugsink/bugsink/blob/bddc2e8f640e82b7d1f861f1b8b363535d8a22a1/bugsink/conf_templates/singleserver.py.template#L41
             - name: TIME_ZONE
               value: "Asia/Tokyo"
+          startupProbe:
+            httpGet:
+              path: /
+              port: 9000
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            periodSeconds: 5
+            failureThreshold: 3
           resources:
             limits:
               cpu: 100m
