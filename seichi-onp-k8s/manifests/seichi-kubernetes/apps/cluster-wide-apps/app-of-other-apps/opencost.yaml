@@ -20,6 +20,11 @@ spec:
               port: 9090
           ui:
             enabled: true
+          metrics:
+            serviceMonitor:
+              enabled: true
+              additionalLabels:
+                release: prometheus
   destination:
     server: https://kubernetes.default.svc
     namespace: opencost
