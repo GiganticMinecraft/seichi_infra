@@ -99,6 +99,6 @@ spec:
               memory: 500Mi
               ephemeral-storage: 500Mi
   strategy:
-    type: Recreate
+    type: RollingUpdate
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
