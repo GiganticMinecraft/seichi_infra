@@ -18,8 +18,8 @@ server:
     targetMemoryUtilizationPercentage: 175
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 50m
+      memory: 384Mi
   pdb:
     enabled: true
     minAvailable: 1
@@ -77,8 +77,8 @@ configs:
 controller:
   resources:
     requests:
-      cpu: 250m
-      memory: 768Mi
+      cpu: 600m
+      memory: 2Gi
   metrics:
     enabled: true
     serviceMonitor:
@@ -98,8 +98,8 @@ dex:
           key: client-secret
   resources:
     requests:
-      cpu: 50m
-      memory: 128Mi
+      cpu: 10m
+      memory: 384Mi
   metrics:
     enabled: true
     serviceMonitor:
@@ -115,8 +115,8 @@ dex:
 redis:
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 15m
+      memory: 64Mi
   metrics:
     enabled: true
     serviceMonitor:
@@ -128,8 +128,8 @@ repoServer:
   replicaCount: 1
   resources:
     requests:
-      cpu: 500m
-      memory: 128Mi
+      cpu: 200m
+      memory: 256Mi
   metrics:
     enabled: true
     serviceMonitor:
@@ -141,8 +141,8 @@ applicationSet:
   replicaCount: 1
   resources:
     requests:
-      cpu: 500m
-      memory: 128Mi
+      cpu: 15m
+      memory: 384Mi
   metrics:
     enabled: true
     serviceMonitor:
@@ -153,8 +153,8 @@ applicationSet:
 notifications:
   resources:
     requests:
-      cpu: 100m
-      memory: 64Mi
+      cpu: 15m
+      memory: 192Mi
   metrics:
     enabled: true
     serviceMonitor:

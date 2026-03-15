@@ -13,6 +13,10 @@ spec:
       releaseName: argo-workflows
       values: |
         controller:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
           metricsConfig:
             enabled: true
           serviceMonitor:
@@ -26,6 +30,10 @@ spec:
               ttlStrategy:
                 secondsAfterCompletion: 592200
         server:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
           secure: true
           extraArgs:
             - --auth-mode=sso
