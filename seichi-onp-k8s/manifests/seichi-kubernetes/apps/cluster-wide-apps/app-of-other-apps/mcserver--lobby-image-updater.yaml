@@ -1,0 +1,16 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: mcserver--lobby
+  namespace: argocd
+spec:
+  namespace: argocd
+  writeBackConfig:
+    method: argocd
+  applicationRefs:
+    - namePattern: "seichi-minecraft-mcserver--lobby"
+      images:
+        - alias: minecraft
+          imageName: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:latest
+          commonUpdateSettings:
+            updateStrategy: digest
