@@ -15,6 +15,8 @@ spec:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
       name: "cluster-wide-apps-{{path.basenameNormalized}}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
     spec:
       project: cluster-wide-apps
       source:
@@ -66,6 +68,8 @@ spec:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
       name: "seichi-debug-gateway-{{path.basenameNormalized}}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
     spec:
       project: seichi-debug-gateway
       source:
@@ -107,6 +111,8 @@ spec:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
       name: "seichi-gateway-{{path.basenameNormalized}}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
     spec:
       project: seichi-gateway
       source:
@@ -136,6 +142,8 @@ kind: Application
 metadata:
   name: app-of-cloudflared-tunnel-exits
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
 spec:
   project: cloudflared-tunnel-exits
   source:
@@ -176,6 +184,8 @@ spec:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
       name: "seichi-minecraft-{{path.basenameNormalized}}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
     spec:
       project: seichi-minecraft
       source:
@@ -216,6 +226,8 @@ spec:
       # 各Application が argocd namespace に配置されるため prefix した方が安全
       name: "seichi-debug-minecraft-{{path.basenameNormalized}}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
     spec:
       project: seichi-debug-minecraft
       source:
