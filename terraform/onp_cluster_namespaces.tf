@@ -13,12 +13,18 @@ resource "kubernetes_namespace" "onp_seichi_debug_minecraft" {
 resource "kubernetes_namespace" "onp_seichi_gateway" {
   metadata {
     name = "seichi-gateway"
+    labels = {
+      "goldilocks.fairwinds.com/enabled" = "true"
+    }
   }
 }
 
 resource "kubernetes_namespace" "onp_seichi_minecraft" {
   metadata {
     name = "seichi-minecraft"
+    labels = {
+      "goldilocks.fairwinds.com/enabled" = "true"
+    }
   }
 }
 
@@ -37,6 +43,9 @@ resource "kubernetes_namespace" "onp_argo" {
 resource "kubernetes_namespace" "onp_monitoring" {
   metadata {
     name = "monitoring"
+    labels = {
+      "goldilocks.fairwinds.com/enabled" = "true"
+    }
   }
 }
 
