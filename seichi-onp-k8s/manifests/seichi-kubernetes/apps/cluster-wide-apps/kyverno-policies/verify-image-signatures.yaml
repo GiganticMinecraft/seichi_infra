@@ -19,7 +19,8 @@ spec:
               kinds:
                 - Pod
       verifyImages:
-        - imageReferences:
+        - mutateDigest: false
+          imageReferences:
             - "ghcr.io/giganticminecraft/*"
           attestors:
             - entries:
