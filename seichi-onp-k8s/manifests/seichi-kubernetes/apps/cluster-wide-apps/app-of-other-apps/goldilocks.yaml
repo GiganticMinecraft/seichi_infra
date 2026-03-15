@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: goldilocks
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: goldilocks
+    repoURL: https://charts.fairwinds.com/stable
+    targetRevision: 10.3.0
+    helm:
+      releaseName: goldilocks
+      values: |
+        vpa:
+          enabled: false
+        dashboard:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: goldilocks
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
