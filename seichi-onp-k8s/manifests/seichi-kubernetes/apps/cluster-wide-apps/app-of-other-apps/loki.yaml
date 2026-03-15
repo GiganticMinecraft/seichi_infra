@@ -75,6 +75,22 @@ spec:
                   name: garage-loki-credentials
                   key: AWS_SECRET_ACCESS_KEY
 
+        chunksCache:
+          resources:
+            requests:
+              cpu: 20m
+              memory: 4Gi
+            limits:
+              memory: 4Gi
+
+        resultsCache:
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              memory: 64Mi
+
         # Zero out replica counts of other deployment modes
         backend:
           replicas: 0
