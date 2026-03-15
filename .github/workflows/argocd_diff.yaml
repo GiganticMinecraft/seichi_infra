@@ -28,20 +28,18 @@ jobs:
         run: |
           PR_HEAD_SHA="${{ github.event.pull_request.head.sha }}"
 
-          # ArgoCD に登録されている全アプリを取得
           app_names=$(argocd app list \
             --server "${ARGOCD_SERVER}" \
             --grpc-web \
             --auth-token "${ARGOCD_AUTH_TOKEN}" \
             --output name)
 
-          diff_output=""
           has_diff=false
+          touch /tmp/argocd-diff-output.md
 
           for app in ${app_names}; do
             echo "::group::Checking diff for ${app}"
 
-            # diff の終了コードを記録する (0=差分なし, 1=差分あり, 2=エラー)
             set +e
             result=$(argocd app diff "${app}" \
               --server "${ARGOCD_SERVER}" \
@@ -57,30 +55,22 @@ jobs:
 
             if [ ${exit_code} -eq 1 ]; then
               has_diff=true
-              cat >> /tmp/argocd-diff-output.md <<BLOCK_EOF
-<details>
-<summary>📝 ${app} (diff detected)</summary>
-
-\`\`\`diff
-${result}
-\`\`\`
-
-</details>
-
-BLOCK_EOF
+              echo "<details>" >> /tmp/argocd-diff-output.md
+              printf '<summary>📝 %s (diff detected)</summary>\n\n' "${app}" >> /tmp/argocd-diff-output.md
+              echo '```diff' >> /tmp/argocd-diff-output.md
+              echo "${result}" >> /tmp/argocd-diff-output.md
+              echo '```' >> /tmp/argocd-diff-output.md
+              echo "</details>" >> /tmp/argocd-diff-output.md
+              echo "" >> /tmp/argocd-diff-output.md
             elif [ ${exit_code} -ge 2 ]; then
               has_diff=true
-              cat >> /tmp/argocd-diff-output.md <<BLOCK_EOF
-<details>
-<summary>⚠️ ${app} (error)</summary>
-
-\`\`\`
-${result}
-\`\`\`
-
-</details>
-
-BLOCK_EOF
+              echo "<details>" >> /tmp/argocd-diff-output.md
+              printf '<summary>⚠️ %s (error)</summary>\n\n' "${app}" >> /tmp/argocd-diff-output.md
+              echo '```' >> /tmp/argocd-diff-output.md
+              echo "${result}" >> /tmp/argocd-diff-output.md
+              echo '```' >> /tmp/argocd-diff-output.md
+              echo "</details>" >> /tmp/argocd-diff-output.md
+              echo "" >> /tmp/argocd-diff-output.md
             fi
           done
 
@@ -102,7 +92,6 @@ BLOCK_EOF
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 既存のコメントを探して更新、なければ新規作成
           existing_comment_id=$(gh api \
             "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
             --jq '.[] | select(.body | startswith("## ArgoCD Diff Result")) | .id' \
