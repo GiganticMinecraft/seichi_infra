@@ -20,7 +20,7 @@ spec:
       containers:
         - resources:
             requests:
-              memory: 128Mi
+              memory: 32Mi
 
           image: nginx:1.29.6
           name: seichi-game-data-publisher-cache-proxy

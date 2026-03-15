@@ -19,8 +19,8 @@ spec:
         deploymentStrategy: Recreate
         resources:
           requests:
-            cpu: "250m"
-            memory: "512Mi"
+            cpu: "20m"
+            memory: "64Mi"
         valkeyConfig: |
           maxmemory 1024mb
         dataStorage:

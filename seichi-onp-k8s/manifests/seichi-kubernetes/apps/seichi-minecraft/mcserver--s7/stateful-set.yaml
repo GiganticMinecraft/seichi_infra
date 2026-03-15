@@ -73,7 +73,7 @@ spec:
               memory: 6Gi
             limits:
               cpu: 2
-              memory: 6Gi
+              memory: 8Gi
           env:
             - name: MEMORY
               value: 4G

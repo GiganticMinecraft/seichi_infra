@@ -65,11 +65,11 @@ spec:
               value: "Asia/Tokyo"
           resources:
             limits:
-              cpu: 200m
+              cpu: 100m
               memory: 500Mi
               ephemeral-storage: 500Mi
             requests:
-              cpu: 200m
+              cpu: 50m
               memory: 500Mi
               ephemeral-storage: 500Mi
   strategy:

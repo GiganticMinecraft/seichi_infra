@@ -20,7 +20,7 @@ spec:
       containers:
         - resources:
             requests:
-              memory: 128Mi
+              memory: 512Mi
 
           envFrom:
             - configMapRef:

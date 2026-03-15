@@ -69,10 +69,10 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: 8
-              memory: 26Gi
+              cpu: 3
+              memory: 24Gi
             limits:
-              cpu: 10
+              cpu: 4
               memory: 26Gi
           env:
             - name: MEMORY

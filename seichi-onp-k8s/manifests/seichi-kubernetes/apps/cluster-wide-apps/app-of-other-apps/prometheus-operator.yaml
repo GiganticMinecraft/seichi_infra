@@ -184,7 +184,7 @@ spec:
                       storage: 300Gi
             resources:
               requests:
-                memory: 2Gi
+                memory: 12Gi
             retention: 180d
             retentionSize: "270GB"
             additionalScrapeConfigs:
