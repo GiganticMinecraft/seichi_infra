@@ -20,10 +20,10 @@ spec:
           image: ghcr.io/giganticminecraft/seichi-portal-backend:main-649c758
           resources:
             requests:
-              cpu: 250m
+              cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 500m
+              cpu: 100m
               memory: 256Mi
           env:
             - name: MYSQL_DATABASE

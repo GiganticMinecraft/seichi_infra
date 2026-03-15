@@ -20,11 +20,11 @@ spec:
           image: ghcr.io/giganticminecraft/idea-reaction:v0.7.0
           resources:
             requests:
-              cpu: 250m
-              memory: 16Mi
-            limits:
-              cpu: 500m
+              cpu: 15m
               memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
           env:
             # https://github.com/GiganticMinecraft/idea-reaction/blob/3a986d34ed87ab328dd6a6d2eed7f731523118a2/src/main.rs#L43-L56
             - name: ENV_NAME

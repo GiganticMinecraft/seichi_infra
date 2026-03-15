@@ -23,11 +23,11 @@ spec:
           size: 10Gi
         resources:
           requests:
-            cpu: "250m"
-            memory: "512Mi"
+            cpu: "15m"
+            memory: "64Mi"
           limits:
-            cpu: "500m"
-            memory: "1Gi"
+            cpu: "50m"
+            memory: "128Mi"
   destination:
     server: https://kubernetes.default.svc
     namespace: seichi-minecraft

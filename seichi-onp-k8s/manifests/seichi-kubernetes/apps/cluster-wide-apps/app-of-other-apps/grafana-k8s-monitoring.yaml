@@ -121,6 +121,21 @@ spec:
         alloy-profiles:
           enabled: true
 
+        beyla:
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+
+        beyla-k8s-cache:
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+
         alloy-operator:
           deploy: true
   syncPolicy:

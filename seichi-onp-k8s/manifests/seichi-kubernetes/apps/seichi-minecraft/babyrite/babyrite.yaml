@@ -20,11 +20,11 @@ spec:
           image: ghcr.io/m1sk9/babyrite:v1.1.3
           resources:
             requests:
-              cpu: 250m
-              memory: 16Mi
-            limits:
-              cpu: 500m
+              cpu: 15m
               memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - name: babyrite-config-volume
               mountPath: /config

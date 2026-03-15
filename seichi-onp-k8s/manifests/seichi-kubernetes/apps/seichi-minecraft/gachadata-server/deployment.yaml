@@ -20,11 +20,11 @@ spec:
           image: ghcr.io/giganticminecraft/gachadata-server:sha-23f6394
           resources:
             requests:
-              cpu: 250m
-              memory: 128Mi
+              cpu: 15m
+              memory: 32Mi
             limits:
-              cpu: 500m
-              memory: 256Mi
+              cpu: 50m
+              memory: 64Mi
           env:
             - name: MYSQL_USER
               value: mcserver
