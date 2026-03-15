@@ -1,0 +1,136 @@
+name: ArgoCD Diff
+
+on:
+  pull_request:
+    paths:
+      - "seichi-onp-k8s/manifests/seichi-kubernetes/**"
+
+jobs:
+  argocd-diff:
+    name: ArgoCD Diff
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd
+          sudo mv argocd /usr/local/bin/argocd
+
+      - name: Get ArgoCD app diff
+        id: argocd-diff
+        env:
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_SERVER: argocd.onp-k8s.admin.seichi.click
+        run: |
+          PR_HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+          # ArgoCD に登録されている全アプリを取得
+          app_names=$(argocd app list \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --output name)
+
+          diff_output=""
+          has_diff=false
+
+          for app in ${app_names}; do
+            echo "::group::Checking diff for ${app}"
+
+            # diff の終了コードを記録する (0=差分なし, 1=差分あり, 2=エラー)
+            set +e
+            result=$(argocd app diff "${app}" \
+              --server "${ARGOCD_SERVER}" \
+              --grpc-web \
+              --auth-token "${ARGOCD_AUTH_TOKEN}" \
+              --revision "${PR_HEAD_SHA}" \
+              2>&1)
+            exit_code=$?
+            set -e
+
+            echo "${result}"
+            echo "::endgroup::"
+
+            if [ ${exit_code} -eq 1 ]; then
+              has_diff=true
+              cat >> /tmp/argocd-diff-output.md <<BLOCK_EOF
+<details>
+<summary>📝 ${app} (diff detected)</summary>
+
+\`\`\`diff
+${result}
+\`\`\`
+
+</details>
+
+BLOCK_EOF
+            elif [ ${exit_code} -ge 2 ]; then
+              has_diff=true
+              cat >> /tmp/argocd-diff-output.md <<BLOCK_EOF
+<details>
+<summary>⚠️ ${app} (error)</summary>
+
+\`\`\`
+${result}
+\`\`\`
+
+</details>
+
+BLOCK_EOF
+            fi
+          done
+
+          echo "has_diff=${has_diff}" >> "$GITHUB_OUTPUT"
+
+      - name: Build comment body
+        if: steps.argocd-diff.outputs.has_diff == 'true'
+        run: |
+          {
+            echo "## ArgoCD Diff Result"
+            echo ""
+            echo '`argocd app diff --revision ${{ github.event.pull_request.head.sha }}` の結果、以下の差分・エラーが検出されました。'
+            echo ""
+            cat /tmp/argocd-diff-output.md
+          } > /tmp/argocd-comment.md
+
+      - name: Comment on Pull Request
+        if: steps.argocd-diff.outputs.has_diff == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 既存のコメントを探して更新、なければ新規作成
+          existing_comment_id=$(gh api \
+            "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq '.[] | select(.body | startswith("## ArgoCD Diff Result")) | .id' \
+            | head -n 1)
+
+          if [ -n "${existing_comment_id}" ]; then
+            gh api \
+              --method PATCH \
+              "repos/${{ github.repository }}/issues/comments/${existing_comment_id}" \
+              -F body=@/tmp/argocd-comment.md
+          else
+            gh pr comment "${{ github.event.pull_request.number }}" \
+              --repo "${{ github.repository }}" \
+              --body-file /tmp/argocd-comment.md
+          fi
+
+      - name: Remove comment if no diff
+        if: steps.argocd-diff.outputs.has_diff == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing_comment_id=$(gh api \
+            "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq '.[] | select(.body | startswith("## ArgoCD Diff Result")) | .id' \
+            | head -n 1)
+
+          if [ -n "${existing_comment_id}" ]; then
+            gh api \
+              --method DELETE \
+              "repos/${{ github.repository }}/issues/comments/${existing_comment_id}"
+          fi
