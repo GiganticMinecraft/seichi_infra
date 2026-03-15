@@ -37,5 +37,5 @@ spec:
               - { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect__mc_s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" }
               - { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect__mc_s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" }
               - { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect__mc_s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" }
-  retryStrategy:
-    limit: 3
+    retryStrategy:
+      limit: 3
