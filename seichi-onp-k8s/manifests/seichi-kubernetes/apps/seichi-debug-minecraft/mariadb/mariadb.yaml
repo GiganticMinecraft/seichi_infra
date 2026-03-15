@@ -158,6 +158,7 @@ spec:
     timeoutSeconds: 5
 
   updateStrategy:
+    autoUpdateDataPlane: true
     type: ReplicasFirstPrimaryLast
 
   metrics:
