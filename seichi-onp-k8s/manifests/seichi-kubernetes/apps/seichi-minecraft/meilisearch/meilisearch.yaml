@@ -15,6 +15,8 @@ spec:
         image:
           repository: getmeili/meilisearch
           tag: "v1.36.0"
+        auth:
+          existingMasterKeySecret: seichi-portal-meilisearch-master-key
         environment:
           MEILI_ENV: production
           MEILI_NO_ANALYTICS: "true"

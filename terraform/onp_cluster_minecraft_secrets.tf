@@ -265,6 +265,21 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
 }
 
 
+resource "kubernetes_secret" "seichi_portal_meilisearch_master_key" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichi-portal-meilisearch-master-key"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    MEILI_MASTER_KEY = var.meilisearch__master_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
 

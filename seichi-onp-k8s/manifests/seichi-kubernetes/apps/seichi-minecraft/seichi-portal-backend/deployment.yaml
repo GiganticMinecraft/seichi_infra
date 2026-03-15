@@ -49,6 +49,11 @@ spec:
               value: "6379"
             - name: MEILISEARCH_HOST
               value: http://seichi-portal-meilisearch:7700
+            - name: MEILISEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-meilisearch-master-key
+                  key: MEILI_MASTER_KEY
             - name: RABBITMQ_USER
               value: seichi-portal
             - name: RABBITMQ_PASSWORD
