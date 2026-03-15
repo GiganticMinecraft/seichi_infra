@@ -51,6 +51,8 @@ spec:
     metadata:
       name: "cloudflared-tunnel-https-exit--{{name}}"
       namespace: argocd
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
     spec:
       project: cloudflared-tunnel-exits
       source:
