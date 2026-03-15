@@ -559,6 +559,16 @@ variable "proxmox_backup_client__fingerprint" {
 
 # endregion
 
+#region meilisearch secrets
+
+variable "meilisearch__master_key" {
+  description = "Meilisearch master key for seichi-portal-meilisearch"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region tailscale-approval-bot secrets
 
 variable "tailscale_approval_bot__tailnet" {
