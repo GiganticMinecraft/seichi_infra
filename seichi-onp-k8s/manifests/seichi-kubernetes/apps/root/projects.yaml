@@ -64,6 +64,12 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: "kyverno"
       server: https://kubernetes.default.svc
+    - namespace: "vpa"
+      server: https://kubernetes.default.svc
+    - namespace: "goldilocks"
+      server: https://kubernetes.default.svc
+    - namespace: "opencost"
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"

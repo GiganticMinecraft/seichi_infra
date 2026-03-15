@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vpa
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: vpa
+    repoURL: https://charts.fairwinds.com/stable
+    targetRevision: 4.10.2
+    helm:
+      releaseName: vpa
+      values: |
+        recommender:
+          enabled: true
+        updater:
+          enabled: false
+        admissionController:
+          enabled: false
+        metrics-server:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vpa
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
