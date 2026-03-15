@@ -299,6 +299,21 @@ resource "kubernetes_secret" "backup_failure_notify_webhook" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "argocd_backup_workflow_auth_token" {
+  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+
+  metadata {
+    name      = "argocd-auth-token"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    token = var.argocd_backup_workflow_auth_token
+  }
+
+  type = "Opaque"
+}
+
 # pbs-credentials: seichi-minecraft に配置し、seichi-debug-minecraft と garage に複製
 resource "kubernetes_secret" "pbs_credentials" {
   depends_on = [kubernetes_namespace.onp_seichi_minecraft]
