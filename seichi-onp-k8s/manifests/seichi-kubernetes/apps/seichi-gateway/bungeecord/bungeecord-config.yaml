@@ -86,7 +86,17 @@ data:
         - redisbungee.command.plist
 
     groups:
+      taaa150:
+        - admin
       unchama:
+        - admin
+      shirotubu:
+        - admin
+      Lucky3028:
+        - admin
+      Kory3:
+        - admin
+      SpecialBoyWaka:
         - admin
 
     custom_server_name: HexaCord
