@@ -75,8 +75,8 @@ spec:
             httpGet:
               path: /
               port: 9000
-            failureThreshold: 30
-            periodSeconds: 2
+            failureThreshold: 60
+            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /
