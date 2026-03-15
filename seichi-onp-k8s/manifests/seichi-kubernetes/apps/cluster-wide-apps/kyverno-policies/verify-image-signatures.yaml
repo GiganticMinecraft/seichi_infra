@@ -13,6 +13,7 @@ spec:
   webhookTimeoutSeconds: 30
   rules:
     - name: verify-giganticminecraft-images
+      skipBackgroundRequests: true
       match:
         any:
           - resources:
