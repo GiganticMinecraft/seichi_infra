@@ -105,7 +105,6 @@ jobs:
           tags: |
             type=sha,prefix=sha-,suffix=,format=short
             type=raw,value=${{ matrix.image_ver }}
-            type=raw,value=latest
 
       - if: steps.should_build.outputs.should_build == 'true'
         name: Build (and push if on main)
