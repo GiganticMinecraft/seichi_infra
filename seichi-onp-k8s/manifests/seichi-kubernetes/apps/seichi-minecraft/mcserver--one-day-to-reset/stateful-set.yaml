@@ -53,8 +53,10 @@ spec:
           name: minecraft
           resources:
             requests:
+              cpu: 750m
               memory: 6Gi
             limits:
+              cpu: 1500m
               memory: 6Gi
           env:
             - name: MEMORY
@@ -93,6 +95,15 @@ spec:
               name: minecraft
             - containerPort: 18321
               name: jmx-metrics
+
+          livenessProbe:
+            exec:
+              command:
+                - mc-health
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
 
           startupProbe:
             tcpSocket:

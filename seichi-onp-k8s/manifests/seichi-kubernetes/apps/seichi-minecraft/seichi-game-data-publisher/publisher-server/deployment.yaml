@@ -20,7 +20,11 @@ spec:
       containers:
         - resources:
             requests:
+              cpu: 20m
               memory: 512Mi
+            limits:
+              cpu: 50m
+              memory: 768Mi
 
           envFrom:
             - configMapRef:
@@ -30,6 +34,20 @@ spec:
           name: seichi-game-data-publisher-server
           ports:
             - containerPort: 80
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
           startupProbe:
             tcpSocket:
               port: 80
