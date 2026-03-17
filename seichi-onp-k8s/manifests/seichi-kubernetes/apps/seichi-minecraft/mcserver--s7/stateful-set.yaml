@@ -249,6 +249,15 @@ spec:
             - containerPort: 32000
               name: jmx-remote
 
+          livenessProbe:
+            exec:
+              command:
+                - mc-health
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
           startupProbe:
             tcpSocket:
               port: 25565
@@ -319,7 +328,8 @@ spec:
             - name: mcserver--s7-data
               mountPath: /data
 
-        - resources:
+        - restartPolicy: OnFailure
+          resources:
             limits:
               memory: 128Mi
           image: nginx:1.29.6
