@@ -352,8 +352,7 @@ spec:
             - name: mcserver--s1-data
               mountPath: /data
 
-        - restartPolicy: OnFailure
-          resources:
+        - resources:
             limits:
               memory: 128Mi
           image: nginx:1.29.6
