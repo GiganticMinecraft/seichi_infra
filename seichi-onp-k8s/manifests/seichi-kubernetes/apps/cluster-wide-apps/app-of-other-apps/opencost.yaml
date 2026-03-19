@@ -8,7 +8,7 @@ spec:
   source:
     chart: opencost
     repoURL: https://opencost.github.io/opencost-helm-chart
-    targetRevision: 2.5.11
+    targetRevision: 2.5.12
     helm:
       releaseName: opencost
       values: |
