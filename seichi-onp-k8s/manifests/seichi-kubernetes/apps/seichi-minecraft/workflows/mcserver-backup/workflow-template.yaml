@@ -232,6 +232,11 @@ spec:
       inputs:
         parameters:
           - name: statefulset-name
+      retryStrategy:
+        limit: 3
+        backoff:
+          duration: "30s"
+          factor: 2
       activeDeadlineSeconds: 300 # 5分でタイムアウト
       script:
         image: quay.io/argoproj/argocd:v3.3.4
