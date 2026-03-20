@@ -151,7 +151,7 @@ spec:
           - |
             curl -fSs -X POST \
               -H "Content-Type: application/json" \
-              --data "{
+              --data-raw "{
                 \"content\": \"<@&532704116799963168>\",
                 \"allowed_mentions\": {\"roles\": [\"532704116799963168\"]},
                 \"embeds\": [{
