@@ -248,6 +248,9 @@ spec:
                           {{workflow.parameters.release-body}}
                           __RELEASE_BODY_BOUNDARY__
 
+                          # HTML コメント行を除去 (GitHub 自動生成リリースノートの先頭コメント)
+                          sed -i '/^<!--.*-->$/d' /tmp/release-body.txt
+
                           # Discord embed description の 4096 文字制限に対応
                           body=$(head -c 4000 /tmp/release-body.txt)
                           if [ "$(wc -c < /tmp/release-body.txt)" -gt 4000 ]; then
