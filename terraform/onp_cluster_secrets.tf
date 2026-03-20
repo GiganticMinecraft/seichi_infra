@@ -233,6 +233,21 @@ resource "kubernetes_secret" "garage_backup_s3_credentials" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "garage_backup_failure_notify_webhook" {
+  depends_on = [kubernetes_namespace.garage]
+
+  metadata {
+    name      = "backup-failure-notify-webhook"
+    namespace = "garage"
+  }
+
+  data = {
+    DISCORD_WEBHOOK_URL = var.backup_failure_notify_webhook_url
+  }
+
+  type = "Opaque"
+}
+
 # Garage Admin API token (shared between Garage daemon and Admin Console)
 resource "kubernetes_secret" "garage_admin_api_token" {
   depends_on = [kubernetes_namespace.garage]
