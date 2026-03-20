@@ -251,7 +251,7 @@ spec:
                 key: token
         source: |
           argocd app sync "seichi-minecraft-{{inputs.parameters.statefulset-name}}" \
-            --plaintext \
+            --insecure \
             --timeout 300
 
     - name: notify-on-failure
