@@ -102,7 +102,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: steps.build.outputs.digest != ''
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
           format: 'sarif'
