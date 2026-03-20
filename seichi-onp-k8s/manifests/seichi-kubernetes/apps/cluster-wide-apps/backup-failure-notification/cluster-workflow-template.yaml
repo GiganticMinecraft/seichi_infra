@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterWorkflowTemplate
+metadata:
+  name: backup-failure-notification
+spec:
+  templates:
+    - name: send-discord-notification
+      inputs:
+        parameters:
+          - name: title
+      container:
+        image: curlimages/curl:8.18.0
+        env:
+          - name: DISCORD_WEBHOOK_URL
+            valueFrom:
+              secretKeyRef:
+                name: backup-failure-notify-webhook
+                key: DISCORD_WEBHOOK_URL
+        command: [sh, -ceu]
+        args:
+          - |
+            curl -fSs -X POST \
+              -H "Content-Type: application/json" \
+              --data "{
+                \"content\": \"<@&532704116799963168>\",
+                \"allowed_mentions\": {\"roles\": [\"532704116799963168\"]},
+                \"embeds\": [{
+                  \"title\": \"{{inputs.parameters.title}}\",
+                  \"description\": \"バックアップワークフロー \`{{workflow.name}}\` が失敗しました。ArgoWorkflows を確認してください。\",
+                  \"color\": 15548997
+                }]
+              }" \
+              "${DISCORD_WEBHOOK_URL}"
