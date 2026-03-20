@@ -23,6 +23,8 @@ spec:
   serviceAccountName: mcserver--lobby-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
+  activeDeadlineSeconds: 7200 # 2時間でタイムアウト
+  onExit: notify-on-failure
   entrypoint: default
   templates:
     - name: default
@@ -172,6 +174,37 @@ spec:
             sleep 5
           done
           echo "Scale-up confirmed!"
+
+    - name: notify-on-failure
+      steps:
+        - - name: send-failure-notification
+            template: send-discord-notification
+            when: "{{workflow.status}} != Succeeded"
+
+    - name: send-discord-notification
+      container:
+        image: curlimages/curl:8.18.0
+        env:
+          - name: DISCORD_WEBHOOK_URL
+            valueFrom:
+              secretKeyRef:
+                name: backup-failure-notify-webhook
+                key: DISCORD_WEBHOOK_URL
+        command: [sh, -ceu]
+        args:
+          - |
+            curl -fSs -X POST \
+              -H "Content-Type: application/json" \
+              --data "{
+                \"content\": \"<@&532704116799963168>\",
+                \"allowed_mentions\": {\"roles\": [\"532704116799963168\"]},
+                \"embeds\": [{
+                  \"title\": \"mcserver--lobby バックアップ失敗\",
+                  \"description\": \"バックアップワークフローが失敗しました。ArgoWorkflows を確認してください。\",
+                  \"color\": 15548997
+                }]
+              }" \
+              "${DISCORD_WEBHOOK_URL}"
 
   volumes:
     - name: backup-target-volume
