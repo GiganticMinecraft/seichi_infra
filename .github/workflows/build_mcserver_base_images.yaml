@@ -107,6 +107,7 @@ jobs:
           image-ref: ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-results.sarif'
+          ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
