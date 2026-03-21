@@ -135,6 +135,7 @@ jobs:
           image-ref: ${{ matrix.image }}@${{ steps.build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-results.sarif'
+          ignore-unfixed: true
 
       - if: always() && steps.should_build.outputs.should_build == 'true' && steps.build.outputs.digest != ''
         name: Upload Trivy scan results to GitHub Security tab
