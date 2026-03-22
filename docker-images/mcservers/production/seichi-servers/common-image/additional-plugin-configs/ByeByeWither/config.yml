@@ -4,3 +4,6 @@ wither:
 ender-dragon:
   is-enabled: true
   ignored-worlds: []
+phantom:
+　is-enabled: true
+  ignored-worlds: []
