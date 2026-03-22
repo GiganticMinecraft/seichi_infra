@@ -83,7 +83,6 @@
       schedule: [
         'at any time',
       ],
-      automerge: true,
     },
   ],
   postUpdateOptions: [
