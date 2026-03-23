@@ -191,20 +191,28 @@ spec:
           S3_REGION="seichi-cloud"
           BUCKET="mariadb-backups"
 
-          KEYS=$(aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
+          OBJECTS_TO_DELETE=$(aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
             s3api list-objects-v2 --bucket "$BUCKET" \
-            --query "Contents[?starts_with(Key, 'database--') && LastModified<'${CUTOFF}'].Key" \
-            --output text)
+            --query "Contents[?starts_with(Key, 'database--') && LastModified<'${CUTOFF}'].{Key: Key}" \
+            --output json)
 
-          if [ "$KEYS" = "None" ] || [ -z "$KEYS" ]; then
-            echo "削除対象のオブジェクトはありません"
-          else
-            echo "$KEYS" | tr '\t' '\n' | while read -r KEY; do
-              [ -z "$KEY" ] && continue
-              echo "削除: s3://${BUCKET}/${KEY}"
+          if [ "$OBJECTS_TO_DELETE" = "null" ]; then
+            OBJECTS_TO_DELETE="[]"
+          fi
+
+          COUNT=$(echo "$OBJECTS_TO_DELETE" | jq 'length')
+          if [ "$COUNT" -gt 0 ]; then
+            echo "削除対象: ${COUNT}件"
+            echo "$OBJECTS_TO_DELETE" | jq -r '.[].Key'
+
+            echo "$OBJECTS_TO_DELETE" | jq -c '. as $in | range(0; length; 1000) | $in[.:. + 1000]' | while read -r BATCH; do
+              DELETE_PAYLOAD="{\"Objects\": ${BATCH}, \"Quiet\": false}"
               aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
-                s3 rm "s3://${BUCKET}/${KEY}"
+                s3api delete-objects --bucket "$BUCKET" --delete "$DELETE_PAYLOAD"
             done
+            echo "${COUNT}件のオブジェクトを削除しました"
+          else
+            echo "削除対象のオブジェクトはありません"
           fi
 
           echo "=== S3クリーンアップ完了 ==="
