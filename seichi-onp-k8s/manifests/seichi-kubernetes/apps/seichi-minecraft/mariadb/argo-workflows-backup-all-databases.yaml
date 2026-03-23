@@ -46,6 +46,8 @@ spec:
             withParam: "{{steps.list-databases.outputs.result}}"
         - - name: cleanup-old-backups
             template: cleanup-old-backups
+          - name: cleanup-old-s3-objects
+            template: cleanup-old-s3-objects
 
     - name: check-maintenance-mode
       script:
@@ -173,6 +175,50 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+
+    - name: cleanup-old-s3-objects
+      script:
+        image: amazon/aws-cli:2
+        command: [sh]
+        source: |
+          set -e
+          RETENTION_DAYS=3
+          CUTOFF=$(date -u -d "@$(($(date +%s) - RETENTION_DAYS * 86400))" +%Y-%m-%dT%H:%M:%SZ)
+
+          echo "=== ${RETENTION_DAYS}日より古いS3バックアップオブジェクトを削除します (cutoff: ${CUTOFF}) ==="
+
+          S3_ENDPOINT="http://garage.garage.svc.cluster.local:3900"
+          S3_REGION="seichi-cloud"
+          BUCKET="mariadb-backups"
+
+          KEYS=$(aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
+            s3api list-objects-v2 --bucket "$BUCKET" \
+            --query "Contents[?starts_with(Key, 'database--') && LastModified<'${CUTOFF}'].Key" \
+            --output text)
+
+          if [ "$KEYS" = "None" ] || [ -z "$KEYS" ]; then
+            echo "削除対象のオブジェクトはありません"
+          else
+            echo "$KEYS" | tr '\t' '\n' | while read -r KEY; do
+              [ -z "$KEY" ] && continue
+              echo "削除: s3://${BUCKET}/${KEY}"
+              aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
+                s3 rm "s3://${BUCKET}/${KEY}"
+            done
+          fi
+
+          echo "=== S3クリーンアップ完了 ==="
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: garage-s3-credentials
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: garage-s3-credentials
+                key: AWS_SECRET_ACCESS_KEY
 
     - name: notify-on-failure
       steps:
