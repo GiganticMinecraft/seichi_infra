@@ -1,4 +1,5 @@
 .idea/
+.claude/settings.local.json
 
 # Local .terraform directories
 **/.terraform/*
