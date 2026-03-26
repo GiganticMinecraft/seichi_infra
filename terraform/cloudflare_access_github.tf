@@ -1,13 +1,2 @@
-resource "cloudflare_access_identity_provider" "github_oauth" {
-  zone_id = local.cloudflare_zone_id
-  name    = "GitHub OAuth"
-  type    = "github"
-  config {
-    client_id     = var.github_cloudflare_oauth_client_id
-    client_secret = var.github_cloudflare_oauth_client_secret
-  }
-
-  lifecycle {
-    ignore_changes = [config[0].client_secret]
-  }
-}
+# NOTE: Cloudflare provider v4 → v5 移行のため、旧リソース定義は cloudflare_v4_state_cleanup.tf の
+# removed ブロックに移行しました。v5 移行 PR で新リソースタイプとして再定義されます。
