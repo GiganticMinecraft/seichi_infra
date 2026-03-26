@@ -1,4 +1,66 @@
 # 向き先を指定する必要があるDNSレコードのリソース
+
+resource "cloudflare_dns_record" "play" {
+  zone_id = local.cloudflare_zone_id
+  name    = "play.seichi.click"
+  content = "nrt.premium-aws.tcpshield.com"
+  type    = "CNAME"
+  ttl     = 1 # automatic
+}
+
+resource "cloudflare_dns_record" "play_debug" {
+  zone_id = local.cloudflare_zone_id
+  name    = "play-debug.seichi.click"
+  content = "nrt.premium-aws.tcpshield.com"
+  type    = "CNAME"
+  ttl     = 1 # automatic
+}
+
+resource "cloudflare_dns_record" "github_pages" {
+  zone_id = local.cloudflare_zone_id
+  name    = "_github-pages-challenge-GiganticMinecraft.seichi.click"
+  content = "e6145d3fd4824da7133309fa2dd2c6"
+  type    = "TXT"
+  ttl     = 1 # automatic
+}
+
+resource "cloudflare_dns_record" "github_pages_command_reference" {
+  zone_id = local.cloudflare_zone_id
+  name    = "cmd.seichi.click"
+  content = "giganticminecraft.github.io"
+  type    = "CNAME"
+  ttl     = 1 # automatic
+}
+
+resource "cloudflare_dns_record" "portal" {
+  zone_id = local.cloudflare_zone_id
+  name    = "portal.seichi.click"
+  content = "${cloudflare_pages_project.seichi_portal.name}.pages.dev"
+  type    = "CNAME"
+  ttl     = 1 # automatic
+}
+
+resource "cloudflare_dns_record" "playguide" {
+  zone_id = local.cloudflare_zone_id
+  name    = "playguide.seichi.click"
+  content = "${cloudflare_pages_project.seichi_playguide.name}.pages.dev"
+  type    = "CNAME"
+  ttl     = 1 # automatic
+}
+
+# ローカルにトンネルを生やしてアクセスすることを想定したドメイン。
 #
-# NOTE: Cloudflare provider v4 → v5 移行のため、旧リソース定義は cloudflare_v4_state_cleanup.tf の
-# removed ブロックに移行しました。v5 移行 PR で新リソースタイプとして再定義されます。
+# 例えば、オンプレのk8sクラスタのAPIエンドポイントへは、
+# ローカルポートをTCPプロキシにバインドしてアクセスすることを想定している。
+# こういったケースでは、
+#  - k8s-api.onp-k8s.admin.local-tunnels.seichi.click が 127.0.0.1 を向いている
+#  - APIエンドポイントのTLS証明書のSANに k8s-api.onp-k8s.admin.local-tunnels.seichi.click が書かれている
+# が満たされていれば良いため、
+# この要求を満たすように cloudflare_dns_record.local_tunnels のようなAレコードを入れている。
+resource "cloudflare_dns_record" "local_tunnels" {
+  zone_id = local.cloudflare_zone_id
+  name    = "*.local-tunnels.seichi.click"
+  content = "127.0.0.1"
+  type    = "A"
+  ttl     = 1 # automatic
+}
