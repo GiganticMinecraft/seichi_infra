@@ -22,7 +22,7 @@ spec:
             requests:
               memory: 32Mi
 
-          image: nginx:1.29.6
+          image: nginx:1.29.7
           name: seichi-game-data-publisher-cache-proxy
           ports:
             - containerPort: 80
