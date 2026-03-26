@@ -15,7 +15,7 @@ jobs:
       needs_update: ${{ steps.compare.outputs.needs_update }}
       sha1: ${{ steps.sha.outputs.sha1 }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
@@ -76,7 +76,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -85,7 +85,7 @@ jobs:
           sed -i "s|^resource-pack-sha1=.*|resource-pack-sha1=${{ needs.compute-sha1.outputs.sha1 }}|" \
             docker-images/mcservers/production/lobby/common-minecraft-server-configs/server.properties
       - name: Git as GitHub Actions Bot
-        uses: Lucky3028/git-as-gha@v1.0.1
+        uses: Lucky3028/git-as-gha@48a4d96a17acfb1f4f54604785693b1f03ba1524 # v1.0.1
       - name: Commit and push
         run: |
           VERSION=$(grep -oP 'download/v\K[^/]+' \

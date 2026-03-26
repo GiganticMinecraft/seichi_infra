@@ -10,8 +10,8 @@ jobs:
     name: tf plan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: hashicorp/setup-terraform@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
           terraform_version: 1.14.4
@@ -41,7 +41,7 @@ jobs:
         working-directory: "./terraform"
 
       - name: Comment result to Pull Request
-        uses: robburger/terraform-pr-commenter@v1
+        uses: robburger/terraform-pr-commenter@72c6e45eced6641488a6cf3ff104b7b9bda9c66c # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
