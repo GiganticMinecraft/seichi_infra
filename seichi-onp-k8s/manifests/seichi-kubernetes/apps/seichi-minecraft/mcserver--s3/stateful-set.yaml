@@ -70,13 +70,13 @@ spec:
         - resources:
             requests:
               cpu: 2
-              memory: 10Gi
+              memory: 12Gi
             limits:
               cpu: 4
-              memory: 10Gi
+              memory: 12Gi
           env:
             - name: MEMORY
-              value: 6G
+              value: 10G
             - name: EULA
               value: "TRUE"
 
