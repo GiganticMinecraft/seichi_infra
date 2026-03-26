@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(terraform init:*)",
+      "Bash(terraform validate:*)",
+      "Bash(terraform fmt:*)",
+      "Bash(echo \"exit: $?\")"
+    ]
+  }
+}
