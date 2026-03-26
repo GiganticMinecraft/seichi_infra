@@ -213,3 +213,96 @@ removed {
 }
 
 # endregion
+
+# region cloudflare_ruleset (v5 でステートスキーマが非互換)
+
+removed {
+  from = cloudflare_ruleset.custom_firewall_rules
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_ruleset.seichi_portal_transform_for_cors
+  lifecycle {
+    destroy = false
+  }
+}
+
+# endregion
+
+# region cloudflare_pages_project (v5 でステートスキーマが非互換)
+
+removed {
+  from = cloudflare_pages_project.seichi_portal
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_pages_project.seichi_playguide
+  lifecycle {
+    destroy = false
+  }
+}
+
+# endregion
+
+# region cloudflare_page_rule (v5 でステートスキーマが非互換)
+
+removed {
+  from = cloudflare_page_rule.global
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_page_rule.seichi_maps
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_page_rule.spring_maps
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_page_rule.cache_public_game_data_api
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_page_rule.disable_security_on_sentry_api
+  lifecycle {
+    destroy = false
+  }
+}
+
+# endregion
+
+# region cloudflare_pages_domain (v5 でステートスキーマが非互換)
+
+removed {
+  from = cloudflare_pages_domain.seichi_portal_domain
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = cloudflare_pages_domain.seichi_playguide_domain
+  lifecycle {
+    destroy = false
+  }
+}
+
+# endregion
