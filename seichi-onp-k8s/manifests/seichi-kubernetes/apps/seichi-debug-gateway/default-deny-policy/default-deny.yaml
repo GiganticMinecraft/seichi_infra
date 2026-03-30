@@ -1,13 +1,16 @@
 # policyAuditMode の動作検証用。
-# audit-denied が記録されることを確認後、
-# 問題があれば即 revert する。
+# ingressDeny/egressDeny は allow ポリシーより常に優先される。
+# policyAuditMode が有効な間は実際のドロップは発生せず、
+# audit-denied として Hubble メトリクスに記録される。
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: default-deny-all
 spec:
   endpointSelector: {}
-  ingress:
-    - {}
-  egress:
-    - {}
+  ingressDeny:
+    - fromEntities:
+        - "all"
+  egressDeny:
+    - toEntities:
+        - "all"
