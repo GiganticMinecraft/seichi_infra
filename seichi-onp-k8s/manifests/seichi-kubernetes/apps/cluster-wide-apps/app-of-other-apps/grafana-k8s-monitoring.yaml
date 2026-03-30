@@ -94,6 +94,8 @@ spec:
           enabled: true
           ebpf:
             enabled: true
+          java:
+            enabled: true
           pprof:
             enabled: true
 
