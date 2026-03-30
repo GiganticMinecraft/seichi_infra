@@ -12,6 +12,8 @@ spec:
       app: mcserver--debug-s2
   template:
     metadata:
+      annotations:
+        profiles.grafana.com/java.enabled: "true"
       labels:
         app: mcserver--debug-s2
         mcserver: debug-s2
