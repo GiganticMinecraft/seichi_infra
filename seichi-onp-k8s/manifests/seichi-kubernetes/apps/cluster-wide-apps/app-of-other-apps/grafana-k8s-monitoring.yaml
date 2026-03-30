@@ -49,15 +49,19 @@ spec:
 
         clusterEvents:
           enabled: true
+          collector: alloy-singleton
 
         nodeLogs:
           enabled: true
+          collector: alloy-logs
 
         podLogsViaLoki:
           enabled: true
+          collector: alloy-logs
 
         applicationObservability:
           enabled: true
+          collector: alloy-receiver
           receivers:
             otlp:
               http:
@@ -92,6 +96,7 @@ spec:
 
         profiling:
           enabled: true
+          collector: alloy-profiles
           ebpf:
             enabled: true
           java:
