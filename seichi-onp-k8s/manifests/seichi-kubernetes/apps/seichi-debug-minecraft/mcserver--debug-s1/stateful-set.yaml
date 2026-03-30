@@ -14,6 +14,7 @@ spec:
     metadata:
       annotations:
         profiles.grafana.com/java.enabled: "true"
+        resource.opentelemetry.io/service.name: "mcserver-debug-s1"
       labels:
         app: mcserver--debug-s1
         mcserver: debug-s1

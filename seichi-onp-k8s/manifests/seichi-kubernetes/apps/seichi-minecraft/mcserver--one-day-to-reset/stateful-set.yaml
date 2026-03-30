@@ -21,6 +21,7 @@ spec:
     metadata:
       annotations:
         profiles.grafana.com/java.enabled: "true"
+        resource.opentelemetry.io/service.name: "mcserver-one-day-to-reset"
       labels:
         app: mcserver--one-day-to-reset
         mcserver: one-day-to-reset
