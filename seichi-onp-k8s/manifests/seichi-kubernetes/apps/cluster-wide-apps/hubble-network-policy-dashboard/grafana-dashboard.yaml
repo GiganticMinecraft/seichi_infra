@@ -52,7 +52,7 @@ data:
         {
           "id": 1,
           "title": "Policy Audit: Denied Flows (policyAuditMode)",
-          "description": "policyAuditMode有効時に、実際にポリシーで拒否されるはずのフローを表示。このパネルにデータが表示される場合、対応するallowルールが必要。",
+          "description": "policyAuditMode有効時に、ポリシーで拒否されるはずのフローを表示(action=audit/denied/audit-denied)。このパネルにデータが表示される場合、対応するallowルールが必要。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
           "datasource": { "type": "prometheus" },
@@ -70,7 +70,7 @@ data:
           },
           "targets": [
             {
-              "expr": "sum by (source, source_namespace, destination, destination_namespace) (rate(hubble_policy_verdicts_total{action=~\"denied|audit-denied\", source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval]))",
+              "expr": "sum by (source, source_namespace, destination, destination_namespace) (rate(hubble_policy_verdicts_total{action=~\"denied|audit-denied|audit\", source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval]))",
               "legendFormat": "{{source_namespace}}/{{source}} → {{destination_namespace}}/{{destination}}",
               "refId": "A"
             }
@@ -157,7 +157,7 @@ data:
         {
           "id": 4,
           "title": "Policy Verdicts by Action",
-          "description": "ポリシー判定結果の時系列。forwarded/denied/audit-deniedの割合を監視。policyAuditMode有効時はaudit-deniedが出現する。",
+          "description": "ポリシー判定結果の時系列。forwarded/denied/auditの割合を監視。policyAuditMode有効時はauditが出現する。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
           "datasource": { "type": "prometheus" },
@@ -173,7 +173,7 @@ data:
             },
             "overrides": [
               {
-                "matcher": { "id": "byRegexp", "options": ".*denied.*" },
+                "matcher": { "id": "byRegexp", "options": ".*(denied|audit).*" },
                 "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
               }
             ]
