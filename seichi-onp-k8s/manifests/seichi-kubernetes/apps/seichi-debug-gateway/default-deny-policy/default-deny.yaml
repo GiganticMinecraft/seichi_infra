@@ -1,0 +1,13 @@
+# policyAuditMode の動作検証用。
+# audit-denied が記録されることを確認後、
+# 問題があれば即 revert する。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  endpointSelector: {}
+  ingress:
+    - {}
+  egress:
+    - {}
