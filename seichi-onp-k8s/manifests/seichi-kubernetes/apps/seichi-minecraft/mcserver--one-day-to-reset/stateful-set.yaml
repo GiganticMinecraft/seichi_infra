@@ -71,7 +71,8 @@ spec:
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
-                -XX:NativeMemoryTracking=summary -XX:+UnlockDiagnosticVMOptions
+                -XX:NativeMemoryTracking=summary
+                -XX:+UnlockDiagnosticVMOptions
                 -XX:+DebugNonSafepoints
 
             - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
