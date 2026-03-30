@@ -1,0 +1,15 @@
+# policyAuditMode が有効な間は実際のドロップは発生せず、
+# audit として Hubble メトリクスに記録される。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: monitoring
+spec:
+  endpointSelector: {}
+  ingressDeny:
+    - fromEntities:
+        - "all"
+  egressDeny:
+    - toEntities:
+        - "all"
