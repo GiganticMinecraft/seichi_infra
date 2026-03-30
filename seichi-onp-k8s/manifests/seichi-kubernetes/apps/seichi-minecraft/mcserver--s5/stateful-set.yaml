@@ -12,6 +12,9 @@ spec:
       app: mcserver--s5
   template:
     metadata:
+      annotations:
+        profiles.grafana.com/java.enabled: "true"
+        resource.opentelemetry.io/service.name: "mcserver-s5"
       labels:
         app: mcserver--s5
         mcserver: s5
@@ -100,6 +103,8 @@ spec:
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
                 -XX:NativeMemoryTracking=summary
+                -XX:+UnlockDiagnosticVMOptions
+                -XX:+DebugNonSafepoints
 
             - name: ENABLE_JMX
               value: "true"

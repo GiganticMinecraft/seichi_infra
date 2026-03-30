@@ -14,6 +14,7 @@ spec:
     metadata:
       annotations:
         profiles.grafana.com/java.enabled: "true"
+        resource.opentelemetry.io/service.name: "mcserver-debug-s2"
       labels:
         app: mcserver--debug-s2
         mcserver: debug-s2
@@ -141,9 +142,13 @@ spec:
                 -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4
                 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90
                 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem
-                -XX:MaxTenuringThreshold=1 -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints
-                -Dusing.aikars.flags=https://mcflags.emc.gs
+                -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs
                 -Daikars.new.flags=true
+
+            - name: JVM_XX_OPTS
+              value: >-
+                -XX:+UnlockDiagnosticVMOptions
+                -XX:+DebugNonSafepoints
 
             - name: ENABLE_JMX
               value: "true"

@@ -13,6 +13,9 @@ spec:
       app: mcserver--lobby
   template:
     metadata:
+      annotations:
+        profiles.grafana.com/java.enabled: "true"
+        resource.opentelemetry.io/service.name: "mcserver-lobby"
       labels:
         app: mcserver--lobby
         mcserver: lobby
@@ -65,6 +68,8 @@ spec:
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
                 -XX:NativeMemoryTracking=summary
+                -XX:+UnlockDiagnosticVMOptions
+                -XX:+DebugNonSafepoints
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする
