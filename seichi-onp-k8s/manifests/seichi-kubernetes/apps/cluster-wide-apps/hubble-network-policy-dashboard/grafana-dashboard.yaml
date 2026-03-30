@@ -27,7 +27,7 @@ data:
           {
             "name": "source_namespace",
             "type": "query",
-            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "datasource": { "type": "prometheus" },
             "query": "label_values(hubble_policy_verdicts_total, source_namespace)",
             "includeAll": true,
             "allValue": ".*",
@@ -38,7 +38,7 @@ data:
           {
             "name": "destination_namespace",
             "type": "query",
-            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "datasource": { "type": "prometheus" },
             "query": "label_values(hubble_policy_verdicts_total, destination_namespace)",
             "includeAll": true,
             "allValue": ".*",
@@ -55,7 +55,7 @@ data:
           "description": "policyAuditMode有効時に、実際にポリシーで拒否されるはずのフローを表示。このパネルにデータが表示される場合、対応するallowルールが必要。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -82,7 +82,7 @@ data:
           "description": "ポリシーにより許可されたフローのnamespace間マトリクス。NetworkPolicy設計時の通信要件把握に使用。",
           "type": "table",
           "gridPos": { "h": 10, "w": 12, "x": 0, "y": 8 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "unit": "ops"
@@ -94,7 +94,7 @@ data:
           },
           "targets": [
             {
-              "expr": "topk(30, sum by (source_namespace, destination_namespace) (rate(hubble_policy_verdicts_total{action=\"forwarded\"}[$__rate_interval])))",
+              "expr": "topk(30, sum by (source_namespace, destination_namespace) (rate(hubble_policy_verdicts_total{action=\"forwarded\", source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval])))",
               "format": "table",
               "instant": true,
               "refId": "A"
@@ -120,7 +120,7 @@ data:
           "description": "ポリシーにより許可されたフローのワークロード単位の詳細。source/destinationにはワークロード名またはCilium identity が入る。",
           "type": "table",
           "gridPos": { "h": 10, "w": 12, "x": 12, "y": 8 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "unit": "ops"
@@ -160,7 +160,7 @@ data:
           "description": "ポリシー判定結果の時系列。forwarded/denied/audit-deniedの割合を監視。policyAuditMode有効時はaudit-deniedが出現する。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -192,7 +192,7 @@ data:
           "description": "パケットドロップの理由別レート。POLICY_DENIEDが出現した場合、NetworkPolicyによる意図しないブロックの可能性がある。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -219,7 +219,7 @@ data:
           "description": "全フローのverdict別レート。FORWARDED/DROPPED/TRACED/TRANSLATEDの全体傾向。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -245,7 +245,7 @@ data:
           "description": "DNS問い合わせの宛先ドメイン別レート。Egress NetworkPolicy設計時にFQDNベースのルール作成に使用。データが無い場合、Hubble DNS metricsの設定を確認。",
           "type": "timeseries",
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
@@ -272,10 +272,10 @@ data:
           "description": "ingress/egressのポリシー判定レート。",
           "type": "piechart",
           "gridPos": { "h": 8, "w": 8, "x": 0, "y": 34 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "targets": [
             {
-              "expr": "sum by (direction, action) (increase(hubble_policy_verdicts_total[$__rate_interval]))",
+              "expr": "sum by (direction, action) (increase(hubble_policy_verdicts_total{source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval]))",
               "legendFormat": "{{direction}} / {{action}}",
               "refId": "A"
             }
@@ -287,10 +287,10 @@ data:
           "description": "ポリシーマッチの種類 (l3-only, l4-only, all, none)。noneはポリシーにマッチしなかった通信で、audit-deniedの候補。",
           "type": "piechart",
           "gridPos": { "h": 8, "w": 8, "x": 8, "y": 34 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "targets": [
             {
-              "expr": "sum by (match) (increase(hubble_policy_verdicts_total[$__rate_interval]))",
+              "expr": "sum by (match) (increase(hubble_policy_verdicts_total{source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval]))",
               "legendFormat": "{{match}}",
               "refId": "A"
             }
@@ -302,7 +302,7 @@ data:
           "description": "ドロップされたフローのsource/destination別Top。ドロップ元・先の特定に使用。",
           "type": "table",
           "gridPos": { "h": 8, "w": 8, "x": 16, "y": 34 },
-          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": { "unit": "short" },
             "overrides": []
