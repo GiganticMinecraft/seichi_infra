@@ -74,6 +74,7 @@ spec:
 
         autoInstrumentation:
           enabled: true
+          collector: alloy-singleton
           beyla:
             resources:
               requests:
