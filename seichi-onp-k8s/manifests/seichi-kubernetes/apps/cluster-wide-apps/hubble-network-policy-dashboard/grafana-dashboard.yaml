@@ -1,0 +1,337 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hubble-network-policy-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Cilium"
+data:
+  hubble-network-policy-planning.json: |
+    {
+      "uid": "hubble-network-policy-planning",
+      "title": "Hubble NetworkPolicy Planning",
+      "description": "NetworkPolicy導入計画のための通信フロー分析ダッシュボード。Hubble policy verdicts、drop理由、DNS問い合わせを可視化し、必要な許可ルールを特定する。",
+      "tags": ["cilium", "hubble", "network-policy"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "source_namespace",
+            "type": "query",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "query": "label_values(hubble_policy_verdicts_total, source_namespace)",
+            "includeAll": true,
+            "allValue": ".*",
+            "current": { "text": "All", "value": "$__all" },
+            "refresh": 2,
+            "sort": 1
+          },
+          {
+            "name": "destination_namespace",
+            "type": "query",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "query": "label_values(hubble_policy_verdicts_total, destination_namespace)",
+            "includeAll": true,
+            "allValue": ".*",
+            "current": { "text": "All", "value": "$__all" },
+            "refresh": 2,
+            "sort": 1
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Policy Audit: Denied Flows (policyAuditMode)",
+          "description": "policyAuditMode有効時に、実際にポリシーで拒否されるはずのフローを表示。このパネルにデータが表示される場合、対応するallowルールが必要。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum by (source, source_namespace, destination, destination_namespace) (rate(hubble_policy_verdicts_total{action=~\"denied|audit-denied\", source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval]))",
+              "legendFormat": "{{source_namespace}}/{{source}} → {{destination_namespace}}/{{destination}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Namespace間 通信マトリクス (Forwarded)",
+          "description": "ポリシーにより許可されたフローのnamespace間マトリクス。NetworkPolicy設計時の通信要件把握に使用。",
+          "type": "table",
+          "gridPos": { "h": 10, "w": 12, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "options": {
+            "sortBy": [{ "displayName": "Value", "desc": true }]
+          },
+          "targets": [
+            {
+              "expr": "topk(30, sum by (source_namespace, destination_namespace) (rate(hubble_policy_verdicts_total{action=\"forwarded\"}[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "source_namespace": "Source Namespace",
+                  "destination_namespace": "Destination Namespace",
+                  "Value": "Rate (ops)"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Workload間 通信マトリクス (Forwarded)",
+          "description": "ポリシーにより許可されたフローのワークロード単位の詳細。source/destinationにはワークロード名またはCilium identity が入る。",
+          "type": "table",
+          "gridPos": { "h": 10, "w": 12, "x": 12, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "options": {
+            "sortBy": [{ "displayName": "Value", "desc": true }]
+          },
+          "targets": [
+            {
+              "expr": "topk(30, sum by (source, source_namespace, destination, destination_namespace) (rate(hubble_policy_verdicts_total{action=\"forwarded\", source_namespace=~\"$source_namespace\", destination_namespace=~\"$destination_namespace\"}[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "source": "Source",
+                  "source_namespace": "Src NS",
+                  "destination": "Destination",
+                  "destination_namespace": "Dst NS",
+                  "Value": "Rate (ops)"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Policy Verdicts by Action",
+          "description": "ポリシー判定結果の時系列。forwarded/denied/audit-deniedの割合を監視。policyAuditMode有効時はaudit-deniedが出現する。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 30,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "ops"
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*denied.*" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "expr": "sum by (action) (rate(hubble_policy_verdicts_total[$__rate_interval]))",
+              "legendFormat": "{{action}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Drop Reasons",
+          "description": "パケットドロップの理由別レート。POLICY_DENIEDが出現した場合、NetworkPolicyによる意図しないブロックの可能性がある。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum by (reason) (rate(hubble_drop_total[$__rate_interval]))",
+              "legendFormat": "{{reason}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Flow Overview by Verdict",
+          "description": "全フローのverdict別レート。FORWARDED/DROPPED/TRACED/TRANSLATEDの全体傾向。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 20
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum by (subtype, verdict) (rate(hubble_flows_processed_total[$__rate_interval]))",
+              "legendFormat": "{{subtype}} / {{verdict}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "DNS Queries (Egress先の特定用)",
+          "description": "DNS問い合わせの宛先ドメイン別レート。Egress NetworkPolicy設計時にFQDNベースのルール作成に使用。データが無い場合、Hubble DNS metricsの設定を確認。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "topk(15, sum by (query) (rate(hubble_dns_queries_total[$__rate_interval])))",
+              "legendFormat": "{{query}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "title": "Policy Verdicts by Direction",
+          "description": "ingress/egressのポリシー判定レート。",
+          "type": "piechart",
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 34 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "targets": [
+            {
+              "expr": "sum by (direction, action) (increase(hubble_policy_verdicts_total[$__rate_interval]))",
+              "legendFormat": "{{direction}} / {{action}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "title": "Policy Match Type",
+          "description": "ポリシーマッチの種類 (l3-only, l4-only, all, none)。noneはポリシーにマッチしなかった通信で、audit-deniedの候補。",
+          "type": "piechart",
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 34 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "targets": [
+            {
+              "expr": "sum by (match) (increase(hubble_policy_verdicts_total[$__rate_interval]))",
+              "legendFormat": "{{match}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "title": "Top Dropped Flows by Source/Destination",
+          "description": "ドロップされたフローのsource/destination別Top。ドロップ元・先の特定に使用。",
+          "type": "table",
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 34 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": { "unit": "short" },
+            "overrides": []
+          },
+          "options": {
+            "sortBy": [{ "displayName": "Value", "desc": true }]
+          },
+          "targets": [
+            {
+              "expr": "topk(20, sum by (source, destination, reason) (increase(hubble_drop_total[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "source": "Source",
+                  "destination": "Destination",
+                  "reason": "Reason",
+                  "Value": "Count"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
