@@ -13,22 +13,22 @@ spec:
   source:
     chart: k8s-monitoring
     repoURL: https://grafana.github.io/helm-charts
-    targetRevision: 3.8.5
+    targetRevision: 4.0.0
     helm:
       values: |
         cluster:
           name: "seichi-cloud"
 
         destinations:
-          - name: localPrometheus
+          localPrometheus:
             type: prometheus
             url: http://prometheus-kube-prometheus-prometheus:9090
 
-          - name: localLoki
+          localLoki:
             type: loki
             url: http://loki-gateway:80/loki/api/v1/push
 
-          - name: localTempo
+          localTempo:
             type: otlp
             url: http://tempo:4317
             tls:
@@ -40,7 +40,7 @@ spec:
             traces:
               enabled: true
 
-          - name: localPyroscope
+          localPyroscope:
             type: pyroscope
             url: http://pyroscope:4040/ingest
 
@@ -53,7 +53,7 @@ spec:
         nodeLogs:
           enabled: true
 
-        podLogs:
+        podLogsViaLoki:
           enabled: true
 
         applicationObservability:
@@ -70,6 +70,19 @@ spec:
 
         autoInstrumentation:
           enabled: true
+          beyla:
+            resources:
+              requests:
+                cpu: 20m
+                memory: 64Mi
+            k8sCache:
+              resources:
+                requests:
+                  cpu: 20m
+                  memory: 64Mi
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
 
         annotationAutodiscovery:
           enabled: false
@@ -79,62 +92,50 @@ spec:
 
         profiling:
           enabled: true
+          ebpf:
+            enabled: true
+          java:
+            enabled: true
+          pprof:
+            enabled: true
 
-        alloy-metrics:
-          enabled: true
+        collectors:
+          alloy-metrics:
+            presets: [deployment]
+          alloy-singleton:
+            presets: [singleton]
+          alloy-logs:
+            presets: [daemonset, filesystem-log-reader]
+          alloy-receiver:
+            presets: [deployment]
+            extraConfig: |-
+              faro.receiver "default" {
+                server {
+                  listen_address = "0.0.0.0"
+                  listen_port    = 12347
 
-        alloy-singleton:
-          enabled: true
+                  cors_allowed_origins = ["https://garage-admin.onp.admin.seichi.click"]
 
-        alloy-logs:
-          enabled: true
+                  max_allowed_payload_size = "10MiB"
+                }
 
-        alloy-receiver:
-          enabled: true
-          extraConfig: |-
-            faro.receiver "default" {
-              server {
-                listen_address = "0.0.0.0"
-                listen_port    = 12347
-
-                cors_allowed_origins = ["https://garage-admin.onp.admin.seichi.click"]
-
-                max_allowed_payload_size = "10MiB"
+                output {
+                  logs   = [loki.write.localloki.receiver]
+                  traces = [otelcol.processor.attributes.localtempo.input]
+                }
               }
-
-              output {
-                logs   = [loki.write.localloki.receiver]
-                traces = [otelcol.processor.attributes.localtempo.input]
-              }
-            }
-          alloy:
-            extraPorts:
-              - name: otlp-http
-                port: 4318
-                targetPort: 4318
-                protocol: TCP
-              - name: faro
-                port: 12347
-                targetPort: 12347
-                protocol: TCP
-
-        alloy-profiles:
-          enabled: true
-
-        beyla:
-          resources:
-            requests:
-              cpu: 20m
-              memory: 64Mi
-
-        beyla-k8s-cache:
-          resources:
-            requests:
-              cpu: 20m
-              memory: 64Mi
-            limits:
-              cpu: 100m
-              memory: 256Mi
+            alloy:
+              extraPorts:
+                - name: otlp-http
+                  port: 4318
+                  targetPort: 4318
+                  protocol: TCP
+                - name: faro
+                  port: 12347
+                  targetPort: 12347
+                  protocol: TCP
+          alloy-profiles:
+            presets: [privileged, daemonset]
 
         alloy-operator:
           deploy: true
