@@ -42,7 +42,7 @@ spec:
 
           localPyroscope:
             type: pyroscope
-            url: http://pyroscope:4040/ingest
+            url: http://pyroscope:4040
 
         clusterMetrics:
           enabled: false # kube-prometheus-stackがあるのでオフ
