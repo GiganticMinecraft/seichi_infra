@@ -19,6 +19,8 @@ spec:
       mcserver: one-day-to-reset
   template:
     metadata:
+      annotations:
+        profiles.grafana.com/java.enabled: "true"
       labels:
         app: mcserver--one-day-to-reset
         mcserver: one-day-to-reset
@@ -68,7 +70,8 @@ spec:
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
-                -XX:NativeMemoryTracking=summary
+                -XX:NativeMemoryTracking=summary -XX:+UnlockDiagnosticVMOptions
+                -XX:+DebugNonSafepoints
 
             - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
               valueFrom:
