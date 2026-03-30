@@ -106,8 +106,6 @@ spec:
             enabled: true
 
         collectors:
-          alloy-metrics:
-            presets: [deployment]
           alloy-singleton:
             presets: [singleton]
           alloy-logs:
