@@ -73,10 +73,10 @@ spec:
         - resources:
             requests:
               cpu: 3
-              memory: 12Gi
+              memory: 14Gi
             limits:
               cpu: 4
-              memory: 14Gi
+              memory: 16Gi
           env:
             - name: MEMORY
               value: 10G
