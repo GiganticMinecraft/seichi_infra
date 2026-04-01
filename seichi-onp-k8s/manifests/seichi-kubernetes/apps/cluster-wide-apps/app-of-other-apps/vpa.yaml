@@ -8,7 +8,7 @@ spec:
   source:
     chart: vpa
     repoURL: https://charts.fairwinds.com/stable
-    targetRevision: 4.10.2
+    targetRevision: 4.11.0
     helm:
       releaseName: vpa
       values: |
