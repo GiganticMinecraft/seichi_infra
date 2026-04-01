@@ -105,6 +105,8 @@ spec:
                 -XX:NativeMemoryTracking=summary
                 -XX:+UnlockDiagnosticVMOptions
                 -XX:+DebugNonSafepoints
+                -XX:ReservedCodeCacheSize=384m
+                -XX:MaxMetaspaceSize=384m
 
             - name: ENABLE_JMX
               value: "true"

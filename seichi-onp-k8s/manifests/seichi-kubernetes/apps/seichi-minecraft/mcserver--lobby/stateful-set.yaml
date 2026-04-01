@@ -70,6 +70,8 @@ spec:
                 -XX:NativeMemoryTracking=summary
                 -XX:+UnlockDiagnosticVMOptions
                 -XX:+DebugNonSafepoints
+                -XX:ReservedCodeCacheSize=384m
+                -XX:MaxMetaspaceSize=384m
 
             - name: COPY_CONFIG_DEST
               # /config をサーバーディレクトリにコピーするようにする

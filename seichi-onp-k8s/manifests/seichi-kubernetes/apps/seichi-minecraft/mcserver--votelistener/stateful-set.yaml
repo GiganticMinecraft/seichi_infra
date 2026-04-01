@@ -73,10 +73,10 @@ spec:
         - resources:
             requests:
               cpu: 500m
-              memory: 3Gi
+              memory: 5Gi
             limits:
               cpu: 2
-              memory: 4Gi
+              memory: 5Gi
           env:
             - name: MEMORY
               value: 2G
@@ -108,6 +108,8 @@ spec:
                 -XX:NativeMemoryTracking=summary
                 -XX:+UnlockDiagnosticVMOptions
                 -XX:+DebugNonSafepoints
+                -XX:ReservedCodeCacheSize=384m
+                -XX:MaxMetaspaceSize=384m
 
             - name: ENABLE_JMX
               value: "true"
