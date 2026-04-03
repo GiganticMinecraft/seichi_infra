@@ -498,8 +498,8 @@ data:
         {
           "id": 17,
           "title": "Connectivity Status",
-          "description": "各ノードから見た reachable / unreachable ノード数 (type=node)。全ノードが 6/6 reachable なら正常。",
-          "type": "bargauge",
+          "description": "各ノードから見た unreachable ノード数 (type=node)。0 が正常。1 以上は要調査。",
+          "type": "stat",
           "gridPos": { "h": 7, "w": 12, "x": 12, "y": 35 },
           "datasource": { "type": "prometheus" },
           "fieldConfig": {
@@ -507,21 +507,19 @@ data:
               "unit": "short",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }]
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
               }
             },
-            "overrides": [
-              {
-                "matcher": { "id": "byRegexp", "options": ".*unreachable.*" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
-              }
-            ]
+            "overrides": []
           },
-          "options": { "orientation": "horizontal", "displayMode": "gradient" },
+          "options": { "colorMode": "background", "graphMode": "area", "textMode": "value_and_name" },
           "targets": [
             {
-              "expr": "cilium_node_health_connectivity_status{type=\"node\", node=~\"$node\"}",
-              "legendFormat": "{{node}} {{status}}",
+              "expr": "cilium_node_health_connectivity_status{type=\"node\", status=\"unreachable\", node=~\"$node\"}",
+              "legendFormat": "{{node}}",
               "refId": "A"
             }
           ]
