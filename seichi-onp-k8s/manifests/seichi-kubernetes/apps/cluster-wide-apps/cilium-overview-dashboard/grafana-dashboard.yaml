@@ -387,23 +387,22 @@ data:
         {
           "id": 13,
           "title": "BGP Session State",
-          "description": "ノードごとの BGP セッション状態。1=Established が正常。",
+          "description": "ノードごとの BGP セッション状態。Cilium 1.19 では 1=Established, 0=Not Established。",
           "type": "stat",
           "gridPos": { "h": 5, "w": 8, "x": 0, "y": 29 },
           "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
               "mappings": [
-                { "type": "value", "options": { "1": { "text": "Idle", "color": "red" } } },
-                { "type": "value", "options": { "2": { "text": "Connect", "color": "orange" } } },
-                { "type": "value", "options": { "3": { "text": "Active", "color": "orange" } } },
-                { "type": "value", "options": { "4": { "text": "OpenSent", "color": "yellow" } } },
-                { "type": "value", "options": { "5": { "text": "OpenConfirm", "color": "yellow" } } },
-                { "type": "value", "options": { "6": { "text": "Established", "color": "green" } } }
+                { "type": "value", "options": { "0": { "text": "Down", "color": "red" } } },
+                { "type": "value", "options": { "1": { "text": "Established", "color": "green" } } }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "red", "value": null }]
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
               }
             },
             "overrides": []
@@ -412,7 +411,7 @@ data:
           "targets": [
             {
               "expr": "cilium_bgp_control_plane_session_state{node=~\"$node\"}",
-              "legendFormat": "{{node}}",
+              "legendFormat": "{{node}} → {{neighbor}}",
               "refId": "A"
             }
           ]
@@ -499,28 +498,30 @@ data:
         {
           "id": 17,
           "title": "Connectivity Status",
-          "description": "ノードごとの接続性ステータス。動的にノードを検出。",
-          "type": "stat",
+          "description": "各ノードから見た reachable / unreachable ノード数 (type=node)。全ノードが 6/6 reachable なら正常。",
+          "type": "bargauge",
           "gridPos": { "h": 7, "w": 12, "x": 12, "y": 35 },
           "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "mappings": [
-                { "type": "value", "options": { "0": { "text": "Unreachable", "color": "red" } } },
-                { "type": "value", "options": { "1": { "text": "Reachable", "color": "green" } } }
-              ],
+              "unit": "short",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "red", "value": null }]
+                "steps": [{ "color": "green", "value": null }]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*unreachable.*" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+              }
+            ]
           },
-          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "options": { "orientation": "horizontal", "displayMode": "gradient" },
           "targets": [
             {
-              "expr": "cilium_node_health_connectivity_status{node=~\"$node\"}",
-              "legendFormat": "{{node}} → {{target_node_name}}",
+              "expr": "cilium_node_health_connectivity_status{type=\"node\", node=~\"$node\"}",
+              "legendFormat": "{{node}} {{status}}",
               "refId": "A"
             }
           ]
