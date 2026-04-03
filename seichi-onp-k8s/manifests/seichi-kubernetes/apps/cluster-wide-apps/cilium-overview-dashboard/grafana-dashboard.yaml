@@ -1,0 +1,776 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cilium-overview-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Cilium"
+data:
+  cilium-overview.json: |
+    {
+      "uid": "cilium-overview",
+      "title": "Cilium Overview",
+      "description": "Cilium Agent の健全性、Datapath、Conntrack、BGP、ノード間接続性、リソース使用量、ポリシー、K8s/API を一覧できる統合ダッシュボード。",
+      "tags": ["cilium", "prometheus"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "templating": {
+        "list": [
+          {
+            "name": "node",
+            "type": "query",
+            "datasource": { "type": "prometheus" },
+            "query": "label_values(cilium_endpoint_state{k8s_app=\"cilium\"}, node)",
+            "includeAll": true,
+            "allValue": ".*",
+            "current": { "text": "All", "value": "$__all" },
+            "multi": true,
+            "refresh": 2,
+            "sort": 1
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 100,
+          "title": "Health",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "collapsed": false
+        },
+        {
+          "id": 1,
+          "title": "Cluster Health",
+          "description": "到達不能ノード数と到達不能 Health エンドポイント数。0 が正常。",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "targets": [
+            {
+              "expr": "sum(cilium_unreachable_nodes{node=~\"$node\"})",
+              "legendFormat": "Unreachable Nodes",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(cilium_unreachable_health_endpoints{node=~\"$node\"})",
+              "legendFormat": "Unreachable Endpoints",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Errors & Warnings",
+          "description": "Cilium Agent のエラー・警告数。",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 1 },
+                  { "color": "red", "value": 10 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "targets": [
+            {
+              "expr": "sum(cilium_errors_warnings_total{level=\"error\", node=~\"$node\"})",
+              "legendFormat": "Errors",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(cilium_errors_warnings_total{level=\"warning\", node=~\"$node\"})",
+              "legendFormat": "Warnings",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Bootstrap Time",
+          "description": "Agent 起動時間 (overall)。ノード別。",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 5 },
+                  { "color": "red", "value": 10 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "targets": [
+            {
+              "expr": "cilium_agent_bootstrap_seconds{scope=\"overall\", node=~\"$node\"}",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Endpoint States",
+          "description": "クラスタ全体のエンドポイント状態分布。",
+          "type": "bargauge",
+          "gridPos": { "h": 4, "w": 12, "x": 12, "y": 1 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*(regenerating|waiting|restoring).*" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]
+              }
+            ]
+          },
+          "options": { "orientation": "horizontal", "displayMode": "gradient" },
+          "targets": [
+            {
+              "expr": "sum(cilium_endpoint_state{node=~\"$node\"}) by (endpoint_state)",
+              "legendFormat": "{{endpoint_state}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 200,
+          "title": "Datapath",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "collapsed": false
+        },
+        {
+          "id": 5,
+          "title": "Forwarded Packets",
+          "description": "クラスタ全体の転送パケットレート。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 6 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "custom": { "drawStyle": "line", "fillOpacity": 20 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(cilium_forward_count_total{node=~\"$node\"}[$__rate_interval])) by (direction)",
+              "legendFormat": "{{direction}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Forwarded Traffic",
+          "description": "クラスタ全体の転送トラフィック (bps)。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 6 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bps",
+              "custom": { "drawStyle": "line", "fillOpacity": 20 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(cilium_forward_bytes_total{node=~\"$node\"}[$__rate_interval])) by (direction) * 8",
+              "legendFormat": "{{direction}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "Drops",
+          "description": "パケットドロップ。reason と node で分割。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 6 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "custom": { "drawStyle": "bars", "fillOpacity": 80, "stacking": { "mode": "normal" } }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(cilium_drop_count_total{node=~\"$node\"}[$__rate_interval])) by (node, reason)",
+              "legendFormat": "{{node}} - {{reason}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 300,
+          "title": "Conntrack & BPF",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+          "collapsed": false
+        },
+        {
+          "id": 8,
+          "title": "CT Entries (alive)",
+          "description": "Conntrack テーブルのアクティブエントリ数。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 14 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(cilium_datapath_conntrack_gc_entries{status=\"alive\", node=~\"$node\"}) by (family, protocol)",
+              "legendFormat": "{{family}} {{protocol}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "title": "CT GC Duration",
+          "description": "Conntrack GC にかかる時間。distributedLRU の効果測定に有用。ノード別表示。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 14 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "rate(cilium_datapath_conntrack_gc_duration_seconds_sum{node=~\"$node\"}[$__rate_interval]) / rate(cilium_datapath_conntrack_gc_duration_seconds_count{node=~\"$node\"}[$__rate_interval])",
+              "legendFormat": "{{node}} avg",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.99, rate(cilium_datapath_conntrack_gc_duration_seconds_bucket{node=~\"$node\"}[$__rate_interval]))",
+              "legendFormat": "{{node}} p99",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "title": "CT GC Runs & Key Fallbacks",
+          "description": "CT GC 実行数と key fallback 数。fallback の増加は CT map 圧迫を示唆。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 14 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(cilium_datapath_conntrack_gc_runs_total{node=~\"$node\"}[$__rate_interval])) by (node)",
+              "legendFormat": "{{node}} runs",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(rate(cilium_datapath_conntrack_gc_key_fallbacks_total{node=~\"$node\"}[$__rate_interval])) by (node)",
+              "legendFormat": "{{node}} fallbacks",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "title": "BPF Map Pressure",
+          "description": "BPF マップの使用率。map_name ごとにノード別表示。1.0 で満杯。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 21 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "cilium_bpf_map_pressure{node=~\"$node\"} > 0",
+              "legendFormat": "{{node}} {{map_name}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "title": "BPF Memory",
+          "description": "BPF maps + progs のメモリ使用量。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 21 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "cilium_bpf_maps_virtual_memory_max_bytes{node=~\"$node\"} + cilium_bpf_progs_virtual_memory_max_bytes{node=~\"$node\"}",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 400,
+          "title": "BGP",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+          "collapsed": false
+        },
+        {
+          "id": 13,
+          "title": "BGP Session State",
+          "description": "ノードごとの BGP セッション状態。1=Established が正常。",
+          "type": "stat",
+          "gridPos": { "h": 5, "w": 8, "x": 0, "y": 29 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                { "type": "value", "options": { "1": { "text": "Idle", "color": "red" } } },
+                { "type": "value", "options": { "2": { "text": "Connect", "color": "orange" } } },
+                { "type": "value", "options": { "3": { "text": "Active", "color": "orange" } } },
+                { "type": "value", "options": { "4": { "text": "OpenSent", "color": "yellow" } } },
+                { "type": "value", "options": { "5": { "text": "OpenConfirm", "color": "yellow" } } },
+                { "type": "value", "options": { "6": { "text": "Established", "color": "green" } } }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "red", "value": null }]
+              }
+            },
+            "overrides": []
+          },
+          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "targets": [
+            {
+              "expr": "cilium_bgp_control_plane_session_state{node=~\"$node\"}",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "title": "BGP Advertised Routes",
+          "description": "クラスタ全体の BGP 広告ルート数。",
+          "type": "timeseries",
+          "gridPos": { "h": 5, "w": 8, "x": 8, "y": 29 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(cilium_bgp_control_plane_advertised_routes{node=~\"$node\"}) by (afi, safi)",
+              "legendFormat": "advertised {{afi}}/{{safi}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "title": "BGP Received Routes",
+          "description": "クラスタ全体の BGP 受信ルート数。",
+          "type": "timeseries",
+          "gridPos": { "h": 5, "w": 8, "x": 16, "y": 29 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(cilium_bgp_control_plane_received_routes{node=~\"$node\"}) by (afi, safi)",
+              "legendFormat": "received {{afi}}/{{safi}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 500,
+          "title": "Node Connectivity",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
+          "collapsed": false
+        },
+        {
+          "id": 16,
+          "title": "Node-to-Node Latency (p50 / p99)",
+          "description": "ノード間ヘルスチェックのレイテンシ。BBR 有効化の効果測定に使える。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 35 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.5, rate(cilium_node_health_connectivity_latency_seconds_bucket{node=~\"$node\"}[$__rate_interval]))",
+              "legendFormat": "{{node}} p50",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.99, rate(cilium_node_health_connectivity_latency_seconds_bucket{node=~\"$node\"}[$__rate_interval]))",
+              "legendFormat": "{{node}} p99",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "title": "Connectivity Status",
+          "description": "ノードごとの接続性ステータス。動的にノードを検出。",
+          "type": "stat",
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 35 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                { "type": "value", "options": { "0": { "text": "Unreachable", "color": "red" } } },
+                { "type": "value", "options": { "1": { "text": "Reachable", "color": "green" } } }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "red", "value": null }]
+              }
+            },
+            "overrides": []
+          },
+          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "targets": [
+            {
+              "expr": "cilium_node_health_connectivity_status{node=~\"$node\"}",
+              "legendFormat": "{{node}} → {{target_node_name}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 600,
+          "title": "Agent Resources",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 42 },
+          "collapsed": false
+        },
+        {
+          "id": 18,
+          "title": "CPU Usage",
+          "description": "Cilium Agent の CPU 使用率 (%)。ノード別。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 43 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "irate(cilium_process_cpu_seconds_total{node=~\"$node\"}[$__rate_interval]) * 100",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "title": "Resident Memory",
+          "description": "Cilium Agent の RSS メモリ使用量。ノード別。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 43 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "cilium_process_resident_memory_bytes{node=~\"$node\"}",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "title": "Open File Descriptors",
+          "description": "Cilium Agent のオープン FD 数。ノード別。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 43 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "cilium_process_open_fds{node=~\"$node\"}",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 700,
+          "title": "Policy",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 50 },
+          "collapsed": false
+        },
+        {
+          "id": 21,
+          "title": "Policy Count",
+          "description": "クラスタ全体のポリシー数。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 6, "x": 0, "y": 51 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "avg(cilium_policy{node=~\"$node\"}) by (node)",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "title": "Enforcement Status",
+          "description": "エンドポイントのポリシー適用状況。",
+          "type": "bargauge",
+          "gridPos": { "h": 7, "w": 6, "x": 6, "y": 51 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "blue", "value": null }]
+              }
+            },
+            "overrides": []
+          },
+          "options": { "orientation": "horizontal", "displayMode": "gradient" },
+          "targets": [
+            {
+              "expr": "sum(cilium_policy_endpoint_enforcement_status{node=~\"$node\"}) by (enforcement)",
+              "legendFormat": "{{enforcement}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "title": "Policy Implementation Delay",
+          "description": "ポリシー変更からエンドポイント適用までの遅延。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 6, "x": 12, "y": 51 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "cilium_policy_implementation_delay{node=~\"$node\"}",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "title": "Endpoint Regeneration Time (p90)",
+          "description": "エンドポイント再生成時間の 90 パーセンタイル。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 6, "x": 18, "y": 51 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.90, sum(rate(cilium_endpoint_regeneration_time_stats_seconds_bucket{scope!=\"total\", node=~\"$node\"}[$__rate_interval])) by (le, node))",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "id": 800,
+          "title": "K8s & API",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 58 },
+          "collapsed": false
+        },
+        {
+          "id": 25,
+          "title": "Agent API Latency",
+          "description": "Cilium Agent API の平均レイテンシ。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 59 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "rate(cilium_agent_api_process_time_seconds_sum{node=~\"$node\"}[$__rate_interval]) / rate(cilium_agent_api_process_time_seconds_count{node=~\"$node\"}[$__rate_interval])",
+              "legendFormat": "{{node}} {{method}} {{path}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "title": "K8s API Latency",
+          "description": "K8s API サーバーへのリクエストレイテンシ。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 59 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "drawStyle": "line", "fillOpacity": 10 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "rate(cilium_k8s_client_api_latency_time_seconds_sum{node=~\"$node\"}[$__rate_interval]) / rate(cilium_k8s_client_api_latency_time_seconds_count{node=~\"$node\"}[$__rate_interval])",
+              "legendFormat": "{{node}} {{method}} {{path}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "title": "K8s Events Rate",
+          "description": "Kubernetes イベントの受信レート。scope 別。",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 59 },
+          "datasource": { "type": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": { "drawStyle": "line", "fillOpacity": 20 }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(cilium_kubernetes_events_total{node=~\"$node\"}[$__rate_interval])) by (scope, action)",
+              "legendFormat": "{{scope}} {{action}}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }

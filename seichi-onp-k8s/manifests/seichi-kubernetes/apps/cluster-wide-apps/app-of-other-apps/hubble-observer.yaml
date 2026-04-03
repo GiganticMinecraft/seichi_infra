@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hubble-observer
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: hubble-observer
+    repoURL: ghcr.io/onzack
+    targetRevision: 2.3.0
+    helm:
+      releaseName: hubble-observer
+      values: |
+        verdictFilter: "none"
+        hubbleRelay:
+          serviceName: hubble-relay
+          port: "80"
+          namespace: kube-system
+        grafanaDashboard:
+          enabled: false
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 128Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
