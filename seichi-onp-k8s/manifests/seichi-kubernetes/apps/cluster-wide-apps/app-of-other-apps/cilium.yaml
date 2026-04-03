@@ -13,6 +13,7 @@ spec:
       releaseName: cilium
       values: |
         policyAuditMode: true
+        policyDenyResponse: icmp
         kubeProxyReplacement: true
         k8sServiceHost: 192.168.32.100 # modify it if necessary
         k8sServicePort: 8443
@@ -24,16 +25,20 @@ spec:
           algorithm: maglev
         routingMode: native
         autoDirectNodeRoutes: true
+        directRoutingSkipUnreachable: true
         bpf:
           datapathMode: netkit
           lbExternalClusterIP: true
           masquerade: true
-        # bandwidthManager:
-        #   enabled: true
-        #   bbr: true
+          distributedLRU:
+            enabled: true
+          mapDynamicSizeRatio: 0.0080
+        bandwidthManager:
+          enabled: true
+          bbr: true
         ipv4:
           enabled: true
-        enableIPv4BIGTCP: true
+        enableIPv4BIGTCP: false
         ipv4NativeRoutingCIDR: "10.96.128.0/18" # modify it if necessary
         ipam:
           operator:
