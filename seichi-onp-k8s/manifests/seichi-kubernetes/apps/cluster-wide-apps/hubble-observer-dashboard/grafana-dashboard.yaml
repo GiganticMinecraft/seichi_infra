@@ -1,0 +1,1925 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hubble-observer-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Cilium"
+data:
+  hubble-observer-flows.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "Grafana dashboard for Cilium Flows - Hubble Observer",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "links": [
+        {
+          "asDropdown": false,
+          "icon": "external link",
+          "includeVars": false,
+          "keepTime": false,
+          "tags": [],
+          "targetBlank": true,
+          "title": "GitHub",
+          "tooltip": "",
+          "type": "link",
+          "url": "https://github.com/onzack/hubble-observer"
+        }
+      ],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 10,
+          "panels": [],
+          "title": "Statistics",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "fixed"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 4,
+            "x": 0,
+            "y": 1
+          },
+          "id": 5,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(\n    count_over_time(\n        {namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n        | $logparser | flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\" \n        | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n    [$__range])\n)",
+              "legendFormat": "",
+              "queryType": "instant",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Flows",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": []
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/AUDIT.*/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/(DROPPED|ERROR)/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/FORWARDED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/REDIRECTED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/TRACED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/TRANSLATED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "purple",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 3,
+            "x": 4,
+            "y": 1
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "sort": "desc",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by(flow_verdict) (\n    count_over_time(\n        {namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n        | $logparser | flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\"\n        | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n    [$__range])\n)",
+              "hide": false,
+              "legendFormat": "{{flow_verdict}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Flows per Verdict",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": false,
+                  "title": "",
+                  "url": "/d/${__dashboard.uid}/${__dashboard}?${__url_time_range}&${datasource:queryparam}&${sourcenamespace:queryparam}&${destinationnamespace:queryparam}&${ipversion:queryparam}&${searchregex:queryparam}&${excluderegex:queryparam}&var-direction=${__data.fields.flow_traffic_direction}"
+                }
+              ],
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 3,
+            "x": 7,
+            "y": 1
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": true
+            },
+            "sort": "desc",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by(flow_traffic_direction) (\n    count_over_time(\n        {namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n        | $logparser | flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\"\n        | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n    [$__range])\n)",
+              "hide": false,
+              "legendFormat": "",
+              "queryType": "instant",
+              "refId": "A"
+            }
+          ],
+          "title": "Flows per Direction",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": false,
+                  "title": "",
+                  "url": "/d/${__dashboard.uid}/${__dashboard}?${__url_time_range}&${datasource:queryparam}&${destinationnamespace:queryparam}&${ipversion:queryparam}&${searchregex:queryparam}&${excluderegex:queryparam}&${direction:queryparam}&var-sourcenamespace=${__data.fields.flow_source_namespace}"
+                }
+              ],
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 5,
+            "x": 10,
+            "y": 1
+          },
+          "id": 7,
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent"
+              ]
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": true
+            },
+            "sort": "desc",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by(flow_source_namespace) (\n    count_over_time(\n        {namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n        | $logparser | flow_source_namespace!=\"\" | flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\"\n        | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n    [$__range])\n)",
+              "hide": false,
+              "legendFormat": "",
+              "queryType": "instant",
+              "refId": "A"
+            }
+          ],
+          "title": "Flows per Source Namespace",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "links": [
+                {
+                  "targetBlank": false,
+                  "title": "",
+                  "url": "/d/${__dashboard.uid}/${__dashboard}?${__url_time_range}&${datasource:queryparam}&${destinationnamespace:queryparam}&${ipversion:queryparam}&${excluderegex:queryparam}&${direction:queryparam}&${sourcenamespace:queryparam}&var-searchregex=${__data.fields.flow_destination_name}"
+                }
+              ],
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 9,
+            "x": 15,
+            "y": 1
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent"
+              ]
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": true
+            },
+            "sort": "desc",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by(flow_destination_name) (\n    count_over_time(\n        {namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n        | $logparser | flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\" \n        | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n        | json flow_destination_name=\"flow.destination_names[0]\" | flow_destination_name!=\"\" \n    [$__range])\n)",
+              "hide": false,
+              "legendFormat": "",
+              "queryType": "instant",
+              "refId": "A"
+            }
+          ],
+          "title": "Flows per Destination",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "description": "Flows per Verdict (per $__interval)",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": false,
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "bars",
+                "fillOpacity": 70,
+                "gradientMode": "hue",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/(DROPPED|ERROR)/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/AUDIT.*/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/FORWARDED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/REDIRECTED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/TRACED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/TRANSLATED/"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "purple",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "id": 11,
+          "interval": "30s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by(flow_verdict) (\n    count_over_time(\n        {namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n        | $logparser | flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\"\n        | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n    [$__auto])\n)",
+              "hide": false,
+              "legendFormat": "{{flow_verdict}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 12
+          },
+          "id": 4,
+          "panels": [],
+          "title": "History",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": true,
+                "footer": {
+                  "reducers": []
+                },
+                "inspect": false,
+                "minWidth": 50
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "AUDIT": {
+                      "color": "orange",
+                      "index": 2
+                    },
+                    "DROPPED": {
+                      "color": "red",
+                      "index": 0
+                    },
+                    "ERROR": {
+                      "color": "red",
+                      "index": 4
+                    },
+                    "FORWARDED": {
+                      "color": "green",
+                      "index": 1
+                    },
+                    "REDIRECTED": {
+                      "color": "yellow",
+                      "index": 3
+                    },
+                    "TRACED": {
+                      "color": "blue",
+                      "index": 5
+                    },
+                    "TRANSLATED": {
+                      "color": "purple",
+                      "index": 6
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Source IP"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 105
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Source"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 350
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Source Namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 200
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Direction"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 95
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Destination"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 400
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 160
+                  },
+                  {
+                    "id": "custom.width",
+                    "value": 195
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Verdict"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 90
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "applyToRow": false,
+                      "mode": "gradient",
+                      "type": "color-background"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Destination IP"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Dest. Port"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 100
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Drop Description"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 240
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Direction"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 100
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Destination Namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 200
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Flow UUID"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 105
+                  },
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "targetBlank": true,
+                        "title": "Open this Flow UUID in a new tab",
+                        "url": "/d/${__dashboard.uid}/${__dashboard}?${__url_time_range}&viewPanel=3&var-ipversion=$__all&var-searchregex=${__data.fields[\"Flow UUID\"]}"
+                      },
+                      {
+                        "targetBlank": true,
+                        "title": "Download CiliumNetworkPolicy (first click \"Generate..\")",
+                        "url": "${hubbleobservercf2cnpurl}/download/${__data.fields[\"Flow UUID\"]}"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "actions",
+                    "value": [
+                      {
+                        "fetch": {
+                          "body": "${__data.fields.Line}",
+                          "headers": [
+                            [
+                              "Content-Type",
+                              "application/json"
+                            ]
+                          ],
+                          "method": "POST",
+                          "queryParams": [],
+                          "url": "${hubbleobservercf2cnpurl}/generate"
+                        },
+                        "style": {
+                          "backgroundColor": "#5794F2"
+                        },
+                        "title": "Generate CiliumNetworkPolicy from Flow",
+                        "type": "fetch"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Line"
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom.viz",
+                    "value": true
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 24,
+            "x": 0,
+            "y": 13
+          },
+          "id": 1,
+          "options": {
+            "cellHeight": "sm",
+            "enablePagination": true,
+            "showHeader": true,
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "Time"
+              }
+            ]
+          },
+          "pluginVersion": "12.3.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "{namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n| $logparser \n| flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\" \n| flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n| json flow_destination_name=\"flow.destination_names[0]\"\n| pattern `<_>\"source\":{<_>\"labels\":[<sourceLabels>]<_>}<_>,\"destination\":{<_>\"labels\":[<destinationLabels>]}<_>`\n| pattern `<_>\"k8s:job-name=<sourceJobName>\"<_>`\n| label_format \n    Verdict=`{{.flow_verdict}}`,\n    Source_IP=`{{.flow_IP_source}}`,\n    Source=`{{ if .flow_source_pod_name }}{{.flow_source_pod_name}} (Pod) {{else if .sourceJobName}} {{.sourceJobName}} (Job) {{else}} {{.sourceLabels}} (Label) {{end}}`,\n    Source_Namespace=`{{.flow_source_namespace}}`,\n    Direction=`{{.flow_traffic_direction}}`,\n    Dest_Port=`{{ if .flow_l4_TCP_destination_port}}TCP-{{.flow_l4_TCP_destination_port}}{{else if .flow_l4_UDP_destination_port}}UDP-{{.flow_l4_UDP_destination_port}}{{else if .flow_l4_ICMPv4_type}} ICMPv4 {{else}}{{end}}`, #\n    #Destination=`{{.flow_destination_name}}`,\n    Destination=`{{ if .flow_destination_pod_name }}{{.flow_destination_pod_name}} (Pod) {{ else if .flow_destination_name }}{{.flow_destination_name}} (URL){{else}} {{.destinationLabels}} (Label) {{end}}`,\n    #Destination_Pod=`{{.flow_destination_pod_name}}`,\n    Destination_Namespace=`{{.flow_destination_namespace}}`,\n    Destination_IP=`{{.flow_IP_destination}}`, \n    Drop_Description=`{{.flow_drop_reason_desc}}`,\n    Flow_UUID=`{{.flow_uuid}}`",
+              "maxLines": 100,
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Cilium Flows over Time",
+          "transformations": [
+            {
+              "id": "extractFields",
+              "options": {
+                "delimiter": ",",
+                "keepTime": false,
+                "replace": false,
+                "source": "labels"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "Time",
+                    "Dest_Port",
+                    "Destination",
+                    "Destination_IP",
+                    "Destination_Namespace",
+                    "Direction",
+                    "Drop_Description",
+                    "Flow_UUID",
+                    "Source",
+                    "Source_IP",
+                    "Source_Namespace",
+                    "Verdict"
+                  ],
+                  "pattern": "^[A-Z].*"
+                }
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "(.*)_(.*)",
+                "renamePattern": "$1 $2"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Line": false,
+                  "app": true,
+                  "container": true,
+                  "container_id": true,
+                  "flow_IP_ipVersion": true,
+                  "flow_Type": true,
+                  "flow_destination_ID": true,
+                  "flow_destination_cluster_name": true,
+                  "flow_destination_identity": true,
+                  "flow_drop_reason": true,
+                  "flow_ethernet_destination": true,
+                  "flow_ethernet_source": true,
+                  "flow_event_type_sub_type": true,
+                  "flow_event_type_type": true,
+                  "flow_l4_ICMPv4_code": true,
+                  "flow_l4_ICMPv4_type": true,
+                  "flow_l4_ICMPv6_type": true,
+                  "flow_l4_TCP_flags_ACK": true,
+                  "flow_l4_TCP_flags_FIN": true,
+                  "flow_l4_TCP_flags_PSH": true,
+                  "flow_l4_TCP_flags_RST": true,
+                  "flow_l4_TCP_flags_SYN": true,
+                  "flow_l4_TCP_source_port": true,
+                  "flow_node_name": true,
+                  "flow_source_ID": true,
+                  "flow_source_cluster_name": true,
+                  "flow_source_identity": true,
+                  "flow_time": true,
+                  "host": true,
+                  "namespace": true,
+                  "node_name": true,
+                  "pod": true,
+                  "pod_id": true,
+                  "pod_template_hash": true,
+                  "service_name": true,
+                  "time": true
+                },
+                "includeByName": {},
+                "indexByName": {
+                  "Dest Port": 6,
+                  "Destination": 7,
+                  "Destination IP": 9,
+                  "Destination Namespace": 8,
+                  "Direction": 5,
+                  "Drop Description": 10,
+                  "Flow UUID": 11,
+                  "Source": 3,
+                  "Source IP": 2,
+                  "Source Namespace": 4,
+                  "Time": 0,
+                  "Verdict": 1
+                },
+                "renameByName": {
+                  "Dest Port": "Dest. Port",
+                  "Line": "",
+                  "flow_IP_destination": "Destination IP",
+                  "flow_IP_ipVersion": "IP Version",
+                  "flow_IP_source": "Source IP",
+                  "flow_Summary": "Summary",
+                  "flow_Type": "Type",
+                  "flow_destination_cluster_name": "Source Cluster",
+                  "flow_destination_identity": "",
+                  "flow_destination_name": "Destination",
+                  "flow_destination_namespace": "Destination Namespace",
+                  "flow_destination_pod_name": "Destination Pod",
+                  "flow_drop_reason": "Drop Reason",
+                  "flow_drop_reason_desc": "Drop Description",
+                  "flow_ethernet_destination": "",
+                  "flow_event_type_sub_type": "",
+                  "flow_l4_ICMPv6_type": "",
+                  "flow_l4_TCP_destination_port": "Dest. Port",
+                  "flow_l4_TCP_flags_SYN": "",
+                  "flow_l4_TCP_source_port": "Source Port",
+                  "flow_node_name": "Node",
+                  "flow_source_ID": "",
+                  "flow_source_cluster_name": "Source Cluster",
+                  "flow_source_identity": "Source ID",
+                  "flow_source_namespace": "Source Namespace",
+                  "flow_source_pod_name": "Source Pod",
+                  "flow_time": "",
+                  "flow_traffic_direction": "Direction",
+                  "flow_uuid": "Flow UUID",
+                  "flow_verdict": "Verdict",
+                  "host": ""
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 28
+          },
+          "id": 13,
+          "panels": [
+            {
+              "datasource": {
+                "default": false,
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false,
+                    "minWidth": 50
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "AUDIT": {
+                          "color": "orange",
+                          "index": 2
+                        },
+                        "DROPPED": {
+                          "color": "red",
+                          "index": 0
+                        },
+                        "ERROR": {
+                          "color": "red",
+                          "index": 4
+                        },
+                        "FORWARDED": {
+                          "color": "green",
+                          "index": 1
+                        },
+                        "REDIRECTED": {
+                          "color": "yellow",
+                          "index": 3
+                        },
+                        "TRACED": {
+                          "color": "blue",
+                          "index": 5
+                        },
+                        "TRANSLATED": {
+                          "color": "purple",
+                          "index": 6
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Source IP"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 105
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Source"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 350
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Source Namespace"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 200
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Direction"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 95
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Destination"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 400
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Verdict"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 90
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "applyToRow": false,
+                          "mode": "gradient",
+                          "type": "color-background"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Destination IP"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 150
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Dest. Port"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 100
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Direction"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 100
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Destination Namespace"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.minWidth",
+                        "value": 200
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Destination New"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 335
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 15,
+                "w": 24,
+                "x": 0,
+                "y": 29
+              },
+              "id": 14,
+              "options": {
+                "cellHeight": "sm",
+                "enablePagination": true,
+                "showHeader": true,
+                "sortBy": []
+              },
+              "pluginVersion": "12.3.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "loki",
+                    "uid": "${datasource}"
+                  },
+                  "direction": "backward",
+                  "editorMode": "code",
+                  "expr": "{namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n| $logparser \n| flow_source_namespace=~\"$sourcenamespace\" | flow_destination_namespace=~\"$destinationnamespace\" | flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\" \n| flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n| json flow_destination_name=\"flow.destination_names[0]\"\n| pattern `<_>\"source\":{<_>\"labels\":[<sourceLabels>]<_>}<_>,\"destination\":{<_>\"labels\":[<destinationLabels>]}<_>`\n| pattern `<_>\"k8s:job-name=<sourceJobName>\"<_>`\n| label_format \n    Verdict=`{{.flow_verdict}}`,\n    Source_IP=`{{.flow_IP_source}}`,\n    Source=`{{ if .flow_source_pod_name }}{{.flow_source_pod_name}} (Pod) {{else if .sourceJobName}} {{.sourceJobName}} (Job) {{else}} {{.sourceLabels}} (Label) {{end}}`,\n    Source_Namespace=`{{.flow_source_namespace}}`,\n    Direction=`{{.flow_traffic_direction}}`,\n    Dest_Port=`{{ if .flow_l4_TCP_destination_port}}TCP-{{.flow_l4_TCP_destination_port}}{{else if .flow_l4_UDP_destination_port}}UDP-{{.flow_l4_UDP_destination_port}}{{else if .flow_l4_ICMPv4_type}} ICMPv4 {{else}}{{end}}`, #\n    #Destination=`{{.flow_destination_name}}`,\n    Destination=`{{ if .flow_destination_pod_name }}{{.flow_destination_pod_name}} (Pod) {{ else if .flow_destination_name }}{{.flow_destination_name}} (URL){{else}} {{.destinationLabels}} (Label) {{end}}`,\n    #Destination_Pod=`{{.flow_destination_pod_name}}`,\n    Destination_Namespace=`{{.flow_destination_namespace}}`,\n    Destination_IP=`{{.flow_IP_destination}}`, \n    Drop_Description=`{{.flow_drop_reason_desc}}`,\n    Flow_UUID=`{{.flow_uuid}}`",
+                  "maxLines": 100,
+                  "queryType": "range",
+                  "refId": "A"
+                }
+              ],
+              "title": "Unique Cilium Flows",
+              "transformations": [
+                {
+                  "id": "extractFields",
+                  "options": {
+                    "keepTime": true,
+                    "replace": true,
+                    "source": "labels"
+                  }
+                },
+                {
+                  "id": "filterFieldsByName",
+                  "options": {
+                    "include": {
+                      "pattern": "^[A-Z].*"
+                    }
+                  }
+                },
+                {
+                  "id": "renameByRegex",
+                  "options": {
+                    "regex": "(.*)_(.*)",
+                    "renamePattern": "$1 $2"
+                  }
+                },
+                {
+                  "id": "groupBy",
+                  "options": {
+                    "fields": {
+                      "Dest Port": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Dest_Port": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Destination": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Destination IP": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Destination Namespace": {
+                        "aggregations": [
+                          "count"
+                        ],
+                        "operation": "groupby"
+                      },
+                      "Destination_IP": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Destination_Namespace": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Direction": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Source": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Source IP": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Source Namespace": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Source_IP": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      },
+                      "Verdict": {
+                        "aggregations": [],
+                        "operation": "groupby"
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "organize",
+                  "options": {
+                    "excludeByName": {
+                      "app": true,
+                      "container": true,
+                      "container_id": true,
+                      "flow_IP_ipVersion": true,
+                      "flow_Type": true,
+                      "flow_destination_ID": true,
+                      "flow_destination_cluster_name": true,
+                      "flow_destination_identity": true,
+                      "flow_drop_reason": true,
+                      "flow_ethernet_destination": true,
+                      "flow_ethernet_source": true,
+                      "flow_event_type_sub_type": true,
+                      "flow_event_type_type": true,
+                      "flow_l4_ICMPv4_code": true,
+                      "flow_l4_ICMPv4_type": true,
+                      "flow_l4_ICMPv6_type": true,
+                      "flow_l4_TCP_flags_ACK": true,
+                      "flow_l4_TCP_flags_FIN": true,
+                      "flow_l4_TCP_flags_PSH": true,
+                      "flow_l4_TCP_flags_RST": true,
+                      "flow_l4_TCP_flags_SYN": true,
+                      "flow_l4_TCP_source_port": true,
+                      "flow_node_name": true,
+                      "flow_source_ID": true,
+                      "flow_source_cluster_name": true,
+                      "flow_source_identity": true,
+                      "flow_time": true,
+                      "host": true,
+                      "namespace": true,
+                      "node_name": true,
+                      "pod": true,
+                      "pod_id": true,
+                      "pod_template_hash": true,
+                      "service_name": true,
+                      "time": true
+                    },
+                    "includeByName": {},
+                    "indexByName": {
+                      "Dest Port": 6,
+                      "Destination": 7,
+                      "Destination IP": 9,
+                      "Destination Namespace": 8,
+                      "Direction": 5,
+                      "Drop Description": 10,
+                      "Flow UUID": 11,
+                      "Source": 3,
+                      "Source IP": 2,
+                      "Source Namespace": 4,
+                      "Time": 0,
+                      "Verdict": 1
+                    },
+                    "renameByName": {
+                      "Dest Port": "Dest. Port",
+                      "Destination Namespace (count)": "Count",
+                      "flow_IP_destination": "Destination IP",
+                      "flow_IP_ipVersion": "IP Version",
+                      "flow_IP_source": "Source IP",
+                      "flow_Summary": "Summary",
+                      "flow_Type": "Type",
+                      "flow_destination_cluster_name": "Source Cluster",
+                      "flow_destination_identity": "",
+                      "flow_destination_name": "Destination",
+                      "flow_destination_namespace": "Destination Namespace",
+                      "flow_destination_pod_name": "Destination Pod",
+                      "flow_drop_reason": "Drop Reason",
+                      "flow_drop_reason_desc": "Drop Description",
+                      "flow_ethernet_destination": "",
+                      "flow_event_type_sub_type": "",
+                      "flow_l4_ICMPv6_type": "",
+                      "flow_l4_TCP_destination_port": "Dest. Port",
+                      "flow_l4_TCP_flags_SYN": "",
+                      "flow_l4_TCP_source_port": "Source Port",
+                      "flow_node_name": "Node",
+                      "flow_source_ID": "",
+                      "flow_source_cluster_name": "Source Cluster",
+                      "flow_source_identity": "Source ID",
+                      "flow_source_namespace": "Source Namespace",
+                      "flow_source_pod_name": "Source Pod",
+                      "flow_time": "",
+                      "flow_traffic_direction": "Direction",
+                      "flow_uuid": "Flow UUID",
+                      "flow_verdict": "Verdict",
+                      "host": ""
+                    }
+                  }
+                }
+              ],
+              "type": "table"
+            }
+          ],
+          "title": "Unique Flows",
+          "type": "row"
+        },
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 29
+          },
+          "id": 12,
+          "panels": [
+            {
+              "datasource": {
+                "default": false,
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "description": "",
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 28,
+                "w": 24,
+                "x": 0,
+                "y": 30
+              },
+              "id": 3,
+              "options": {
+                "dedupStrategy": "none",
+                "enableInfiniteScrolling": false,
+                "enableLogDetails": true,
+                "prettifyLogMessage": true,
+                "showCommonLabels": false,
+                "showControls": false,
+                "showLabels": false,
+                "showTime": true,
+                "sortOrder": "Descending",
+                "syntaxHighlighting": true,
+                "wrapLogMessage": true
+              },
+              "pluginVersion": "12.3.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "loki",
+                    "uid": "${datasource}"
+                  },
+                  "direction": "backward",
+                  "editorMode": "code",
+                  "expr": "{namespace=\"$hubbleobservernamespace\",container=\"hubble-observer\"} |~ `(?i)$searchregex` !~ `(?i)$excluderegex`\n| $logparser \n| flow_traffic_direction=~\"$direction\" | flow_IP_ipVersion=~\"$ipversion\" | flow_source_cluster_name=~\"$sourcecluster\" | flow_destination_cluster_name=~\"$destinationcluster\"\n| json flow_destination_name=\"flow.destination_names[0]\"",
+                  "legendFormat": "",
+                  "queryType": "range",
+                  "refId": "A"
+                }
+              ],
+              "title": "",
+              "type": "logs"
+            }
+          ],
+          "title": "Raw Flows",
+          "type": "row"
+        }
+      ],
+      "preload": false,
+      "refresh": "",
+      "schemaVersion": 42,
+      "tags": [
+        "cilium",
+        "network",
+        "hubble"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "text": "",
+              "value": "P8E80F9AEF21F6940",
+              "selected": true
+            },
+            "includeAll": false,
+            "label": "Datasource",
+            "name": "datasource",
+            "options": [],
+            "query": "loki",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "text": "",
+              "value": ""
+            },
+            "label": "Source Namespace",
+            "name": "sourcenamespace",
+            "options": [
+              {
+                "selected": true,
+                "text": "",
+                "value": ""
+              }
+            ],
+            "query": "",
+            "type": "textbox"
+          },
+          {
+            "current": {
+              "text": "",
+              "value": ""
+            },
+            "label": "Destination Namespace",
+            "name": "destinationnamespace",
+            "options": [
+              {
+                "selected": true,
+                "text": "",
+                "value": ""
+              }
+            ],
+            "query": "",
+            "type": "textbox"
+          },
+          {
+            "allValue": ".+",
+            "current": {
+              "text": "$__all",
+              "value": "$__all"
+            },
+            "includeAll": true,
+            "label": "Direction",
+            "name": "direction",
+            "options": [
+              {
+                "selected": false,
+                "text": "INGRESS",
+                "value": "INGRESS"
+              },
+              {
+                "selected": false,
+                "text": "EGRESS",
+                "value": "EGRESS"
+              }
+            ],
+            "query": "INGRESS, EGRESS",
+            "type": "custom"
+          },
+          {
+            "allValue": ".+",
+            "current": {
+              "text": "IPv4",
+              "value": "IPv4"
+            },
+            "includeAll": true,
+            "label": "IP Version",
+            "name": "ipversion",
+            "options": [
+              {
+                "selected": true,
+                "text": "IPv4",
+                "value": "IPv4"
+              },
+              {
+                "selected": false,
+                "text": "IPv6",
+                "value": "IPv6"
+              }
+            ],
+            "query": "IPv4, IPv6",
+            "type": "custom"
+          },
+          {
+            "current": {
+              "text": "",
+              "value": ""
+            },
+            "description": "Regex search (case insensitive)",
+            "label": "Search Regex",
+            "name": "searchregex",
+            "options": [
+              {
+                "selected": true,
+                "text": "",
+                "value": ""
+              }
+            ],
+            "query": "",
+            "type": "textbox"
+          },
+          {
+            "current": {
+              "text": "a^",
+              "value": "a^"
+            },
+            "description": "Regex exclude (case insensitive)",
+            "label": "Exclude Regex",
+            "name": "excluderegex",
+            "options": [
+              {
+                "selected": true,
+                "text": "a^",
+                "value": "a^"
+              }
+            ],
+            "query": "a^",
+            "type": "textbox"
+          },
+          {
+            "hide": 2,
+            "name": "hubbleobservernamespace",
+            "query": "kube-system",
+            "skipUrlSync": true,
+            "type": "constant",
+            "current": {
+              "text": "kube-system",
+              "value": "kube-system"
+            },
+            "options": [
+              {
+                "value": "kube-system",
+                "text": "kube-system",
+                "selected": false
+              }
+            ]
+          },
+          {
+            "current": {
+              "text": "regexp `(?P<message>.+)` | line_format `{{.message}}` | json",
+              "value": "regexp `(?P<message>.+)` | line_format `{{.message}}` | json"
+            },
+            "description": "Parses CRI log lines, extracting timestamp, stream, flags, and message. Only the message part is taken if it matches, then it is parsed as JSON.",
+            "hide": 2,
+            "name": "logparser",
+            "options": [
+              {
+                "selected": true,
+                "text": "regexp `(?P<message>.+)` | line_format `{{.message}}` | json",
+                "value": "regexp `(?P<message>.+)` | line_format `{{.message}}` | json"
+              }
+            ],
+            "query": "regexp `(?P<message>.+)` | line_format `{{.message}}` | json",
+            "type": "textbox"
+          },
+          {
+            "current": {
+              "text": "",
+              "value": ""
+            },
+            "label": "Source Cluster",
+            "name": "sourcecluster",
+            "options": [
+              {
+                "selected": true,
+                "text": "",
+                "value": ""
+              }
+            ],
+            "query": "",
+            "type": "textbox"
+          },
+          {
+            "current": {
+              "text": "",
+              "value": ""
+            },
+            "label": "Destination Cluster",
+            "name": "destinationcluster",
+            "options": [
+              {
+                "selected": true,
+                "text": "",
+                "value": ""
+              }
+            ],
+            "query": "",
+            "type": "textbox"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-30m",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Hubble Observer - Cilium Flows",
+      "uid": "hubble-observer-flows",
+      "version": 60,
+      "weekStart": "",
+      "id": null
+    }
