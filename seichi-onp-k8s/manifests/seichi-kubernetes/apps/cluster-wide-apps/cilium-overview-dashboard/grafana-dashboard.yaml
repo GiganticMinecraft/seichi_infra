@@ -499,28 +499,30 @@ data:
         {
           "id": 17,
           "title": "Connectivity Status",
-          "description": "ノードごとの接続性ステータス。動的にノードを検出。",
-          "type": "stat",
+          "description": "各ノードから見た reachable / unreachable ノード数 (type=node)。全ノードが 6/6 reachable なら正常。",
+          "type": "bargauge",
           "gridPos": { "h": 7, "w": 12, "x": 12, "y": 35 },
           "datasource": { "type": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "mappings": [
-                { "type": "value", "options": { "0": { "text": "Unreachable", "color": "red" } } },
-                { "type": "value", "options": { "1": { "text": "Reachable", "color": "green" } } }
-              ],
+              "unit": "short",
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "red", "value": null }]
+                "steps": [{ "color": "green", "value": null }]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*unreachable.*" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+              }
+            ]
           },
-          "options": { "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+          "options": { "orientation": "horizontal", "displayMode": "gradient" },
           "targets": [
             {
-              "expr": "cilium_node_health_connectivity_status{node=~\"$node\"}",
-              "legendFormat": "{{node}} → {{target_node_name}}",
+              "expr": "cilium_node_health_connectivity_status{type=\"node\", node=~\"$node\"}",
+              "legendFormat": "{{node}} {{status}}",
               "refId": "A"
             }
           ]
