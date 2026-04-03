@@ -7,7 +7,7 @@ spec:
   project: cluster-wide-apps
   source:
     chart: hubble-observer
-    repoURL: ghcr.io/onzack
+    repoURL: ghcr.io/onzack/helm-charts
     targetRevision: 2.3.0
     helm:
       releaseName: hubble-observer
