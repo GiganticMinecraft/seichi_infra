@@ -58,6 +58,7 @@ data:
 
             # Backend API proxy
             location /api/ {
+                client_max_body_size 100m;
                 set $api_backend "http://garage-admin-api.garage-admin.svc.cluster.local:8080";
                 proxy_pass $api_backend;
                 proxy_set_header Host $host;
