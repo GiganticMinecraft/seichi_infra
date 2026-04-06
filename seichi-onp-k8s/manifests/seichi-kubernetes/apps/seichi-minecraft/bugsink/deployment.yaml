@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: bugsink
-          image: bugsink/bugsink:2.0.14
+          image: bugsink/bugsink:2.1.0
           ports:
             - containerPort: 9000
               protocol: TCP
