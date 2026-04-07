@@ -122,7 +122,11 @@ spec:
                   jsonData:
                     tracesToLogsV2:
                       datasourceUid: Loki
-                      tags: ['pod', 'namespace']
+                      tags:
+                        - key: 'k8s.namespace.name'
+                          value: 'namespace'
+                        - key: 'service.name'
+                          value: 'service_name'
                       filterByTraceID: false
                       filterBySpanID: false
                       spanStartTimeShift: '-1h'
@@ -136,7 +140,11 @@ spec:
                           query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))'
                     tracesToProfiles:
                       datasourceUid: Pyroscope
-                      tags: ['pod', 'namespace']
+                      tags:
+                        - key: 'k8s.namespace.name'
+                          value: 'namespace'
+                        - key: 'service.name'
+                          value: 'service_name'
                       profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
                       customQuery: false
                     serviceMap:
