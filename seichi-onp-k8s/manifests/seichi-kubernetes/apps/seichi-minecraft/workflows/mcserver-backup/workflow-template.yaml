@@ -136,6 +136,17 @@ spec:
         parameters:
           - name: statefulset-name
           - name: persistent-volume-claim-name
+      metrics:
+        prometheus:
+          - name: backup_step_duration_seconds
+            help: "Duration of mcserver backup run-backup step in seconds"
+            labels:
+              - key: step
+                value: "run-backup"
+              - key: server
+                value: "{{inputs.parameters.statefulset-name}}"
+            gauge:
+              value: "{{duration}}"
       volumes:
         - name: backup-target-volume
           persistentVolumeClaim:
@@ -213,6 +224,17 @@ spec:
       inputs:
         parameters:
           - name: coreprotect-db-name
+      metrics:
+        prometheus:
+          - name: backup_step_duration_seconds
+            help: "Duration of mcserver backup delete-coreprotect-db step in seconds"
+            labels:
+              - key: step
+                value: "delete-coreprotect-db"
+              - key: server
+                value: "{{inputs.parameters.coreprotect-db-name}}"
+            gauge:
+              value: "{{duration}}"
       script:
         image: mirror.gcr.io/mariadb:11.8
         env:

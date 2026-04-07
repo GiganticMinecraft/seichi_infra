@@ -17,6 +17,11 @@ spec:
             requests:
               cpu: 10m
               memory: 64Mi
+          extraEnv:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://tempo.monitoring.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
           metricsConfig:
             enabled: true
           serviceMonitor:
@@ -29,6 +34,12 @@ spec:
                 strategy: OnWorkflowSuccess
               ttlStrategy:
                 secondsAfterCompletion: 592200
+        executor:
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://tempo.monitoring.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
         server:
           resources:
             requests:

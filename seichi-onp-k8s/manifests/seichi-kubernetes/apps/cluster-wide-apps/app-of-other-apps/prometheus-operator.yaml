@@ -122,13 +122,12 @@ spec:
                   jsonData:
                     tracesToLogsV2:
                       datasourceUid: Loki
-                      tags: ['job', 'instance', 'pod', 'namespace']
-                      filterByTraceID: true
+                      tags: ['pod', 'namespace']
+                      filterByTraceID: false
                       filterBySpanID: false
                       spanStartTimeShift: '-1h'
                       spanEndTimeShift: '1h'
-                      customQuery: true
-                      query: 'method="$${__span.tags.method}"'
+                      customQuery: false
                     tracesToMetrics:
                       datasourceUid: Prometheus
                       tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
@@ -137,10 +136,9 @@ spec:
                           query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))'
                     tracesToProfiles:
                       datasourceUid: Pyroscope
-                      tags: ['job', 'instance', 'pod', 'namespace']
+                      tags: ['pod', 'namespace']
                       profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
-                      customQuery: true
-                      query: 'method="$${__span.tags.method}"'
+                      customQuery: false
                     serviceMap:
                       datasourceUid: 'prometheus'
                     nodeGraph:
