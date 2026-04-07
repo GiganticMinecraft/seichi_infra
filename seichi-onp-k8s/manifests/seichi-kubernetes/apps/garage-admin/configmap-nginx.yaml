@@ -35,9 +35,17 @@ data:
             # K8s CoreDNS resolver for dynamic upstream resolution
             resolver kube-dns.kube-system.svc.cluster.local valid=30s;
 
-            # SPA entry point - always revalidate to get latest asset references
+            # SPA entry point - always revalidate (no tracing for static content)
             location = /index.html {
+                otel_trace off;
                 add_header Cache-Control "no-cache";
+            }
+
+            # Static assets (no tracing)
+            location /assets/ {
+                otel_trace off;
+                expires 1y;
+                add_header Cache-Control "public, immutable";
             }
 
             location / {
@@ -75,10 +83,5 @@ data:
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             }
 
-            # Static assets cache (Vite hashed filenames)
-            location /assets/ {
-                expires 1y;
-                add_header Cache-Control "public, immutable";
-            }
         }
     }
