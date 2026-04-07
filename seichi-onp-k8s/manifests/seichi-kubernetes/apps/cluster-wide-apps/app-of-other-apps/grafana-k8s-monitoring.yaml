@@ -77,10 +77,11 @@ spec:
           collector: alloy-singleton
           beyla:
             config:
-              discovery:
-                exclude_instrument:
-                  - exe_path: ".*alloy.*|.*otelcol.*|.*beyla.*"
-                  - k8s_namespace: garage-admin
+              data:
+                discovery:
+                  exclude_instrument:
+                    - exe_path: ".*alloy.*|.*otelcol.*|.*beyla.*"
+                    - k8s_namespace: garage-admin
             resources:
               requests:
                 cpu: 20m
