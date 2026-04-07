@@ -46,6 +46,7 @@ data:
 
             # Faro telemetry collection → Alloy
             location = /collect {
+                otel_trace off;
                 limit_except POST {
                     deny all;
                 }
@@ -53,6 +54,15 @@ data:
                 proxy_pass $faro_backend;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+            # Health check (no tracing)
+            location = /api/health {
+                otel_trace off;
+                set $api_backend "http://garage-admin-api.garage-admin.svc.cluster.local:8080";
+                proxy_pass $api_backend;
+                proxy_set_header Host $host;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             }
 
