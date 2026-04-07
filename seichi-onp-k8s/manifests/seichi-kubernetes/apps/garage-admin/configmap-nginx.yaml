@@ -49,6 +49,7 @@ data:
             }
 
             location / {
+                otel_trace off;
                 try_files $uri $uri/ /index.html;
             }
 
