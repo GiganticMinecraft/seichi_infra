@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: garage-block-metrics-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Garage"
+data:
+  garage-block-metrics.json: |
+    {
+      "uid": "garage-block-metrics",
+      "title": "Garage ブロック管理メトリクス",
+      "description": "Garage のブロックリシンク・破損検出の推移を表示します",
+      "tags": ["garage", "block", "resync"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "pod",
+            "type": "query",
+            "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+            "query": "label_values(block_resync_queue_length, pod)",
+            "multi": true,
+            "includeAll": true,
+            "current": { "text": "All", "value": "$__all" },
+            "refresh": 2
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "リシンクエラー数",
+          "description": "0 が正常です。1 以上はブロック喪失の可能性を意味します。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10,
+                "showPoints": "auto",
+                "thresholdsStyle": { "mode": "line" }
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              },
+              "min": 0
+            }
+          },
+          "targets": [
+            {
+              "expr": "block_resync_errored_blocks{pod=~\"$pod\"}",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "リシンクキュー長",
+          "description": "レイアウト変更後は一時的に増加します。時間が経っても減少しない場合は問題の可能性があります。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10,
+                "showPoints": "auto"
+              },
+              "min": 0
+            }
+          },
+          "targets": [
+            {
+              "expr": "block_resync_queue_length{pod=~\"$pod\"}",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "破損検出回数 (累積)",
+          "description": "Scrub またはブロック読み取り時に検出された破損の累積値です。値が増加していればディスク障害の可能性があります。メトリクスが存在しない場合は破損が一度も検出されていない（正常）ことを意味します。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10,
+                "showPoints": "auto"
+              },
+              "min": 0,
+              "noValue": "未検出 (正常)"
+            }
+          },
+          "targets": [
+            {
+              "expr": "block_corruption_counter{pod=~\"$pod\"}",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "リシンク処理数 (rate)",
+          "description": "単位時間あたりのリシンク処理数です。レイアウト変更後にどの程度の速度でリシンクが進んでいるか確認できます。",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10,
+                "showPoints": "auto"
+              },
+              "min": 0,
+              "unit": "ops"
+            }
+          },
+          "targets": [
+            {
+              "expr": "rate(block_resync_counter{pod=~\"$pod\"}[5m])",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
