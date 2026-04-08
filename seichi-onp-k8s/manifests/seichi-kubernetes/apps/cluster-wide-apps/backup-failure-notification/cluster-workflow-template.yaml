@@ -9,7 +9,7 @@ spec:
         parameters:
           - name: title
       container:
-        image: curlimages/curl:8.18.0
+        image: curlimages/curl:8.19.0
         env:
           - name: DISCORD_WEBHOOK_URL
             valueFrom:
