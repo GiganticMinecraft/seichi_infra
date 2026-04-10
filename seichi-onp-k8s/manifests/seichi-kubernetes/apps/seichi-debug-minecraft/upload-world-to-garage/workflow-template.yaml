@@ -31,7 +31,7 @@ spec:
 
     - name: cleanup
       script:
-        image: debian:13
+        image: debian:trixie-20260406
         command: ["/bin/sh", "-c"]
         source: |
           echo "=== Cleaning up work directory ==="
@@ -46,7 +46,7 @@ spec:
         parameters:
           - name: server-name
       script:
-        image: debian:13
+        image: debian:trixie-20260406
         command: ["/bin/sh", "-c"]
         source: |
           set -e
