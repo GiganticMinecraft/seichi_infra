@@ -32,7 +32,7 @@ spec:
           masquerade: true
           distributedLRU:
             enabled: true
-          mapDynamicSizeRatio: 0.0080
+          mapDynamicSizeRatio: 0.0025
         bandwidthManager:
           enabled: true
           bbr: true
