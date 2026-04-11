@@ -216,6 +216,7 @@ variable "onp_k8s_kubechecks_argocd_api_token" {
   description = "ArgoCD API token for the kubechecks account"
   type        = string
   sensitive   = true
+  default     = ""
 }
 
 #endregion
