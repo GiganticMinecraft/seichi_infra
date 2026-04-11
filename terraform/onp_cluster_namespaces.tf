@@ -84,3 +84,9 @@ resource "kubernetes_namespace" "kyverno" {
     name = "kyverno"
   }
 }
+
+resource "kubernetes_namespace" "kubechecks" {
+  metadata {
+    name = "kubechecks"
+  }
+}

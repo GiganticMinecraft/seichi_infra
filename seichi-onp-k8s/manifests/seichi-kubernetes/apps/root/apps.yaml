@@ -200,6 +200,109 @@ spec:
             maxDuration: 2m
 ---
 apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubechecks
+  namespace: argocd
+spec:
+  project: kubechecks
+  source:
+    repoURL: https://zapier.github.io/kubechecks/
+    chart: kubechecks
+    targetRevision: 3.0.0
+    helm:
+      releaseName: kubechecks
+      values: |
+        configMap:
+          create: true
+          env:
+            KUBECHECKS_VCS_TYPE: "github"
+            KUBECHECKS_ARGOCD_API_SERVER_ADDR: "argocd-server.argocd:443"
+            KUBECHECKS_ARGOCD_API_INSECURE: "true"
+            KUBECHECKS_WEBHOOK_URL_BASE: "https://kubechecks.onp-k8s.admin.seichi.click"
+            KUBECHECKS_FALLBACK_K8S_VERSION: "1.32.1"
+            KUBECHECKS_TIDY_OUTDATED_COMMENTS_MODE: "delete"
+            KUBECHECKS_LOG_LEVEL: "info"
+            KUBECHECKS_MONITOR_ALL_APPLICATIONS: "true"
+
+        secrets:
+          create: false
+
+        deployment:
+          envFrom:
+            - secretRef:
+                name: kubechecks-github-app-secret
+
+        ingress:
+          create: false
+
+        service:
+          create: true
+          type: ClusterIP
+          port: 8080
+
+        serviceAccount:
+          create: true
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubechecks
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: -1
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kubechecks-apps
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        revision: main
+        directories:
+          - path: seichi-onp-k8s/manifests/seichi-kubernetes/apps/kubechecks/*
+  template:
+    metadata:
+      name: "kubechecks-{{path.basenameNormalized}}"
+      namespace: argocd
+    spec:
+      project: kubechecks
+      source:
+        repoURL: https://github.com/GiganticMinecraft/seichi_infra
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kubechecks
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+        retry:
+          limit: -1
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: seichi-debug-minecraft-apps

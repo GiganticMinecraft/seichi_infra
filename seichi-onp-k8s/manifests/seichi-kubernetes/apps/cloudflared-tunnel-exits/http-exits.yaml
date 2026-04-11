@@ -111,6 +111,11 @@ spec:
             external-hostname: goldilocks.onp-k8s.admin.seichi.click
             internal-authority: "goldilocks-dashboard.goldilocks:80"
 
+          # kubechecks - GitHub Webhook を受け付けるリバースプロキシ (POST のみ許可)
+          - name: kubechecks
+            external-hostname: kubechecks.onp-k8s.admin.seichi.click
+            internal-authority: "kubechecks-webhook-proxy.kubechecks:80"
+
   template:
     metadata:
       name: "cloudflared-tunnel-http-exit--{{name}}"

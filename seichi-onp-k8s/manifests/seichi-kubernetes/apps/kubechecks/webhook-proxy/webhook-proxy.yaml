@@ -1,0 +1,64 @@
+# kubechecks の Webhook エンドポイントに対して POST リクエストのみを許可するリバースプロキシ。
+# Cloudflare Tunnel 経由で外部公開されるが、不要なリクエストを遮断するために nginx を挟む。
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubechecks-webhook-proxy
+  namespace: kubechecks
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: kubechecks-webhook-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubechecks-webhook-proxy
+  namespace: kubechecks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubechecks-webhook-proxy
+  template:
+    metadata:
+      labels:
+        app: kubechecks-webhook-proxy
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29.8
+          volumeMounts:
+            - name: conf
+              mountPath: /etc/nginx/conf.d/proxy.conf
+              subPath: proxy.conf
+      volumes:
+        - name: conf
+          configMap:
+            name: kubechecks-webhook-proxy-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubechecks-webhook-proxy-config
+  namespace: kubechecks
+data:
+  proxy.conf: |
+    server_names_hash_bucket_size 128;
+
+    server {
+      listen 80;
+      server_name kubechecks.onp-k8s.admin.seichi.click;
+      location /hooks {
+        limit_except POST {
+          deny all;
+        }
+        proxy_pass http://kubechecks.kubechecks:8080;
+        proxy_request_buffering off;
+      }
+    }
