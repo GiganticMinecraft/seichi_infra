@@ -329,6 +329,23 @@ resource "kubernetes_secret" "truenas_exporter_api_key" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "onp_kubechecks_github_app_secret" {
+  depends_on = [kubernetes_namespace.kubechecks]
+
+  metadata {
+    name      = "kubechecks-github-app-secret"
+    namespace = "kubechecks"
+  }
+
+  data = {
+    KUBECHECKS_GITHUB_APP_ID          = var.onp_k8s_kubechecks_github_app_id
+    KUBECHECKS_GITHUB_INSTALLATION_ID = var.onp_k8s_kubechecks_github_app_installation_id
+    KUBECHECKS_GITHUB_PRIVATE_KEY     = var.onp_k8s_kubechecks_github_app_pem
+  }
+
+  type = "Opaque"
+}
+
 resource "random_password" "minecraft__prod_mariadb_pr_review_password" {
   length  = 16
   special = false // MariaDBのパスワードがぶっ壊れて困るので記号を含めない

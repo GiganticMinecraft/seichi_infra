@@ -68,9 +68,9 @@ Kubernetes 上で動いている(ArgoCD 以外の)すべての追加リソース
 
 Terraform Cloud に登録すべき認証情報等のより詳細な情報は [`main.tf`](../../../terraform/main.tf) の variable 定義を参照してください。
 
-## ArgoCD Diff CI
+## ArgoCD Diff チェック (kubechecks)
 
-`seichi-onp-k8s/manifests/seichi-kubernetes/` 配下のファイルが変更された PR では、GitHub Actions が `argocd app diff` を実行し、差分やエラーがある場合に PR コメントとして結果を投稿します。
+PR に対する ArgoCD の diff チェックは [kubechecks](https://github.com/zapier/kubechecks) によって行われます。kubechecks はクラスタ内に常駐し、GitHub Webhook 経由で PR イベントを受信して `argocd app diff` を実行し、結果を PR コメントとして投稿します。
 
 ## 注意事項(主にレビュアーや運営チームな方向け)
 本リポジトリはPublicリポジトリを想定し、seichi.click networkに関する公開可能なインフラ構成についての情報を取り扱っています。コントリビュート/レビューにあたっては以下の点に留意してください。
