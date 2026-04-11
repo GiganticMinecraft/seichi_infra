@@ -212,6 +212,12 @@ variable "onp_k8s_kubechecks_github_app_pem" {
   sensitive   = true
 }
 
+variable "onp_k8s_kubechecks_argocd_api_token" {
+  description = "ArgoCD API token for the kubechecks account"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise Grafana to GitHub integration

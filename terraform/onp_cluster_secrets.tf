@@ -341,6 +341,7 @@ resource "kubernetes_secret" "onp_kubechecks_github_app_secret" {
     KUBECHECKS_GITHUB_APP_ID          = var.onp_k8s_kubechecks_github_app_id
     KUBECHECKS_GITHUB_INSTALLATION_ID = var.onp_k8s_kubechecks_github_app_installation_id
     KUBECHECKS_GITHUB_PRIVATE_KEY     = var.onp_k8s_kubechecks_github_app_pem
+    KUBECHECKS_ARGOCD_API_TOKEN       = var.onp_k8s_kubechecks_argocd_api_token
   }
 
   type = "Opaque"
