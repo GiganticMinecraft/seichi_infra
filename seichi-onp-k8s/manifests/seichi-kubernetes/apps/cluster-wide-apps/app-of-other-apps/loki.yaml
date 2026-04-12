@@ -49,6 +49,11 @@ spec:
             volume_enabled: true
             ingestion_rate_mb: 8
             ingestion_burst_size_mb: 16
+            # Kubernetes audit log の RequestResponse エントリは
+            # デフォルト 256KB を超えることがある (observed: ~490KB)。
+            # 超過時はドロップではなく切り詰めにして可観測性を維持する。
+            max_line_size: 1MB
+            max_line_size_truncate: true
           ruler:
             enable_api: true
 
