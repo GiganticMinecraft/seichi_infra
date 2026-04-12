@@ -116,6 +116,50 @@ spec:
             presets: [singleton]
           alloy-logs:
             presets: [daemonset, filesystem-log-reader]
+            # k8s-monitoring Helm chart は alloy-logs 以外の任意名 collector を
+            # サポートしないため、audit log 収集を alloy-logs に同居させている。
+            # /var/log/kubernetes/audit/ は CP ノードにしか存在しないので、
+            # worker の alloy-logs では local.file_match が空 targets を返し、
+            # 実質的に CP ノードのみで audit log が収集される。
+            extraConfig: |-
+              local.file_match "k8s_audit" {
+                path_targets = [{
+                  __path__ = "/var/log/kubernetes/audit/audit*.log",
+                  job      = "integrations/kubernetes/audit",
+                  instance = sys.env("HOSTNAME"),
+                  cluster  = "seichi-cloud",
+                }]
+              }
+
+              loki.source.file "k8s_audit" {
+                targets       = local.file_match.k8s_audit.targets
+                forward_to    = [loki.process.k8s_audit.receiver]
+                tail_from_end = true
+              }
+
+              loki.process "k8s_audit" {
+                // audit イベントは 1 行 1 JSON。
+                // user.username や objectRef.resource/namespace をラベル化すると
+                // カーディナリティが爆発して Loki が劣化するので、
+                // 低カーディナリティな level のみラベル化し、他は log 本文の JSON で検索する
+                // (Grafana Explore では `| json | user_username="..."` で絞り込める)
+                stage.json {
+                  expressions = {
+                    audit_level = "level",
+                  }
+                }
+                stage.labels {
+                  values = {
+                    level = "audit_level",
+                  }
+                }
+                stage.static_labels {
+                  values = {
+                    source = "k8s-audit",
+                  }
+                }
+                forward_to = [loki.write.localloki.receiver]
+              }
           alloy-receiver:
             presets: [deployment]
             extraConfig: |-
