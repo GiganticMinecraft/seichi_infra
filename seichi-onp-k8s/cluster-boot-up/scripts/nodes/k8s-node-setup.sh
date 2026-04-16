@@ -211,7 +211,6 @@ global
     user haproxy
     group haproxy
     daemon
-    ssl-server-verify none
 defaults
     log     global
     mode    http
@@ -241,9 +240,9 @@ backend k8s-api
     http-check expect status 200
     balance roundrobin
     default-server inter 5s downinter 2s rise 2 fall 3 slowstart 60s maxconn 250 maxqueue 256 weight 100
-    server k8s-api-1 ${NODE_IPS[0]}:6443 check
-    server k8s-api-2 ${NODE_IPS[1]}:6443 check
-    server k8s-api-3 ${NODE_IPS[2]}:6443 check
+    server k8s-api-1 ${NODE_IPS[0]}:6443 check verify required ca-file /etc/kubernetes/pki/ca.crt
+    server k8s-api-2 ${NODE_IPS[1]}:6443 check verify required ca-file /etc/kubernetes/pki/ca.crt
+    server k8s-api-3 ${NODE_IPS[2]}:6443 check verify required ca-file /etc/kubernetes/pki/ca.crt
 EOF
 
 # Install Keepalived
