@@ -35,6 +35,7 @@ spec:
     innodb_io_capacity_max = 3000
     max_allowed_packet = 256M
     performance_schema=on
+    performance_schema_instrument='memory/%=ON'
     max-connections=400
     join_buffer_size=256K
 
@@ -49,6 +50,12 @@ spec:
   env:
     - name: TZ
       value: SYSTEM
+    # glibc malloc は thread-per-connection ワークロードで arena 断片化を起こし、
+    # buffer pool (8G) を大きく超えて RSS が膨れ上がる。
+    # 公式 image に同梱されている jemalloc に切り替えて RSS を抑える。
+    # 実測では RSS が limit (16Gi) の 96% 超まで張り付いていた。
+    - name: LD_PRELOAD
+      value: /usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
   podSecurityContext:
     runAsUser: 0
