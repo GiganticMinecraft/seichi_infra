@@ -49,6 +49,12 @@ spec:
   env:
     - name: TZ
       value: SYSTEM
+    # glibc malloc は thread-per-connection ワークロードで arena 断片化を起こし、
+    # buffer pool (8G) を大きく超えて RSS が膨れ上がる。
+    # 公式 image に同梱されている jemalloc に切り替えて RSS を抑える。
+    # 実測では RSS が limit (16Gi) の 96% 超まで張り付いていた。
+    - name: LD_PRELOAD
+      value: /usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
   podSecurityContext:
     runAsUser: 0
