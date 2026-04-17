@@ -194,19 +194,21 @@ data:
           "type": "row"
         },
         {
-          "datasource": { "type": "loki", "uid": "${loki_ds}" },
-          "description": "Where are slow queries concentrated in time? Heatmap of query_time from structured_metadata. Complements the existing mariadb-slow-queries dashboard's rate panels (which aggregate digest-level) by showing raw per-event distribution.",
+          "datasource": { "type": "prometheus", "uid": "${prometheus_ds}" },
+          "description": "Where are slow queries concentrated in time and at what latency? Native heatmap from the loki.process histogram buckets that Alloy emits (stage.metrics). Complements existing rate-based digest panels by showing raw per-event distribution across query_time buckets (0.1 / 0.25 / 0.5 / 1 / 2 / 5 / 10 s).",
           "fieldConfig": { "defaults": { "unit": "s" } },
           "gridPos": { "h": 10, "w": 24, "x": 0, "y": 14 },
           "id": 7,
           "options": {
-            "calculate": true,
+            "calculate": false,
             "yAxis": { "unit": "s", "decimals": 2 }
           },
           "targets": [
             {
-              "datasource": { "type": "loki", "uid": "${loki_ds}" },
-              "expr": "sum(rate({source=\"mariadb-slow\", pod=~\"$pod\"} | unwrap query_time | __error__=\"\" [$__interval]))",
+              "datasource": { "type": "prometheus", "uid": "${prometheus_ds}" },
+              "expr": "sum by (le) (rate(loki_process_custom_mariadb_slow_query_seconds_bucket{exported_namespace=\"seichi-minecraft\", exported_pod=~\"$pod\"}[$__rate_interval]))",
+              "format": "heatmap",
+              "legendFormat": "{{le}}",
               "queryType": "range",
               "refId": "A"
             }
@@ -263,6 +265,20 @@ data:
             "name": "loki_ds",
             "options": [],
             "query": "loki",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Prometheus Datasource",
+            "multi": false,
+            "name": "prometheus_ds",
+            "options": [],
+            "query": "prometheus",
             "refresh": 1,
             "regex": "",
             "skipUrlSync": false,
