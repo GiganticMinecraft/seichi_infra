@@ -46,6 +46,7 @@ data:
             {
               "datasource": { "type": "loki", "uid": "${loki_ds}" },
               "expr": "sum by (user) (count_over_time({source=\"mariadb-slow\", pod=~\"$pod\"}[$__interval]))",
+              "legendFormat": "{{user}}",
               "queryType": "range",
               "refId": "A"
             }
