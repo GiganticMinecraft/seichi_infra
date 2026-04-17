@@ -57,6 +57,36 @@ spec:
     - name: LD_PRELOAD
       value: /usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
+  # slow log をファイル (/var/log/mysql/mysql-slow.log) から sidecar 経由で
+  # stdout に流すための emptyDir。mariadb-operator は spec.volumes / spec.volumeMounts を
+  # primary container と sidecar container の両方に自動伝播するため、sidecar 側で
+  # 同じ mountPath を書くと "must be unique" エラーになる。
+  volumes:
+    - name: slow-log
+      emptyDir: {}
+  volumeMounts:
+    - name: slow-log
+      mountPath: /var/log/mysql
+
+  sidecarContainers:
+    # MariaDB は slow log を stdout に書けない (MDEV-26625、/dev/stderr は権限降格後に open 不可)
+    # ため、ファイル → 共有 emptyDir → sidecar tail -F → stdout という経路で
+    # kubelet の pod log 回収経路に乗せ、Alloy が拾えるようにする。
+    - name: slow-log-tailer
+      image: busybox:1.37.0
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          until [ -f /var/log/mysql/mysql-slow.log ]; do sleep 1; done
+          exec tail -n +1 -F /var/log/mysql/mysql-slow.log
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi
+
   podSecurityContext:
     runAsUser: 0
 
