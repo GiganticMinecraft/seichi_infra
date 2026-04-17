@@ -374,7 +374,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 67 },
           "id": 61,
-          "options": { "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+          "options": { "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true, "sortBy": "Last *", "sortDesc": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
           "targets": [
             { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "topk(10, mysql_perf_schema_memory_events_used_bytes{instance=~\"$instance\"})", "legendFormat": "{{event_name}}", "refId": "A" }
           ],
