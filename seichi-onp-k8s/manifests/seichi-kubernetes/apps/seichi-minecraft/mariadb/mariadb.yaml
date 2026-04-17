@@ -84,6 +84,14 @@ spec:
     # ウォームアップクエリは運用上重要ではないのでそのトレードオフを受け入れる。
     - name: slow-log-tailer
       image: busybox:1.37.0
+      # mariadb-operator は spec.env を primary と sidecar の両方に伝播する。
+      # primary 用の LD_PRELOAD=jemalloc が busybox sidecar にも適用されると、
+      # jemalloc が無いため ld.so が "cannot be preloaded" と毎プロセス ERROR 行を
+      # stdout に吐き、Alloy の multiline パイプラインに紛れ込んで slow log を汚す。
+      # sidecar 側で空に上書きして無効化する。
+      env:
+        - name: LD_PRELOAD
+          value: ""
       command: ["/bin/sh", "-c"]
       args:
         - |
