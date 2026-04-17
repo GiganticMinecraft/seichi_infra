@@ -1,0 +1,331 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-slow-log-loki-dashboard
+  namespace: seichi-minecraft
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "MariaDB"
+data:
+  mariadb-slow-log-loki.json: |
+    {
+      "annotations": { "list": [] },
+      "description": "MariaDB slow query log collected from the slow-log-tailer sidecar via Loki. Uses structured_metadata (query_time, rows_examined, etc.) emitted by the Alloy loki.process.mariadb_slow pipeline.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "panels": [],
+          "title": "Overview",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Slow query count per minute grouped by user. Spike = unusual workload or a new offender.",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 60,
+                "lineWidth": 1,
+                "stacking": { "group": "A", "mode": "normal" }
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+          "id": 1,
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "sum by (user) (count_over_time({source=\"mariadb-slow\", pod=~\"$pod\"}[$__interval]))",
+              "legendFormat": "{{user}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Slow queries / $__interval (by user)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Query_time percentiles computed from structured_metadata. P95 spikes indicate emerging hot paths.",
+          "fieldConfig": { "defaults": { "unit": "s" } },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+          "id": 2,
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "quantile_over_time(0.50, {source=\"mariadb-slow\", pod=~\"$pod\"} | unwrap query_time | __error__=\"\" [$__interval])",
+              "legendFormat": "P50",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "quantile_over_time(0.95, {source=\"mariadb-slow\", pod=~\"$pod\"} | unwrap query_time | __error__=\"\" [$__interval])",
+              "legendFormat": "P95",
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "quantile_over_time(0.99, {source=\"mariadb-slow\", pod=~\"$pod\"} | unwrap query_time | __error__=\"\" [$__interval])",
+              "legendFormat": "P99",
+              "refId": "C"
+            }
+          ],
+          "title": "query_time percentiles (s)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Total slow queries in the selected time range.",
+          "fieldConfig": { "defaults": { "unit": "short" } },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 9 },
+          "id": 3,
+          "options": { "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false } },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "sum(count_over_time({source=\"mariadb-slow\", pod=~\"$pod\"}[$__range]))",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Total slow queries",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Slow queries taking longer than 1 second — escalation threshold.",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "orange", "value": 1 },
+                  { "color": "red", "value": 10 }
+                ]
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 9 },
+          "id": 4,
+          "options": {
+            "colorMode": "background",
+            "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "sum(count_over_time({source=\"mariadb-slow\", pod=~\"$pod\"} | query_time > 1 [$__range]))",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Queries > 1s",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Queries reading > 10,000 rows — potential missing-index candidates.",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "orange", "value": 1 }
+                ]
+              },
+              "unit": "short"
+            }
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 9 },
+          "id": 5,
+          "options": {
+            "colorMode": "background",
+            "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "sum(count_over_time({source=\"mariadb-slow\", pod=~\"$pod\"} | rows_examined > 10000 [$__range]))",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Queries examining > 10k rows",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Distinct users seen in the time range.",
+          "fieldConfig": { "defaults": { "unit": "short" } },
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 9 },
+          "id": 6,
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "count(count by (user) (count_over_time({source=\"mariadb-slow\", pod=~\"$pod\"}[$__range])))",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Distinct users",
+          "type": "stat"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+          "id": 102,
+          "panels": [],
+          "title": "query_time distribution (heatmap)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${prometheus_ds}" },
+          "description": "Where are slow queries concentrated in time and at what latency? Native heatmap from the loki.process histogram buckets that Alloy emits (stage.metrics). Complements existing rate-based digest panels by showing raw per-event distribution across query_time buckets (0.1 / 0.25 / 0.5 / 1 / 2 / 5 / 10 s).",
+          "fieldConfig": { "defaults": { "unit": "s" } },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 14 },
+          "id": 7,
+          "options": {
+            "calculate": false,
+            "yAxis": { "unit": "s", "decimals": 2 }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${prometheus_ds}" },
+              "expr": "sum by (le) (rate(loki_process_custom_mariadb_slow_query_seconds_bucket{exported_namespace=\"seichi-minecraft\", exported_pod=~\"$pod\"}[$__rate_interval]))",
+              "format": "heatmap",
+              "legendFormat": "{{le}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "query_time heatmap",
+          "type": "heatmap"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
+          "id": 101,
+          "panels": [],
+          "title": "Raw slow queries",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Individual slow queries with bind values. Each entry is one slow log event (multi-line) with structured_metadata fields shown as badges.",
+          "gridPos": { "h": 16, "w": 24, "x": 0, "y": 25 },
+          "id": 10,
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "{source=\"mariadb-slow\", pod=~\"$pod\"} | query_time > $min_query_time",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Slow queries (query_time > $min_query_time s)",
+          "type": "logs"
+        }
+      ],
+      "refresh": "30s",
+      "schemaVersion": 39,
+      "tags": ["mariadb", "loki", "slow-query"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": false, "text": "Loki", "value": "Loki" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Loki Datasource",
+            "multi": false,
+            "name": "loki_ds",
+            "options": [],
+            "query": "loki",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Prometheus Datasource",
+            "multi": false,
+            "name": "prometheus_ds",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "loki", "uid": "${loki_ds}" },
+            "definition": "",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Pod",
+            "multi": true,
+            "name": "pod",
+            "options": [],
+            "query": { "label": "pod", "refId": "LokiVariableQueryEditor-VariableQuery", "stream": "{source=\"mariadb-slow\"}", "type": 1 },
+            "refresh": 2,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "current": { "selected": false, "text": "0.1", "value": "0.1" },
+            "hide": 0,
+            "label": "Min query_time (s)",
+            "name": "min_query_time",
+            "options": [
+              { "selected": false, "text": "0", "value": "0" },
+              { "selected": false, "text": "0.05", "value": "0.05" },
+              { "selected": true, "text": "0.1", "value": "0.1" },
+              { "selected": false, "text": "0.5", "value": "0.5" },
+              { "selected": false, "text": "1", "value": "1" },
+              { "selected": false, "text": "5", "value": "5" }
+            ],
+            "query": "0, 0.05, 0.1, 0.5, 1, 5",
+            "type": "custom"
+          }
+        ]
+      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": {},
+      "timezone": "Asia/Tokyo",
+      "title": "MariaDB Slow Query Log (Loki)",
+      "uid": "mariadb-slow-log-loki",
+      "version": 1,
+      "weekStart": ""
+    }
