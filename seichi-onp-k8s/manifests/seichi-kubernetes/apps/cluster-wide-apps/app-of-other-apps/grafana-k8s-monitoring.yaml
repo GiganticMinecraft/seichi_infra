@@ -160,6 +160,109 @@ spec:
                 }
                 forward_to = [loki.write.localloki.receiver]
               }
+
+              // ---- MariaDB slow query log parsing ----
+              // mariadb Pod に同居する "slow-log-tailer" sidecar が slow log を pod stdout に
+              // 中継している。default の podLogsViaLoki でも line-by-line で Loki に届くが、
+              // それとは別に multiline で 1 イベントに再結合し、structured_metadata を付けて
+              // Prometheus ヒストグラムも併発行する。
+              discovery.kubernetes "mariadb_slow" {
+                role = "pod"
+                selectors {
+                  role  = "pod"
+                  field = "spec.nodeName=" + sys.env("HOSTNAME")
+                }
+              }
+
+              discovery.relabel "mariadb_slow" {
+                targets = discovery.kubernetes.mariadb_slow.targets
+
+                rule {
+                  source_labels = ["__meta_kubernetes_pod_container_name"]
+                  regex         = "slow-log-tailer"
+                  action        = "keep"
+                }
+                rule {
+                  source_labels = ["__meta_kubernetes_namespace"]
+                  target_label  = "namespace"
+                }
+                rule {
+                  source_labels = ["__meta_kubernetes_pod_name"]
+                  target_label  = "pod"
+                }
+                rule {
+                  source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+                  separator     = "/"
+                  replacement   = "/var/log/pods/*$1/*.log"
+                  target_label  = "__path__"
+                }
+              }
+
+              // loki.source.file はグロブ展開をしないので、必ず local.file_match を挟む。
+              local.file_match "mariadb_slow" {
+                path_targets = discovery.relabel.mariadb_slow.output
+              }
+
+              loki.source.file "mariadb_slow" {
+                targets       = local.file_match.mariadb_slow.targets
+                forward_to    = [loki.process.mariadb_slow.receiver]
+                tail_from_end = true
+              }
+
+              loki.process "mariadb_slow" {
+                // containerd の pod log ヘッダを剥がす
+                stage.cri {}
+
+                // MariaDB は同じ秒のクエリでは "# Time:" を省略するので、
+                // 毎イベント必ず出現する "# User@Host:" を境界にする。
+                // 先頭の "# Time:" 行は前イベントの末尾に混ざるが regex で読み飛ばすので OK。
+                stage.multiline {
+                  firstline     = "^# User@Host:"
+                  max_wait_time = "3s"
+                  max_lines     = 500
+                }
+
+                // "\\S+" は "root[root]" を greedy に食って後続の "[" で fail するので、
+                // user は "[^\\[]+" で "[" の手前までを捕まえる。
+                stage.regex {
+                  expression = "(?s)User@Host:\\s+(?P<user>[^\\[]+)\\[.*?Query_time:\\s+(?P<query_time>[\\d.]+)\\s+Lock_time:\\s+(?P<lock_time>[\\d.]+)\\s+Rows_sent:\\s+(?P<rows_sent>\\d+)\\s+Rows_examined:\\s+(?P<rows_examined>\\d+)"
+                }
+
+                // 低カーディナリティだけ label 化
+                stage.labels {
+                  values = {
+                    user = "",
+                  }
+                }
+                stage.static_labels {
+                  values = {
+                    source = "mariadb-slow",
+                  }
+                }
+
+                // 高カーディナリティは structured_metadata (Loki v3 で index されない)
+                stage.structured_metadata {
+                  values = {
+                    query_time    = "",
+                    lock_time     = "",
+                    rows_examined = "",
+                    rows_sent     = "",
+                  }
+                }
+
+                // Prometheus ヒストグラムとしても発行
+                // (Alloy の命名規則で "loki_process_custom_" プレフィックスが付く)
+                stage.metrics {
+                  metric.histogram {
+                    name        = "mariadb_slow_query_seconds"
+                    description = "MariaDB slow query execution time (seconds)"
+                    source      = "query_time"
+                    buckets     = [0.1, 0.25, 0.5, 1, 2, 5, 10]
+                  }
+                }
+
+                forward_to = [loki.write.localloki.receiver]
+              }
           alloy-receiver:
             presets: [deployment]
             extraConfig: |-
