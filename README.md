@@ -34,3 +34,4 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
 ただし、BungeeCordのサービス定義は、[著作権で保護されている、まいんちゃんのサーバーアイコン](https://github.com/GiganticMinecraft/branding)をダウンロードして利用するように設定されています。当該設定を流用する場合は[`branding` レポジトリ](https://github.com/GiganticMinecraft/branding)の利用許諾に記載されている条件に従う必要があるため、以下のどちらかを満たすように設定してください：
  - BungeeCord の Deployment リソースでのサーバーアイコンのURL指定(`SERVER_ICON_URL` 環境変数)をまいんちゃんアイコン以外のものに差し替える
  - 不特定多数が BungeeCord に接続できないようにする
+# kubechecks test
