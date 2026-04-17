@@ -227,7 +227,7 @@ data:
         },
         {
           "datasource": { "type": "loki", "uid": "${loki_ds}" },
-          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。structured_metadata (query_time / rows_examined / rows_sent / lock_time / user / db) を列として展開する。",
+          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。Loki API の direction=backward (default) で新しい順に最大 20000 行取得後 client-side sort するため、極端に長い時間範囲 (7d 以上など) では古い時間帯の slow query が母集団から漏れる可能性あり。通常の運用レンジ (1h〜24h) では全量カバー可能。",
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -324,7 +324,7 @@ data:
             {
               "datasource": { "type": "loki", "uid": "${loki_ds}" },
               "expr": "{source=\"mariadb-slow\", pod=~\"$pod\"} | query_time > $min_query_time",
-              "maxLines": 5000,
+              "maxLines": 20000,
               "queryType": "range",
               "refId": "A"
             }
@@ -333,6 +333,14 @@ data:
             {
               "id": "extractFields",
               "options": { "source": "labels" }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": ["Time", "query_time", "rows_examined", "rows_sent", "lock_time", "user", "Line"]
+                }
+              }
             },
             {
               "id": "convertFieldType",
@@ -361,12 +369,7 @@ data:
             {
               "id": "organize",
               "options": {
-                "excludeByName": {
-                  "id": true,
-                  "tsNs": true,
-                  "labels": true,
-                  "labelTypes": true
-                },
+                "excludeByName": {},
                 "indexByName": {
                   "Time": 0,
                   "query_time": 1,
@@ -374,8 +377,7 @@ data:
                   "rows_sent": 3,
                   "lock_time": 4,
                   "user": 5,
-                  "db": 6,
-                  "Line": 7
+                  "Line": 6
                 },
                 "renameByName": {}
               }
