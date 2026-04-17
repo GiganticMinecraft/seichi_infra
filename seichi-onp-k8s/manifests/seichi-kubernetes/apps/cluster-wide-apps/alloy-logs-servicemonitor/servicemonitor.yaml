@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: alloy-logs
+  namespace: monitoring
+  labels:
+    # kube-prometheus-stack の Prometheus は podMonitorSelector / serviceMonitorSelector を
+    # matchLabels: {release: prometheus} で絞っているので、この label が無いと無視される。
+    release: prometheus
+spec:
+  # k8s-monitoring chart が作る Service: k8s-monitoring-alloy-logs
+  # 目的: alloy-logs が loki.process 内の stage.metrics で発行する
+  # loki_process_custom_mariadb_slow_query_seconds_* ヒストグラム等を Prometheus に取り込む。
+  # clusterMetrics.enabled が false (kube-prometheus-stack 側で K8s metrics を取っているため) の設定下で
+  # alloy-logs 自身の自己 metrics と loki.process 経由で emit される custom metrics を
+  # 拾うためには別経路の scrape 設定が必要で、それが本 ServiceMonitor。
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-logs
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+      # 6 node (worker + CP) それぞれの alloy-logs pod が持つ自己メトリクスを取得する。
+      # pod ごとに node label が付くので Prometheus 側で分かる。
