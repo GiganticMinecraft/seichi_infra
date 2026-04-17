@@ -61,24 +61,34 @@ spec:
   # stdout に流すための emptyDir。mariadb-operator は spec.volumes / spec.volumeMounts を
   # primary container と sidecar container の両方に自動伝播するため、sidecar 側で
   # 同じ mountPath を書くと "must be unique" エラーになる。
+  # sizeLimit: MariaDB slow log は自動ローテーションされない。実測 ~230 KB/h なので
+  # 500Mi = ~3 ヶ月分。想定外の増加でノードの ephemeral storage を巻き込む前に
+  # Pod が eviction される上限として設定する。
   volumes:
     - name: slow-log
-      emptyDir: {}
+      emptyDir:
+        sizeLimit: 500Mi
   volumeMounts:
     - name: slow-log
       mountPath: /var/log/mysql
 
   sidecarContainers:
     # MariaDB は slow log を stdout に書けない (MDEV-26625、/dev/stderr は権限降格後に open 不可)
-    # ため、ファイル → 共有 emptyDir → sidecar tail -F → stdout という経路で
+    # ため、ファイル → 共有 emptyDir → sidecar tail → stdout という経路で
     # kubelet の pod log 回収経路に乗せ、Alloy が拾えるようにする。
+    #
+    # tail はデフォルトの末尾から開始 ("-n +1" を付けない)。sidecar 再起動時に
+    # 既存 slow log を先頭から再送してしまうと Loki 側で重複ストリームになり、
+    # loki_process_custom_mariadb_slow_query_seconds_* の累積値が歪む。
+    # 初回起動時の数百 ms 分の slow log は失うが、mariadb 起動直後の
+    # ウォームアップクエリは運用上重要ではないのでそのトレードオフを受け入れる。
     - name: slow-log-tailer
       image: busybox:1.37.0
       command: ["/bin/sh", "-c"]
       args:
         - |
           until [ -f /var/log/mysql/mysql-slow.log ]; do sleep 1; done
-          exec tail -n +1 -F /var/log/mysql/mysql-slow.log
+          exec tail -F /var/log/mysql/mysql-slow.log
       resources:
         requests:
           cpu: 10m
