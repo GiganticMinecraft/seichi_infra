@@ -188,6 +188,35 @@ data:
         {
           "collapsed": false,
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+          "id": 102,
+          "panels": [],
+          "title": "query_time distribution (heatmap)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Where are slow queries concentrated in time? Heatmap of query_time from structured_metadata. Complements the existing mariadb-slow-queries dashboard's rate panels (which aggregate digest-level) by showing raw per-event distribution.",
+          "fieldConfig": { "defaults": { "unit": "s" } },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 14 },
+          "id": 7,
+          "options": {
+            "calculate": true,
+            "yAxis": { "unit": "s", "decimals": 2 }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "sum(rate({source=\"mariadb-slow\", pod=~\"$pod\"} | unwrap query_time | __error__=\"\" [$__interval]))",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "query_time heatmap",
+          "type": "heatmap"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
           "id": 101,
           "panels": [],
           "title": "Raw slow queries",
@@ -196,7 +225,7 @@ data:
         {
           "datasource": { "type": "loki", "uid": "${loki_ds}" },
           "description": "Individual slow queries with bind values. Each entry is one slow log event (multi-line) with structured_metadata fields shown as badges.",
-          "gridPos": { "h": 16, "w": 24, "x": 0, "y": 14 },
+          "gridPos": { "h": 16, "w": 24, "x": 0, "y": 25 },
           "id": 10,
           "options": {
             "dedupStrategy": "none",
