@@ -506,6 +506,162 @@ data:
           ],
           "title": "Total Table Size (all DBs)",
           "type": "stat"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 96 },
+          "id": 108,
+          "panels": [],
+          "title": "Storage",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "PVC (storage-mariadb-0) の使用率。80% を超えたら容量拡張・不要テーブル削除を検討。",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "min": 0,
+              "max": 100,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green",  "value": null },
+                  { "color": "orange", "value": 70 },
+                  { "color": "red",    "value": 85 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "gridPos": { "h": 5, "w": 6, "x": 0, "y": 97 },
+          "id": 80,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "kubelet_volume_stats_used_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"} / kubelet_volume_stats_capacity_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"} * 100",
+              "legendFormat": "usage %",
+              "refId": "A"
+            }
+          ],
+          "title": "Disk Usage %",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "現在使用中の物理データ量 / PVC 総容量。",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "unit": "decbytes"
+            }
+          },
+          "gridPos": { "h": 5, "w": 6, "x": 6, "y": 97 },
+          "id": 81,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "kubelet_volume_stats_used_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"}",
+              "legendFormat": "used",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "kubelet_volume_stats_capacity_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"}",
+              "legendFormat": "capacity",
+              "refId": "B"
+            }
+          ],
+          "title": "Disk Used / Capacity",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "使用量の時系列推移。右肩上がりの急勾配は予想外の書き込み発生を示唆。Total Table Size (all DBs) と対比すると、DB 以外 (binlog、slow log、tmp 等) の使用量も推定できる。",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "lineWidth": 2
+              },
+              "unit": "decbytes"
+            }
+          },
+          "gridPos": { "h": 10, "w": 12, "x": 12, "y": 97 },
+          "id": 82,
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "kubelet_volume_stats_used_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"}",
+              "legendFormat": "used",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "kubelet_volume_stats_capacity_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"}",
+              "legendFormat": "capacity",
+              "refId": "B"
+            }
+          ],
+          "title": "Disk Usage Over Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "直近 1 週間の傾きから現容量に達するまでの予測日数。急激な変動があると値が揺れるので傾向の目安として使う。",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red",    "value": null },
+                  { "color": "orange", "value": 30 },
+                  { "color": "green",  "value": 180 }
+                ]
+              },
+              "unit": "d",
+              "decimals": 0
+            }
+          },
+          "gridPos": { "h": 5, "w": 12, "x": 0, "y": 102 },
+          "id": 83,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "(kubelet_volume_stats_capacity_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"} - kubelet_volume_stats_used_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"}) / clamp_min(deriv(kubelet_volume_stats_used_bytes{namespace=\"seichi-minecraft\", persistentvolumeclaim=\"storage-mariadb-0\"}[7d]), 1) / 86400",
+              "legendFormat": "days until full",
+              "refId": "A"
+            }
+          ],
+          "title": "Est. Days Until Full (7d trend)",
+          "type": "stat"
         }
       ],
       "refresh": "30s",
