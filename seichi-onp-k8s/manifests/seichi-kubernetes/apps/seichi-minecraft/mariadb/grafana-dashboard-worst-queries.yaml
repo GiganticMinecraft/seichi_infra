@@ -1,0 +1,235 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-worst-queries-dashboard
+  namespace: seichi-minecraft
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "MariaDB"
+data:
+  mariadb-worst-queries.json: |
+    {
+      "annotations": { "list": [] },
+      "description": "Which MariaDB query patterns should you optimize first? Top digests from performance_schema ranked by total DB time / avg time / rows examined, combined with a Loki heatmap of query_time distribution and raw queries with bind values.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "panels": [],
+          "title": "Top queries by TOTAL DB time (from performance_schema digest)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "description": "Query patterns sorted by total time the DB spent on them. This is the #1 signal for 'what to optimize'. Equivalent to pt-query-digest's 'Rank by total response time'. Updated whenever performance_schema.events_statements_summary_by_digest is refreshed (continuous).",
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "align": "left", "cellOptions": { "type": "auto" } }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "digest_pattern" },
+                "properties": [{ "id": "custom.width", "value": 520 }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "total_seconds" },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } },
+                  { "id": "color", "value": { "mode": "continuous-YlRd" } }
+                ]
+              },
+              { "matcher": { "id": "byName", "options": "avg_ms" }, "properties": [{ "id": "unit", "value": "ms" }] },
+              { "matcher": { "id": "byName", "options": "max_ms" }, "properties": [{ "id": "unit", "value": "ms" }] }
+            ]
+          },
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 1 },
+          "id": 1,
+          "options": { "footer": { "show": false } },
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT LEFT(DIGEST_TEXT, 200) AS digest_pattern, SCHEMA_NAME AS schema_name, COUNT_STAR AS exec_count, ROUND(SUM_TIMER_WAIT/1e12, 3) AS total_seconds, ROUND(AVG_TIMER_WAIT/1e9, 3) AS avg_ms, ROUND(MAX_TIMER_WAIT/1e9, 3) AS max_ms, SUM_ROWS_EXAMINED AS rows_examined_total, ROUND(SUM_ROWS_EXAMINED / NULLIF(COUNT_STAR,0), 1) AS avg_rows_examined FROM performance_schema.events_statements_summary_by_digest WHERE DIGEST_TEXT IS NOT NULL AND LAST_SEEN > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY SUM_TIMER_WAIT DESC LIMIT 20",
+              "refId": "A"
+            }
+          ],
+          "title": "Top 20 queries by total DB time (last 1h)",
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+          "id": 101,
+          "panels": [],
+          "title": "Other angles",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "description": "Queries that are slow per-execution even if infrequent. High max_ms with low exec_count = individual outliers.",
+          "fieldConfig": {
+            "defaults": { "custom": { "align": "left" } },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "digest_pattern" }, "properties": [{ "id": "custom.width", "value": 360 }] },
+              { "matcher": { "id": "byName", "options": "avg_ms" }, "properties": [{ "id": "unit", "value": "ms" }] },
+              { "matcher": { "id": "byName", "options": "max_ms" }, "properties": [{ "id": "unit", "value": "ms" }] }
+            ]
+          },
+          "gridPos": { "h": 10, "w": 12, "x": 0, "y": 14 },
+          "id": 2,
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT LEFT(DIGEST_TEXT, 150) AS digest_pattern, SCHEMA_NAME AS schema_name, COUNT_STAR AS cnt, ROUND(AVG_TIMER_WAIT/1e9, 2) AS avg_ms, ROUND(MAX_TIMER_WAIT/1e9, 2) AS max_ms FROM performance_schema.events_statements_summary_by_digest WHERE DIGEST_TEXT IS NOT NULL AND COUNT_STAR >= 1 AND LAST_SEEN > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY AVG_TIMER_WAIT DESC LIMIT 10",
+              "refId": "A"
+            }
+          ],
+          "title": "Top 10 by AVG query time (individually slow)",
+          "type": "table"
+        },
+        {
+          "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+          "description": "Queries reading the most rows total. Candidates for missing indexes or overly-broad WHERE clauses.",
+          "fieldConfig": {
+            "defaults": { "custom": { "align": "left" } },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "digest_pattern" }, "properties": [{ "id": "custom.width", "value": 360 }] }
+            ]
+          },
+          "gridPos": { "h": 10, "w": 12, "x": 12, "y": 14 },
+          "id": 3,
+          "targets": [
+            {
+              "datasource": { "type": "mysql", "uid": "${mariadb_ds}" },
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT LEFT(DIGEST_TEXT, 150) AS digest_pattern, SCHEMA_NAME AS schema_name, COUNT_STAR AS cnt, SUM_ROWS_EXAMINED AS rows_examined, ROUND(SUM_ROWS_EXAMINED/NULLIF(COUNT_STAR,0), 0) AS avg_rows FROM performance_schema.events_statements_summary_by_digest WHERE DIGEST_TEXT IS NOT NULL AND SUM_ROWS_EXAMINED > 0 AND LAST_SEEN > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY SUM_ROWS_EXAMINED DESC LIMIT 10",
+              "refId": "A"
+            }
+          ],
+          "title": "Top 10 by rows examined (scan-heavy)",
+          "type": "table"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
+          "id": 102,
+          "panels": [],
+          "title": "Time-series view (from Loki slow log)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Query_time distribution over time. Spot burst patterns or creeping regressions.",
+          "fieldConfig": { "defaults": { "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "unit": "s" } },
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 25 },
+          "id": 4,
+          "options": {
+            "calculate": true,
+            "calculation": { "xBuckets": { "mode": "size", "value": "1m" } },
+            "yAxis": { "unit": "s", "decimals": 2 }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "sum(rate({source=\"mariadb-slow\"} | unwrap query_time | __error__=\"\" [$__interval]))",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "query_time heatmap",
+          "type": "heatmap"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "Raw slow queries with bind values — use when digest-level aggregation isn't enough (specific user, specific timestamp, specific IDs).",
+          "gridPos": { "h": 14, "w": 24, "x": 0, "y": 35 },
+          "id": 5,
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "{source=\"mariadb-slow\"} | query_time > $min_query_time",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Raw slow queries > $min_query_time s",
+          "type": "logs"
+        }
+      ],
+      "refresh": "30s",
+      "schemaVersion": 39,
+      "tags": ["mariadb", "slow-query", "perf-schema"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": false, "text": "MariaDB", "value": "MariaDB" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "MariaDB Datasource",
+            "multi": false,
+            "name": "mariadb_ds",
+            "options": [],
+            "query": "mysql",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": { "selected": false, "text": "Loki", "value": "Loki" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Loki Datasource",
+            "multi": false,
+            "name": "loki_ds",
+            "options": [],
+            "query": "loki",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          },
+          {
+            "current": { "selected": false, "text": "0.5", "value": "0.5" },
+            "hide": 0,
+            "label": "Min query_time (s) [log panel]",
+            "name": "min_query_time",
+            "options": [
+              { "selected": false, "text": "0.1", "value": "0.1" },
+              { "selected": true, "text": "0.5", "value": "0.5" },
+              { "selected": false, "text": "1", "value": "1" },
+              { "selected": false, "text": "5", "value": "5" }
+            ],
+            "query": "0.1, 0.5, 1, 5",
+            "type": "custom"
+          }
+        ]
+      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": {},
+      "timezone": "Asia/Tokyo",
+      "title": "MariaDB Worst Queries",
+      "uid": "mariadb-worst-queries",
+      "version": 1,
+      "weekStart": ""
+    }
