@@ -222,13 +222,168 @@ data:
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
           "id": 101,
           "panels": [],
-          "title": "Raw slow queries",
+          "title": "Top offenders & raw log",
           "type": "row"
         },
         {
           "datasource": { "type": "loki", "uid": "${loki_ds}" },
+          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。Loki API の direction=backward (default) で新しい順に最大 20000 行取得後 client-side sort するため、極端に長い時間範囲 (7d 以上など) では古い時間帯の slow query が母集団から漏れる可能性あり。通常の運用レンジ (1h〜24h) では全量カバー可能。",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "left",
+                "cellOptions": { "type": "auto" },
+                "filterable": true
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "query_time" },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  { "id": "decimals", "value": 3 },
+                  { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } },
+                  { "id": "thresholds", "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      { "color": "green", "value": null },
+                      { "color": "yellow", "value": 0.5 },
+                      { "color": "orange", "value": 1 },
+                      { "color": "red", "value": 5 }
+                    ]
+                  } },
+                  { "id": "custom.width", "value": 110 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "lock_time" },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  { "id": "decimals", "value": 3 },
+                  { "id": "custom.width", "value": 100 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "rows_examined" },
+                "properties": [
+                  { "id": "unit", "value": "short" },
+                  { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } },
+                  { "id": "thresholds", "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      { "color": "green", "value": null },
+                      { "color": "yellow", "value": 10000 },
+                      { "color": "orange", "value": 100000 },
+                      { "color": "red", "value": 1000000 }
+                    ]
+                  } },
+                  { "id": "custom.width", "value": 130 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "rows_sent" },
+                "properties": [
+                  { "id": "unit", "value": "short" },
+                  { "id": "custom.width", "value": 100 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "user" },
+                "properties": [
+                  { "id": "custom.width", "value": 120 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Time" },
+                "properties": [
+                  { "id": "custom.width", "value": 170 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Line" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "type": "auto", "wrapText": true } }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 25 },
+          "id": 11,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "show": false },
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${loki_ds}" },
+              "expr": "{source=\"mariadb-slow\", pod=~\"$pod\"} | query_time > $min_query_time",
+              "maxLines": 20000,
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "extractFields",
+              "options": { "source": "labels" }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": ["Time", "query_time", "rows_examined", "rows_sent", "lock_time", "user", "Line"]
+                }
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  { "destinationType": "number", "targetField": "query_time" },
+                  { "destinationType": "number", "targetField": "lock_time" },
+                  { "destinationType": "number", "targetField": "rows_examined" },
+                  { "destinationType": "number", "targetField": "rows_sent" }
+                ]
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  { "field": "query_time", "desc": true }
+                ]
+              }
+            },
+            {
+              "id": "limit",
+              "options": { "limitField": 20 }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "query_time": 1,
+                  "rows_examined": 2,
+                  "rows_sent": 3,
+                  "lock_time": 4,
+                  "user": 5,
+                  "Line": 6
+                },
+                "renameByName": {}
+              }
+            }
+          ],
+          "title": "Top 20 slowest individual queries",
+          "type": "table"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_ds}" },
           "description": "Individual slow queries with bind values. Each entry is one slow log event (multi-line) with structured_metadata fields shown as badges.",
-          "gridPos": { "h": 16, "w": 24, "x": 0, "y": 25 },
+          "gridPos": { "h": 16, "w": 24, "x": 0, "y": 37 },
           "id": 10,
           "options": {
             "dedupStrategy": "none",
