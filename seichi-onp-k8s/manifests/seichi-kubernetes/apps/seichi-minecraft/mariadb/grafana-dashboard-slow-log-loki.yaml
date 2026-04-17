@@ -294,12 +294,6 @@ data:
                 ]
               },
               {
-                "matcher": { "id": "byName", "options": "db" },
-                "properties": [
-                  { "id": "custom.width", "value": 140 }
-                ]
-              },
-              {
                 "matcher": { "id": "byName", "options": "Time" },
                 "properties": [
                   { "id": "custom.width", "value": 170 }
