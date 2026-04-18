@@ -227,7 +227,7 @@ data:
         },
         {
           "datasource": { "type": "loki", "uid": "${loki_ds}" },
-          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。Loki 側 max_entries_limit_per_query のデフォルト 5000 に合わせて maxLines=5000 としており、direction=backward (default) のため約 17h (5000/290 entries/h) を超える時間範囲では古い側の slow query が母集団から漏れる。問題調査時は time range を短く (1h〜数時間) 絞るのが推奨。",
+          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。Loki 側 max_entries_limit_per_query (default 5000) に合わせて maxLines=5000。対象期間の slow query が 5000 件を超えると direction=backward のため新しい側 5000 件のみが母集団となり、古い slow query が top-20 から漏れる。件数ベースの制限なので burst 時は短時間でも到達しうる (平常時 ~290 entries/h で目安 17h)。漏れたら time range を短くするか、$min_query_time を上げて母集団を絞るのが推奨。",
           "fieldConfig": {
             "defaults": {
               "custom": {
