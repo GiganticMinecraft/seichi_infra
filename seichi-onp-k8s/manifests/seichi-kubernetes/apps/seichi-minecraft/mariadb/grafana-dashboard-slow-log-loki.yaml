@@ -326,14 +326,10 @@ data:
           "transformations": [
             {
               "id": "extractFields",
-              "options": { "source": "labels" }
-            },
-            {
-              "id": "filterFieldsByName",
               "options": {
-                "include": {
-                  "names": ["Time", "query_time", "rows_examined", "rows_sent", "lock_time", "user", "Line"]
-                }
+                "source": "Line",
+                "format": "regexp",
+                "regExp": "/User@Host:\\s+(?<user>[^\\[]+)\\[.*?Query_time:\\s+(?<query_time>[\\d.]+)\\s+Lock_time:\\s+(?<lock_time>[\\d.]+)\\s+Rows_sent:\\s+(?<rows_sent>\\d+)\\s+Rows_examined:\\s+(?<rows_examined>\\d+)/s"
               }
             },
             {
@@ -363,7 +359,12 @@ data:
             {
               "id": "organize",
               "options": {
-                "excludeByName": {},
+                "excludeByName": {
+                  "labels": true,
+                  "tsNs": true,
+                  "labelTypes": true,
+                  "id": true
+                },
                 "indexByName": {
                   "Time": 0,
                   "query_time": 1,
