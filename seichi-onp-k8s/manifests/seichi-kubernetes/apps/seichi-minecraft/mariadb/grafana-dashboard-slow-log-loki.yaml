@@ -302,7 +302,7 @@ data:
               {
                 "matcher": { "id": "byName", "options": "query" },
                 "properties": [
-                  { "id": "custom.cellOptions", "value": { "type": "auto", "wrapText": true } }
+                  { "id": "custom.cellOptions", "value": { "type": "auto", "wrapText": false, "cellValueInspect": true } }
                 ]
               }
             ]
