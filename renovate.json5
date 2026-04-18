@@ -75,11 +75,11 @@
       groupName: 'mariadb-operator',
     },
     {
-      // debianは日付付きタグ（例: trixie-20260406）を無視し、それ以外（例: 13, 13.4, 13-slim, trixie, trixie-slim, stable）は許可する
+      // debianは日付付きタグ（例: trixie-20260406）を無視し、バージョン番号（例: 13, 13.4, 13-slim）・コードネーム（例: trixie, trixie-slim, trixie-backports）・エイリアス（例: stable, latest）のみ許可する
       matchPackageNames: [
         'debian',
       ],
-      allowedVersions: '/^(?!.*-\\d{8}).+$/',
+      allowedVersions: '/^(\\d+(\\.\\d+)?(-slim)?|[a-z][a-z-]+(-slim|-backports)?)$/',
     },
     {
       matchManagers: [
