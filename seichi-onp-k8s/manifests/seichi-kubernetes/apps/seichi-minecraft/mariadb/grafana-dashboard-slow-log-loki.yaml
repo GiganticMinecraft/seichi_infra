@@ -294,6 +294,12 @@ data:
                 ]
               },
               {
+                "matcher": { "id": "byName", "options": "db" },
+                "properties": [
+                  { "id": "custom.width", "value": 160 }
+                ]
+              },
+              {
                 "matcher": { "id": "byName", "options": "Time" },
                 "properties": [
                   { "id": "custom.width", "value": 170 }
@@ -329,7 +335,7 @@ data:
               "options": {
                 "source": "Line",
                 "format": "regexp",
-                "regExp": "/User@Host:\\s+(?<user>[^\\[]+)\\[.*?Query_time:\\s+(?<query_time>[\\d.]+)\\s+Lock_time:\\s+(?<lock_time>[\\d.]+)\\s+Rows_sent:\\s+(?<rows_sent>\\d+)\\s+Rows_examined:\\s+(?<rows_examined>\\d+).*?SET timestamp=\\d+;\\s*(?<query>.*)/s"
+                "regExp": "/User@Host:\\s+(?<user>[^\\[]+)\\[.*?Schema:\\s(?<db>\\S*)\\s+QC_hit.*?Query_time:\\s+(?<query_time>[\\d.]+)\\s+Lock_time:\\s+(?<lock_time>[\\d.]+)\\s+Rows_sent:\\s+(?<rows_sent>\\d+)\\s+Rows_examined:\\s+(?<rows_examined>\\d+).*?SET timestamp=\\d+;\\s*(?<query>.*)/s"
               }
             },
             {
@@ -373,7 +379,8 @@ data:
                   "rows_sent": 3,
                   "lock_time": 4,
                   "user": 5,
-                  "query": 6
+                  "db": 6,
+                  "query": 7
                 },
                 "renameByName": {}
               }
