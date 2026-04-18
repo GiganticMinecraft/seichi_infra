@@ -98,7 +98,7 @@ spec:
           STATEFULSET_NAME="{{inputs.parameters.statefulset-name}}"
           SUFFIX="${STATEFULSET_NAME#mcserver--}"
           ALL_SERVERS_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
-          PER_SERVER_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath="{.data.enabled--${SUFFIX}}" 2>/dev/null || echo "false")
+          PER_SERVER_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath="{.data['enabled--${SUFFIX}']}" 2>/dev/null || echo "false")
           if [ "$ALL_SERVERS_MAINTENANCE_ENABLED" = "true" ] || [ "$PER_SERVER_MAINTENANCE_ENABLED" = "true" ]; then
             echo "メンテナンスモードが有効です。バックアップワークフローをスキップします。"
             exit 1
