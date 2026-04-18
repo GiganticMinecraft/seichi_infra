@@ -227,7 +227,7 @@ data:
         },
         {
           "datasource": { "type": "loki", "uid": "${loki_ds}" },
-          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。Loki API の direction=backward (default) で新しい順に最大 20000 行取得後 client-side sort するため、極端に長い時間範囲 (7d 以上など) では古い時間帯の slow query が母集団から漏れる可能性あり。通常の運用レンジ (1h〜24h) では全量カバー可能。",
+          "description": "時間範囲内の個別スロークエリを query_time 降順で上位20件表示。犯人特定用のスキャン可能な table ビュー。Loki 側 max_entries_limit_per_query のデフォルト 5000 に合わせて maxLines=5000 としており、direction=backward (default) のため約 17h (5000/290 entries/h) を超える時間範囲では古い側の slow query が母集団から漏れる。問題調査時は time range を短く (1h〜数時間) 絞るのが推奨。",
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -318,7 +318,7 @@ data:
             {
               "datasource": { "type": "loki", "uid": "${loki_ds}" },
               "expr": "{source=\"mariadb-slow\", pod=~\"$pod\"} | query_time > $min_query_time",
-              "maxLines": 20000,
+              "maxLines": 5000,
               "queryType": "range",
               "refId": "A"
             }
