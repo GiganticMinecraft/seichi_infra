@@ -75,6 +75,13 @@
       groupName: 'mariadb-operator',
     },
     {
+      // debianは日付付きタグ（例: trixie-20260406）を無視し、それ以外（例: 13, 13.4, 13-slim, trixie, trixie-slim, stable）は許可する
+      matchPackageNames: [
+        'debian',
+      ],
+      allowedVersions: '/^(?!.*-\\d{8}).+$/',
+    },
+    {
       matchManagers: [
         'custom.regex',
       ],
