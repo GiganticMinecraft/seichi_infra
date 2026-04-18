@@ -285,7 +285,8 @@ spec:
                 - -c
                 - |
                   # メンテナンスモードチェック（ConfigMapをボリュームマウントで読み取り）
-                  if grep -q "^true$" /maintenance-mode/enabled 2>/dev/null; then
+                  if grep -q "^true$" /maintenance-mode/enabled 2>/dev/null || \
+                     grep -q "^true$" /maintenance-mode/enabled--s5 2>/dev/null; then
                     echo "Maintenance mode is enabled"
                     exit 1
                   fi
