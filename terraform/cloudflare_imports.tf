@@ -25,11 +25,6 @@ import {
 }
 
 import {
-  to = cloudflare_dns_record.portal
-  id = "77c10fdfa7c65de4d14903ed8879ebcb/81784b1c8b1e599f0a1730092df1e819"
-}
-
-import {
   to = cloudflare_dns_record.playguide
   id = "77c10fdfa7c65de4d14903ed8879ebcb/fc7936c45cf60dbdf751f004389e78d1"
 }
@@ -124,21 +119,7 @@ import {
 
 # endregion
 
-# region Rulesets (transform rules - firewall rules は既にステートにある)
-
-import {
-  to = cloudflare_ruleset.seichi_portal_transform_for_cors
-  id = "zones/77c10fdfa7c65de4d14903ed8879ebcb/e22e283066b842fd98243e72c685051a"
-}
-
-# endregion
-
 # region Pages Projects
-
-import {
-  to = cloudflare_pages_project.seichi_portal
-  id = "9e9e88e2b19878c4a911c3c8a715a168/seichi-portal"
-}
 
 import {
   to = cloudflare_pages_project.seichi_playguide
@@ -148,11 +129,6 @@ import {
 # endregion
 
 # region Pages Domains
-
-import {
-  to = cloudflare_pages_domain.seichi_portal_domain
-  id = "9e9e88e2b19878c4a911c3c8a715a168/seichi-portal/portal.seichi.click"
-}
 
 import {
   to = cloudflare_pages_domain.seichi_playguide_domain

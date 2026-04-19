@@ -520,22 +520,6 @@ variable "bugsink_admin_password" {
 
 #endregion
 
-#region env variables for Cloudflare Pages projects
-
-variable "cloudflare_pages__seichi_portal__next_public_backend_api_url" {
-  description = "The url of Seichi Portal backend API"
-  type        = string
-  sensitive   = true
-}
-
-variable "cloudflare_pages__seichi_portal__next_public_ms_app_client_id" {
-  description = "The application cliend ID on Microsoft Azure Portal for Seichi Portal"
-  type        = string
-  sensitive   = true
-}
-
-#endregion
-
 # region ArgoCD backup-workflow account token
 
 variable "argocd_backup_workflow_auth_token" {
