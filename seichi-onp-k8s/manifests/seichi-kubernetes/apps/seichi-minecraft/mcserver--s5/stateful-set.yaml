@@ -68,6 +68,36 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: always-whitelist
+          image: busybox:1.37.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Asia/Tokyo
+          command:
+            - sh
+            - -c
+            - |
+              sed -i 's/white-list: false/white-list: true/g' /data/server.properties
+          volumeMounts:
+            - name: mcserver--s5-data
+              mountPath: /data
+        - name: find-dir
+          image: busybox:1.37.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: Asia/Tokyo
+          command:
+            - sh
+            - -c
+            - |
+              ls -la /data
+              ls -la /data/world_SW_3
+              ls -la /data/world_SW_3_new
+          volumeMounts:
+            - name: mcserver--s5-data
+              mountPath: /data
 
       containers:
         - resources:
