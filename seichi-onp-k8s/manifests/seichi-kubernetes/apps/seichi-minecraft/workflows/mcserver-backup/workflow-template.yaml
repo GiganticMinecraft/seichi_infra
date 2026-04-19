@@ -28,6 +28,10 @@ spec:
         tasks:
           - name: check-maintenance-mode
             template: check-maintenance-mode
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{inputs.parameters.statefulset-name}}"
 
           - name: get-timestamp
             template: get-timestamp
@@ -83,13 +87,19 @@ spec:
               - delete-coreprotect-db
 
     - name: check-maintenance-mode
+      inputs:
+        parameters:
+          - name: statefulset-name
       script:
         image: alpine/kubectl:1.35.4
         command: ["/bin/sh", "-c"]
         source: |
           set -e
-          MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
-          if [ "$MAINTENANCE_ENABLED" = "true" ]; then
+          STATEFULSET_NAME="{{inputs.parameters.statefulset-name}}"
+          SUFFIX="${STATEFULSET_NAME#mcserver--}"
+          ALL_SERVERS_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
+          PER_SERVER_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath="{.data['enabled--${SUFFIX}']}" 2>/dev/null || echo "false")
+          if [ "$ALL_SERVERS_MAINTENANCE_ENABLED" = "true" ] || [ "$PER_SERVER_MAINTENANCE_ENABLED" = "true" ]; then
             echo "メンテナンスモードが有効です。バックアップワークフローをスキップします。"
             exit 1
           fi
