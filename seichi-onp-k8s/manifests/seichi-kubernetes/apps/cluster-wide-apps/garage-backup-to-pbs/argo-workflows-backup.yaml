@@ -144,15 +144,9 @@ spec:
                 - name: title
                   value: "garage バックアップ失敗"
 
-  volumeClaimTemplates:
-    - metadata:
-        name: dump-volume
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: topolvm-provisioner
-        resources:
-          requests:
-            storage: 200Gi
   volumes:
+    - name: dump-volume
+      persistentVolumeClaim:
+        claimName: garage-backup-dump
     - name: pbs-tmpfs
       emptyDir: {}

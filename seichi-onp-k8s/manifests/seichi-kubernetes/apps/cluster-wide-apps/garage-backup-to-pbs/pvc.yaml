@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: garage-backup-dump
+  namespace: garage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: topolvm-provisioner
+  resources:
+    requests:
+      storage: 400Gi
