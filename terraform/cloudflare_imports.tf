@@ -25,11 +25,6 @@ import {
 }
 
 import {
-  to = cloudflare_dns_record.portal
-  id = "77c10fdfa7c65de4d14903ed8879ebcb/81784b1c8b1e599f0a1730092df1e819"
-}
-
-import {
   to = cloudflare_dns_record.playguide
   id = "77c10fdfa7c65de4d14903ed8879ebcb/fc7936c45cf60dbdf751f004389e78d1"
 }
