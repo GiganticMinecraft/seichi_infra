@@ -78,25 +78,7 @@ spec:
             - sh
             - -c
             - |
-              sed -i 's/white-list: false/white-list: true/g' /data/server.properties
-          volumeMounts:
-            - name: mcserver--s5-data
-              mountPath: /data
-        - name: find-dir
-          image: busybox:1.37.0
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: TZ
-              value: Asia/Tokyo
-          command:
-            - sh
-            - -c
-            - |
-              ls -la /data/world_SW_3
-              echo "-----------------"
-              chown -R 1000:1000 /data/world_SW_3
-              echo "-----------------"
-              ls -la /data/world_SW_3
+              sed -i 's/white-list: true/white-list: false/g' /data/server.properties
           volumeMounts:
             - name: mcserver--s5-data
               mountPath: /data
