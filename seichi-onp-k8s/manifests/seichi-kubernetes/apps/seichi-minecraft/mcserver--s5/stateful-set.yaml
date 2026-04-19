@@ -92,15 +92,11 @@ spec:
             - sh
             - -c
             - |
-              ls -la /data
+              ls -la /data/world_SW_3
               echo "-----------------"
-              mv /data/world_SW_3 /data/world_SW_3_old
+              chown -R 1000:1000 /data/world_SW_3
               echo "-----------------"
-              mv /data/world_SW_3_new /data/world_SW_3
-              echo "-----------------"
-              rm -rf /data/world_SW_3_new/data
-              echo "-----------------"
-              ls -la /data
+              ls -la /data/world_SW_3
           volumeMounts:
             - name: mcserver--s5-data
               mountPath: /data
