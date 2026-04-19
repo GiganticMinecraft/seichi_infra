@@ -32,14 +32,6 @@ resource "cloudflare_dns_record" "github_pages_command_reference" {
   ttl     = 1 # automatic
 }
 
-resource "cloudflare_dns_record" "portal" {
-  zone_id = local.cloudflare_zone_id
-  name    = "portal.seichi.click"
-  content = "${cloudflare_pages_project.seichi_portal.name}.pages.dev"
-  type    = "CNAME"
-  ttl     = 1 # automatic
-}
-
 resource "cloudflare_dns_record" "playguide" {
   zone_id = local.cloudflare_zone_id
   name    = "playguide.seichi.click"
