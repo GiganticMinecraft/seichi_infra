@@ -66,6 +66,25 @@ spec:
           BUCKETS=$(aws $S3_OPTS s3 ls | awk '{print $3}')
           echo "Found buckets: $BUCKETS"
 
+          # 永続 PVC 上で Garage から削除済みバケットのディレクトリが残ると
+          # 不要なデータを PBS に送り続けることになるため、sync 前に掃除する
+          echo "=== Pruning orphaned bucket directories ==="
+          for dir in "$DUMP_DIR"/*/; do
+            [ -d "$dir" ] || continue
+            existing=$(basename "$dir")
+            found=0
+            for b in $BUCKETS; do
+              if [ "$b" = "$existing" ]; then
+                found=1
+                break
+              fi
+            done
+            if [ "$found" = 0 ]; then
+              echo "Removing orphaned directory: $dir"
+              rm -rf "$dir"
+            fi
+          done
+
           for bucket in $BUCKETS; do
             echo "--- Syncing bucket: $bucket ---"
             mkdir -p "$DUMP_DIR/$bucket"
