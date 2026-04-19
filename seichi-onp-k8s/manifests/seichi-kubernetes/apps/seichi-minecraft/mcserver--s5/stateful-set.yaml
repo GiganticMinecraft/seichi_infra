@@ -93,8 +93,14 @@ spec:
             - -c
             - |
               ls -la /data
+              echo "-----------------"
               ls -la /data/world_SW_3
+              echo "-----------------"
+              ls -la /data/world_SW_3/data
+              echo "-----------------"
               ls -la /data/world_SW_3_new
+              echo "-----------------"
+              ls -la /data/world_SW_3_new/earth_1-1000_osm-based_without-features_1-17-1
           volumeMounts:
             - name: mcserver--s5-data
               mountPath: /data
