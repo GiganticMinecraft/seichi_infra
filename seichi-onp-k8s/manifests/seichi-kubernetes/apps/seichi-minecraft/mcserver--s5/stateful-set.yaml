@@ -94,9 +94,9 @@ spec:
             - |
               ls -la /data
               echo "-----------------"
-              mv -R /data/world_SW_3 /data/world_SW_3_old
+              mv /data/world_SW_3 /data/world_SW_3_old
               echo "-----------------"
-              mv -R /data/world_SW_3_new /data/world_SW_3
+              mv /data/world_SW_3_new /data/world_SW_3
               echo "-----------------"
               rm -rf /data/world_SW_3_new/data
               echo "-----------------"
