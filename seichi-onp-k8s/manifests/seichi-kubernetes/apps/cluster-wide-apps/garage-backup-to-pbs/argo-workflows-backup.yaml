@@ -23,7 +23,7 @@ spec:
   serviceAccountName: garage-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
-  activeDeadlineSeconds: 14400
+  activeDeadlineSeconds: 28800
   onExit: notify-on-failure
   entrypoint: default
   templates:
