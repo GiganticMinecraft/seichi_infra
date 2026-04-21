@@ -1,6 +1,6 @@
 module github.com/GiganticMinecraft/mod-downloader
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.6
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.15
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.17
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.1
-	github.com/getsentry/sentry-go v0.45.1
+	github.com/getsentry/sentry-go v0.46.0
 )
 
 require (
