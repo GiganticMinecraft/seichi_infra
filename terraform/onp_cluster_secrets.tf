@@ -10,8 +10,8 @@ resource "helm_release" "kubernetes_replicator" {
   cleanup_on_fail = true
 }
 
-resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
-  depends_on = [kubernetes_namespace.onp_argocd]
+resource "kubernetes_secret_v1" "onp_argocd_github_oauth_app_secret" {
+  depends_on = [kubernetes_namespace_v1.onp_argocd]
 
   metadata {
     name      = "argocd-github-oauth-app-secret"
@@ -30,8 +30,8 @@ resource "kubernetes_secret" "onp_argocd_github_oauth_app_secret" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_argocd_applicationset_controller_github_app_secret" {
-  depends_on = [kubernetes_namespace.onp_argocd]
+resource "kubernetes_secret_v1" "onp_argocd_applicationset_controller_github_app_secret" {
+  depends_on = [kubernetes_namespace_v1.onp_argocd]
 
   metadata {
     name      = "argocd-applicationset-controller-github-app-secret"
@@ -54,8 +54,8 @@ resource "kubernetes_secret" "onp_argocd_applicationset_controller_github_app_se
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_argocd_workflows_sso" {
-  depends_on = [kubernetes_namespace.onp_argocd]
+resource "kubernetes_secret_v1" "onp_argocd_workflows_sso" {
+  depends_on = [kubernetes_namespace_v1.onp_argocd]
 
   metadata {
     name      = "argo-workflows-sso"
@@ -70,8 +70,8 @@ resource "kubernetes_secret" "onp_argocd_workflows_sso" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_argo_workflows_sso" {
-  depends_on = [kubernetes_namespace.onp_argo]
+resource "kubernetes_secret_v1" "onp_argo_workflows_sso" {
+  depends_on = [kubernetes_namespace_v1.onp_argo]
 
   metadata {
     name      = "argo-workflows-sso"
@@ -86,8 +86,8 @@ resource "kubernetes_secret" "onp_argo_workflows_sso" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
-  depends_on = [kubernetes_namespace.onp_monitoring]
+resource "kubernetes_secret_v1" "onp_grafana_github_oauth_app_secret" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
 
   metadata {
     name      = "grafana-github-oauth-app-secret"
@@ -102,8 +102,8 @@ resource "kubernetes_secret" "onp_grafana_github_oauth_app_secret" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_synology_csi" {
-  depends_on = [kubernetes_namespace.onp_synology_csi]
+resource "kubernetes_secret_v1" "onp_synology_csi" {
+  depends_on = [kubernetes_namespace_v1.onp_synology_csi]
 
   metadata {
     name      = "client-info-secret"
@@ -117,8 +117,8 @@ resource "kubernetes_secret" "onp_synology_csi" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_democratic_csi_sc_truenas_03" {
-  depends_on = [kubernetes_namespace.onp_democratic_csi]
+resource "kubernetes_secret_v1" "onp_democratic_csi_sc_truenas_03" {
+  depends_on = [kubernetes_namespace_v1.onp_democratic_csi]
 
   metadata {
     name      = "democratic-csi-driver-config-sc-truenas-03"
@@ -134,8 +134,8 @@ resource "kubernetes_secret" "onp_democratic_csi_sc_truenas_03" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "cloudflared_tunnel_credential" {
-  depends_on = [kubernetes_namespace.cloudflared_tunnel_exits]
+resource "kubernetes_secret_v1" "cloudflared_tunnel_credential" {
+  depends_on = [kubernetes_namespace_v1.cloudflared_tunnel_exits]
 
   metadata {
     name      = "cloudflared-tunnel-credential"
@@ -153,8 +153,8 @@ resource "kubernetes_secret" "cloudflared_tunnel_credential" {
 }
 
 # Garage S3-compatible object storage credentials
-resource "kubernetes_secret" "garage_loki_credentials" {
-  depends_on = [kubernetes_namespace.onp_monitoring]
+resource "kubernetes_secret_v1" "garage_loki_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
 
   metadata {
     name      = "garage-loki-credentials"
@@ -169,8 +169,8 @@ resource "kubernetes_secret" "garage_loki_credentials" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "garage_thanos_credentials" {
-  depends_on = [kubernetes_namespace.onp_monitoring]
+resource "kubernetes_secret_v1" "garage_thanos_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
 
   metadata {
     name      = "garage-thanos-credentials"
@@ -198,8 +198,8 @@ resource "kubernetes_secret" "garage_thanos_credentials" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "garage_seichi_minecraft_credentials" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "garage_seichi_minecraft_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "garage-s3-credentials"
@@ -217,8 +217,8 @@ resource "kubernetes_secret" "garage_seichi_minecraft_credentials" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "garage_backup_s3_credentials" {
-  depends_on = [kubernetes_namespace.garage]
+resource "kubernetes_secret_v1" "garage_backup_s3_credentials" {
+  depends_on = [kubernetes_namespace_v1.garage]
 
   metadata {
     name      = "garage-backup-s3-credentials"
@@ -233,8 +233,8 @@ resource "kubernetes_secret" "garage_backup_s3_credentials" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "garage_backup_failure_notify_webhook" {
-  depends_on = [kubernetes_namespace.garage]
+resource "kubernetes_secret_v1" "garage_backup_failure_notify_webhook" {
+  depends_on = [kubernetes_namespace_v1.garage]
 
   metadata {
     name      = "backup-failure-notify-webhook"
@@ -249,8 +249,8 @@ resource "kubernetes_secret" "garage_backup_failure_notify_webhook" {
 }
 
 # Garage Admin API token (shared between Garage daemon and Admin Console)
-resource "kubernetes_secret" "garage_admin_api_token" {
-  depends_on = [kubernetes_namespace.garage]
+resource "kubernetes_secret_v1" "garage_admin_api_token" {
+  depends_on = [kubernetes_namespace_v1.garage]
 
   metadata {
     name      = "garage-admin-api-token"
@@ -265,8 +265,8 @@ resource "kubernetes_secret" "garage_admin_api_token" {
 }
 
 # Garage Admin Console secrets
-resource "kubernetes_secret" "garage_admin_github_oauth" {
-  depends_on = [kubernetes_namespace.garage_admin]
+resource "kubernetes_secret_v1" "garage_admin_github_oauth" {
+  depends_on = [kubernetes_namespace_v1.garage_admin]
 
   metadata {
     name      = "garage-admin-github-oauth"
@@ -282,8 +282,8 @@ resource "kubernetes_secret" "garage_admin_github_oauth" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "garage_admin_token" {
-  depends_on = [kubernetes_namespace.garage_admin]
+resource "kubernetes_secret_v1" "garage_admin_token" {
+  depends_on = [kubernetes_namespace_v1.garage_admin]
 
   metadata {
     name      = "garage-admin-token"
@@ -297,8 +297,8 @@ resource "kubernetes_secret" "garage_admin_token" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "garage_admin_s3" {
-  depends_on = [kubernetes_namespace.garage_admin]
+resource "kubernetes_secret_v1" "garage_admin_s3" {
+  depends_on = [kubernetes_namespace_v1.garage_admin]
 
   metadata {
     name      = "garage-admin-s3"
@@ -314,8 +314,8 @@ resource "kubernetes_secret" "garage_admin_s3" {
 }
 
 # TrueNAS Exporter API key
-resource "kubernetes_secret" "truenas_exporter_api_key" {
-  depends_on = [kubernetes_namespace.onp_monitoring]
+resource "kubernetes_secret_v1" "truenas_exporter_api_key" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
 
   metadata {
     name      = "truenas-exporter-api-key"
@@ -329,8 +329,8 @@ resource "kubernetes_secret" "truenas_exporter_api_key" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_kubechecks_github_app_secret" {
-  depends_on = [kubernetes_namespace.kubechecks]
+resource "kubernetes_secret_v1" "onp_kubechecks_github_app_secret" {
+  depends_on = [kubernetes_namespace_v1.kubechecks]
 
   metadata {
     name      = "kubechecks-github-app-secret"
@@ -363,8 +363,8 @@ resource "random_password" "minecraft__prod_mariadb_monitoring_password" {
 }
 
 # mariadb-monitoring-password: seichi-minecraft に配置し、monitoring と PR namespaces に複製
-resource "kubernetes_secret" "mariadb_monitoring_password" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "mariadb_monitoring_password" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mariadb-monitoring-password"
@@ -382,7 +382,7 @@ resource "kubernetes_secret" "mariadb_monitoring_password" {
 }
 
 # mariadb-pr-review-password: kube-system に配置し、PR namespaces に複製
-resource "kubernetes_secret" "mariadb_pr_review_password" {
+resource "kubernetes_secret_v1" "mariadb_pr_review_password" {
   metadata {
     name      = "mariadb-pr-review-password"
     namespace = "kube-system"
@@ -400,8 +400,8 @@ resource "kubernetes_secret" "mariadb_pr_review_password" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "idea_reaction_discord_token" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "idea_reaction_discord_token" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "idea-reaction-discord-token"
@@ -413,8 +413,8 @@ resource "kubernetes_secret" "idea_reaction_discord_token" {
   }
 }
 
-resource "kubernetes_secret" "idea_reaction_redmine_api_key" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "idea_reaction_redmine_api_key" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "idea-reaction-redmine-api-key"
@@ -426,8 +426,8 @@ resource "kubernetes_secret" "idea_reaction_redmine_api_key" {
   }
 }
 
-resource "kubernetes_secret" "babyrite_discord_token" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "babyrite_discord_token" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "babyrite-discord-token"
