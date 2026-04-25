@@ -79,7 +79,7 @@ spec:
           - name: timestamp
       activeDeadlineSeconds: 3600
       script:
-        image: alpine/kubectl:1.35.4
+        image: alpine/kubectl:1.36.0
         command: ["/bin/sh", "-c"]
         source: |
           while true; do
