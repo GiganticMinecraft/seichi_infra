@@ -20,6 +20,13 @@ fill-memory-tolerance: 500
 prevent-block-place: false
 prevent-mob-spawn: false
 worlds:
+  world_SW_3:
+    x: 0.0
+    z: 0.0
+    # Earth整地の1:1000スケールのワールドボーダーの設定値が -18432 -9216 ～ 18431 9215 であることから、+50ブロックにして、以下のように指定
+    radiusX: 18482
+    radiusZ: 9266
+    wrapping: false
   world_SW_4:
     x: 0.0
     z: 0.0
