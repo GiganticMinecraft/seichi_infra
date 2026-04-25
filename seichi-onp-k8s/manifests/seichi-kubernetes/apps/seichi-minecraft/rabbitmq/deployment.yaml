@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: rabbitmq:4.2-management-alpine
+          image: rabbitmq:4.3-management-alpine
           env:
             - name: RABBITMQ_DEFAULT_USER
               value: seichi-portal
