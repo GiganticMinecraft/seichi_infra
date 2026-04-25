@@ -1,5 +1,5 @@
-resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_debug_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_debug_minecraft]
 
   metadata {
     name      = "mcserver--common--config-secrets"
@@ -14,8 +14,8 @@ resource "kubernetes_secret" "onp_minecraft_debug_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_debug_seichiassist_webhook_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_debug_seichiassist_webhook_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mcserver--seichiassist-webhook--config-secrets"
@@ -31,8 +31,8 @@ resource "kubernetes_secret" "onp_minecraft_debug_seichiassist_webhook_secrets" 
 }
 
 
-resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mcserver--common--config-secrets"
@@ -48,8 +48,8 @@ resource "kubernetes_secret" "onp_minecraft_prod_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_lobby_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_lobby_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mcserver--lobby--config-secrets"
@@ -63,8 +63,8 @@ resource "kubernetes_secret" "onp_minecraft_prod_lobby_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_seichiassist_webhook_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_seichiassist_webhook_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mcserver--seichiassist-webhook--config-secrets"
@@ -82,8 +82,8 @@ resource "kubernetes_secret" "onp_minecraft_prod_seichiassist_webhook_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_one_day_to_reset_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_one_day_to_reset_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mcserver--one-day-to-reset--config-secrets"
@@ -97,8 +97,8 @@ resource "kubernetes_secret" "onp_minecraft_prod_one_day_to_reset_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_kagawa_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_kagawa_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mcserver--kagawa--config-secrets"
@@ -112,8 +112,8 @@ resource "kubernetes_secret" "onp_minecraft_prod_kagawa_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "argo_events_github_access_token" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "argo_events_github_access_token" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "argo-events-github-access-token"
@@ -128,8 +128,8 @@ resource "kubernetes_secret" "argo_events_github_access_token" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "seichiassist_downloader_develop_release_notify_webhook" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "seichiassist_downloader_develop_release_notify_webhook" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "seichiassist-downloader-develop-release-notify-webhook"
@@ -143,8 +143,8 @@ resource "kubernetes_secret" "seichiassist_downloader_develop_release_notify_web
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "seichiassist_downloader_master_release_notify_webhook" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "seichiassist_downloader_master_release_notify_webhook" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "seichiassist-downloader-master-release-notify-webhook"
@@ -158,8 +158,8 @@ resource "kubernetes_secret" "seichiassist_downloader_master_release_notify_webh
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_bugsink_admin_password" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_bugsink_admin_password" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "bugsink-admin-password"
@@ -203,8 +203,8 @@ resource "random_password" "minecraft__prod_mariadb_litebans_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "kubernetes_secret" "onp_minecraft_prod_mariadb_root_password" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_prod_mariadb_root_password" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "mariadb"
@@ -246,8 +246,8 @@ resource "random_password" "minecraft__debug_mariadb_luckperms_password" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
-  depends_on = [kubernetes_namespace.onp_seichi_debug_minecraft]
+resource "kubernetes_secret_v1" "onp_minecraft_debug_mariadb_root_password" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_debug_minecraft]
 
   metadata {
     name      = "mariadb"
@@ -265,8 +265,8 @@ resource "kubernetes_secret" "onp_minecraft_debug_mariadb_root_password" {
 }
 
 
-resource "kubernetes_secret" "seichi_portal_meilisearch_master_key" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "seichi_portal_meilisearch_master_key" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "seichi-portal-meilisearch-master-key"
@@ -280,8 +280,8 @@ resource "kubernetes_secret" "seichi_portal_meilisearch_master_key" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "tailscale_approval_bot_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "tailscale-approval-bot-secrets"
@@ -299,8 +299,8 @@ resource "kubernetes_secret" "tailscale_approval_bot_secrets" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "backup_failure_notify_webhook" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "backup_failure_notify_webhook" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "backup-failure-notify-webhook"
@@ -314,8 +314,8 @@ resource "kubernetes_secret" "backup_failure_notify_webhook" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "argocd_backup_workflow_auth_token" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "argocd_backup_workflow_auth_token" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "argocd-auth-token"
@@ -330,8 +330,8 @@ resource "kubernetes_secret" "argocd_backup_workflow_auth_token" {
 }
 
 # pbs-credentials: seichi-minecraft に配置し、seichi-debug-minecraft と garage に複製
-resource "kubernetes_secret" "pbs_credentials" {
-  depends_on = [kubernetes_namespace.onp_seichi_minecraft]
+resource "kubernetes_secret_v1" "pbs_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
   metadata {
     name      = "pbs-credentials"
