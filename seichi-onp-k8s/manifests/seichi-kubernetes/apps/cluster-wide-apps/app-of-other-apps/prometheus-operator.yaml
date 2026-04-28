@@ -100,14 +100,17 @@ spec:
               apiVersion: 1
               datasources:
                 - name: Prometheus
+                  uid: PBFA97CFB590B2093
                   type: prometheus
                   url: http://prometheus-kube-prometheus-prometheus:9090
                   isDefault: true
                 - name: Loki
+                  uid: P8E80F9AEF21F6940
                   type: loki
                   url: http://loki-gateway
                   isDefault: false
                 - name: Pyroscope
+                  uid: P02E4190217B50628
                   type: grafana-pyroscope-datasource
                   access: proxy
                   url: http://pyroscope:4040
@@ -115,13 +118,14 @@ spec:
                   jsonData:
                     minStep: '15s'
                 - name: Tempo
+                  uid: P214B5B846CF3925F
                   type: tempo
                   access: proxy
                   url: http://tempo:3200
                   isDefault: false
                   jsonData:
                     tracesToLogsV2:
-                      datasourceUid: Loki
+                      datasourceUid: P8E80F9AEF21F6940
                       tags:
                         - key: 'k8s.namespace.name'
                           value: 'namespace'
@@ -133,13 +137,13 @@ spec:
                       spanEndTimeShift: '1h'
                       customQuery: false
                     tracesToMetrics:
-                      datasourceUid: Prometheus
+                      datasourceUid: PBFA97CFB590B2093
                       tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
                       queries:
                         - name: 'Sample query'
                           query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))'
                     tracesToProfiles:
-                      datasourceUid: Pyroscope
+                      datasourceUid: P02E4190217B50628
                       tags:
                         - key: 'k8s.namespace.name'
                           value: 'namespace'
@@ -148,7 +152,7 @@ spec:
                       profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
                       customQuery: false
                     serviceMap:
-                      datasourceUid: 'prometheus'
+                      datasourceUid: PBFA97CFB590B2093
                     nodeGraph:
                       enabled: true
                     search:
@@ -161,6 +165,7 @@ spec:
                       type: 'Tag'
                       tag: 'http.path'
                 - name: MariaDB
+                  uid: P2ABB19EC46770D68
                   type: mysql
                   url: mariadb.seichi-minecraft:3306
                   isDefault: false

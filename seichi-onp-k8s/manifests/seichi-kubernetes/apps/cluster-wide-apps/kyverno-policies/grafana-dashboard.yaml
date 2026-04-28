@@ -3394,7 +3394,7 @@ data:
         "templating": {
           "list": [
             {
-              "current": null,
+              "current": {},
               "hide": 0,
               "includeAll": false,
               "label": "datasource",
