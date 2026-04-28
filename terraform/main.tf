@@ -300,6 +300,18 @@ variable "garage_thanos_secret_access_key" {
   sensitive   = true
 }
 
+variable "garage_pyroscope_access_key_id" {
+  description = "Garage access key ID for Pyroscope (v2 object storage backend)"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_pyroscope_secret_access_key" {
+  description = "Garage secret access key for Pyroscope (v2 object storage backend)"
+  type        = string
+  sensitive   = true
+}
+
 variable "garage_seichi_minecraft_access_key_id" {
   description = "Garage access key ID for seichi-minecraft (plugins, backups, worlds)"
   type        = string
