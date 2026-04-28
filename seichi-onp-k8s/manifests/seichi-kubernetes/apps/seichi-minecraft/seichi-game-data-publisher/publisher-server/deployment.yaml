@@ -19,11 +19,14 @@ spec:
     spec:
       containers:
         - resources:
+            # Bumped from 50m to 300m to absorb the OTel exporter and
+            # pprof-rs profiler overhead; the previous 50m limit caused 90%+
+            # CFS throttling even with avg CPU usage <10m.
             requests:
-              cpu: 20m
+              cpu: 50m
               memory: 512Mi
             limits:
-              cpu: 50m
+              cpu: 300m
               memory: 768Mi
 
           envFrom:
