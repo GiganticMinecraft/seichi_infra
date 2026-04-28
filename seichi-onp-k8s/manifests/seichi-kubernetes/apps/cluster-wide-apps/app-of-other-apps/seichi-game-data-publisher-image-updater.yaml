@@ -1,0 +1,17 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: seichi-game-data-publisher
+  namespace: argocd
+spec:
+  namespace: argocd
+  writeBackConfig:
+    method: argocd
+  applicationRefs:
+    - namePattern: "seichi-minecraft-seichi-game-data-publisher"
+      images:
+        - alias: publisher
+          imageName: ghcr.io/giganticminecraft/seichi-game-data-publisher
+          commonUpdateSettings:
+            updateStrategy: latest
+            allowTags: "regexp:^sha-"
