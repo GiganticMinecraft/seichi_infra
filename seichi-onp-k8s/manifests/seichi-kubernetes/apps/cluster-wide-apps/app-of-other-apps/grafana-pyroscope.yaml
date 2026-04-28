@@ -25,6 +25,15 @@ spec:
             v1: false
             v2: true
 
+        # chart 同梱の Alloy (StatefulSet pyroscope-alloy) を無効化。
+        # profile 収集は k8s-monitoring chart の alloy-profiles に一本化する。
+        # 両方有効だと同じ Pod の /debug/pprof/profile を二重 scrape して
+        # "cpu profiling already in use" で片方が 500 で落ちる。
+        # k8s-monitoring 側は cpu/memory/goroutine/block/mutex/fgprof/java/ebpf
+        # を annotation ベースで網羅しており、同梱 Alloy の機能を完全にカバー済。
+        alloy:
+          enabled: false
+
         pyroscope:
           # v2 アーキテクチャ: profile を Garage (S3 互換) に直接書き込むため
           # ローカル PVC は不要。chart デフォルトでも false だが意図を明示する。
