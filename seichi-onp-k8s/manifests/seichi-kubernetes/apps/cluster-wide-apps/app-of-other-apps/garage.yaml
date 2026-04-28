@@ -46,7 +46,6 @@ spec:
 
         image:
           repository: dxflrs/amd64_garage
-          tag: "v2.2.0"
           pullPolicy: IfNotPresent
 
         resources:
