@@ -16,6 +16,15 @@ spec:
     targetRevision: 2.0.1
     helm:
       values: |
+        # chart-native の v1/v2 切替 knob。
+        # この knob を立てると chart 側が write-path=segment-writer や
+        # enable-query-backend 等の関連フラグ群を内部で組み立てる。
+        # extraArgs に -architecture.storage=v2 を直接渡すと不整合が起きる。
+        architecture:
+          storage:
+            v1: false
+            v2: true
+
         pyroscope:
           # v2 アーキテクチャ: profile を Garage (S3 互換) に直接書き込むため
           # ローカル PVC は不要。chart デフォルトでも false だが意図を明示する。
@@ -25,10 +34,6 @@ spec:
           extraArgs:
             # structuredConfig 内の ${VAR} を環境変数で展開させる
             config.expand-env: "true"
-            # v1 dual mode を抜けて v2 (segment-writer + object storage) のみで動作させる
-            # architecture.storage=v2 では write-path=segment-writer も必須 (起動時 fatal)
-            architecture.storage: v2
-            write-path: segment-writer
 
           extraCustomEnvVars:
             - name: GARAGE_S3_ACCESS_KEY_ID
