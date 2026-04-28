@@ -26,7 +26,9 @@ spec:
             # structuredConfig 内の ${VAR} を環境変数で展開させる
             config.expand-env: "true"
             # v1 dual mode を抜けて v2 (segment-writer + object storage) のみで動作させる
+            # architecture.storage=v2 では write-path=segment-writer も必須 (起動時 fatal)
             architecture.storage: v2
+            write-path: segment-writer
 
           extraCustomEnvVars:
             - name: GARAGE_S3_ACCESS_KEY_ID
