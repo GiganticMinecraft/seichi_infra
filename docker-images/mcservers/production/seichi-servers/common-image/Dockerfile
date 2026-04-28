@@ -1,8 +1,17 @@
+FROM busybox:1.37.0 AS srv-stopper-downloader
+# renovate: datasource=github-releases depName=giganticminecraft/SrvStopper
+ARG SRV_STOPPER_VERSION=1.0.0
+RUN wget \
+  -O /root/SrvStopper.jar \
+  https://github.com/giganticminecraft/SrvStopper/releases/download/v${SRV_STOPPER_VERSION}/SrvStopper-${SRV_STOPPER_VERSION}.jar
+
 FROM ghcr.io/giganticminecraft/chunk-search-rs:sha-c583474 AS chunk-search-provider
 FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:0347692ca1fadc1827b962439c0c47aa3c3feb1b99b0471342c64e228d935239
 
 ENV VERSION="1.18.2"
 
+# SrvStopper.jar を配置
+COPY --link --from=srv-stopper-downloader /root/SrvStopper.jar /plugins
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins

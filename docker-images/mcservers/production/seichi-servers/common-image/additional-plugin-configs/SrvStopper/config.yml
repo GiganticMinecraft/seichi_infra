@@ -1,0 +1,7 @@
+# 指定したプラグインがすべて有効ではない場合にサーバを停止するかどうか
+force-stop: false
+# 起動時に有効であることを確認するプラグイン名の一覧
+required-plugins:
+  - SeichiAssist
+  - WorldEdit
+  - WorldGuard
