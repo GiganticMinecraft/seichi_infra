@@ -34,6 +34,11 @@ spec:
           extraArgs:
             # structuredConfig 内の ${VAR} を環境変数で展開させる
             config.expand-env: "true"
+            # architecture.storage=v2 では write-path=segment-writer も必須だが
+            # chart 2.0.1 は v2 を立てても write-path を自動セットしない (確認済)。
+            # 起動時に "write-path=segment-writer is required for v2 storage layer"
+            # で fatal するため明示する。
+            write-path: segment-writer
 
           extraCustomEnvVars:
             - name: GARAGE_S3_ACCESS_KEY_ID
