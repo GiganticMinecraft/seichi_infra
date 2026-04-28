@@ -71,7 +71,7 @@ ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
 
 PBS GUI (<https://sc-proxbksrv-01.ide-hadar.ts.net:8007/>) にログインし、
 データストア配下の `host/mcserver--s{1,2,3,5,7}` から復旧元のバックアップを探す。
-スナップショットのタイムスタンプ（例: `2026-04-28T19:00:00Z`）を控えておく。
+スナップショットのタイムスタンプ（例: `2026-04-28T19:00:00Z`）を控えておく。GUI の表示設定によってはローカルタイムが表示される場合があるが、ここでは UTC 形式の正確なスナップショット ID（Snapshot 列の値など）が必要となる。
 
 UTC 表記で控え、後述の `RESTORE_TARGET_DATE_PBS` にそのまま渡す。
 
@@ -234,7 +234,7 @@ ERROR や Exception が出ていたらそのサーバーは別途調査が必要
 ## 注意事項
 
 - **メンテナンスモード ON 中は毎日 04:00 JST の MariaDB バックアップ Cron がスキップされる。**
-  ロールバックが長時間にわたって 04:00 JST を跨ぐ場合、その日のバックアップは作成されない。
+  ロールバックが長時間にわたって 04:00 JST を跨ぐ場合、その日のバックアップは作成されない。なお、現在の実装ではワークフローがエラー（Failed）として終了するため、Discord 等に失敗通知が飛ぶ点に留意すること。
 - MariaDB バックアップ本体（Garage S3 上の `database--{name}` prefix）の保持期間は 3 日。
   `targetRecoveryTime` は秒単位の point-in-time recovery ではなく、指定時刻以前で最新の
   フルバックアップを採用する仕組み（MariaDB CR で binlog を有効化していないため）なので、
@@ -252,7 +252,7 @@ ERROR や Exception が出ていたらそのサーバーは別途調査が必要
   これは想定挙動なので、起動成否は手順 5 のとおり Pod ログ (`Done (xx.xxs)! For help, type "help"`) で判定する。
 - mcserver の world と coreprotect database は対になっているケースがあるため、world をロールバックした
   サーバーに対応する coreprotect database（例: `coreprotect-s1`）も合わせてロールバックすべきか
-  別途検討する（本手順の対象外）。
+  別途検討する（本手順の対象外）。不整合が問題になる場合は、`restore--mariadb--with-prefix` を用いて該当の prefix をリストアすることを検討してください。
 - **MariaDB の slow log は restore 中に必ず evict 連鎖を起こす**（`long_query_time=0.1` で全クエリが
   記録される設定 + emptyDir `sizeLimit: 500Mi`）。手順 4a / 4c で
   `slow_query_log` を OFF / ON する暫定回避を必須とする。
