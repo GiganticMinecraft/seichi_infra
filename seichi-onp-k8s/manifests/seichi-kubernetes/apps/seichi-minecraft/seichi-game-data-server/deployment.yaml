@@ -34,7 +34,12 @@ spec:
                   name: mariadb
                   key: mcserver-password
 
-          image: ghcr.io/giganticminecraft/seichi-game-data-server:sha-019129d
+          # Track the rolling :master tag so Argo Image Updater can swap
+          # digests in. Per-commit pinning happens by setting a sha- tag here
+          # if you ever need to roll back (and disabling Image Updater for
+          # this image temporarily).
+          image: ghcr.io/giganticminecraft/seichi-game-data-server:master
+          imagePullPolicy: Always
           name: seichi-game-data-server
           ports:
             - containerPort: 80

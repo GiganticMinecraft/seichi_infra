@@ -30,7 +30,12 @@ spec:
             - configMapRef:
                 name: seichi-game-data-publisher-server
 
-          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:sha-745211e
+          # Track the rolling :master tag so Argo Image Updater can swap
+          # digests in. Per-commit pinning happens by setting a sha- tag here
+          # if you ever need to roll back (and disabling Image Updater for
+          # this image temporarily).
+          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:master
+          imagePullPolicy: Always
           name: seichi-game-data-publisher-server
           ports:
             - containerPort: 80
