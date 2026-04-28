@@ -134,6 +134,18 @@
       depNameTemplate: 'kubernetes-sigs/metrics-server',
       versioningTemplate: 'semver',
     },
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^docker-images/mcservers/production/seichi-servers/common-image/Dockerfile$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=github-releases depName=giganticminecraft/SrvStopper\\nARG SRV_STOPPER_VERSION=(?<currentValue>[\\d.]+)',
+      ],
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: 'giganticminecraft/SrvStopper',
+      versioningTemplate: 'semver',
+    },
     // ロビーサーバーのserver.propertiesに記載されているリソースパックのURLを更新する
     {
       customType: 'regex',
