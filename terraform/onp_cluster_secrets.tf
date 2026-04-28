@@ -198,6 +198,22 @@ resource "kubernetes_secret_v1" "garage_thanos_credentials" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "garage_pyroscope_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
+
+  metadata {
+    name      = "garage-pyroscope-credentials"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_pyroscope_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_pyroscope_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "garage_seichi_minecraft_credentials" {
   depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 

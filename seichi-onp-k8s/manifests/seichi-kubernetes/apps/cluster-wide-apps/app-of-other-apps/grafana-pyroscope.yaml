@@ -17,11 +17,40 @@ spec:
     helm:
       values: |
         pyroscope:
+          # v2 アーキテクチャ: profile を Garage (S3 互換) に直接書き込むため
+          # ローカル PVC は不要。chart デフォルトでも false だが意図を明示する。
           persistence:
             enabled: false
-            accessModes:
-              - ReadWriteOnce
-            size: 100Gi
+
+          extraArgs:
+            # structuredConfig 内の ${VAR} を環境変数で展開させる
+            config.expand-env: "true"
+            # v1 dual mode を抜けて v2 (segment-writer + object storage) のみで動作させる
+            architecture.storage: v2
+
+          extraCustomEnvVars:
+            - name: GARAGE_S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: garage-pyroscope-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: GARAGE_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-pyroscope-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+
+          structuredConfig:
+            storage:
+              backend: s3
+              s3:
+                endpoint: garage.garage.svc.cluster.local:3900
+                bucket_name: pyroscope
+                region: seichi-cloud
+                access_key_id: ${GARAGE_S3_ACCESS_KEY_ID}
+                secret_access_key: ${GARAGE_S3_SECRET_ACCESS_KEY}
+                insecure: true
+                force_path_style: true
   syncPolicy:
     automated:
       prune: true
