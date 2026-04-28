@@ -106,6 +106,25 @@ Argo Workflows UI から、対象サーバーごとに WorkflowTemplate を Subm
 
 ### 4. MariaDB database のロールバック実行
 
+#### 4a. 事前準備: `slow_query_log` を OFF にする
+
+リストア中は大量の SQL が流れて全クエリが MariaDB の slow log
+(`long_query_time=0.1`) に乗り、`slow-log` emptyDir の `sizeLimit: 500Mi` を
+超えて **`mariadb-0` Pod が `Evicted` される** 連鎖が起きる
+（実際に発生し、複数の restore Job が `BackoffLimitExceeded` で失敗した実績あり）。
+
+リストア開始前に slow log を OFF にして、既存ファイルも truncate しておく：
+
+```bash
+ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
+  'kubectl -n seichi-minecraft exec mariadb-0 -c mariadb -- bash -c \
+     "mariadb -u root -p\"\$MARIADB_ROOT_PASSWORD\" \
+        -e \"SET GLOBAL slow_query_log=OFF; SHOW GLOBAL VARIABLES LIKE '\''slow_query_log'\'';\" \
+      && : > /var/log/mysql/mysql-slow.log"'
+```
+
+#### 4b. ロールバック実行
+
 Argo Workflows UI から `restore--mariadb--with-prefix`（namespace: `seichi-minecraft`）を、
 対象 database ごとに 4 回 Submit する。
 
@@ -123,25 +142,67 @@ Argo Workflows UI から `restore--mariadb--with-prefix`（namespace: `seichi-mi
 
 ワークフローは MariaDB Operator の `Restore` CRD を作成し、完了まで最大 1 時間（`activeDeadlineSeconds: 3600`）待機する。
 
+#### 4c. 事後処理: `slow_query_log` を ON に戻す
+
+手順 5 で全 DB の Restore が成功したことを確認したら、必ず ON に戻す：
+
+```bash
+ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
+  'kubectl -n seichi-minecraft exec mariadb-0 -c mariadb -- bash -c \
+     "mariadb -u root -p\"\$MARIADB_ROOT_PASSWORD\" \
+        -e \"SET GLOBAL slow_query_log=ON; SHOW GLOBAL VARIABLES LIKE '\''slow_query_log'\'';\""'
+```
+
 ### 5. 全ジョブの完了確認
 
-Argo Workflows UI で全 9 本（mcserver 5 本 + database 4 本）が `Succeeded` になっていることを確認する。
+#### MariaDB (`restore--mariadb--with-prefix`)
 
-CLI でも確認可能：
+**重要:** workflow が `Succeeded` になっていても **実際は失敗している場合がある**。
+`restore--mariadb--with-prefix` の `wait-complete-mariadb-restore` ステップは
+Restore CR の `conditions[?(@.type=='Failed')].status` を見て失敗判定するが、
+MariaDB Operator (v0.x 系) は失敗時も `type=Complete, status=True, message=Failed,
+reason=JobFailed` を返す（`type=Failed` という condition は付与されない）ため、
+失敗判定が空振りして workflow は誤って `Succeeded` になる。
+
+必ず Restore CR 側で `STATUS` 列（= `message`）を直接確認する：
+
+```bash
+ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
+  'kubectl -n seichi-minecraft get restore.k8s.mariadb.com'
+```
+
+`STATUS` が `Success` のものだけが本当に成功。`Failed` のものは workflow を
+再 submit してリトライする（`generateName` を変えるだけで OK）。
+
+Argo Workflows UI または CLI でも各 workflow を `Succeeded` を一応確認：
 
 ```bash
 ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
   'kubectl -n seichi-minecraft get workflows --sort-by=.metadata.creationTimestamp | tail -20'
 ```
 
-mcserver 系は StatefulSet が `replicas=1` で起動し直しているはず：
+#### Minecraft world (`restore--mcserver--sN`)
+
+**重要:** `wait-for-scale-to-1` ステップは StatefulSet の `.status.availableReplicas` が
+`1` になるのを待つが、メンテモード ON 中は readinessProbe が必ず失敗するため
+`availableReplicas` は 0 のまま増えない。よって本ステップは
+`activeDeadlineSeconds: 300` の 5 分でタイムアウトし、**workflow 全体は `Failed` になる。**
+これは想定挙動。
+
+代わりに、各 mcserver の Pod ログを直接確認して Minecraft 本体が起動完了しているかを判断する：
 
 ```bash
 ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
-  'kubectl -n seichi-minecraft get pods | grep "^mcserver--s"'
+  'for n in s1 s2 s3 s5 s7; do
+     echo "--- mcserver--$n-0 ---"
+     kubectl -n seichi-minecraft logs mcserver--$n-0 -c minecraft --tail=200 \
+       | grep -E "Done \(|ERROR|Exception" | tail -5
+   done'
 ```
 
-メンテモード ON のままなので Pod は NotReady（READY 0/1 や 1/2）で正常。
+各サーバーで `Done (xx.xxs)! For help, type "help"` の行が出ていれば起動完了とみなす
+（Pod 自体は Running、READY は `0/1` または `1/2` のままで問題なし）。
+ERROR や Exception が出ていたらそのサーバーは別途調査が必要。
 
 ### 6. メンテナンスモード解除
 
@@ -186,9 +247,23 @@ ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
 - world ロールバックは `plugins/*.jar` を削除する。プラグイン jar は ConfigMap / initContainer で
   再配置される設計なので、StatefulSet の起動シーケンスが正常に走れば自動的に補充される。
 - StatefulSet のスケールアップ待ちは 5 分でタイムアウトする。Pod が立ち上がらない場合は手動調査が必要。
+- `restore--mcserver--sN` の最終ステップ `wait-for-scale-to-1` は `availableReplicas` を見ているため、
+  **メンテナンスモード ON 中は readinessProbe が失敗し続けて必ずタイムアウト → workflow が `Failed` になる**。
+  これは想定挙動なので、起動成否は手順 5 のとおり Pod ログ (`Done (xx.xxs)! For help, type "help"`) で判定する。
 - mcserver の world と coreprotect database は対になっているケースがあるため、world をロールバックした
   サーバーに対応する coreprotect database（例: `coreprotect-s1`）も合わせてロールバックすべきか
   別途検討する（本手順の対象外）。
+- **MariaDB の slow log は restore 中に必ず evict 連鎖を起こす**（`long_query_time=0.1` で全クエリが
+  記録される設定 + emptyDir `sizeLimit: 500Mi`）。手順 4a / 4c で
+  `slow_query_log` を OFF / ON する暫定回避を必須とする。
+  恒久対策候補: `myCnf` から `slow_query_log` を削除する、`sizeLimit` を引き上げる、
+  Operator の Restore Job spec に `slow_query_log=OFF` を強制する、など。
+- **`restore--mariadb--with-prefix` の `wait-complete-mariadb-restore` の判定ロジックには
+  既知のバグがある**: MariaDB Operator は失敗時 `type=Complete, status=True, message=Failed` を
+  返すため、`type=Failed` のみを見ている現行ロジックでは失敗を検知できない。
+  workflow が Succeeded でも Restore CR の `STATUS` が `Failed` でないかを必ず手動確認する。
+  恒久対策候補: workflow 側で `conditions[?(@.type=='Complete')].message` も `Success` か
+  チェックするように修正。
 
 ## 関連リンク
 
