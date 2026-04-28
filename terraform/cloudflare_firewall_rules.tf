@@ -49,7 +49,7 @@ resource "cloudflare_ruleset" "custom_firewall_rules" {
     },
     {
       action      = "skip"
-      expression  = "(http.request.uri.path eq \"/api/dashboards/import\") or (http.request.uri.path eq \"/api/dashboards/db\")"
+      expression  = "(http.host eq \"grafana.onp-k8s.admin.seichi.click\" and (http.request.uri.path eq \"/api/dashboards/import\" or http.request.uri.path eq \"/api/dashboards/db\"))"
       description = "bypass-waf-grafana-add-dashboards"
       action_parameters = {
         products = ["waf"]
