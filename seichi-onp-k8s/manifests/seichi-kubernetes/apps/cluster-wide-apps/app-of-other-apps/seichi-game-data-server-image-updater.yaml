@@ -11,7 +11,10 @@ spec:
     - namePattern: "seichi-minecraft-seichi-game-data-server"
       images:
         - alias: server
-          imageName: ghcr.io/giganticminecraft/seichi-game-data-server
+          # Track digest changes on the rolling :master tag (re-pushed by CI on
+          # every merge to default branch). Same shape as mcserver--lobby; works
+          # around the ApplicationSet wiping kustomize.images overrides each
+          # reconcile cycle.
+          imageName: ghcr.io/giganticminecraft/seichi-game-data-server:master
           commonUpdateSettings:
-            updateStrategy: latest
-            allowTags: "regexp:^sha-"
+            updateStrategy: digest
