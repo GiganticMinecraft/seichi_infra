@@ -7,3 +7,16 @@ data:
   GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server:80"
   RUST_LOG: "debug,h2::codec::framed_read=info"
   RUST_BACKTRACE: "1"
+
+  # OpenTelemetry: traces, metrics, logs are pushed to the cluster's Alloy
+  # receiver, which fans out to Tempo / Mimir / Loki. Disabling the exporter
+  # is as simple as removing OTEL_EXPORTER_OTLP_ENDPOINT.
+  OTEL_SERVICE_NAME: "seichi-game-data-publisher"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_TRACES_SAMPLER: "parentbased_always_on"
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=production"
+
+  # Continuous profiler push target. Unset to disable.
+  PYROSCOPE_SERVER_ADDRESS: "http://pyroscope.monitoring.svc.cluster.local:4040"
+  PYROSCOPE_APPLICATION_NAME: "seichi-game-data-publisher"

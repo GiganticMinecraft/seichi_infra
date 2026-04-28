@@ -3,7 +3,10 @@ kind: ConfigMap
 metadata:
   name: seichi-game-data-server-config
 data:
-  RUST_LOG: "info"
+  # `debug` is enabled to surface sqlx::query events (db.statement,
+  # rows_returned, elapsed_secs) which are emitted at Debug level and become
+  # logs attached to each gRPC span via OTLP.
+  RUST_LOG: "info,sqlx::query=debug"
   HTTP_HOST: "0.0.0.0"
   HTTP_PORT: "80"
 
@@ -13,3 +16,16 @@ data:
   DB_USER: "mcserver"
 
   # Db password will be read from mcserver--common--config-secrets secret
+
+  # OpenTelemetry: traces, metrics, logs are pushed to the cluster's Alloy
+  # receiver, which fans out to Tempo / Mimir / Loki. Disabling the exporter
+  # is as simple as removing OTEL_EXPORTER_OTLP_ENDPOINT.
+  OTEL_SERVICE_NAME: "seichi-game-data-server"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_TRACES_SAMPLER: "parentbased_always_on"
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=production"
+
+  # Continuous profiler push target. Unset to disable.
+  PYROSCOPE_SERVER_ADDRESS: "http://pyroscope.monitoring.svc.cluster.local:4040"
+  PYROSCOPE_APPLICATION_NAME: "seichi-game-data-server"
