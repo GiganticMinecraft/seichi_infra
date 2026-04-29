@@ -5,9 +5,9 @@ metadata:
 data:
   # Expect game-data-server service to be in the same namespace
   GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server:80"
-  # Base level info; the previous "debug" base flooded Loki with hyper_util
-  # connection-pool DEBUG events from the OTLP exporter (~2 lines/sec).
-  RUST_LOG: "info"
+  # Base level info; keep sqlx::query at debug to match the game-data stack's
+  # query tracing policy without enabling noisy crate-wide DEBUG logs.
+  RUST_LOG: "info,sqlx::query=debug"
   RUST_BACKTRACE: "1"
 
   # OpenTelemetry: traces, metrics, logs are pushed to the cluster's Alloy
