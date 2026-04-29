@@ -125,7 +125,17 @@ jobs:
       - if: steps.should_build.outputs.should_build == 'true' && github.ref == 'refs/heads/main'
         name: Sign container image with Cosign
         run: |
-          cosign sign --yes \
+          cosign sign --yes --registry-referrers-mode=oci-1-1 \
+            ${{ matrix.image }}@${{ steps.build.outputs.digest }}
+
+      # Kyverno のポリシー (verify-image-signatures.yaml) と同じ条件で検証し、
+      # 署名と検証側のモードがズレた瞬間に CI を fail させる。
+      - if: steps.should_build.outputs.should_build == 'true' && github.ref == 'refs/heads/main'
+        name: Verify signature like Kyverno does
+        run: |
+          cosign verify \
+            --certificate-identity-regexp 'https://github\.com/GiganticMinecraft/.+' \
+            --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
             ${{ matrix.image }}@${{ steps.build.outputs.digest }}
 
       - if: steps.should_build.outputs.should_build == 'true' && steps.build.outputs.digest != ''
