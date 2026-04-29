@@ -40,6 +40,19 @@ spec:
           persistence:
             enabled: false
 
+          # Pyroscope 自身への自己 scrape を停止。
+          # chart デフォルトは pyroscope Pod に
+          # profiles.grafana.com/{cpu,memory,goroutine}.scrape="true" を付与し、
+          # 同クラスタの alloy-profiles が 15s 間隔で自分を scrape する。
+          # distributor の received_compressed_bytes_sum を type 別に集計したところ、
+          # goroutine + mutex + block (= Pyroscope 自身しか出せない種別) だけで
+          # 全受信量の 45% を占めていたため、自己 scrape を無効化する。
+          # 既存キー (port_name, service_git_ref 等) は helm の map merge で残る。
+          podAnnotations:
+            profiles.grafana.com/cpu.scrape: "false"
+            profiles.grafana.com/memory.scrape: "false"
+            profiles.grafana.com/goroutine.scrape: "false"
+
           extraArgs:
             # structuredConfig 内の ${VAR} を環境変数で展開させる
             config.expand-env: "true"
