@@ -1,3 +1,8 @@
+import {
+  to = helm_release.onp_cluster_argocd
+  id = "argocd/argocd"
+}
+
 resource "helm_release" "onp_cluster_argocd" {
   # https://github.com/argoproj/argo-helm/releases/tag/argo-cd-7.2.1
   repository = "https://argoproj.github.io/argo-helm"
