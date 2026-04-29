@@ -97,7 +97,17 @@ jobs:
       - name: Sign container image with Cosign
         if: github.ref == 'refs/heads/main'
         run: |
-          cosign sign --yes \
+          cosign sign --yes --registry-referrers-mode=oci-1-1 \
+            ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+
+      # Kyverno のポリシー (verify-image-signatures.yaml) と同じ条件で検証し、
+      # 署名と検証側のモードがズレた瞬間に CI を fail させる。
+      - name: Verify signature like Kyverno does
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cosign verify \
+            --certificate-identity-regexp 'https://github\.com/GiganticMinecraft/.+' \
+            --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
             ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
 
       - name: Run Trivy vulnerability scanner
