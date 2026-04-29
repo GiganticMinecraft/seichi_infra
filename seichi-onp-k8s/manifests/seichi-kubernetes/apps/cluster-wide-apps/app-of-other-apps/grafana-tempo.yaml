@@ -27,6 +27,14 @@ spec:
                   - local-blocks
                   - service-graphs
                   - span-metrics
+          server:
+            grpc_server_max_recv_msg_size: 16777216
+            grpc_server_max_send_msg_size: 16777216
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  max_recv_msg_size_mib: 16
         persistence:
           enabled: true
           accessModes:
