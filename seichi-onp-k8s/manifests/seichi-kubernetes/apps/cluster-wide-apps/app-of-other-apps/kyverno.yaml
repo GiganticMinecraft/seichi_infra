@@ -8,7 +8,7 @@ spec:
   source:
     chart: kyverno
     repoURL: https://kyverno.github.io/kyverno/
-    targetRevision: 3.7.2
+    targetRevision: 3.8.0
     helm:
       releaseName: kyverno
       values: |
