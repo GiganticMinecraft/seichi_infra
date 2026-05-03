@@ -85,6 +85,8 @@ jobs:
         run: |
           cosign sign --yes --registry-referrers-mode=oci-1-1 \
             ${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: 1
 
       # Kyverno のポリシー (verify-image-signatures.yaml) と同じ条件で検証し、
       # 署名と検証側のモードがズレた瞬間に CI を fail させる。
