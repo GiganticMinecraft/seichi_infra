@@ -11,7 +11,7 @@ FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha
 ENV VERSION="1.18.2"
 
 # SrvStopper.jar を配置
-COPY --link --from=srv-stopper-downloader /root/SrvStopper.jar /plugins
+COPY --link --from=srv-stopper-downloader /root/SrvStopper.jar /plugins/SrvStopper.jar
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
