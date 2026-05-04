@@ -9,9 +9,12 @@ spec:
   project: cluster-wide-apps
   source:
     # Querier / Store / Compactor のマニフェストは GiganticMinecraft/thanos-config で管理。
-    # 上流追従は thanos-config 側の Renovate (quay.io/thanos/thanos の image tag) で機械化。
+    # 上流追従:
+    #   - thanos-config 内: Renovate (quay.io/thanos/thanos の image tag)
+    #   - thanos-config の release: release-please bot が tag を切る
+    #   - 本ファイルの targetRevision: Renovate ArgoCD manager が tag を bump
     repoURL: https://github.com/GiganticMinecraft/thanos-config
-    targetRevision: main
+    targetRevision: v0.1.0
     path: '.'
     directory:
       # repo のルートにある main.jsonnet 以外 (LICENSE, README.md, renovate.json5)
