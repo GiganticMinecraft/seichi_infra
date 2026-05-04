@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: thanos
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  project: cluster-wide-apps
+  source:
+    # Querier / Store / Compactor のマニフェストは GiganticMinecraft/thanos-config で管理。
+    # 上流追従は thanos-config 側の Renovate (quay.io/thanos/thanos の image tag) で機械化。
+    repoURL: https://github.com/GiganticMinecraft/thanos-config
+    targetRevision: main
+    path: '.'
+    directory:
+      # repo のルートにある main.jsonnet 以外 (LICENSE, README.md, renovate.json5)
+      # を ArgoCD の manifest scanner に拾わせない
+      include: main.jsonnet
+      jsonnet: {}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
