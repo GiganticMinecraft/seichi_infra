@@ -251,6 +251,11 @@ spec:
                           # HTML コメント行を除去 (GitHub 自動生成リリースノートの先頭コメント)
                           sed -i '/^<!--.*-->$/d' /tmp/release-body.txt
 
+                          # 開発者向け情報を除去 (プレイヤー向け通知には不要)
+                          sed -i 's/ by @[^ ]* in https:\/\/github\.com\/[^ ]*//g' /tmp/release-body.txt
+                          sed -i '/^\*\*Full Changelog\*\*/d' /tmp/release-body.txt
+                          sed -i '/^## What'\''s Changed/d' /tmp/release-body.txt
+
                           # Discord embed description の 4096 文字制限に対応
                           body=$(head -c 4000 /tmp/release-body.txt)
                           if [ "$(wc -c < /tmp/release-body.txt)" -gt 4000 ]; then
