@@ -235,3 +235,29 @@ worlds:
         shader: stdtexture
         lighting: shadows
         mapzoomin: 0
+  # 実際には使用していないが、サーバの設定上存在するワールドになるので、検出させたうえで表示させない
+  - name: world_2_the_end
+    title: "ジ・エンド"
+    enabled : false
+    center:
+      x: 0
+      y: 64
+      z: 0
+    maps:
+      - class: org.dynmap.hdmap.HDMap
+        name: flat
+        title: "Flat"
+        prefix: flat
+        perspective: iso_S_90_vlowres
+        shader: stdtexture
+        lighting: brightnight
+        # Adjust extra zoom in levels - default is 2
+        mapzoomin: 0
+      - class: org.dynmap.hdmap.HDMap
+        name: surface
+        title: "Surface"
+        prefix: t
+        perspective: iso_SE_30_vlowres
+        shader: stdtexture
+        lighting: brightnight
+        mapzoomin: 0
