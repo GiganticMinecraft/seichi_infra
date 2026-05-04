@@ -252,9 +252,11 @@ spec:
                           sed -i '/^<!--.*-->$/d' /tmp/release-body.txt
 
                           # 開発者向け情報を除去 (プレイヤー向け通知には不要)
-                          sed -i 's/ by @[^ ]* in https:\/\/github\.com\/[^ ]*//g' /tmp/release-body.txt
-                          sed -i '/^\*\*Full Changelog\*\*/d' /tmp/release-body.txt
-                          sed -i '/^## What'\''s Changed/d' /tmp/release-body.txt
+                          sed -i \
+                            -e 's/ by @[^ ]* in https:\/\/github\.com\/[^ ]*//g' \
+                            -e '/^\*\*Full Changelog\*\*/d' \
+                            -e '/^## What'\''s Changed/d' \
+                            /tmp/release-body.txt
 
                           # Discord embed description の 4096 文字制限に対応
                           body=$(head -c 4000 /tmp/release-body.txt)
