@@ -14,7 +14,7 @@ spec:
     #   - thanos-config の release: release-please bot が tag を切る
     #   - 本ファイルの targetRevision: Renovate ArgoCD manager が tag を bump
     repoURL: https://github.com/GiganticMinecraft/thanos-config
-    targetRevision: v0.1.0
+    targetRevision: v1.0.0
     path: '.'
     directory:
       # repo のルートにある main.jsonnet 以外 (LICENSE, README.md, renovate.json5)
