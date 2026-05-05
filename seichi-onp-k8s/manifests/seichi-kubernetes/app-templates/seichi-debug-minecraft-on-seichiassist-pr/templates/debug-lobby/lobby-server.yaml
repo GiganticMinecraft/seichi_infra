@@ -123,12 +123,6 @@ spec:
             - name: REMOVE_OLD_MODS
               value: "TRUE"
 
-            # mc-image-helper について、PaperMC の新しい v3 API にまだ対応していないバージョンが入っているので、暫定対処として、Paper のリリースチャンネルを固定
-            # https://github.com/itzg/mc-image-helper/pull/587
-            # https://github.com/itzg/docker-minecraft-server/issues/3672
-            - name: PAPER_CHANNEL
-              value: "default"
-
             - name: MODS
               # DiscordSRV:
               #   https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.25.1/DiscordSRV-Build-1.25.1.jar
