@@ -1,0 +1,10 @@
+command-block-overrides: []
+ignore-vanilla-permissions: false
+unrestricted-advancements: false
+aliases:
+  lobby:
+    - hub
+  s1:
+    - server debug-s1
+  s2:
+    - server debug-s2
