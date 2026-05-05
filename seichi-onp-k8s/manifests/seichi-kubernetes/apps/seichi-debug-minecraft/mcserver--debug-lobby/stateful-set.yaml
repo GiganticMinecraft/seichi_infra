@@ -1,0 +1,200 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mcserver--debug-lobby
+  namespace: seichi-debug-minecraft
+  labels:
+    app: mcserver--debug-lobby
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcserver--debug-lobby
+  template:
+    metadata:
+      annotations:
+        profiles.grafana.com/java.enabled: "true"
+        resource.opentelemetry.io/service.name: "mcserver-debug-lobby"
+      labels:
+        app: mcserver--debug-lobby
+        mcserver: debug-lobby
+    spec:
+      initContainers:
+        - name: mod-downloader
+          image: ghcr.io/giganticminecraft/mod-downloader:sha-6f4c728
+          env:
+            - name: S3_ENDPOINT
+              value: garage.garage.svc.cluster.local:3900
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: BUCKET_NAME
+              value: seichi-plugins
+            - name: BUCKET_PREFIX_NAME
+              value: deb-lobby
+            - name: DOWNLOAD_TARGET_DIR_PATH
+              value: /downloaded-plugins
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
+
+      containers:
+        - resources:
+            requests:
+              cpu: 2
+              memory: 4Gi
+            limits:
+              cpu: 2
+              memory: 4Gi
+          env:
+            - name: MEMORY
+              value: 4G
+            - name: EULA
+              value: "TRUE"
+
+            - name: JVM_OPTS
+              value: >-
+                -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
+                -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
+                -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
+                -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M
+                -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4
+                -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90
+                -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem
+                -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs
+                -Daikars.new.flags=true
+
+            - name: JVM_XX_OPTS
+              value: >-
+                -XX:+UnlockDiagnosticVMOptions
+                -XX:+DebugNonSafepoints
+
+            - name: ENABLE_JMX
+              value: "true"
+            - name: JMX_PORT
+              value: "32000"
+
+            - name: COPY_CONFIG_DEST
+              value: /data
+
+            - name: CFG_REPLACEMENT__DISCORDSRV_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcserver--common--config-secrets
+                  key: DISCORDSRV_TOKEN
+
+            - name: CFG_REPLACEMENT__PROMETHEUS_EXPORTER_PORT
+              value: "9225"
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_USER
+              value: coreprotect
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_DATABASE_NAME
+              value: coreprotect__mc_debug_lobby
+
+            - name: CFG_REPLACEMENT__COREPROTECT_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: coreprotect-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_HOST
+              value: mariadb
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PORT
+              value: "3306"
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_USER
+              value: luckperms
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb
+                  key: luckperms-password
+
+            - name: CFG_REPLACEMENT__LUCKPERMS_MYSQL_DATABASE_NAME
+              value: luckperms
+
+            - name: REMOVE_OLD_MODS
+              value: "TRUE"
+
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                mvm set difficulty peaceful world_2
+                rg flag -w world_2 __global__ build deny
+                rg flag -w world_2 __global__ use allow
+                rg flag -w world_2 __global__ deny-spawn WANDERING_TRADER
+
+            - name: COPY_PLUGINS_SRC
+              value: |-
+                /downloaded-plugins
+                /plugins
+
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_lobby:sha-fixme
+          name: minecraft
+          ports:
+            - containerPort: 25565
+              name: minecraft
+            - containerPort: 18321
+              name: jmx-metrics
+            - containerPort: 9225
+              name: mc-metrics
+            - containerPort: 32000
+              name: jmx-remote
+
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            failureThreshold: 6
+            periodSeconds: 20
+
+          readinessProbe:
+            exec:
+              command:
+                - mc-monitor
+                - status
+                - --host
+                - localhost
+                - --port
+                - "25565"
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+
+          volumeMounts:
+            - name: mod-downloader-volume
+              mountPath: /downloaded-plugins
+
+            - name: mcserver--debug-lobby-data
+              mountPath: /data
+
+      volumes:
+        - name: mod-downloader-volume
+          emptyDir: {}
+
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mcserver--debug-lobby-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi

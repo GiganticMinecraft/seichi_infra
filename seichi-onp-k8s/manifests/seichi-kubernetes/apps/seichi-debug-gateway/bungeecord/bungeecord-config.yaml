@@ -16,6 +16,10 @@ spec:
           restricted: false
           motd: ''
       {{- end }}
+        debug-lobby:
+          address: mcserver--debug-lobby.seichi-debug-minecraft:25565
+          restricted: false
+          motd: ''
         debug-s1:
           address: mcserver--debug-s1.seichi-debug-minecraft:25565
           restricted: false
@@ -27,9 +31,9 @@ spec:
 
       listeners:
         - priorities:
-            - debug-s1
+            - debug-lobby
           forced_hosts:
-            play-debug.seichi.click: debug-s1
+            play-debug.seichi.click: debug-lobby
 
           query_port: 25565
           motd: ''
