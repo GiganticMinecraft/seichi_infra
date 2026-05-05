@@ -57,7 +57,7 @@ worlds:
         shader: stdtexture
         lighting: shadows
         mapzoomin: 0
-  - name: world_nether_tt
+  - name: world_nether_TT
     title: "ネザー狩場"
     enabled : true
     center:
