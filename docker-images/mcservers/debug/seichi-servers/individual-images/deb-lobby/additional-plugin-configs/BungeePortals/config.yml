@@ -1,0 +1,5 @@
+# BungeePortals configuration file, visit www.spigotmc.org/resources/bungeeportals.19 for help.
+SaveTask:
+  Enabled: false
+  Interval: 600
+NoPortalPermissionMessage: '&cYou do not have permission to go to the server {destination}.'

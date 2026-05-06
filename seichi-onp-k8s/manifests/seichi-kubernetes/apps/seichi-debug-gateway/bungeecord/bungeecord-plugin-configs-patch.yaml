@@ -4,11 +4,11 @@ metadata:
   name: bungeecord-plugin-configs
 data:
   BungeeHubCommand-config.yml: |
-    hub-server-name: debug-pr-2115-lobby
+    hub-server-name: debug-lobby
     already-connected-message: "You are already at the hub server!"
 
   BungeeKick-config.yml: |
-    ServerName: debug-pr-2115-lobby
+    ServerName: debug-lobby
     KickMessage: '&6You have been kicked! Reason:&4 '
     ShowKickMessage: True
 
