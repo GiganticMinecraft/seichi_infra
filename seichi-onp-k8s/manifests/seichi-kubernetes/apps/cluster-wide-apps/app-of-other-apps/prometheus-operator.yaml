@@ -52,7 +52,7 @@ spec:
                 foldersFromFilesStructure: true
           defaultDashboardsTimezone: Asia/Tokyo
           env:
-            GF_PLUGINS_PREINSTALL: "isovalent-hubble-datasource;grafana-sentry-datasource"
+            GF_PLUGINS_PREINSTALL_SYNC: "isovalent-hubble-datasource,grafana-sentry-datasource"
           grafana.ini:
             log:
               level: warn
