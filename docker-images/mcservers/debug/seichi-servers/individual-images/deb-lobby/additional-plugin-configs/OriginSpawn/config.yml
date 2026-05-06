@@ -1,7 +1,7 @@
 world-name: world_2
-loc-x: 41
+loc-x: 0
 loc-y: 69
-loc-z: -6
+loc-z: 0
 loc-yaw: 90.0
 loc-pitch: 0.0
 always-force-players-spawn: true
