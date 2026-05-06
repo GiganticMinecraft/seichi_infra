@@ -2,6 +2,8 @@ command-block-overrides: []
 ignore-vanilla-permissions: false
 unrestricted-advancements: false
 aliases:
+  spawn:
+    - originspawn
   lobby:
     - hub
   s1:
