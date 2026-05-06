@@ -1,0 +1,70 @@
+# Number of rows of slots of your server selector menu. For example '2' will mean 2*9 = 18 slots. Max value is 6.
+rows: 1
+
+# This will be displayed as the title of the menu.
+title: 'サーバーを選択 - select server (DEBUG)'
+
+# This will be the name of the server selector item
+item-name: '&b&o右クリックしてサーバーを選択 - Right click plz'
+
+item-lore: []
+
+# The name of the server selector item.
+item: NETHER_STAR
+
+# Give the item when a player joins?
+on-join: true
+
+# What slot should the item be in? Specify -1 to automatically put it in the first available slot.
+inv-slot: 0
+
+# URL clickable message
+url-message: '&3&lClick here'
+
+# Command to open the menu. Specify "none" for no command. (without /)
+command: "menu"
+
+# Require permission to open menu?
+require-permission: false
+# Which permission node to require?
+permission-node: 'ssx.menu.default'
+no-permission-message: "&cYou don't have permission to open this menu."
+
+# https://github.com/ServerSelectorX/ServerSelectorX/wiki/Free-%7C-Items-in-the-server-selector
+menu:
+
+  # Server item
+  0:
+    # Action to run when the item is clicked
+    action: 'srv:debug-s1'
+    offline:
+      item: DIAMOND_PICKAXE
+      name: '&fギガンティック☆整地鯖（デバッグ）'
+      lore:
+       - '&eデバッグ用 アルカディア&bサーバー'
+       - ''
+       - '&7デバッグ用アルカディアサーバー'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server debug-s1'
+
+  1:
+    # Action to run when the item is clicked
+    action: 'srv:debug-s2'
+
+    offline:
+      item: DIAMOND_SHOVEL
+      name: '&fギガンティック☆整地鯖（デバッグ）'
+      lore:
+       - '&eデバッグ用 エデン&bサーバー'
+       - ''
+       - '&7デバッグ用エデンサーバー'
+       - ''
+       - '&7Version: 1.18.2'
+       - '&7Command: /server debug-s2'
+
+  # No action item
+  -1: # -1 means everything else
+    action: 'none'
+    offline:
+      item: AIR
