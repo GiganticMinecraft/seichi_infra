@@ -1,0 +1,764 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: container-runtime-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Infrastructure"
+data:
+  container-runtime-dashboard.json: |
+    {
+      "uid": "container-runtime",
+      "title": "Container Runtime & Node Pressure",
+      "description": "containerd CRI operations, image pull activity, GC, and Linux PSI for Kubernetes nodes.",
+      "tags": ["containerd", "kubernetes", "psi", "prometheus"],
+      "timezone": "Asia/Tokyo",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-6h", "to": "now" },
+      "graphTooltip": 1,
+      "annotations": {
+        "list": []
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "datasource",
+            "type": "datasource",
+            "query": "prometheus",
+            "current": { "text": "Prometheus", "value": "PBFA97CFB590B2093" }
+          },
+          {
+            "name": "node",
+            "label": "Node",
+            "type": "query",
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_node_info{container_runtime_version=~\"containerd://.*\"}, node)",
+            "query": {
+              "qryType": 1,
+              "query": "label_values(kube_node_info{container_runtime_version=~\"containerd://.*\"}, node)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "includeAll": true,
+            "allValue": ".*",
+            "multi": true,
+            "refresh": 2,
+            "sort": 1,
+            "current": { "selected": true, "text": "All", "value": "$__all" }
+          },
+          {
+            "name": "namespace",
+            "label": "Namespace",
+            "type": "query",
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info{node=~\"$node\"}, namespace)",
+            "query": {
+              "qryType": 1,
+              "query": "label_values(kube_pod_info{node=~\"$node\"}, namespace)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "includeAll": true,
+            "allValue": ".*",
+            "multi": true,
+            "refresh": 2,
+            "sort": 1,
+            "current": { "selected": true, "text": "All", "value": "$__all" }
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 100,
+          "title": "Runtime Overview",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "collapsed": false
+        },
+        {
+          "id": 1,
+          "title": "containerd Version",
+          "description": "Installed containerd version by node.",
+          "type": "table",
+          "gridPos": { "h": 5, "w": 8, "x": 0, "y": 1 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "containerd_build_info_total{node=~\"$node\"}",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "Value": true,
+                  "__name__": true,
+                  "instance": true,
+                  "job": true,
+                  "revision": true
+                },
+                "indexByName": {
+                  "node": 0,
+                  "version": 1
+                },
+                "renameByName": {
+                  "node": "Node",
+                  "version": "Version"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          }
+        },
+        {
+          "id": 2,
+          "title": "In-progress Image Pulls",
+          "description": "Current image pulls through containerd CRI.",
+          "type": "stat",
+          "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum(containerd_cri_sandboxed_in_progress_image_pulls_total{node=~\"$node\"})",
+              "legendFormat": "pulls",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 1 },
+                  { "color": "red", "value": 5 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 3,
+          "title": "Image Pull Rate",
+          "description": "Successful and failed CRI image pulls per second.",
+          "type": "timeseries",
+          "gridPos": { "h": 5, "w": 6, "x": 12, "y": 1 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (status) (rate(containerd_cri_sandboxed_image_pulls_total{node=~\"$node\"}[$__rate_interval]))",
+              "legendFormat": "{{status}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false,
+                "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom" }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom" }
+          }
+        },
+        {
+          "id": 4,
+          "title": "Image Pull Throughput",
+          "description": "containerd CRI reported image pulling throughput.",
+          "type": "timeseries",
+          "gridPos": { "h": 5, "w": 6, "x": 18, "y": 1 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (node) (containerd_cri_sandboxed_image_pulling_throughput{node=~\"$node\"})",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom" }
+          }
+        },
+        {
+          "id": 101,
+          "title": "CRI Operation Latency",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+          "collapsed": false
+        },
+        {
+          "id": 5,
+          "title": "p95 Container Start",
+          "description": "95th percentile of CRI container start latency by node.",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 7 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum by (le, node) (rate(containerd_cri_container_start_seconds_bucket{node=~\"$node\"}[$__rate_interval])))",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+          }
+        },
+        {
+          "id": 6,
+          "title": "p95 Sandbox Runtime Create",
+          "description": "95th percentile of CRI sandbox runtime creation latency by node.",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 7 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum by (le, node) (rate(containerd_cri_sandbox_runtime_create_seconds_bucket{node=~\"$node\"}[$__rate_interval])))",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+          }
+        },
+        {
+          "id": 7,
+          "title": "p95 CNI Operation",
+          "description": "95th percentile of CRI network plugin operation latency by node and operation.",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 7 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum by (le, node, operation_type) (rate(containerd_cri_network_plugin_operations_duration_seconds_seconds_bucket{node=~\"$node\"}[$__rate_interval])))",
+              "legendFormat": "{{node}} {{operation_type}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom" }
+          }
+        },
+        {
+          "id": 102,
+          "title": "Node Pressure",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+          "collapsed": false
+        },
+        {
+          "id": 8,
+          "title": "Node CPU Pressure",
+          "description": "PSI CPU waiting time. Use this to detect CPU contention during image pulls or workload starts.",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 15 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (node) (label_replace(rate(node_pressure_cpu_waiting_seconds_total[$__rate_interval]), \"internal_ip\", \"$1\", \"instance\", \"([^:]+):.*\") * on (internal_ip) group_left(node) max by (node, internal_ip) (kube_node_info{node=~\"$node\"}))",
+              "legendFormat": "{{node}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+          }
+        },
+        {
+          "id": 9,
+          "title": "Node IO Pressure",
+          "description": "PSI IO waiting and stalled time by node.",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 15 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (node) (label_replace(rate(node_pressure_io_waiting_seconds_total[$__rate_interval]), \"internal_ip\", \"$1\", \"instance\", \"([^:]+):.*\") * on (internal_ip) group_left(node) max by (node, internal_ip) (kube_node_info{node=~\"$node\"}))",
+              "legendFormat": "{{node}} waiting",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (node) (label_replace(rate(node_pressure_io_stalled_seconds_total[$__rate_interval]), \"internal_ip\", \"$1\", \"instance\", \"([^:]+):.*\") * on (internal_ip) group_left(node) max by (node, internal_ip) (kube_node_info{node=~\"$node\"}))",
+              "legendFormat": "{{node}} stalled",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+          }
+        },
+        {
+          "id": 10,
+          "title": "Node Memory Pressure",
+          "description": "PSI memory waiting and stalled time by node.",
+          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 15 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (node) (label_replace(rate(node_pressure_memory_waiting_seconds_total[$__rate_interval]), \"internal_ip\", \"$1\", \"instance\", \"([^:]+):.*\") * on (internal_ip) group_left(node) max by (node, internal_ip) (kube_node_info{node=~\"$node\"}))",
+              "legendFormat": "{{node}} waiting",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (node) (label_replace(rate(node_pressure_memory_stalled_seconds_total[$__rate_interval]), \"internal_ip\", \"$1\", \"instance\", \"([^:]+):.*\") * on (internal_ip) group_left(node) max by (node, internal_ip) (kube_node_info{node=~\"$node\"}))",
+              "legendFormat": "{{node}} stalled",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+          }
+        },
+        {
+          "id": 103,
+          "title": "Container Pressure Hotspots",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "collapsed": false
+        },
+        {
+          "id": 11,
+          "title": "Top Container CPU Pressure",
+          "description": "Containers with the highest PSI CPU waiting rate.",
+          "type": "table",
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 23 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "topk(10, sum by (namespace, pod, container, node) (rate(container_pressure_cpu_waiting_seconds_total{node=~\"$node\", namespace=~\"$namespace\", container!=\"\"}[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "Value": "CPU pressure/s",
+                  "namespace": "Namespace",
+                  "pod": "Pod",
+                  "container": "Container",
+                  "node": "Node"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "CPU pressure/s" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+                  { "id": "color", "value": { "mode": "thresholds" } },
+                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          }
+        },
+        {
+          "id": 12,
+          "title": "Top Container IO Pressure",
+          "description": "Containers with the highest PSI IO waiting rate.",
+          "type": "table",
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 23 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "topk(10, sum by (namespace, pod, container, node) (rate(container_pressure_io_waiting_seconds_total{node=~\"$node\", namespace=~\"$namespace\", container!=\"\"}[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "Value": "IO pressure/s",
+                  "namespace": "Namespace",
+                  "pod": "Pod",
+                  "container": "Container",
+                  "node": "Node"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "IO pressure/s" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+                  { "id": "color", "value": { "mode": "thresholds" } },
+                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          }
+        },
+        {
+          "id": 13,
+          "title": "Top Container Memory Pressure",
+          "description": "Containers with the highest PSI memory waiting rate.",
+          "type": "table",
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 23 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "topk(10, sum by (namespace, pod, container, node) (rate(container_pressure_memory_waiting_seconds_total{node=~\"$node\", namespace=~\"$namespace\", container!=\"\"}[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "Value": "Memory pressure/s",
+                  "namespace": "Namespace",
+                  "pod": "Pod",
+                  "container": "Container",
+                  "node": "Node"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "Memory pressure/s" },
+                "properties": [
+                  { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+                  { "id": "color", "value": { "mode": "thresholds" } },
+                  { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          }
+        },
+        {
+          "id": 104,
+          "title": "Runtime Saturation & GC",
+          "type": "row",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+          "collapsed": false
+        },
+        {
+          "id": 14,
+          "title": "Container CPU Throttled Periods",
+          "description": "Top containers by cAdvisor CPU CFS throttled periods.",
+          "type": "table",
+          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 32 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "topk(10, sum by (namespace, pod, container, node) (rate(container_cpu_cfs_throttled_periods_total{node=~\"$node\", namespace=~\"$namespace\", container!=\"\"}[$__rate_interval])))",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true },
+                "renameByName": {
+                  "Value": "Throttled periods/s",
+                  "namespace": "Namespace",
+                  "pod": "Pod",
+                  "container": "Container",
+                  "node": "Node"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          }
+        },
+        {
+          "id": 15,
+          "title": "Container OOM Events",
+          "description": "OOM events reported by cgroup metrics.",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 32 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (node, namespace, pod, container) (increase(container_memory_oom_total{node=~\"$node\", namespace=~\"$namespace\", container!=\"\"}[$__rate_interval]))",
+              "legendFormat": "{{node}} {{namespace}}/{{pod}} {{container}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "bars",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 60,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom" }
+          }
+        },
+        {
+          "id": 16,
+          "title": "containerd GC Duration",
+          "description": "Garbage collection duration and collection rate.",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 32 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "expr": "sum by (node) (rate(containerd_gc_gc_seconds_sum{node=~\"$node\"}[$__rate_interval])) / sum by (node) (rate(containerd_gc_gc_seconds_count{node=~\"$node\"}[$__rate_interval]))",
+              "legendFormat": "{{node}} avg duration",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (node) (rate(containerd_gc_collections_total{node=~\"$node\"}[$__rate_interval]))",
+              "legendFormat": "{{node}} collections/s",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*collections/s" },
+                "properties": [
+                  { "id": "unit", "value": "ops" }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "desc" },
+            "legend": { "showLegend": true, "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+          }
+        }
+      ],
+      "links": []
+    }
