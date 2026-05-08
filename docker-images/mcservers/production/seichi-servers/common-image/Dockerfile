@@ -6,7 +6,7 @@ RUN wget \
   https://github.com/giganticminecraft/SrvStopper/releases/download/v${SRV_STOPPER_VERSION}/SrvStopper-${SRV_STOPPER_VERSION}.jar
 
 FROM ghcr.io/giganticminecraft/chunk-search-rs:sha-c583474 AS chunk-search-provider
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:d7a6fd8633917f18a7b1d6f17add204d7067ad7c0727665bfb44854a6ca75625
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:d6e683fadb76d8fe18a1a592a543a15f5f195c2eb0578a5b2145cf101c04fe4d
 
 ENV VERSION="1.18.2"
 
