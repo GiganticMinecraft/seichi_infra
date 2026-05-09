@@ -24,7 +24,7 @@ spec:
           image: ghcr.io/giganticminecraft/mod-downloader:sha-6f4c728
           env:
             - name: S3_ENDPOINT
-              value: garage.garage.svc.cluster.local:3900
+              value: garag.garage.svc.cluster.local:3900
             - name: S3_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
