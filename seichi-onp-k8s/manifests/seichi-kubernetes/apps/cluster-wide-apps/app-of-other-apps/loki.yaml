@@ -56,6 +56,24 @@ spec:
             max_line_size_truncate: true
           ruler:
             enable_api: true
+          structuredConfig:
+            ingester:
+              lifecycler:
+                ring:
+                  kvstore:
+                    store: inmemory
+            distributor:
+              ring:
+                kvstore:
+                  store: inmemory
+            compactor:
+              compactor_ring:
+                kvstore:
+                  store: inmemory
+            common:
+              ring:
+                kvstore:
+                  store: inmemory
 
         minio:
           enabled: false
