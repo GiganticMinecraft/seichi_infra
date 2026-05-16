@@ -73,7 +73,7 @@ spec:
               interval: 30s
               scrapeTimeout: 10s
           tracing:
-            sink: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4317"
+            sink: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
   destination:
     server: https://kubernetes.default.svc
     namespace: garage
