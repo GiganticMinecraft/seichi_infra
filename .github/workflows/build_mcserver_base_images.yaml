@@ -38,13 +38,13 @@ jobs:
           #     各サーバーの基底イメージ指定は
           #     java_version_component_in_tag + digest pinning で行うこととしている。
           - mcserver_base_image_tag: java8-jdk
-            mcserver_base_image_digest: "sha256:086476a4d0c71cd13fe7d5bd5f79417f48c2c844d463bb8bfa8088569c47dd0e"
+            mcserver_base_image_digest: "sha256:dc2447f6b6d0a55343c6f0580935ceb5d60e08bd1f56424138dc7bb35fc3a751"
             java_version_component_in_tag: java8-jdk
           - mcserver_base_image_tag: java17
-            mcserver_base_image_digest: "sha256:0a4a73627fb9febcf4473d70aa32bacd0d62d14b3bfb2bd177bca7c03d7beecc"
+            mcserver_base_image_digest: "sha256:751b7f03dc94faa8da8b92800d63f66049c1c300d1a0ddd12fc248d63933a55a"
             java_version_component_in_tag: java17-jdk
           - mcserver_base_image_tag: java21-jdk
-            mcserver_base_image_digest: "sha256:558f343c3ce6213335c91961678e27c3989698f1d892bc76f62a6e1686b0061a"
+            mcserver_base_image_digest: "sha256:207c3b417d89ae9282bfa04633454c87acf03fe01044cf32111ee5a7f898fbb9"
             java_version_component_in_tag: java21-jdk
 
     steps:
