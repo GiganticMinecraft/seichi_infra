@@ -2,5 +2,21 @@
 force-stop: true
 # 起動時に有効であることを確認するプラグイン名の一覧
 required-plugins:
+  - AntiProxy
+  - BetterChairs
+  - BungeePortals
+  - CoreProtect
+  - DecentHolograms
+  - DiscordSRV
+  - EditArmorStands
+  - LiteBans
+  - LuckPerms
+  - LunaChat
+  - Multiverse-Core
+  - Multiverse-Portals
+  - OriginSpawn
+  - ServerSelectorX
+  - ViaBackwards
+  - WorldBorder
   - WorldEdit
   - WorldGuard
