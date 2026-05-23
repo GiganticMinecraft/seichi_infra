@@ -65,10 +65,6 @@ spec:
                 ring:
                   kvstore:
                     store: memberlist
-            distributor:
-              ring:
-                kvstore:
-                  store: memberlist
             compactor:
               compactor_ring:
                 kvstore:
