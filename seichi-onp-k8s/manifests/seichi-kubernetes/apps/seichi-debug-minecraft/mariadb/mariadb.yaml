@@ -62,7 +62,7 @@ spec:
         - name: BUCKET_NAME
           value: mariadb-backups
     - name: fix-sql-dump-permissions
-      image: busybox:1.37.0
+      image: busybox:1.38.0
       command:
         - sh
         - -c
@@ -74,7 +74,7 @@ spec:
             find /docker-entrypoint-initdb.d -type f -exec chmod 644 {} +
           fi
     - name: add-debug-migrations
-      image: busybox:1.37.0
+      image: busybox:1.38.0
       command:
         - sh
         - -c

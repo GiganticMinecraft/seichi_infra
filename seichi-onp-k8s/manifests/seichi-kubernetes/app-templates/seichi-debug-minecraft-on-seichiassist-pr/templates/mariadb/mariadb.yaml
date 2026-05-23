@@ -140,7 +140,7 @@ spec:
             - mountPath: /docker-entrypoint-initdb.d
               name: sqldump-volume
         - name: fix-sql-dump-permissions
-          image: busybox:1.37.0
+          image: busybox:1.38.0
           args:
             - sh
             - -c
@@ -154,7 +154,7 @@ spec:
             - mountPath: /docker-entrypoint-initdb.d
               name: sqldump-volume
         - name: add-debug-migrations
-          image: busybox:1.37.0
+          image: busybox:1.38.0
           args:
             - sh
             - -c

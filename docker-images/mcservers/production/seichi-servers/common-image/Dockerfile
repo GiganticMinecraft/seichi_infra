@@ -1,4 +1,4 @@
-FROM busybox:1.37.0 AS srv-stopper-downloader
+FROM busybox:1.38.0 AS srv-stopper-downloader
 # renovate: datasource=github-releases depName=giganticminecraft/SrvStopper
 ARG SRV_STOPPER_VERSION=1.0.0
 RUN wget \
