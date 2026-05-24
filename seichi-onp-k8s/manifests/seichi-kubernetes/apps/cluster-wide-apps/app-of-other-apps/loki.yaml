@@ -57,23 +57,22 @@ spec:
           ruler:
             enable_api: true
           structuredConfig:
+            memberlist:
+              join_members:
+                - loki-memberlist
             ingester:
               lifecycler:
                 ring:
                   kvstore:
-                    store: inmemory
-            distributor:
-              ring:
-                kvstore:
-                  store: inmemory
+                    store: memberlist
             compactor:
               compactor_ring:
                 kvstore:
-                  store: inmemory
+                  store: memberlist
             common:
               ring:
                 kvstore:
-                  store: inmemory
+                  store: memberlist
 
         minio:
           enabled: false
