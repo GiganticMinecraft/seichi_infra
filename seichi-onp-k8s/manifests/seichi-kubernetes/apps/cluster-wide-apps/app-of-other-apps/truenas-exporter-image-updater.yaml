@@ -4,7 +4,6 @@ metadata:
   name: truenas-exporter
   namespace: argocd
 spec:
-  namespace: argocd
   writeBackConfig:
     method: argocd
   applicationRefs:

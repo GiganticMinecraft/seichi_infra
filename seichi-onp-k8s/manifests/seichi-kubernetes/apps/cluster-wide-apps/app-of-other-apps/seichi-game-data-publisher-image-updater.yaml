@@ -4,7 +4,6 @@ metadata:
   name: seichi-game-data-publisher
   namespace: argocd
 spec:
-  namespace: argocd
   writeBackConfig:
     method: argocd
   applicationRefs:

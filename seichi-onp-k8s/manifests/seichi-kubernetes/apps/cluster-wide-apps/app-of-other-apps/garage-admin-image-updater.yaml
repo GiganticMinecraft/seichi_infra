@@ -4,7 +4,6 @@ metadata:
   name: garage-admin
   namespace: argocd
 spec:
-  namespace: argocd
   writeBackConfig:
     method: argocd
   applicationRefs:
