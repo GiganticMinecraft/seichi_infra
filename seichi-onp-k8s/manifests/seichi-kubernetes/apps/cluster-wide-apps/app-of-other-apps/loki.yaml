@@ -12,7 +12,7 @@ spec:
   project: cluster-wide-apps
   source:
     chart: loki
-    repoURL: https://grafana.github.io/helm-charts
+    repoURL: https://grafana-community.github.io/helm-charts
     targetRevision: 7.0.0
     helm:
       values: |
