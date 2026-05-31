@@ -1,0 +1,42 @@
+# 指定したプラグインがすべて有効ではない場合にサーバを停止するかどうか
+force-stop: true
+# 起動時に有効であることを確認するプラグイン名の一覧
+required-plugins:
+  - antiRedstoneClock
+  - AutoMessage
+  - BetterChairs
+  - BungeePortals
+  - ByeByeWither
+  - ClearLag
+  - ClickTpa
+  - CoreProtect
+  - CustomEnchantments
+  - DecentHolograms
+  - DiscordSRV
+  - dynmap
+  - EatEgg
+  - EditArmorStands
+  - Elytra
+  - FastCraft
+  - LiteBans
+  - LuckPerms
+  - LunaChat
+  - Multiverse-Core
+  - Multiverse-Portals
+  - ObserverUtils
+  - OriginSpawn
+  - ParticleLIB
+  - PlaceholderAPI
+  - ProtocolLib
+  - RandomTeleport
+  - RegenWorld
+  - region-grid-fitter
+  - SeichiAssist
+  - Shopkeepers
+  - ShulkerBoxBackPacks
+  - SpectatorTheater
+  - StreamClock
+  - tce
+  - TradeSystem
+  - WorldEdit
+  - WorldGuard
