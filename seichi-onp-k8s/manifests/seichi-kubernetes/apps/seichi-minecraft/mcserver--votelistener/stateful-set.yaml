@@ -68,7 +68,7 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
-        - name: remove-SrvStopper-config
+        - name: remove-srvstopper-config
           image: busybox:1.38.0
           imagePullPolicy: IfNotPresent
           command:
