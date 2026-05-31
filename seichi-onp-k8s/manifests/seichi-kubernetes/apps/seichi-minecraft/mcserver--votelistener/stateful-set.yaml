@@ -68,6 +68,30 @@ spec:
           volumeMounts:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
+        - name: remove-SrvStopper-config
+          image: busybox:1.38.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              CONFIG_FILE=/data/plugins/SrvStopper/config.yml
+              if [ ! -f "$CONFIG_FILE" ]; then
+                echo "Config file not found: $CONFIG_FILE, skipping"
+                exit 0
+              fi
+
+              echo "=== 修正前 ==="
+              ls -l "/data/plugins/SrvStopper"
+              cat "$CONFIG_FILE"
+              rm "$CONFIG_FILE"
+              echo ""
+              echo "=== 修正後 ==="
+              ls -l "/data/plugins/SrvStopper"
+          volumeMounts:
+            - name: mcserver--votelistener-data
+              mountPath: /data
 
       containers:
         - resources:
