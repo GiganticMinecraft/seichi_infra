@@ -5,7 +5,9 @@ metadata:
   namespace: argocd
 spec:
   writeBackConfig:
-    method: argocd
+    method: git
+    gitConfig:
+      branch: main
   applicationRefs:
     - namePattern: "seichi-minecraft-mcserver--lobby"
       images:
