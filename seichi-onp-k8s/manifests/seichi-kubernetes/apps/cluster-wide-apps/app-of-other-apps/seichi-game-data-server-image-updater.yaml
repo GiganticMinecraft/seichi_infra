@@ -4,7 +4,6 @@ metadata:
   name: seichi-game-data-server
   namespace: argocd
 spec:
-  namespace: argocd
   writeBackConfig:
     method: argocd
   applicationRefs:
