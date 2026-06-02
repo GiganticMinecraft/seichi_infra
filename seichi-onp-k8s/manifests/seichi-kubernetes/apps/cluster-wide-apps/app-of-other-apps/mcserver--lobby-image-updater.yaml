@@ -8,6 +8,8 @@ spec:
     method: git:secret:argocd/argocd-applicationset-controller-github-app-secret
     gitConfig:
       branch: main
+      pullRequest:
+        github: {}
   applicationRefs:
     - namePattern: "seichi-minecraft-mcserver--lobby"
       images:
