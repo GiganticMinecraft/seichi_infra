@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   writeBackConfig:
-    method: git
+    method: git:secret:argocd/argocd-applicationset-controller-github-app-secret
     gitConfig:
       branch: main
   applicationRefs:
