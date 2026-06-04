@@ -3,7 +3,7 @@
 resource "cloudflare_dns_record" "play" {
   zone_id = local.cloudflare_zone_id
   name    = "play.seichi.click"
-  content = "nrt.premium-aws.tcpshield.com"
+  content = "1f8e6b77c38e1bea01fd0700a6388f7d.ipv4.tcpshield.com"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
@@ -11,7 +11,7 @@ resource "cloudflare_dns_record" "play" {
 resource "cloudflare_dns_record" "play_debug" {
   zone_id = local.cloudflare_zone_id
   name    = "play-debug.seichi.click"
-  content = "nrt.premium-aws.tcpshield.com"
+  content = "1f8e6b77c38e1bea01fd0700a6388f7d.ipv4.tcpshield.com"
   type    = "CNAME"
   ttl     = 1 # automatic
 }
