@@ -9,4 +9,4 @@ spec:
   storageClassName: topolvm-provisioner
   resources:
     requests:
-      storage: 400Gi
+      storage: 600Gi
