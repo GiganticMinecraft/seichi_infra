@@ -101,7 +101,22 @@ spec:
             done
             if [ "$found" = 0 ]; then
               echo "Removing orphaned directory: $dir"
-              rm -rf "$dir"
+              # 巨大ディレクトリ(例: Loki の数十万エントリ)では rm -rf が
+              # ENOTEMPTY(Directory not empty) で失敗することがある。これは rm が
+              # getdents64 によるディレクトリ読み出しと unlink を交互に行う過程で、
+              # ext4 htree のハッシュベースのカーソルが削除によってずれ、一部
+              # エントリを読み飛ばしたまま end-of-directory に達し、最後の rmdir 時に
+              # 中身が残っているために起きる(POSIX 的にも readdir 中の更新は unspecified)。
+              # 縮んだディレクトリを読み直せば残りを消せるため、空になるまでリトライする。
+              # また prune は best-effort な後始末なので、消し切れなくても
+              # バックアップ本体は止めない(rm を && の左に置くことで set -e でも中断しない)。
+              n=0
+              while [ -d "$dir" ] && [ "$n" -lt 10 ]; do
+                n=$((n + 1))
+                rm -rf "$dir" && break
+                echo "  prune retry $n: $dir"
+              done
+              [ -d "$dir" ] && echo "  WARNING: $dir を完全に削除できませんでした(次回実行時に再試行されます)"
             fi
           done
 
