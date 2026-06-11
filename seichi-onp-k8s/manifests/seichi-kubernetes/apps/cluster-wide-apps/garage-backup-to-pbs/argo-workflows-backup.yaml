@@ -62,12 +62,32 @@ spec:
           DUMP_DIR="/data/garage-dump"
           mkdir -p "$DUMP_DIR"
 
-          # バケット一覧を取得してそれぞれ sync
-          BUCKETS=$(aws $S3_OPTS s3 ls | awk '{print $3}')
+          # バックアップ対象から除外するバケット（肥大化が激しく PBS バックアップに
+          # 不向きなログ系。除外したバケットの dump ディレクトリは下の prune 処理で削除される）
+          EXCLUDE_BUCKETS="loki"
+
+          # バケット一覧を取得し、除外対象を除いてそれぞれ sync
+          ALL_BUCKETS=$(aws $S3_OPTS s3 ls | awk '{print $3}')
+          BUCKETS=""
+          for b in $ALL_BUCKETS; do
+            excluded=0
+            for ex in $EXCLUDE_BUCKETS; do
+              if [ "$b" = "$ex" ]; then
+                excluded=1
+                break
+              fi
+            done
+            if [ "$excluded" = 1 ]; then
+              echo "Excluding bucket from backup: $b"
+              continue
+            fi
+            BUCKETS="$BUCKETS $b"
+          done
           echo "Found buckets: $BUCKETS"
 
-          # 永続 PVC 上で Garage から削除済みバケットのディレクトリが残ると
-          # 不要なデータを PBS に送り続けることになるため、sync 前に掃除する
+          # 永続 PVC 上に Garage から削除済み、またはバックアップ対象外となった
+          # バケットのディレクトリが残ると不要なデータを PBS に送り続けることになるため、
+          # sync 前に掃除する（BUCKETS に無いディレクトリ＝loki 等の除外バケットも削除される）
           echo "=== Pruning orphaned bucket directories ==="
           for dir in "$DUMP_DIR"/*/; do
             [ -d "$dir" ] || continue
