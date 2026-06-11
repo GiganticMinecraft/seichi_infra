@@ -8,7 +8,7 @@ spec:
   source:
     chart: topolvm
     repoURL: https://topolvm.github.io/topolvm
-    targetRevision: 16.1.0
+    targetRevision: 16.1.1
     helm:
       releaseName: topolvm
       values: |
