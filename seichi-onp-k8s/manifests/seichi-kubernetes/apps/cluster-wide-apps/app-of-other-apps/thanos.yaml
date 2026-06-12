@@ -30,3 +30,11 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+  # StatefulSet の volumeClaimTemplates.spec.volumeMode は jsonnet 側で明示していないが、
+  # k8s が server-side で 'Filesystem' を default 補完するため永続的に OutOfSync になる。
+  # 上流 thanos-config 側で明示するのが本筋ではあるが、ノイズ抑制として ArgoCD 側で無視する。
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates[].spec.volumeMode

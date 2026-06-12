@@ -102,7 +102,9 @@ spec:
                 - name: Prometheus
                   uid: PBFA97CFB590B2093
                   type: prometheus
-                  url: http://prometheus-kube-prometheus-prometheus:9090
+                  # Grafana から見ると Prometheus 直結ではなく Thanos Querier 経由で
+                  # ローカル直近 (sidecar) と Garage 上の長期 (store gateway) が透過的に見える
+                  url: http://thanos-query.monitoring:9090
                   isDefault: true
                 - name: Loki
                   uid: P8E80F9AEF21F6940
@@ -196,8 +198,12 @@ spec:
             resources:
               requests:
                 memory: 12Gi
-            retention: 180d
-            retentionSize: "270GB"
+            # Garage の Thanos object store カバー開始は 2026-03-01。
+            # ローカル retention の終端が Garage 開始より新しいと Querier から見えない
+            # ギャップが発生するため、(today - 2026-03-01) + 数日マージンで設定する。
+            # 時間が経つほど Garage カバー期間が伸びるので、余裕が出たら段階的に縮める。
+            retention: 75d
+            retentionSize: "240GB"
             additionalScrapeConfigs:
             - job_name: 'containerd'
               scheme: http
