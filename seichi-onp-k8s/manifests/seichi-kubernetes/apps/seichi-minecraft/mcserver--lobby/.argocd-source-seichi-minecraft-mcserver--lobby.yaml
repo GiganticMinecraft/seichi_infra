@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:2d7dbd4a4a74a12e67af90796847eff125b067d51be7ceebf3902a2952822ca0
