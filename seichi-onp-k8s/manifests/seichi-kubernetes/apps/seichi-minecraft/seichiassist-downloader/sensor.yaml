@@ -66,7 +66,7 @@ spec:
                           template: restart-debug-server
                   - name: download-release
                     container:
-                      image: alpine:3.23
+                      image: alpine:3.24
                       volumeMounts:
                         - name: work
                           mountPath: /work
@@ -228,7 +228,7 @@ spec:
                         - name: embed-title
                         - name: embed-color
                     container:
-                      image: alpine:3.23
+                      image: alpine:3.24
                       env:
                         - name: DISCORD_WEBHOOK_URL
                           valueFrom:
