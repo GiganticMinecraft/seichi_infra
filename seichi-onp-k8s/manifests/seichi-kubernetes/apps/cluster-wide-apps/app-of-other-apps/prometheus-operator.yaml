@@ -102,8 +102,13 @@ spec:
                 - name: Prometheus
                   uid: PBFA97CFB590B2093
                   type: prometheus
-                  url: http://prometheus-kube-prometheus-prometheus:9090
+                  url: http://thanos-query:9090
                   isDefault: true
+                - name: Prometheus Direct
+                  uid: P8689B564F8D4EF51
+                  type: prometheus
+                  url: http://prometheus-kube-prometheus-prometheus:9090
+                  isDefault: false
                 - name: Loki
                   uid: P8E80F9AEF21F6940
                   type: loki
@@ -192,12 +197,12 @@ spec:
                 spec:
                   resources:
                     requests:
-                      storage: 300Gi
+                      storage: 500Gi
             resources:
               requests:
                 memory: 12Gi
-            retention: 180d
-            retentionSize: "270GB"
+            retention: 30d
+            retentionSize: "120GB"
             additionalScrapeConfigs:
             - job_name: 'containerd'
               scheme: http
@@ -216,6 +221,34 @@ spec:
                 regex: 'grpc_.*'
                 action: drop
         additionalPrometheusRulesMap:
+          thanos:
+            groups:
+              - name: thanos
+                rules:
+                  - alert: ThanosSidecarUploadStale
+                    expr: time() - max by (namespace, pod) (thanos_objstore_bucket_last_successful_upload_time{job="prometheus-kube-prometheus-thanos-discovery"}) > 6 * 60 * 60
+                    for: 15m
+                    labels:
+                      severity: error
+                    annotations:
+                      summary: Thanos sidecar has not uploaded blocks recently
+                      description: Thanos sidecar has not completed a successful object storage upload for more than 6 hours.
+                  - alert: ThanosSidecarUploadFailures
+                    expr: increase(thanos_shipper_upload_failures_total{job="prometheus-kube-prometheus-thanos-discovery"}[30m]) > 0
+                    for: 5m
+                    labels:
+                      severity: error
+                    annotations:
+                      summary: Thanos sidecar upload failures
+                      description: Thanos sidecar failed to upload Prometheus TSDB blocks to object storage.
+                  - alert: ThanosObjectStorageOperationFailures
+                    expr: sum by (job, operation) (increase(thanos_objstore_bucket_operation_failures_total[30m])) > 0
+                    for: 5m
+                    labels:
+                      severity: error
+                    annotations:
+                      summary: Thanos object storage operation failures
+                      description: Thanos object storage operation {{ "{{ $labels.operation }}" }} is failing for {{ "{{ $labels.job }}" }}.
           resource-usage:
             groups:
               - name: resource-usage

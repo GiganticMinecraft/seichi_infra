@@ -30,3 +30,10 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+  # StatefulSet volumeClaimTemplates.spec.volumeMode is defaulted by the API
+  # server, while thanos-config omits it. Ignore that default-only diff here.
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates[].spec.volumeMode
