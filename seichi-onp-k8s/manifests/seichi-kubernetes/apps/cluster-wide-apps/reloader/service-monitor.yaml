@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: reloader-reloader
+  labels:
+    # kube-prometheus-stack の serviceMonitorSelector に一致させる
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: reloader-reloader
+  endpoints:
+    - port: http
+      path: /metrics

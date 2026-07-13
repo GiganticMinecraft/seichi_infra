@@ -60,6 +60,26 @@ configs:
     accounts.mcp-service: apiKey
     accounts.backup-workflow: apiKey
     accounts.kubechecks: apiKey
+    # Reloader (--reload-strategy=annotations) がローリング再起動のために
+    # pod template へ付与する annotation を diff として扱わない。
+    # これがないと selfHeal が annotation を剥がそうとして Reloader と競合する。
+    resource.customizations.ignoreDifferences.apps_Deployment: |
+      jqPathExpressions:
+        - .spec.template.metadata.annotations."reloader.stakater.com/last-reloaded-from"
+    resource.customizations.ignoreDifferences.apps_StatefulSet: |
+      jqPathExpressions:
+        - .spec.template.metadata.annotations."reloader.stakater.com/last-reloaded-from"
+    resource.customizations.ignoreDifferences.apps_DaemonSet: |
+      jqPathExpressions:
+        - .spec.template.metadata.annotations."reloader.stakater.com/last-reloaded-from"
+  repositories:
+    # node-problem-detector の Helm チャート取得先。OCI レジストリは
+    # enableOCI 付きでリポジトリ登録しないと Application の repoURL として解決できない
+    deliveryhero-helm-oci:
+      url: ghcr.io/deliveryhero/helm-charts
+      name: deliveryhero
+      type: helm
+      enableOCI: "true"
   rbac:
     create: true
     # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).

@@ -4,3 +4,18 @@ namespace: cluster-wide-apps
 resources:
   # reloader
   - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.4.19
+  - service.yaml
+  - service-monitor.yaml
+patches:
+  # デフォルトの env-vars 戦略は pod template に環境変数を注入するため、
+  # ArgoCD の selfHeal と競合する。annotation ベースの戦略に切り替え、
+  # argocd-cm 側の resource.customizations.ignoreDifferences で
+  # reloader.stakater.com/last-reloaded-from を diff 対象から除外している。
+  - target:
+      kind: Deployment
+      name: reloader-reloader
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/args
+        value:
+          - --reload-strategy=annotations

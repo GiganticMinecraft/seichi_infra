@@ -44,7 +44,7 @@ spec:
           kind: CSIDriver
           jqPathExpressions:
             - .spec.seLinuxMount
-        - group: ""
+        - group: apps
           kind: Deployment
           jqPathExpressions:
             - .spec.template.spec.containers[].env[].valueFrom.resourceFieldRef.divisor
