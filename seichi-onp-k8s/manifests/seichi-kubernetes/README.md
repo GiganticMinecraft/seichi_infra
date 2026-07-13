@@ -44,29 +44,21 @@ TCP パケットをそのまま送り届ける必要があります。
 | ---------------------------- | ----------------------------------------------------------- | 
 |  BungeeCord (本番環境用)     | [`10.96.0.130`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
 |  BungeeCord (デバッグ環境用) | [`10.96.0.131`](https://github.com/GiganticMinecraft/seichi_infra/blob/83e996ec845ea2cd73d9cea391cd02a03435dbd8/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-gateway/bungeecord/service-bungeecord-loadbalancer.yaml#L8) | 
-|  投票受付サーバー            | (まだ k8s 上に乗っていないので、 `Service` の VIP ではない) |
+|  投票受付サーバー            | [`10.96.0.136`](https://github.com/GiganticMinecraft/seichi_infra/blob/main/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/mcserver--votelistener/service-votelistener-loadbalancer.yaml#L7) |
 
 ### オンプレネットワーク内からのトラフィックを受ける `Service`
 
-レガシーな、オンプレネットワーク内のVMからトラフィックを受け取るサービスにも `loadbalancerIP` を割り当てています。
-
-この条件に該当する `Service` に割り当てられた `loadbalancerIP` は以下の通りです。
-
-| サービス                       | `Service` の VIP                                            | 
-| ------------------------------ | ----------------------------------------------------------- | 
-| 本番 RedisBungee 用 Redis      | [`10.96.0.132`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/redisbungee-redis.yaml#L24) |
-| 本番 BungeeSemaphore 用 Redis  | [`10.96.0.133`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/bungeesemaphore-redis.yaml#L24) |
-| Debug RedisBungee 用 Redis     | [`10.96.0.134`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/redisbungee-redis.yaml#L24) |
-| Debug BungeeSemaphore 用 Redis | [`10.96.0.135`](https://github.com/GiganticMinecraft/seichi_infra/blob/fc00e4f9b755798ed2fcd80c76b68dac49c3dc16/seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-debug-minecraft/bungeesemaphore-redis.yaml#L24) |
+かつては RedisBungee / BungeeSemaphore 用の Redis（VIP `10.96.0.132`〜`10.96.0.135`）がオンプレネットワーク内の VM からトラフィックを受けるため `loadbalancerIP` を持っていましたが、Redis は valkey（[`apps/seichi-minecraft/valkey`](./apps/seichi-minecraft/valkey)ほか）に置き換えられ、クラスタ内部からのみ利用される `ClusterIP` の `Service` になりました。
+現在 `loadbalancerIP` を持つ `Service` は上記の表にある 3 つだけです。
 
 
 ## Kubernetes クラスタのブートストラップについて
 
 Kubernetes 上で動いている(ArgoCD 以外の)すべての追加リソースはPull型の同期を行う ArgoCD によって管理されており、[`apps`](./apps/) ディレクトリ以下の特定のパスに対して行われた変更は ArgoCD によって自動的にクラスタに反映されます。
 
-クラスタのブートストラップ、つまり ArgoCD 自体の管理は [Terraform](../../../terraform/) + [Helm Provider](https://registry.terraform.io/providers/hashicorp/helm/latest/docs) により行われています。そのため、クラスタを新規に作成した時は、Kubernetes にアクセスするための認証情報を Terraform Cloud のシークレットに登録し、Plan + Apply を行うことで ArgoCD とルートプロジェクトを初期化してください。
+クラスタのブートストラップ、つまり ArgoCD 自体の管理は [Terraform](../../../terraform/) + [Helm Provider](https://registry.terraform.io/providers/hashicorp/helm/latest/docs) により行われています。そのため、クラスタを新規に作成した時は、Kubernetes にアクセスするための認証情報を GitHub Actions Secret（`TF_VAR_ONP_K8S_KUBECONFIG`）に登録し、Plan + Apply を行うことで ArgoCD とルートプロジェクトを初期化してください（Terraform の実行は GitHub Actions 上で行われ、Terraform Cloud は state 管理のみを担います）。
 
-Terraform Cloud に登録すべき認証情報等のより詳細な情報は [`main.tf`](../../../terraform/main.tf) の variable 定義を参照してください。
+登録すべき認証情報等のより詳細な情報は [`main.tf`](../../../terraform/main.tf) の variable 定義を参照してください。
 
 ## ArgoCD Diff チェック (kubechecks)
 

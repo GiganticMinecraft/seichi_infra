@@ -9,8 +9,8 @@ Terraformで管理しているインフラの運用ガイド。
 ## 管理リソース
 
 - **GitHub**: Teams、Repository設定
-- **Cloudflare**: Access、証明書、DNS、Page rules
-- **オンプレk8s**: Secret、Namespace
+- **Cloudflare**: Access、証明書、DNS、Page rules、Pages
+- **オンプレk8s**: Secret、Namespace、ArgoCD本体（helm_releaseによるブートストラップ）
 
 ## 実行環境
 
@@ -26,7 +26,9 @@ Terraformで管理しているインフラの運用ガイド。
 
 ## Variable追加時の注意
 
-GitHub Actions SecretからTerraform variableに変換する際、**すべて大文字のスネークケース**で定義すること。
+Terraform variableは**すべて小文字のスネークケース**で定義すること。
+対応するGitHub Actions Secretは `TF_VAR_` + 大文字スネークケース（例: `TF_VAR_CLOUDFLARE_API_KEY`）で登録する。
+`expose-all-tf-vars-to-github-env.sh` がSecret名の `TF_VAR_` 以降を小文字に変換して環境変数として注入するため、この対応関係を崩さないこと。
 
 ## 関連リンク
 

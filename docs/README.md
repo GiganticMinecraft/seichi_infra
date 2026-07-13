@@ -13,6 +13,7 @@ https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 - [Kubernetes証明書更新](./runbooks/k8s-cert-renewal.md)
 - [Cloudflare証明書更新](./runbooks/cloudflare-cert-renewal.md)
 - [Minecraftメンテナンスモード](./runbooks/maintenance-mode.md)
+- [Minecraftワールド・MariaDBロールバック](./runbooks/rollback-mcserver-and-mariadb.md)
 
 ## Guides（ガイド）
 
@@ -26,4 +27,4 @@ https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 
 1. このリポジトリの`docs/`ディレクトリを編集
 2. PRを作成してレビュー
-3. mainにマージ後、Wiki.jsに自動同期
+3. mainにマージ後、GitHub Actions（`deploy_docs.yaml`）がGitHub Pagesへ自動デプロイ

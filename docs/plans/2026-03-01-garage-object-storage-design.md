@@ -1,5 +1,16 @@
 # Garage Object Storage 導入設計
 
+> **ステータス (2026-07-08 追記): 導入済み。** 本文書は 2026-03 時点の設計計画であり、実装は完了している。
+> 実構成が本文書と異なる主な点:
+>
+> - chart / image は v2.3.0（本文書では v2.2.0 / chart 0.9.2）
+> - blockSize は 64MiB（本文書では 1MiB）
+> - metadata PVC は 100Gi（本文書では 10Gi）
+> - バケットは loki / thanos / pyroscope / mariadb-backups / mc-worlds / seichiassist（`seichi-plugins` は存在せず、本文書に記載のない `pyroscope` が存在する）
+> - 「Phase 2〜3（Loki 切替、Thanos 追加）」は実施済みで、Loki / Thanos / Pyroscope はいずれも Garage を本番利用中
+>
+> 最新の実構成は `seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/app-of-other-apps/garage.yaml` を参照。
+
 ## 概要
 
 MinIO (2026年2月アーカイブ済み) の後継として Garage を導入し、
