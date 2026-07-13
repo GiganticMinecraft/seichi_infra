@@ -1,0 +1,37 @@
+apiVersion: remediation.medik8s.io/v1alpha1
+kind: NodeHealthCheck
+metadata:
+  name: worker-nodes
+  annotations:
+    # NodeHealthCheck CRD は OLM がオペレータをインストールした後に生えるため、
+    # 初回 sync 時の dry-run 失敗をスキップする(ApplicationSet の無限リトライで収束する)
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  # control-plane の自動 remediation は事故時の etcd quorum への影響が大きいため
+  # worker のみを対象とする(upstream も CP/worker 混在の selector を強く非推奨としている)
+  selector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: DoesNotExist
+  remediationTemplate:
+    apiVersion: self-node-remediation.medik8s.io/v1alpha1
+    kind: SelfNodeRemediationTemplate
+    # SNR がインストール時に自動生成するデフォルトテンプレート
+    namespace: operators
+    name: self-node-remediation-automatic-strategy-template
+  # 3 worker 構成では常に 2 台以上健全であることを要求する
+  # (kured の再起動は drain 済みかつ数分で復帰するため 300s には達しない想定)
+  minHealthy: 51%
+  unhealthyConditions:
+    - type: Ready
+      status: "False"
+      duration: 300s
+    - type: Ready
+      status: Unknown
+      duration: 300s
+    # node-problem-detector の kernel-monitor が付与する NodeCondition。
+    # カーネルデッドロックは再起動でしか回復しないため対象に含める。
+    # ReadonlyFilesystem はディスク障害由来で再起動ループになり得るため対象外(アラートのみ)
+    - type: KernelDeadlock
+      status: "True"
+      duration: 120s

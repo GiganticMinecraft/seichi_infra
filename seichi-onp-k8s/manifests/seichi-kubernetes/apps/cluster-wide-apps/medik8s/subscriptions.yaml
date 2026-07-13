@@ -1,0 +1,29 @@
+# medik8s のオペレータ 2 つを OLM の operatorhub.io カタログから導入する。
+# NHC は remediator を自動では入れないため、SNR も明示的に Subscribe する必要がある。
+# startingCSV で初期バージョンを明示しているが、installPlanApproval: Automatic のため
+# 以降のアップグレードはカタログの更新に追従する(Git ではなくカタログ駆動)。
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: node-healthcheck-operator
+  namespace: operators
+spec:
+  channel: stable
+  name: node-healthcheck-operator
+  source: operatorhubio-catalog
+  sourceNamespace: olm
+  installPlanApproval: Automatic
+  startingCSV: node-healthcheck-operator.v0.12.0
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: self-node-remediation
+  namespace: operators
+spec:
+  channel: stable
+  name: self-node-remediation
+  source: operatorhubio-catalog
+  sourceNamespace: olm
+  installPlanApproval: Automatic
+  startingCSV: self-node-remediation.v0.13.0
