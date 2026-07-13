@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kured
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: kured
+    repoURL: https://kubereboot.github.io/charts
+    targetRevision: 6.1.0
+    helm:
+      releaseName: kured
+      values: |
+        configuration:
+          timeZone: "Asia/Tokyo"
+          # 04:00 からの Minecraft バックアップ(kubectl patch による replicas 操作)と
+          # 07:00-08:00 の ArgoCD selfHeal ウィンドウを避けた時間帯のみ再起動を許可する
+          startTime: "05:00"
+          endTime: "07:00"
+          # ロックにより同時に再起動するノードは 1 台のみ
+          concurrency: 1
+          # 再起動中にノードが死んだ場合にロックが残留しないようにする
+          lockTtl: 30m
+          drainGracePeriod: "60"
+          drainTimeout: 10m
+          period: 10m
+          annotateNodes: true
+          # 重要なアラートが firing している間は再起動を保留する。
+          # 常時 firing しがちな警告(TargetDown 等)は除外しないと永久にブロックされるため列挙している
+          prometheusUrl: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
+          alertFiringOnly: true
+          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch)$"
+        # tolerations はチャートのデフォルトで control-plane の NoSchedule を含むため未指定のままにする
+        service:
+          create: true
+        metrics:
+          create: true
+          labels:
+            release: prometheus
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
