@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# medik8s (node-healthcheck-operator / self-node-remediation) は OLM 経由でしか
+# 配布されていないため、OLM 本体をここで導入する。
+# バージョンを上げるときは 2 つの URL を同時に更新すること(Renovate は追従しない)
+resources:
+  - https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.45.0/crds.yaml
+  - https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.45.0/olm.yaml
+patches:
+  # self-node-remediation の agent DaemonSet は privileged Pod を必要とするため、
+  # オペレータがインストールされる operators namespace を PSA privileged にする
+  - patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: operators
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged

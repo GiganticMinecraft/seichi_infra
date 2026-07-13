@@ -12,7 +12,84 @@ spec:
     helm:
       releaseName: descheduler
       values: |
-        schedule: "30 19 * * Tue"
+        # JST 水曜 04:30 に週1回実行(従来の "30 19 * * Tue" (UTC) と同時刻)
+        schedule: "30 4 * * 3"
+        timeZone: "Asia/Tokyo"
+        # チャートのデフォルトポリシーをベースに、Pod の退避(=再起動)が
+        # プレイヤー切断に直結する namespace を退避対象から除外する
+        deschedulerPolicy:
+          # 一度の実行で大量退避が起きないようにする安全弁
+          maxNoOfPodsToEvictPerNode: 10
+          profiles:
+            - name: default
+              pluginConfig:
+                - name: DefaultEvictor
+                  args:
+                    # 退避先ノードが確保できない Pod は退避しない
+                    nodeFit: true
+                    podProtections:
+                      defaultDisabled:
+                        - "PodsWithLocalStorage"
+                      extraEnabled:
+                        - "PodsWithPVC"
+                - name: RemoveDuplicates
+                  args:
+                    namespaces:
+                      exclude: &player-facing-namespaces
+                        - seichi-minecraft
+                        - seichi-debug-minecraft
+                        - seichi-gateway
+                        - seichi-debug-gateway
+                - name: RemovePodsHavingTooManyRestarts
+                  args:
+                    podRestartThreshold: 100
+                    includingInitContainers: true
+                    namespaces:
+                      exclude: *player-facing-namespaces
+                - name: RemovePodsViolatingNodeAffinity
+                  args:
+                    nodeAffinityType:
+                      - requiredDuringSchedulingIgnoredDuringExecution
+                    namespaces:
+                      exclude: *player-facing-namespaces
+                - name: RemovePodsViolatingNodeTaints
+                  args:
+                    namespaces:
+                      exclude: *player-facing-namespaces
+                - name: RemovePodsViolatingInterPodAntiAffinity
+                  args:
+                    namespaces:
+                      exclude: *player-facing-namespaces
+                - name: RemovePodsViolatingTopologySpreadConstraint
+                  args:
+                    namespaces:
+                      exclude: *player-facing-namespaces
+                - name: LowNodeUtilization
+                  args:
+                    thresholds:
+                      cpu: 20
+                      memory: 20
+                      pods: 20
+                    targetThresholds:
+                      cpu: 50
+                      memory: 50
+                      pods: 50
+                    # LowNodeUtilization は namespaces を受け付けないので
+                    # evictableNamespaces で除外する
+                    evictableNamespaces:
+                      exclude: *player-facing-namespaces
+              plugins:
+                balance:
+                  enabled:
+                    - RemoveDuplicates
+                    - RemovePodsViolatingTopologySpreadConstraint
+                    - LowNodeUtilization
+                deschedule:
+                  enabled:
+                    - RemovePodsHavingTooManyRestarts
+                    - RemovePodsViolatingNodeTaints
+                    - RemovePodsViolatingNodeAffinity
+                    - RemovePodsViolatingInterPodAntiAffinity
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system

@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: node-problem-detector
+  namespace: argocd
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: node-problem-detector
+    repoURL: ghcr.io/deliveryhero/helm-charts
+    targetRevision: 2.4.1
+    helm:
+      releaseName: node-problem-detector
+      values: |
+        image:
+          # チャートデフォルトのイメージはクラスタの Kubernetes バージョンより古いため明示する
+          tag: v1.36.0
+        metrics:
+          serviceMonitor:
+            enabled: true
+            additionalLabels:
+              release: prometheus
+        settings:
+          log_monitors:
+            # KernelDeadlock / ReadonlyFilesystem などの NodeCondition を設定する。
+            # これらは medik8s NodeHealthCheck の unhealthyConditions からも参照される。
+            # containerd 環境のため docker-monitor.json は含めない
+            - /config/kernel-monitor.json
+            - /config/readonly-monitor.json
+        # tolerations はチャートのデフォルト(operator: Exists, effect: NoSchedule)で
+        # control-plane を含む全ノードにスケジュールされる
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
