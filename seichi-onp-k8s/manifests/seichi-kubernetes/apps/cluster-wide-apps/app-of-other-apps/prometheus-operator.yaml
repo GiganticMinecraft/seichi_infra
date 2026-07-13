@@ -220,6 +220,17 @@ spec:
               - source_labels: [__name__]
                 regex: 'grpc_.*'
                 action: drop
+            # kubeEtcd の ServiceMonitor は selector なし Service + Endpoints で etcd を発見するが、
+            # ArgoCD 3.x のデフォルト resource.exclusions が Endpoints を除外するため機能しない。
+            # そのため static_configs で直接スクレイプする(kubeEtcd 自体は etcd 用 defaultRules の
+            # 有効化条件なので values に残している)。
+            - job_name: 'kube-etcd'
+              scheme: http
+              static_configs:
+              - targets:
+                - 192.168.32.11:2381
+                - 192.168.32.12:2381
+                - 192.168.32.13:2381
         additionalPrometheusRulesMap:
           thanos:
             groups:

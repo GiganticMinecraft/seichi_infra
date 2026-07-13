@@ -21,7 +21,7 @@
 
 ### VM 環境
 
-VM環境は `Proxmox Virtual Environment 9.1.2` を利用しています。
+VM環境は `Proxmox Virtual Environment 9.x` を利用しています（2026-07時点では 9.2.4）。
 
  - ベアメタル9ノード
 
@@ -39,7 +39,10 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
 ### ストレージ
 
 以下のストレージを共有ストレージとして使用しています。
- - Synology NAS(DS1621+)
+ - Synology NAS 2台（seichi-cloud、mktn-arigatonas。iSCSI + NFS）
+ - TrueNAS 3台（sc-truenas-01/02/03。iSCSI）
+
+Kubernetes ワーカーの OS・データディスクは原則ノードローカルの LVM-Thin（`local-lvm`）に置かれ、cloud-init ドライブと snippets は Synology 側（`prd-network-01-lun01` / `seichi-cloud--bkup-01`）に置かれます。
 
 ### ネットワーク
 
@@ -56,15 +59,17 @@ KubernetesノードのVMは cloudinit イメージで作成されています。
          - 192.168.0.0/22 の一部を使用
        - Storage Network (192.168.18.0-192.168.18.127)
          - 192.168.16.0/22 の一部を使用
-     - API Endpoint (192.168.18.100)
+     - API Endpoint VIP (keepalived + HAProxy が保持。[k8s-node-setup.sh](./scripts/nodes/k8s-node-setup.sh) で定義)
+       - 192.168.32.100 (ens20)
+       - 192.168.0.100 (ens18)
     - LoadBalancer VIP (10.96.0.0/22)
 
 ## Kubernetesクラスタの構成
 
-2022/05/23現在、クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/91999d509e52905eaff16fc8928fbe5316f1eaeb/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh#L15-L20)。
+クラスタは (3 control plane nodes + 3 worker nodes) の構成で[作成されています](https://github.com/GiganticMinecraft/seichi_infra/blob/91999d509e52905eaff16fc8928fbe5316f1eaeb/seichi-onp-k8s/cluster-boot-up/scripts/proxmox-host-terminal/deploy-vm.sh#L15-L20)。
 
 クラスタの作成は以下のツール群で行っています。
-  - kubeadm, kubectl, kubelet v1.34.2
+  - kubeadm, kubectl, kubelet（クラスタは 2026-07 現在 v1.36.2）
 
 CNI には Cilium を利用しています。
 
@@ -110,6 +115,8 @@ CNI には Cilium を利用しています。
     `TARGET_BRANCH` は、デプロイ対象のスクリプト(`scripts/`)及び設定ファイル(`snippets/`)への変更が反映されたブランチを指定してください。
 
  1. 生成した全ノードにローカルマシンから接続できるようにします。
+
+    なお、ここで説明する踏み台サーバー経由の SSH は初期構築時の経路です。構築済みクラスタへの日常的なアクセスは tailscale 経由（`seichi-onp-k8s-cp-{1,2,3}.seichi.internal` へ `cloudinit` ユーザーで SSH。[rollback-mcserver-and-mariadb.md](../../docs/runbooks/rollback-mcserver-and-mariadb.md) 参照）で行います。
 
      1. 次のスクリプトを実行し、必要なパラメータをセットします。
 
@@ -366,7 +373,7 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
  - まず、クラスタのセットアップスクリプトにより、`k8s-api.onp-k8s.admin.local-tunnels.seichi.click` がクラスタAPIのSSL証明書のSAN(Subject Alternative Name)に追記されており、かつ、このドメイン(`k8s-api.onp-k8s.admin.local-tunnels.seichi.click`) は `127.0.0.1` を向くように[設定されて](../../terraform/cloudflare_dns_records.tf)います。
 
- - 次に、k8s クラスタ内に、 k8s API Endpoint を `k8s-api.onp-k8s.admin.seichi.click` に張った TCP Argo Tunnel でアクセスできるようにするための `cloudflared` インスタンスを常駐させています。
+ - 次に、k8s クラスタ内に、 k8s API Endpoint を `k8s-api.onp-k8s.admin.seichi.click` に張った TCP トンネル（Cloudflare Tunnel。旧称 Argo Tunnel）でアクセスできるようにするための `cloudflared` インスタンスを常駐させています。
 
 ![クラスタAPIを外部公開する仕組みの構成図](./docs/diagrams/cluster-api-exposure.drawio.svg)
 
@@ -384,31 +391,36 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
 
  1. **proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、クラスタを構成するVMを停止します。
 
+    VM の配置はマイグレーションで変わりうるため、実行前に Proxmox の GUI または `pvesh get /cluster/resources --type vm` で現在の配置を必ず確認してください。
+    以下は 2026-07 時点の配置（cp-1: prox03、cp-2: prox06、cp-3: prox01、wk-1/2/3: prox09/10/11）での例です。
+
     ```sh
-    # unchama-sv-prox02上に存在するクラスタを構成するVMを停止する
-    ssh 192.168.16.151 qm stop 1001
-    ssh 192.168.16.151 qm stop 1101
-    # unchama-sv-prox04上に存在するクラスタを構成するVMを停止する
-    ssh 192.168.16.153 qm stop 1002
-    ssh 192.168.16.153 qm stop 1102
-    # unchama-sv-prox05上に存在するクラスタを構成するVMを停止する
-    ssh 192.168.16.154 qm stop 1003
-    ssh 192.168.16.154 qm stop 1103
+    # unchama-sv-prox03上に存在するクラスタを構成するVMを停止する
+    ssh 192.168.16.152 qm stop 1001
+    # unchama-sv-prox06上に存在するクラスタを構成するVMを停止する
+    ssh 192.168.16.155 qm stop 1002
+    # unchama-sv-prox01上に存在するクラスタを構成するVMを停止する
+    ssh 192.168.16.150 qm stop 1003
+    # unchama-sv-prox09/10/11上に存在するworkerを停止する
+    ssh 192.168.16.158 qm stop 1101
+    ssh 192.168.16.159 qm stop 1102
+    ssh 192.168.16.160 qm stop 1103
     ```
 
  1. **proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、クラスタを構成するVMを削除します。
 
     ```sh
-    # unchama-sv-prox02上に存在するクラスタを構成するVMを削除する
-    ssh 192.168.16.151 qm destroy 9050 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.151 qm destroy 1001 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.151 qm destroy 1101 --destroy-unreferenced-disks true --purge true
-    # unchama-sv-prox04上に存在するクラスタを構成するVMを削除する
-    ssh 192.168.16.153 qm destroy 1102 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.153 qm destroy 1002 --destroy-unreferenced-disks true --purge true
-    # unchama-sv-prox05上に存在するクラスタを構成するVMを削除する
-    ssh 192.168.16.154 qm destroy 1003 --destroy-unreferenced-disks true --purge true
-    ssh 192.168.16.154 qm destroy 1103 --destroy-unreferenced-disks true --purge true
+    # unchama-sv-prox01上に存在するクラスタを構成するVM(とテンプレート)を削除する
+    ssh 192.168.16.150 qm destroy 9050 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.150 qm destroy 1003 --destroy-unreferenced-disks true --purge true
+    # unchama-sv-prox03上に存在するクラスタを構成するVMを削除する
+    ssh 192.168.16.152 qm destroy 1001 --destroy-unreferenced-disks true --purge true
+    # unchama-sv-prox06上に存在するクラスタを構成するVMを削除する
+    ssh 192.168.16.155 qm destroy 1002 --destroy-unreferenced-disks true --purge true
+    # unchama-sv-prox09/10/11上に存在するworkerを削除する
+    ssh 192.168.16.158 qm destroy 1101 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.159 qm destroy 1102 --destroy-unreferenced-disks true --purge true
+    ssh 192.168.16.160 qm destroy 1103 --destroy-unreferenced-disks true --purge true
     ```
 
 ### クラスタの削除後、クラスタの再作成に失敗する場合
@@ -426,7 +438,7 @@ CPノードへのログインに利用できる鍵ペアは、クラスタを作
     1. その後、**proxmoxをホストしている物理マシンのターミナル上で**次のコマンドを実行し、残ったデバイスを削除します。
 
        ```sh
-       for host in 192.168.16.151 192.168.16.153 192.168.16.154 ; do
+       for host in 192.168.16.150 192.168.16.152 192.168.16.155 192.168.16.158 192.168.16.159 192.168.16.160 ; do
          ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--9050--cloudinit
          
          ssh $host dmsetup remove prd--network--01--lun01--vg01-vm--1001--cloudinit

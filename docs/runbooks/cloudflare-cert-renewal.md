@@ -30,10 +30,10 @@ Cloudflareダッシュボードから発行するOrigin証明書。
    cloudflared login
    ```
 
-3. 取得した証明書（cert.pem）をTerraform Cloudのシークレットに更新
-   - Variable: `TF_VAR_ONP_K8S_CLOUDFLARED_TUNNEL_CREDENTIAL`
+3. 取得した証明書（cert.pem）をGitHub Actions Secretに更新
+   - Secret名: `TF_VAR_ONP_K8S_CLOUDFLARED_TUNNEL_CREDENTIAL`（このリポジトリのActions Secret。Terraformへはworkflowが環境変数として注入する）
 
-4. Terraform applyを実行
+4. Terraform applyを実行（mainへのpushまたは`terraform_apply.yaml`のworkflow_dispatch）
 
 ## 関連リンク
 

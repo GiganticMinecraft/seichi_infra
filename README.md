@@ -17,6 +17,7 @@ seichi.click networkのオンプレ環境のうち、公開可能な箇所を管
  - [`diagrams`](./diagrams/)
    - 概要図、ネットワーク構成図などの図を draw.io で描いて管理するディレクトリ。
    - 2022/03/18現在、GitHubがmermaidのレンダリングを正式にサポートしたため、新しい図はmermaidで作成して良いかも
+   - 注意: `unchama-home-infra.drawio.svg` は2022年時点の構成図であり、現在の実態（Proxmoxホスト9台、TrueNAS 3台、Proxmox Backup Server等）を反映していません
  
  - [`seichi-onp-k8s`](./seichi-onp-k8s/)
    - オンプレ環境の k8s クラスタの定義を管理するディレクトリ。詳細は [README](./seichi-onp-k8s/README.md) を参照してください。

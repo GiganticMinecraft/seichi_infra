@@ -37,10 +37,15 @@ nav:
       - Kubernetes証明書更新: runbooks/k8s-cert-renewal.md
       - Cloudflare証明書更新: runbooks/cloudflare-cert-renewal.md
       - Minecraftメンテナンスモード: runbooks/maintenance-mode.md
+      - Minecraftワールド・MariaDBロールバック: runbooks/rollback-mcserver-and-mariadb.md
   - Guides:
       - 開発者向けデプロイガイド: guides/deployment.md
       - Kubernetesクラスタ構築: guides/cluster-setup.md
       - Terraform運用: guides/terraform.md
+  - Plans:
+      - Garageオブジェクトストレージ設計 (2026-03): plans/2026-03-01-garage-object-storage-design.md
+  - Audits:
+      - インフラ実態調査とドキュメントの乖離 (2026-07): audits/2026-07-08-infra-docs-audit.md
 
 markdown_extensions:
   - pymdownx.highlight:
