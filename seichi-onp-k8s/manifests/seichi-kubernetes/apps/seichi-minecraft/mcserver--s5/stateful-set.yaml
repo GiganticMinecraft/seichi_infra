@@ -274,8 +274,10 @@ spec:
           startupProbe:
             tcpSocket:
               port: 25565
-            # 最大120秒待つ
-            failureThreshold: 6
+            # 最大10分待つ。ノード再起動直後のコールドスタートでは
+            # プラグイン読み込みで起動が 120 秒を超え、旧設定(120秒)では
+            # 開通前に kill され続ける再起動ループに陥った(2026-07-14)
+            failureThreshold: 30
             periodSeconds: 20
 
           readinessProbe:

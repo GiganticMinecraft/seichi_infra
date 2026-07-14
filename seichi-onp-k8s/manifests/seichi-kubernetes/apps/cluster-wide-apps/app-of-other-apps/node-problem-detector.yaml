@@ -16,6 +16,9 @@ spec:
           # チャートデフォルトのイメージはクラスタの Kubernetes バージョンより古いため明示する
           tag: v1.36.0
         metrics:
+          # ServiceMonitor が参照する Service はこのフラグでしか作られない
+          # (serviceMonitor.enabled だけでは scrape 対象が存在しなくなる)
+          enabled: true
           serviceMonitor:
             enabled: true
             additionalLabels:
