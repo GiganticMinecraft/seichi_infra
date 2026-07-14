@@ -94,6 +94,24 @@
         'at any time',
       ],
     },
+    {
+      // ノードの containerd / runc のパッチ更新はノールックで automerge する
+      // (kubelet のパッチ追従は Renovate を経由せず kured の rebootCommand で完結している)。
+      // マージしてもバイナリ差し替えと sentinel 作成までで、実際の再起動は
+      // kured の窓 (05:00-07:00 JST) までゲートされるためマージ時刻は問わない。
+      // マイナー以上の更新はこのルールに該当せず、従来どおり人がレビューしてマージする
+      matchPackageNames: [
+        'containerd/containerd',
+        'opencontainers/runc',
+      ],
+      matchUpdateTypes: [
+        'patch',
+      ],
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+    },
   ],
   postUpdateOptions: [
     'gomodTidy',
