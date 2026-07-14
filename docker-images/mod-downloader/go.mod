@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.29
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.3.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.105.1
-	github.com/getsentry/sentry-go v0.47.0
+	github.com/getsentry/sentry-go v0.48.0
 )
 
 require (
@@ -26,6 +26,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.37.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.44.1 // indirect
 	github.com/aws/smithy-go v1.27.3 // indirect
-	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 )
