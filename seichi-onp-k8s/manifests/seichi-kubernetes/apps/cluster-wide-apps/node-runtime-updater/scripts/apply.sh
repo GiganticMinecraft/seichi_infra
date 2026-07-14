@@ -16,6 +16,8 @@ for list in "$PENDING_DIR"/*.list; do
       mv -f "$staged_path" "$final_path"
     fi
   done < "$list"
-  rm -f "$list"
+  # list と target は全 rename の成功後にのみ消す。途中で失敗した場合は残り、
+  # host-update.sh が部分適用として検出して再ステージ -> 翌朝の窓で再適用される
+  rm -f "$list" "${list%.list}.target"
   echo "node-runtime-updater: applied staged $(basename "$list" .list)"
 done

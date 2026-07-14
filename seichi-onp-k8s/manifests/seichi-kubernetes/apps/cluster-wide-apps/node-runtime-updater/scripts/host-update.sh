@@ -4,6 +4,10 @@
 # 実際の差し替えは kured が drain 完了後 (rebootCommand) に apply.sh で rename
 # してから再起動する。稼働中のバイナリには一切触れないため、
 # 「drain -> 更新 -> 直後に再起動」の順序が保証され、新旧バージョンの混在期間が生じない。
+#
+# 収束判定は「インストール済みバージョンの一致」ではなく「pending list が無いこと」で行う。
+# apply が途中で失敗した場合 (例: containerd 本体だけ適用され shim が未適用) でも、
+# list が残っている限り再ステージ・再適用の対象になり続け、放置されない。
 set -eu
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
@@ -44,10 +48,10 @@ stage_bin() {
   echo "$dst.node-runtime-updater.staged $dst" >> "$list"
 }
 
-# pin と一致した (適用済み・pin 巻き戻し等の) コンポーネントの残留ステージングを破棄する。
-# これを怠ると、無関係な再起動のタイミングで古いステージングが適用されてしまう
+# ステージングと target マーカーを破棄する
 discard_staging() {
   list="$1"
+  rm -f "${list%.list}.target"
   [ -e "$list" ] || return 0
   while read -r staged_path _; do
     rm -f "$staged_path"
@@ -55,19 +59,33 @@ discard_staging() {
   rm -f "$list"
 }
 
+# list に記載された staged ファイルがすべて存在する場合のみ真 (部分適用後は偽になる)
+staging_complete() {
+  list="$1"
+  [ -e "$list" ] || return 1
+  while read -r staged_path _; do
+    [ -f "$staged_path" ] || return 1
+  done < "$list"
+  return 0
+}
+
 # ---- containerd (containerd-shim-runc-v2 / ctr 等も tarball ごと追従する) ----
 containerd_bindir=$(dirname "$(command -v containerd || echo /usr/local/bin/containerd)")
 containerd_list="$PENDING_DIR/containerd.list"
-containerd_staged_bin="$containerd_bindir/containerd.node-runtime-updater.staged"
+containerd_target_file="$PENDING_DIR/containerd.target"
 # 出力例: "containerd github.com/containerd/containerd/v2 v2.3.0 <commit>"
 current=$( (containerd --version 2>/dev/null || true) | awk '{print $3}' | sed 's/^v//')
-if [ "$current" != "$WANT_CONTAINERD" ]; then
-  # ステージ済みなら再ダウンロードしない (毎時の実行で無駄な取得をしないため)
-  staged_now=""
-  if [ -x "$containerd_staged_bin" ] && [ -e "$containerd_list" ]; then
-    staged_now=$( ("$containerd_staged_bin" --version 2>/dev/null || true) | awk '{print $3}' | sed 's/^v//')
-  fi
-  if [ "$staged_now" = "$WANT_CONTAINERD" ]; then
+
+# 現在の pin と異なるバージョン向けの残留ステージングは破棄する (pin の変更・巻き戻し)。
+# target が pin と一致するステージングは、部分適用の残りである可能性があるため破棄しない
+if [ -e "$containerd_list" ] && [ "$(cat "$containerd_target_file" 2>/dev/null || true)" != "$WANT_CONTAINERD" ]; then
+  log "containerd: discarding staging for a different pin"
+  discard_staging "$containerd_list"
+fi
+
+if [ "$current" != "$WANT_CONTAINERD" ] || [ -e "$containerd_list" ]; then
+  if staging_complete "$containerd_list"; then
+    # ステージ済み内容は pin と一致 (target 確認済み) かつ全ファイル存在 -> 再ダウンロードしない
     log "containerd: ${current:-none} -> $WANT_CONTAINERD (already staged)"
   else
     log "containerd: staging ${current:-none} -> $WANT_CONTAINERD"
@@ -90,24 +108,27 @@ if [ "$current" != "$WANT_CONTAINERD" ]; then
     for f in "$workdir"/containerd/bin/*; do
       stage_bin "$f" "$containerd_bindir/$(basename "$f")" "$containerd_list"
     done
+    # target マーカーは全ファイルのステージ完了後にのみ書く (これがコミットポイント。
+    # 途中で中断された場合は target 不一致となり、次回まるごと再ステージされる)
+    echo "$WANT_CONTAINERD" > "$containerd_target_file"
   fi
   staged="$staged containerd=$WANT_CONTAINERD"
-else
-  discard_staging "$containerd_list"
 fi
 
 # ---- runc ----
 runc_path="$(command -v runc || echo /usr/local/bin/runc)"
 runc_list="$PENDING_DIR/runc.list"
-runc_staged_bin="$runc_path.node-runtime-updater.staged"
+runc_target_file="$PENDING_DIR/runc.target"
 # 出力例 (1 行目): "runc version 1.4.2"
 current=$( (runc --version 2>/dev/null || true) | awk 'NR==1{print $3}')
-if [ "$current" != "$WANT_RUNC" ]; then
-  staged_now=""
-  if [ -x "$runc_staged_bin" ] && [ -e "$runc_list" ]; then
-    staged_now=$( ("$runc_staged_bin" --version 2>/dev/null || true) | awk 'NR==1{print $3}')
-  fi
-  if [ "$staged_now" = "$WANT_RUNC" ]; then
+
+if [ -e "$runc_list" ] && [ "$(cat "$runc_target_file" 2>/dev/null || true)" != "$WANT_RUNC" ]; then
+  log "runc: discarding staging for a different pin"
+  discard_staging "$runc_list"
+fi
+
+if [ "$current" != "$WANT_RUNC" ] || [ -e "$runc_list" ]; then
+  if staging_complete "$runc_list"; then
     log "runc: ${current:-none} -> $WANT_RUNC (already staged)"
   else
     log "runc: staging ${current:-none} -> $WANT_RUNC"
@@ -125,10 +146,9 @@ if [ "$current" != "$WANT_RUNC" ]; then
     fi
     discard_staging "$runc_list"
     stage_bin "$workdir/runc.$ARCH" "$runc_path" "$runc_list"
+    echo "$WANT_RUNC" > "$runc_target_file"
   fi
   staged="$staged runc=$WANT_RUNC"
-else
-  discard_staging "$runc_list"
 fi
 
 if [ -n "$staged" ]; then
