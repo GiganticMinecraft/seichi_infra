@@ -83,8 +83,19 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
   ignoreDifferences:
     - group: apps
       kind: StatefulSet
       jsonPointers:
         - /spec/volumeClaimTemplates
+    # upstream チャートは rpcSecret 未指定だと render のたびに randAlphaNum で
+    # 新しい値を生成する(ArgoCD では lookup が効かず既存値を保持できない)。
+    # sync ごとに Secret が書き換わると、Pod が起動時に焼き込む rpc_secret が
+    # Pod ごとに食い違い、クラスタ全体で handshake 不能になる
+    # (2026-07-14 のノード再起動で顕在化し S3 が約 5 時間書き込み不能になった)。
+    - kind: Secret
+      name: garage-rpc-secret
+      namespace: garage
+      jsonPointers:
+        - /data/rpcSecret
