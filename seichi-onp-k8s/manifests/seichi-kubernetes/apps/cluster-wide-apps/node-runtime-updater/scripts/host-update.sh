@@ -7,11 +7,17 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 WANT_CONTAINERD="$1"
 WANT_RUNC="$2"
-ARCH=amd64
 
 log() { echo "node-runtime-updater: $*"; }
 
-workdir=$(mktemp -d)
+case "$(uname -m)" in
+  x86_64) ARCH=amd64 ;;
+  aarch64) ARCH=arm64 ;;
+  *) log "unsupported architecture: $(uname -m)"; exit 1 ;;
+esac
+
+# /tmp が noexec でマウントされる構成でも --version の事前チェックが動くよう /var/lib 配下を使う
+workdir=$(mktemp -d /var/lib/node-runtime-updater.XXXXXX)
 trap 'rm -rf "$workdir"' EXIT
 updated=""
 
