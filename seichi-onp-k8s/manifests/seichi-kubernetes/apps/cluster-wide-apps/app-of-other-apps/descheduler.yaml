@@ -12,8 +12,13 @@ spec:
     helm:
       releaseName: descheduler
       values: |
-        # JST 水曜 04:30 に週1回実行(従来の "30 19 * * Tue" (UTC) と同時刻)
-        schedule: "30 4 * * 3"
+        # 毎朝 07:00 JST (kured の再起動窓 05:00-07:00 のクローズ直後) に実行する。
+        # kured が 1 台ずつ drain + 再起動すると最後に再起動したノードが軽いまま残るため、
+        # 窓が閉じて新規再起動が始まらなくなった直後・07:00-08:00 の ArgoCD selfHeal で
+        # Minecraft の Pod が復元されるより前にならすことで、復元時には均された状態の
+        # クラスタへ配置される。LowNodeUtilization は閾値 (20%/50%) を跨いだノードが
+        # ある時しか動かないので、再起動がなかった日はほぼ no-op になる
+        schedule: "0 7 * * *"
         timeZone: "Asia/Tokyo"
         # チャートのデフォルトポリシーをベースに、Pod の退避(=再起動)が
         # プレイヤー切断に直結する namespace を退避対象から除外する
