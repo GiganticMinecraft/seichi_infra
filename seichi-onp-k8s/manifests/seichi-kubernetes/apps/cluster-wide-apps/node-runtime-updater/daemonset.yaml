@@ -44,7 +44,7 @@ spec:
               value: "2.3.3"
             # renovate: datasource=github-releases depName=opencontainers/runc
             - name: RUNC_VERSION
-              value: "1.4.2"
+              value: "1.5.1"
             - name: CHECK_INTERVAL_SECONDS
               value: "3600"
           securityContext:
