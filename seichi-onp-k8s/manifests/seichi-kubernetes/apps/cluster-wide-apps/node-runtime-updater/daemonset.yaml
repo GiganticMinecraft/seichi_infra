@@ -36,7 +36,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: updater
-          image: alpine:3.22
+          image: alpine:3.24
           command: ["/bin/sh", "/scripts/entrypoint.sh"]
           env:
             # renovate: datasource=github-releases depName=containerd/containerd
