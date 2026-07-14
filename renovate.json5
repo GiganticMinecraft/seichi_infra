@@ -94,6 +94,24 @@
         'at any time',
       ],
     },
+    {
+      // ノードの containerd / runc のパッチ更新はノールックで automerge する
+      // (kubelet のパッチ追従は Renovate を経由せず kured の rebootCommand で完結している)。
+      // マージしてもバイナリ差し替えと sentinel 作成までで、実際の再起動は
+      // kured の窓 (05:00-07:00 JST) までゲートされるためマージ時刻は問わない。
+      // マイナー以上の更新はこのルールに該当せず、従来どおり人がレビューしてマージする
+      matchPackageNames: [
+        'containerd/containerd',
+        'opencontainers/runc',
+      ],
+      matchUpdateTypes: [
+        'patch',
+      ],
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+    },
   ],
   postUpdateOptions: [
     'gomodTidy',
@@ -146,6 +164,18 @@
       ],
       datasourceTemplate: 'github-releases',
       depNameTemplate: 'giganticminecraft/SrvStopper',
+      versioningTemplate: 'semver',
+    },
+    // ノードの containerd / runc のピン留めバージョンを更新する
+    // (node-runtime-updater DaemonSet がノード上のバイナリを追従させ、kured が再起動する)
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/node-runtime-updater/daemonset\\.yaml$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n\\s+- name: [A-Z_]+_VERSION\\n\\s+value: "(?<currentValue>[\\d.]+)"',
+      ],
       versioningTemplate: 'semver',
     },
     // ロビーサーバーのserver.propertiesに記載されているリソースパックのURLを更新する

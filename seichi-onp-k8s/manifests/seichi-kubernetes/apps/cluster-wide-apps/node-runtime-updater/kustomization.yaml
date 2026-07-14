@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kube-system
+resources:
+  - daemonset.yaml
+configMapGenerator:
+  # hash suffix 付きで生成されるため、スクリプト変更時に DaemonSet が自動でロールアウトされる
+  - name: node-runtime-updater-scripts
+    files:
+      - scripts/entrypoint.sh
+      - scripts/host-update.sh
+      - scripts/apply.sh

@@ -1,0 +1,75 @@
+# 各ノードの containerd / runc (GitHub releases から直接インストールされている) を
+# 下記 env でピン留めされたバージョンへ揃える DaemonSet。
+#
+# 更新フロー:
+#   Renovate が env のバージョンを bump -> PR マージ -> ArgoCD sync ->
+#   本 DaemonSet が新バイナリをダウンロード・検証して宛先ディレクトリに .staged として
+#   ステージし /var/run/reboot-required を touch ->
+#   kured が 05:00-07:00 JST に 1 台ずつ drain -> apply.sh で rename 適用 -> 再起動
+#
+# 稼働中のバイナリには一切触れず、適用は必ず drain 済みのノードで再起動の直前に行われる。
+# kubelet のパッチ更新 (kured の rebootCommand 内の apt) と同じ
+# 「drain -> 更新 -> 直後に再起動」の順序になり、新旧バージョンの混在期間が生じない。
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-runtime-updater
+  labels:
+    app.kubernetes.io/name: node-runtime-updater
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: node-runtime-updater
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: node-runtime-updater
+    spec:
+      # chroot 先 (ホスト) の /etc/resolv.conf は systemd-resolved のスタブ (127.0.0.53) を
+      # 指しており、Pod の network namespace からは名前解決できないため host network で動かす
+      hostNetwork: true
+      dnsPolicy: Default
+      tolerations:
+        # control-plane ノードの containerd / runc も更新対象にする
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: updater
+          image: alpine:3.22
+          command: ["/bin/sh", "/scripts/entrypoint.sh"]
+          env:
+            # renovate: datasource=github-releases depName=containerd/containerd
+            - name: CONTAINERD_VERSION
+              value: "2.3.0"
+            # renovate: datasource=github-releases depName=opencontainers/runc
+            - name: RUNC_VERSION
+              value: "1.4.2"
+            - name: CHECK_INTERVAL_SECONDS
+              value: "3600"
+          securityContext:
+            runAsUser: 0
+            capabilities:
+              drop: ["ALL"]
+              # ホストへの chroot にのみ必要 (root 所有ファイルの操作は uid 0 の owner 権限で足りる)
+              add: ["SYS_CHROOT"]
+          volumeMounts:
+            - name: host-root
+              mountPath: /host
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: host-root
+          hostPath:
+            path: /
+        - name: scripts
+          configMap:
+            name: node-runtime-updater-scripts
+            defaultMode: 0555

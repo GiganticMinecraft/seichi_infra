@@ -1,0 +1,25 @@
+name: node-runtime-updater e2e
+
+on:
+  pull_request:
+    paths:
+      - "seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/node-runtime-updater/**"
+      - ".github/workflows/node-runtime-updater-e2e.yaml"
+
+jobs:
+  e2e:
+    name: node-runtime-updater e2e
+    runs-on: ubuntu-latest
+    # 実ノードに近い Ubuntu 24.04 の使い捨てコンテナ内で、実際の GitHub releases を
+    # 使ってステージング -> 部分適用からの回復 -> 適用 -> 収束のシナリオを検証する
+    container: ubuntu:24.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Install prerequisites
+        run: apt-get -qq update && apt-get -qq install -y curl ca-certificates
+
+      - name: Run e2e test
+        env:
+          NODE_RUNTIME_UPDATER_E2E: "1"
+        run: sh seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/node-runtime-updater/test/e2e.sh
