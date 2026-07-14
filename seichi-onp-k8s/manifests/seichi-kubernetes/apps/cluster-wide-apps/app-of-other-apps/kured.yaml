@@ -31,6 +31,34 @@ spec:
           prometheusUrl: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
           alertFiringOnly: true
           alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch)$"
+          # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
+          # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
+          # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、
+          # その際に repo の向き先を張り替えれば以後のパッチ追従が自動で継続する。
+          #
+          # sentinel: OS の reboot-required に加えて kubelet の更新有無を apt のドライランで判定する
+          # (コマンド指定時はファイル判定が無効になるため両方をここで見る)。
+          # チャートは useRebootSentinelHostPath=true (デフォルト) だと rebootSentinelCommand を
+          # 出力しないため、hostPath マウント方式を無効化して nsenter によるコマンド方式に切り替える
+          useRebootSentinelHostPath: false
+          # --allow-change-held-packages がないと hold 中の kubelet は simulate でも
+          # 変更対象から外れて更新を検知できない
+          rebootSentinelCommand: >-
+            sh -c 'test -f /var/run/reboot-required ||
+            apt-get -qq -s -o Debug::NoLocking=true --allow-change-held-packages
+            --only-upgrade install kubelet 2>/dev/null
+            | grep -q "^Inst kubelet"'
+          # drain 完了後に実行される。unhold -> パッチ更新 -> hold してから再起動する。
+          # 再起動窓 (05:00-07:00) は unattended-upgrades の実行時間帯と重なり apt lock を
+          # 取り合う可能性があるため Lock::Timeout を設定し、apt が失敗しても reboot は
+          # 必ず実行する (ノードが drain されたまま残らないようにする。sentinel が残るため翌日リトライされる)
+          rebootCommand: >-
+            sh -c 'export DEBIAN_FRONTEND=noninteractive;
+            apt-mark unhold kubelet;
+            apt-get -qq -o DPkg::Lock::Timeout=600 update;
+            apt-get -qq -y -o DPkg::Lock::Timeout=600 --only-upgrade install kubelet;
+            apt-mark hold kubelet;
+            systemctl reboot'
         # tolerations はチャートのデフォルトで control-plane の NoSchedule を含むため未指定のままにする
         service:
           create: true
