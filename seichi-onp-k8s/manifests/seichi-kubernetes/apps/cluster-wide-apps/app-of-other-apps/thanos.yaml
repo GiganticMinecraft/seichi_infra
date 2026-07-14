@@ -30,10 +30,12 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
-  # StatefulSet volumeClaimTemplates.spec.volumeMode is defaulted by the API
-  # server, while thanos-config omits it. Ignore that default-only diff here.
+  # StatefulSet の volumeClaimTemplates は API サーバーが apiVersion/kind/
+  # volumeMode/status を自動補完するため常に差分が出る(volumeMode だけの
+  # 無視では不十分だった)。vct は作成後 immutable で diff を見る意味が
+  # ないため、garage.yaml と同様に丸ごと無視する。
   ignoreDifferences:
     - group: apps
       kind: StatefulSet
-      jqPathExpressions:
-        - .spec.volumeClaimTemplates[].spec.volumeMode
+      jsonPointers:
+        - /spec/volumeClaimTemplates

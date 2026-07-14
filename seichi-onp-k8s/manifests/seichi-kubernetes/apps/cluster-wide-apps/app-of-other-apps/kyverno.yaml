@@ -46,3 +46,13 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+  # チャート 3.8 系の policies.kyverno.io 系 CRD は metadata.labels /
+  # metadata.annotations を空マップ({})でレンダリングする一方、API サーバーは
+  # 空マップを保存しないため「{} vs 無し」の差分が永遠に残り OutOfSync 表示になる。
+  # 空マップの場合に限って無視する(実値が入った場合の差分は今までどおり検知される)
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jqPathExpressions:
+        - .metadata.labels | select(. == {})
+        - .metadata.annotations | select(. == {})
