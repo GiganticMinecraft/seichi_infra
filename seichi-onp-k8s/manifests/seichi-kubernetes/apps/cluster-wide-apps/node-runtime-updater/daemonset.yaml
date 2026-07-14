@@ -41,7 +41,7 @@ spec:
           env:
             # renovate: datasource=github-releases depName=containerd/containerd
             - name: CONTAINERD_VERSION
-              value: "2.3.0"
+              value: "2.3.3"
             # renovate: datasource=github-releases depName=opencontainers/runc
             - name: RUNC_VERSION
               value: "1.4.2"
