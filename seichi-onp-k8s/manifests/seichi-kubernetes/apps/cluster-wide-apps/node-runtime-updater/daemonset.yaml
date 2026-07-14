@@ -1,0 +1,74 @@
+# 各ノードの containerd / runc (GitHub releases から直接インストールされている) を
+# 下記 env でピン留めされたバージョンへ揃える DaemonSet。
+#
+# 更新フロー:
+#   Renovate が env のバージョンを bump -> PR マージ -> ArgoCD sync ->
+#   本 DaemonSet がバイナリを rename で差し替えて /var/run/reboot-required を touch ->
+#   kured が 05:00-07:00 JST に 1 台ずつ drain + 再起動して新バージョンが有効になる
+#
+# rename(2) による差し替えは実行中のプロセスに影響しないため、差し替えから再起動までの間は
+# 旧バージョンが動き続ける (新規コンテナ起動時の runc / shim のみ先行して新版が使われるが、
+# パッチ〜マイナー程度のスキューは互換性がある)。
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-runtime-updater
+  labels:
+    app.kubernetes.io/name: node-runtime-updater
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: node-runtime-updater
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: node-runtime-updater
+    spec:
+      # chroot 先 (ホスト) の /etc/resolv.conf は systemd-resolved のスタブ (127.0.0.53) を
+      # 指しており、Pod の network namespace からは名前解決できないため host network で動かす
+      hostNetwork: true
+      dnsPolicy: Default
+      tolerations:
+        # control-plane ノードの containerd / runc も更新対象にする
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: updater
+          image: alpine:3.22
+          command: ["/bin/sh", "/scripts/entrypoint.sh"]
+          env:
+            # renovate: datasource=github-releases depName=containerd/containerd
+            - name: CONTAINERD_VERSION
+              value: "2.3.0"
+            # renovate: datasource=github-releases depName=opencontainers/runc
+            - name: RUNC_VERSION
+              value: "1.4.2"
+            - name: CHECK_INTERVAL_SECONDS
+              value: "3600"
+          securityContext:
+            runAsUser: 0
+            capabilities:
+              drop: ["ALL"]
+              # ホストへの chroot にのみ必要 (root 所有ファイルの操作は uid 0 の owner 権限で足りる)
+              add: ["SYS_CHROOT"]
+          volumeMounts:
+            - name: host-root
+              mountPath: /host
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: host-root
+          hostPath:
+            path: /
+        - name: scripts
+          configMap:
+            name: node-runtime-updater-scripts
+            defaultMode: 0555

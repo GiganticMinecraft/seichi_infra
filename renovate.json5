@@ -148,6 +148,18 @@
       depNameTemplate: 'giganticminecraft/SrvStopper',
       versioningTemplate: 'semver',
     },
+    // ノードの containerd / runc のピン留めバージョンを更新する
+    // (node-runtime-updater DaemonSet がノード上のバイナリを追従させ、kured が再起動する)
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/node-runtime-updater/daemonset\\.yaml$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n\\s+- name: [A-Z_]+_VERSION\\n\\s+value: "(?<currentValue>[\\d.]+)"',
+      ],
+      versioningTemplate: 'semver',
+    },
     // ロビーサーバーのserver.propertiesに記載されているリソースパックのURLを更新する
     {
       customType: 'regex',
