@@ -48,12 +48,16 @@ spec:
             apt-get -qq -s -o Debug::NoLocking=true --allow-change-held-packages
             --only-upgrade install kubelet 2>/dev/null
             | grep -q "^Inst kubelet"'
-          # drain 完了後に実行される。unhold -> パッチ更新 -> hold してから再起動する。
+          # drain 完了後に実行される。node-runtime-updater がステージした containerd / runc を
+          # apply.sh (rename のみ) で先に適用し、kubelet を unhold -> パッチ更新 -> hold
+          # してから再起動する。すべての更新が drain 済み・再起動直前に適用される。
           # 再起動窓 (05:00-07:00) は unattended-upgrades の実行時間帯と重なり apt lock を
-          # 取り合う可能性があるため Lock::Timeout を設定し、apt が失敗しても reboot は
+          # 取り合う可能性があるため Lock::Timeout を設定し、apply や apt が失敗しても reboot は
           # 必ず実行する (ノードが drain されたまま残らないようにする。sentinel が残るため翌日リトライされる)
           rebootCommand: >-
-            sh -c 'export DEBIAN_FRONTEND=noninteractive;
+            sh -c '{ [ ! -x /var/lib/node-runtime-updater/apply.sh ]
+            || /var/lib/node-runtime-updater/apply.sh; } || true;
+            export DEBIAN_FRONTEND=noninteractive;
             apt-mark unhold kubelet;
             apt-get -qq -o DPkg::Lock::Timeout=600 update;
             apt-get -qq -y -o DPkg::Lock::Timeout=600 --only-upgrade install kubelet;

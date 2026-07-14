@@ -9,3 +9,4 @@ configMapGenerator:
     files:
       - scripts/entrypoint.sh
       - scripts/host-update.sh
+      - scripts/apply.sh

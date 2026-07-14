@@ -3,12 +3,13 @@
 #
 # 更新フロー:
 #   Renovate が env のバージョンを bump -> PR マージ -> ArgoCD sync ->
-#   本 DaemonSet がバイナリを rename で差し替えて /var/run/reboot-required を touch ->
-#   kured が 05:00-07:00 JST に 1 台ずつ drain + 再起動して新バージョンが有効になる
+#   本 DaemonSet が新バイナリをダウンロード・検証して宛先ディレクトリに .staged として
+#   ステージし /var/run/reboot-required を touch ->
+#   kured が 05:00-07:00 JST に 1 台ずつ drain -> apply.sh で rename 適用 -> 再起動
 #
-# rename(2) による差し替えは実行中のプロセスに影響しないため、差し替えから再起動までの間は
-# 旧バージョンが動き続ける (新規コンテナ起動時の runc / shim のみ先行して新版が使われるが、
-# パッチ〜マイナー程度のスキューは互換性がある)。
+# 稼働中のバイナリには一切触れず、適用は必ず drain 済みのノードで再起動の直前に行われる。
+# kubelet のパッチ更新 (kured の rebootCommand 内の apt) と同じ
+# 「drain -> 更新 -> 直後に再起動」の順序になり、新旧バージョンの混在期間が生じない。
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
