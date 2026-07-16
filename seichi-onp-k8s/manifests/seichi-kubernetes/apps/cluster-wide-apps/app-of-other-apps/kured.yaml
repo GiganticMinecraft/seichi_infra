@@ -30,7 +30,10 @@ spec:
           # 常時 firing しがちな警告(TargetDown 等)は除外しないと永久にブロックされるため列挙している
           prometheusUrl: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
           alertFiringOnly: true
-          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch)$"
+          # KubeStatefulSetReplicasMismatch: pyroscope や debug 環境の redis が常時 firing しがちで、
+          # 2026-07-15/16 の窓で全ノードの再起動を 2 日間ブロックした実績があるため、
+          # 同クラスの KubeDeploymentReplicasMismatch / KubePodNotReady と同様に除外する
+          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、
