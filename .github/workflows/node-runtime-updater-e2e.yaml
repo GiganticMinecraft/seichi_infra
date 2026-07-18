@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     # 実ノードに近い Ubuntu 24.04 の使い捨てコンテナ内で、実際の GitHub releases を
     # 使ってステージング -> 部分適用からの回復 -> 適用 -> 収束のシナリオを検証する
-    container: ubuntu:24.04
+    container: ubuntu:26.04
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
