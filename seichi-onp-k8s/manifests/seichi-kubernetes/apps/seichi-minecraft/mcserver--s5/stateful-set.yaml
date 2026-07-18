@@ -99,6 +99,15 @@ spec:
                 -Daikars.new.flags=true
 
             - name: JVM_XX_OPTS
+              # G1PeriodicGCInterval: 無人時間帯はヒープ割り当てが少なく GC がほぼ走らないため、
+              # Cleaner 経由で解放されるネイティブメモリ (Deflater 等) が回収されずに蓄積し、
+              # 約 1GiB/h のペースで増加して数時間で OOMKilled に至っていた (2026-07-18 の計測より)。
+              # アイドル時にも 5 分間隔で concurrent cycle を走らせて回収させる (JEP 346)。
+              # 賑わっている時間帯は GC が高頻度で走るためこのフラグは発動しない。
+              #
+              # MaxDirectMemorySize: 未設定だとデフォルトで Xmx と同じ 8G まで direct buffer が
+              # 伸びられるため、コンテナの memory limit を超えうる。実測ピークは ~450MiB のため
+              # 2 倍のマージンを取って 1G に制限する。
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
@@ -107,6 +116,8 @@ spec:
                 -XX:+DebugNonSafepoints
                 -XX:ReservedCodeCacheSize=384m
                 -XX:MaxMetaspaceSize=384m
+                -XX:G1PeriodicGCInterval=300000
+                -XX:MaxDirectMemorySize=1g
 
             - name: ENABLE_JMX
               value: "true"
