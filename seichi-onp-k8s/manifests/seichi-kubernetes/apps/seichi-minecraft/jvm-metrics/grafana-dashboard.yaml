@@ -1039,6 +1039,36 @@ data:
           ],
           "title": "Last Terminated Reason",
           "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "Breakdown of container memory into process RSS (actual allocation; sustained growth here leads to OOM kill) and page cache (reclaimable by the kernel; growth here is harmless). If the working set grows but RSS stays flat, the growth is just cache.",
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 50, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "normal" }, "thresholdsStyle": { "mode": "off" } },
+              "mappings": [],
+              "min": 0,
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "bytes"
+            },
+            "overrides": [
+              { "matcher": { "id": "byRegexp", "options": ".*rss" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+              { "matcher": { "id": "byRegexp", "options": ".*cache" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }
+            ]
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 99 },
+          "id": 407,
+          "options": {
+            "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "max by (pod) (container_memory_rss{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"})", "legendFormat": "{{pod}} rss", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "max by (pod) (container_memory_working_set_bytes{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"}) - max by (pod) (container_memory_rss{namespace=\"seichi-minecraft\", pod=~\"mcserver--$server-0\", container=\"minecraft\"})", "legendFormat": "{{pod}} cache", "refId": "B" }
+          ],
+          "title": "Memory Breakdown (RSS vs Page Cache)",
+          "type": "timeseries"
         }
       ],
       "refresh": "30s",
