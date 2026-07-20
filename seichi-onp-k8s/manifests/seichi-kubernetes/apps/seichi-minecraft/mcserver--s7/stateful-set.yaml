@@ -83,14 +83,28 @@ spec:
             - name: EULA
               value: "TRUE"
 
+            # glibc の malloc arena の数を制限する。
+            # arena の上限はデフォルトで「CPU コア数 × 8」だが、glibc は cgroup を認識しないため
+            # ここでの CPU コア数は limits.cpu ではなくノードの物理コア数になり、arena が大量に作られうる。
+            # チャンク圧縮 (zlib) などの多スレッドからの細かい malloc/free で断片化した arena は
+            # free 済みでも OS にメモリを返さないため、RSS が戻らずに増え続ける一因になる。
+            - name: MALLOC_ARENA_MAX
+              value: "2"
+
             - name: JVM_OPTS
               # base image 側で JVM_OPTS に対して jmx exporter の設定を追加しているが、上書きが必要なためここで設定する
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
               # ref: https://docs.papermc.io/paper/aikars-flags
+              #
+              # ただし Aikar's flags のうち DisableExplicitGC は ExplicitGCInvokesConcurrent に置き換えている。
+              # MaxDirectMemorySize の上限に達したとき、JVM は System.gc() を呼んで direct buffer の
+              # 回収を試みるが、DisableExplicitGC だとこの経路が塞がれて OutOfMemoryError になりうる。
+              # ExplicitGCInvokesConcurrent なら System.gc() が STW の Full GC ではなく concurrent cycle に
+              # 変換されるため、プラグインの System.gc() 呼び出しでラグらせないという元の目的も保たれる。
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
-                -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
+                -XX:+UnlockExperimentalVMOptions -XX:+ExplicitGCInvokesConcurrent -XX:+AlwaysPreTouch
                 -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M
                 -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4
                 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90
@@ -99,6 +113,15 @@ spec:
                 -Daikars.new.flags=true
 
             - name: JVM_XX_OPTS
+              # G1PeriodicGCInterval: 無人時間帯は Old 世代の回収 (concurrent cycle) が一度も走らず、
+              # Cleaner 経由で解放されるネイティブメモリ (Deflater 等) が Old 世代へ昇格したまま蓄積して
+              # OOMKilled に至りうる (2026-07-18 の mcserver--s5 の障害調査より。詳細は #5486, #5488)。
+              # このフラグは「指定時間、どの GC も走らなかったとき」に concurrent cycle を強制する (JEP 346)。
+              # 無人時でも Young GC は数分に 1 回走ってタイマーをリセットするため、それより短い 1 分に設定する。
+              # 賑わっている時間帯は GC 間隔が数秒のためこのフラグは発動しない。
+              #
+              # MaxDirectMemorySize: 未設定だとデフォルトで Xmx と同額まで direct buffer が伸びられるため、
+              # コンテナの memory limit を超えうる。s5 での実測ピーク ~450MiB に対しマージンを取って 1g に制限する。
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
@@ -107,6 +130,8 @@ spec:
                 -XX:+DebugNonSafepoints
                 -XX:ReservedCodeCacheSize=384m
                 -XX:MaxMetaspaceSize=384m
+                -XX:G1PeriodicGCInterval=60000
+                -XX:MaxDirectMemorySize=1g
 
             - name: ENABLE_JMX
               value: "true"
