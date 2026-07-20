@@ -39,10 +39,10 @@ spec:
           # wk-1 が 107/110 Pod になり全ノードの再起動が止まった実績)。Pod 数だけの偏りは
           # CPU/メモリ requests が高い本クラスタでは descheduler の LowNodeUtilization でも
           # 解消できない (全リソースが閾値未満のノードが存在しないため移動先候補が出ない)
-          # ThanosSidecarUploadStale: kured の drain で garage / Prometheus 周辺の Pod が退避される
-          # と sidecar のアップロードが滞って発火する自傷性のアラートで、放置で自己回復する。
-          # 再起動を保留してもアップロード停滞は解消しないうえ、2026-07-20 の窓で wk-2 の再起動を
-          # 3 周期 (約 40 分) ブロックし窓クローズ間際まで押し込んだ実績があるため除外する
+          # ThanosSidecarUploadStale: 実態は sidecar 再起動でメトリクスが 0 リセットされることによる
+          # 偽発火で、drain が prometheus Pod を動かすたびに窓の最中に firing する (2026-07-20 の窓で
+          # wk-2 の再起動を 3 周期 (約 40 分) ブロックした実績)。アラート式側に > 0 ガードを入れて
+          # 根治したが、本物の停滞時も再起動の保留ではアップロードは復旧しないため除外は維持する
           alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは

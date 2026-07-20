@@ -237,7 +237,14 @@ spec:
               - name: thanos
                 rules:
                   - alert: ThanosSidecarUploadStale
-                    expr: time() - max by (namespace, pod) (thanos_objstore_bucket_last_successful_upload_time{job="prometheus-kube-prometheus-thanos-discovery"}) > 6 * 60 * 60
+                    # thanos_objstore_bucket_last_successful_upload_time は sidecar 再起動で 0 に
+                    # リセットされるため、> 0 で除外しないと Prometheus Pod が再作成されるたびに
+                    # 「6 時間以上未アップロード」扱いで 15 分後に偽発火する (2026-07-20 の kured 窓で
+                    # drain により Pod が移動し、次の 2h ブロックのアップロード (08:00 JST) まで
+                    # 約 2.5 時間誤 firing、wk-2 の再起動を約 40 分ブロックした実績)。
+                    # 「再起動後 1 度もアップロードが成功しない」ケースはこの式では拾えなくなるが、
+                    # 能動的な失敗は ThanosSidecarUploadFailures / ThanosObjectStorageOperationFailures が検知する
+                    expr: time() - max by (namespace, pod) (thanos_objstore_bucket_last_successful_upload_time{job="prometheus-kube-prometheus-thanos-discovery"} > 0) > 6 * 60 * 60
                     for: 15m
                     labels:
                       severity: error
