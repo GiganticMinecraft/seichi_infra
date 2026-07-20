@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: garage
+  namespace: garage
+spec:
+  # replicationFactor 2 + consistent のため 2 replica の同時停止は S3 のほぼ全停止に
+  # 直結する。kured は concurrency 1 なので通常は同時 drain されないが、手動 drain の
+  # 併走や一括メンテで 2 Pod が同時に evict されるのを防ぐ保険。
+  # upstream の garage チャートは PDB テンプレートを持たないためここで管理する
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: garage
+      app.kubernetes.io/instance: garage

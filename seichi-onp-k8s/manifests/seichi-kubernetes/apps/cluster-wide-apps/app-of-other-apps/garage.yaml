@@ -44,6 +44,26 @@ spec:
           replicaCount: 3
           podManagementPolicy: OrderedReady
 
+        # kured の drain の玉突きで 3 replica 中 2 つが同一 worker に同居し得る
+        # (2026-07-20 の再起動窓で garage-1/2 が wk-1 に同居した実績)。
+        # replicationFactor 2 + consistent は 1 ノード停止で書き込み quorum (2/2) を
+        # 失うため、2 replica を同時に失う配置は S3 のほぼ全停止に直結する。
+        # descheduler は PodsWithPVC 保護で PVC 持ち Pod を動かさないため同居は
+        # 自然解消せず、required の anti-affinity で同居自体を禁止する。
+        # worker 3 台にちょうど 3 replica なのでノード再起動中は退避先がなく
+        # Pending で待つが、どのみち再起動中は 1 replica 欠けるため実害はない。
+        # 適用時は Pod template の変更で STS がローリング更新され (1 台ずつ、
+        # iSCSI 付け替えで各 1-3 分書き込み劣化)、同居中の replica は空いている
+        # worker へ自動的に散る
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: garage
+                    app.kubernetes.io/instance: garage
+                topologyKey: kubernetes.io/hostname
+
         image:
           repository: dxflrs/amd64_garage
           pullPolicy: IfNotPresent
