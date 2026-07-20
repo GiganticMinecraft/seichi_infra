@@ -95,6 +95,19 @@
       ],
     },
     {
+      // ghcr.io/giganticminecraft/* は Kyverno の verify-ghcr-image-signatures
+      // (verifyDigest: true) の検証対象であり、tag のみの参照は
+      // "missing digest" の PolicyViolation になる。Audit モードでは
+      // mutateDigest: true を設定できないため、Git 側で digest をピン留めする
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'ghcr.io/giganticminecraft/**',
+      ],
+      pinDigests: true,
+    },
+    {
       // ノードの containerd / runc のパッチ更新はノールックで automerge する
       // (kubelet のパッチ追従は Renovate を経由せず kured の rebootCommand で完結している)。
       // マージしてもバイナリ差し替えと sentinel 作成までで、実際の再起動は
