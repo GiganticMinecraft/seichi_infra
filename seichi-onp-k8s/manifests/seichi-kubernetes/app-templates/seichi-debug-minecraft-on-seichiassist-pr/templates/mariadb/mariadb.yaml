@@ -169,8 +169,30 @@ spec:
               name: sqldump-volume
       restartPolicy: Always
       volumes:
+        # storage (MariaDB datadir) と sqldump-volume (本番バックアップの SQL) は
+        # 合わせて数 GB 消費する。emptyDir だとノードの ephemeral-storage
+        # (kubelet の eviction 対象) を圧迫して Evict の引き金になるため、
+        # Pod と生死を共にする TopoLVM のローカルボリュームを使う
         - name: storage
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                storageClassName: topolvm-provisioner
+                resources:
+                  requests:
+                    storage: 20Gi
         - name: sqldump-volume
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                storageClassName: topolvm-provisioner
+                resources:
+                  requests:
+                    storage: 10Gi
         - name: mariadb-config
           configMap:
             name: mariadb-config
