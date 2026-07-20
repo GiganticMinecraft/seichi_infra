@@ -331,8 +331,19 @@ spec:
           emptyDir: {}
 
         # S1から取ってきたワールドデータをぶちこむボリューム
+        # emptyDir だとノードの ephemeral-storage (kubelet の eviction 対象) を
+        # 数 GB 消費して Evict の引き金になるため、Pod と生死を共にする
+        # TopoLVM のローカルボリューム (generic ephemeral volume) を使う
         - name: world-download-volume
-          emptyDir: {}
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                storageClassName: topolvm-provisioner
+                resources:
+                  requests:
+                    storage: 30Gi
 
         # WorldEditがSchematicaを保存・読み取るするためのvolume
         - name: worldedit-schematica-volume
