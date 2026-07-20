@@ -24,6 +24,12 @@ spec:
           verifyDigest: true
           required: true
           useCache: true
+          # ビルド側は cosign sign --registry-referrers-mode=oci-1-1 で署名しており、
+          # 署名は OCI 1.1 形式 (fallback タグ sha256-<digest>) で保存される。
+          # Kyverno はデフォルトではレガシー形式 (sha256-<digest>.sig タグ) しか
+          # 探さないため、これを有効にしないと署名済みイメージでも
+          # "no signatures found" になる
+          cosignOCI11: true
           imageReferences:
             - "ghcr.io/giganticminecraft/*"
           attestors:
