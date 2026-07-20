@@ -3,6 +3,10 @@ FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha
 
 ENV VERSION="1.18.2"
 
+# このイメージは安定タグ 1.0.0 でも公開され、マニフェスト側は 1.0.0@sha256:... で
+# 参照し、digest の更新は Renovate が追従する。
+# 署名は Kyverno が検証できるレガシー Cosign 形式 (.sig タグ) で行われる。
+
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
 COPY --link ./common-minecraft-server-configs /config

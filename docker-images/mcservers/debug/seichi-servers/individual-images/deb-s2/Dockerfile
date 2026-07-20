@@ -2,6 +2,7 @@ FROM ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:1.0.0@s
 
 # このイメージは sha-<git short SHA> タグに加えて、再 push される安定タグ 1.0.0 でも公開される。
 # マニフェスト側は 1.0.0@sha256:... で参照し、digest の更新は Renovate が追従する。
+# 署名は Kyverno が検証できるレガシー Cosign 形式 (.sig タグ) で行われる。
 
 # プラグインの設定ファイル
 COPY --link ./additional-plugin-configs /plugins
