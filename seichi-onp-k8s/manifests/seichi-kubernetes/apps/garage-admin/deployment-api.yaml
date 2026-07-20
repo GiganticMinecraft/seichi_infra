@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: garage-admin-api
-          image: ghcr.io/giganticminecraft/garage-admin-console-backend:sha-a7b56f5
+          image: ghcr.io/giganticminecraft/garage-admin-console-backend:sha-a7b56f5@sha256:5d533bd1a977081e96cadd0721ad51c07bbe9a221856dea7641638aa56012738
           ports:
             - containerPort: 8080
           env:

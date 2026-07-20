@@ -7,4 +7,4 @@ resources:
 images:
   - name: controller
     newName: ghcr.io/giganticminecraft/seichi-gateway-operator
-    newTag: sha-5281f03
+    newTag: sha-5281f03@sha256:2d356bc6db9e11efa83b902d9a57c4c73628b47475d61ee545e844bc01d6ed0f
