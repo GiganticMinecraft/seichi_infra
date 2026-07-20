@@ -97,7 +97,9 @@ jobs:
       - name: Sign container image with Cosign
         if: github.ref == 'refs/heads/main'
         run: |
-          cosign sign --yes --registry-referrers-mode=oci-1-1 \
+          # ghcr.io は OCI 1.1 referrers API 非対応で、cosign v3 デフォルトの bundle 形式の
+          # 署名は Kyverno が発見できないため、レガシー形式 (.sig タグ) で署名する
+          cosign sign --yes --new-bundle-format=false --use-signing-config=false \
             ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
         env:
           COSIGN_EXPERIMENTAL: 1
@@ -111,6 +113,10 @@ jobs:
             --certificate-identity-regexp 'https://github\.com/GiganticMinecraft/.+' \
             --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
             ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+
+          # 素の cosign verify は bundle 形式も透過的に読めてしまい形式のズレを
+          # 検出できないため、レガシー形式 (.sig タグ) の存在も別途確認する
+          docker buildx imagetools inspect "$(cosign triangulate ${{ env.DOCKER_OUTPUT_IMAGE_NAME }}@${{ steps.build.outputs.digest }})"
 
       - name: Run Trivy vulnerability scanner
         if: steps.build.outputs.digest != ''
