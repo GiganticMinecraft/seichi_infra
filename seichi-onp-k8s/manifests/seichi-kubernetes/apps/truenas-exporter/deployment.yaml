@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: truenas-exporter
-          image: ghcr.io/giganticminecraft/truenas-exporter:sha-0cfd4e4
+          image: ghcr.io/giganticminecraft/truenas-exporter:sha-0cfd4e4@sha256:bf1e7d18df8789c4d1801004b656f4b29b619eeea553b9cc33b581792f8ebaec
           ports:
             - containerPort: 9814
               name: metrics

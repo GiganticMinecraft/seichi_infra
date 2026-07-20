@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gachadata-server
-          image: ghcr.io/giganticminecraft/gachadata-server:sha-23f6394
+          image: ghcr.io/giganticminecraft/gachadata-server:sha-23f6394@sha256:49030b16f117fad17228ada213bdce3e10bad7bbea26ffeb005e9eb53ec70762
           resources:
             requests:
               cpu: 15m
