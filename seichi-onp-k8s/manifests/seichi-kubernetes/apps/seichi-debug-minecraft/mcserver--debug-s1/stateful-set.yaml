@@ -21,7 +21,7 @@ spec:
     spec:
       initContainers:
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-6f4c728
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:0daa980e49144a0d6bd05e9255f1a26def14d8d303706243af34f8f9fd853738
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
@@ -45,7 +45,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
         - name: seichiassist-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-6f4c728
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:0daa980e49144a0d6bd05e9255f1a26def14d8d303706243af34f8f9fd853738
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
@@ -69,7 +69,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
         - name: world-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:sha-6f4c728
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:0daa980e49144a0d6bd05e9255f1a26def14d8d303706243af34f8f9fd853738
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
@@ -323,7 +323,7 @@ spec:
                 /downloaded-plugins
                 /plugins
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:sha-b62e356@sha256:f155c86e06658f57a1eb80d9fdb783a87e6906f51b95e2bdc671520acc719998
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:1.0.0@sha256:f599e1647aa73cdd2bf16198a31bf54991619845540c5fd835a88fc8eb8bc288
           name: minecraft
           ports:
             - containerPort: 25565
