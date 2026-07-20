@@ -61,9 +61,12 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
           images: ${{ env.IMAGE }}
+          # 1.0.0 は再 push される安定タグ。マニフェスト側は 1.0.0@sha256:... で参照し、
+          # digest の更新は Renovate が追従する (mcserver 系イメージと同じ方式)
           tags: |
             type=sha,prefix=sha-,suffix=,format=short
             type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=raw,value=1.0.0
 
       - name: Build (and push if on main)
         id: build
