@@ -1,0 +1,9 @@
+# PR 環境の namespace を Application の管理リソースとして作成する。
+# ApplicationSet の CreateNamespace=true で作られた namespace は Application の
+# 管理外のため、PR クローズで Application が削除されても namespace だけが
+# 残り続けていた。管理下に入れることで、Application 削除のカスケードで
+# namespace ごと (中の PVC なども含めて) 削除されるようになる。
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: seichi-debug-minecraft-on-seichiassist-pr-{{ .Values.SeichiAssistPullRequestNumber }}
