@@ -117,6 +117,11 @@ spec:
               value: PAPER
             - name: VERSION
               value: "1.18.2"
+            # api.papermc.io の v2 API が廃止され (410 Gone)、mc-image-helper 1.40.7 による
+            # ビルド解決が失敗するため、後継の fill API が返す直リンクを指定して回避する
+            # https://fill.papermc.io/v3/projects/paper/versions/1.18.2/builds/388 の server:default
+            - name: PAPER_DOWNLOAD_URL
+              value: https://fill-data.papermc.io/v1/objects/0578f18f4d632b494b468ec56b3b414b5b56fea087ee7d39cf6dcdf4c9d01f05/paper-1.18.2-388.jar
             - name: EULA
               value: "TRUE"
 
