@@ -83,10 +83,12 @@ spec:
                 mkdir -p "/downloaded-worlds/${BASENAME}"
                 echo "Extracting: ${f} -> /downloaded-worlds/${BASENAME}"
                 unzstd -c "${f}" | tar -xf - -C "/downloaded-worlds/${BASENAME}"
+                # 展開の済んだ圧縮ファイルはループ内で即削除する。
+                # ループ末尾で一括削除すると (全圧縮ファイル + 全展開データ) が同居し、
+                # ピーク使用量が展開後サイズの倍近くに達してボリュームが枯渇するため。
+                rm -f "${f}"
               done
               chown -R 1000:1000 /downloaded-worlds/
-              echo "Cleaning up tar.zst files..."
-              rm -f /downloaded-worlds/*.tar.zst
               echo "World data extraction complete."
               ls -la /downloaded-worlds/
           volumeMounts:
@@ -343,7 +345,9 @@ spec:
                 storageClassName: topolvm-provisioner
                 resources:
                   requests:
-                    storage: 30Gi
+                    # 展開後のワールド合計が約 31 GiB (2026-07 実測) あり 30Gi では展開中に枯渇していた。
+                    # 実データ + 稼働中の world 増加分の余裕を見て 60Gi にする。
+                    storage: 60Gi
 
         # WorldEditがSchematicaを保存・読み取るするためのvolume
         - name: worldedit-schematica-volume
