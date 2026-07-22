@@ -162,6 +162,6 @@ jobs:
 
       - if: always() && steps.should_build.outputs.should_build == 'true' && steps.build.outputs.digest != ''
         name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # v4
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4
         with:
           sarif_file: 'trivy-results.sarif'
