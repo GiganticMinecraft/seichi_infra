@@ -150,7 +150,7 @@ redis:
         release: prometheus
 
 repoServer:
-  replicaCount: 1
+  replicas: 1
   resources:
     requests:
       cpu: 200m
@@ -163,7 +163,7 @@ repoServer:
         release: prometheus
 
 applicationSet:
-  replicaCount: 1
+  replicas: 1
   resources:
     requests:
       cpu: 15m
