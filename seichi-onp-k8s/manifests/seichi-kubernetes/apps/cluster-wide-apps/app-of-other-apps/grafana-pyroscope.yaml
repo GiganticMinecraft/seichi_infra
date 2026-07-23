@@ -13,7 +13,7 @@ spec:
   source:
     chart: pyroscope
     repoURL: https://grafana.github.io/helm-charts
-    targetRevision: 2.1.2
+    targetRevision: 2.2.0
     helm:
       values: |
         # chart-native の v1/v2 切替 knob。
