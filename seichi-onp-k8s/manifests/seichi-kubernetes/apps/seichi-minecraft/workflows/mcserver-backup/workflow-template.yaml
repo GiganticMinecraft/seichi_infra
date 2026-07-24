@@ -146,6 +146,7 @@ spec:
               - key: server
                 value: "{{inputs.parameters.statefulset-name}}"
             gauge:
+              realtime: true
               value: "{{duration}}"
       volumes:
         - name: backup-target-volume
@@ -234,6 +235,7 @@ spec:
               - key: server
                 value: "{{inputs.parameters.coreprotect-db-name}}"
             gauge:
+              realtime: true
               value: "{{duration}}"
       script:
         image: mirror.gcr.io/mariadb:11.8
