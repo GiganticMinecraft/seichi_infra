@@ -35,10 +35,46 @@ spec:
           enabled: false
 
         pyroscope:
-          # v2 アーキテクチャ: profile を Garage (S3 互換) に直接書き込むため
-          # ローカル PVC は不要。chart デフォルトでも false だが意図を明示する。
+          # v2 でも metastore だけは stateful で、ローカル PVC が必須。
+          # profile の block 本体は Garage (S3 互換) に直接書かれるが、
+          # metastore は raft の WAL / snapshot / block index を
+          # /data-metastore (data ボリュームの .metastore subPath) に置く。
+          # 上流も -metastore.raft.dir / -metastore.raft.snapshots-dir の
+          # help に "It must be a persistent directory, not a tmpfs or
+          # similar." と明記している。
+          #
+          # chart デフォルトの persistence.enabled=false では data ボリュームが
+          # emptyDir になり、
+          #   1. WAL がノードの root fs (他コンテナと共有・IOPS 分離なし) に載る
+          #   2. Pod 再作成のたびに block index が全消失し、Garage に書き済みの
+          #      block が全て参照不能になる (起動時の DLQ 復旧ストームと
+          #      "failed to find blocks ... Key not found" の原因)
+          # という二重の問題があったため PVC を張る。
+          #
+          # 容量: v2 はローカルに block 本体を置かないので、載るのは
+          # raft の WAL / snapshot と block index だけ。
+          # - WAL は snapshot-threshold(8192) + trailing-logs(18432) で
+          #   おおよそ 26k entry に上限が付く
+          # - snapshot は snapshots-retain=3 で index 3 世代分
+          # - index は追跡中の block 数に比例して伸びる (ここだけ非有界)
+          # Garage の pyroscope バケットは 3 ヶ月で 41.6 GiB / 313,969
+          # オブジェクト。block 1 つあたりの metadata が数 KB とすると
+          # index は GB 未満のオーダーに収まる見込みだが、これまで index が
+          # Pod 再作成のたびに消えていたため定常状態を観測できていない。
+          # chart デフォルトの 10Gi でも足りる公算が高いものの、WAL が
+          # ENOSPC を踏むと今回直している metastore 停止そのものが再発する
+          # ため、余裕を持たせて 32Gi にする。
+          # (synology-iscsi-storage は ALLOWVOLUMEEXPANSION=true なので
+          #  後からオンライン拡張も可能)
+          #
+          # storageClass: monitoring 名前空間の他の stateful ワークロード
+          # (prometheus / loki / tempo / thanos) と揃える。ノード障害時に
+          # index を失わないことを優先し、ノード局所の topolvm ではなく
+          # ネットワーク越しの iSCSI を選ぶ。
           persistence:
-            enabled: false
+            enabled: true
+            size: 32Gi
+            storageClassName: synology-iscsi-storage
 
           # Pyroscope 自身への自己 scrape を停止。
           # chart デフォルトは pyroscope Pod に
@@ -56,6 +92,29 @@ spec:
           extraArgs:
             # structuredConfig 内の ${VAR} を環境変数で展開させる
             config.expand-env: "true"
+
+            # chart デフォルトは debug。1 Pod で 1 日あたり 1200 万行超を
+            # Loki に流していたため info に落とす。
+            log.level: info
+
+            # raft のログストア書き込みに被せられる 10s のタイムアウトを外す。
+            # 上流の timeoutLogStore は、タイムアウト時に raft へ error を返す
+            # 一方で書き込み goroutine はそのまま走り続ける実装になっており、
+            # WAL には index N が書かれたのに raft のメモリ上の lastLog は
+            # N-1 のまま、という乖離が起きる。こうなると leader に昇格する
+            # たびに no-op entry の append が
+            #   "non-monotonic log entries: tried to append index N after N"
+            # で失敗して follower に降格し、選挙が無限ループする
+            # (実際に term が 111527 まで進み、compaction が数日間停止した)。
+            #
+            # この timeout は「leader のディスクが詰まったとき follower に
+            # 選挙を起こさせる」ためのもので、replicaCount=1 の単一ノード
+            # 構成では得るものが無い (降格しても同じノードが再選するだけ)。
+            # 0 を渡すと上流は wrapper 自体を無効化するため、乖離の余地を消す。
+            # 代わりにディスクが詰まった場合は metastore が停止するが、
+            # 状態が壊れて数日間気付けないよりは望ましい。
+            metastore.raft.log-store-timeout: "0"
+
             # architecture.storage=v2 では write-path=segment-writer も必須だが
             # chart 2.0.1 は v2 を立てても write-path を自動セットしない (確認済)。
             # 起動時に "write-path=segment-writer is required for v2 storage layer"
