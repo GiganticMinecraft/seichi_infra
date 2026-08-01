@@ -43,13 +43,10 @@ spec:
           # 偽発火で、drain が prometheus Pod を動かすたびに窓の最中に firing する (2026-07-20 の窓で
           # wk-2 の再起動を 3 周期 (約 40 分) ブロックした実績)。アラート式側に > 0 ガードを入れて
           # 根治したが、本物の停滞時も再起動の保留ではアップロードは復旧しないため除外は維持する
-          # PortalAlertRouteSmokeTest / InfraAlertRouteSmokeTest: #5601 の Discord 通知経路
-          # (2 系統) の疎通確認用の合成アラート (常時 firing のため、除外しないと
-          # 確認期間中の再起動窓を全てブロックする)
           # SeichiPortalHighErrorRate / SeichiPortalBackendCrashLoop: seichi-portal の
           # アプリケーションアラート (#5611, #5618)。アプリのエラーはノード再起動で
           # 直らないため、ノード保守をブロックさせない
-          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|PortalAlertRouteSmokeTest|InfraAlertRouteSmokeTest|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop)$"
+          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、

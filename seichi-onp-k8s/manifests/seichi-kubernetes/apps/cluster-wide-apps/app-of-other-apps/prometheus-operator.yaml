@@ -292,35 +292,6 @@ spec:
                     expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
                   - record: node:node_cpu_utilisation:avg5m
                     expr: 1 - avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
-          # #5601 の受け入れ確認用の合成アラート (常時 firing)。2 系統の route
-          # (discord-portal / discord-infra) をそれぞれ疎通確認するため 2 本ある。
-          # マージ後に各チャンネルへ firing 通知 (ロールメンション付き) が 1 回ずつ
-          # 届くことを確認し、このブロックを削除する。削除のマージで resolved 通知も
-          # 確認できる。kured の alertFilterRegexp にも登録済み (常時 firing のため、
-          # 登録しないと再起動窓 05:00-07:00 をブロックする)
-          alert-route-smoke-test:
-            groups:
-              - name: alert-route-smoke-test
-                rules:
-                  - alert: PortalAlertRouteSmokeTest
-                    expr: vector(1)
-                    labels:
-                      # chart 既定の inhibit_rules が severity=info を InfoInhibitor で
-                      # 抑制するため、Watchdog と同じ none にして確実に配送させる
-                      severity: none
-                      notify: discord
-                      team: portal
-                    annotations:
-                      summary: Discord 通知経路 (portal 系統) の疎通確認用の合成アラート
-                      description: notify=discord + team=portal ルートの firing/resolved 確認用。確認が済んだらこのルールを削除する。
-                  - alert: InfraAlertRouteSmokeTest
-                    expr: vector(1)
-                    labels:
-                      severity: none
-                      notify: discord
-                    annotations:
-                      summary: Discord 通知経路 (インフラ系統) の疎通確認用の合成アラート
-                      description: team なしの notify=discord ルートの firing/resolved 確認用。確認が済んだらこのルールを削除する。
         # 既定はどこにも通知しない (root receiver "null")。Discord への通知は
         # notify=discord ラベルによる明示 opt-in のみ (#5601)。severity ベースの
         # 一括通知は行わない (既存ルールのノイズをそのまま流さないため。
