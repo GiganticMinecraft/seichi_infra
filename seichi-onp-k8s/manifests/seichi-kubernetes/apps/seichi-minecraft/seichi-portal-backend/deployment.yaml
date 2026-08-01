@@ -94,5 +94,8 @@ spec:
               value: "http/protobuf"
             - name: OTEL_TRACES_SAMPLER
               value: "parentbased_always_on"
+            # service.version はここに書くと Renovate のイメージ更新(image: 行のみ書き換え)に
+            # 追従できず乖離するため含めない。アプリ側で CARGO_PKG_VERSION から
+            # OTel resource に埋め込むのが正
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production,service.version=0.2.0"
+              value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production"
