@@ -291,26 +291,14 @@ spec:
                 }
 
                 sourcemaps {
-                  // デフォルトは download = true + download_from_origins = ["*"] で、
-                  // ブラウザが送ってきた任意 URL 由来のパスを Alloy が fetch しうる
-                  // (クラスタ内からの SSRF 経路になる) ため無効化し、
-                  // クラスタ内 Garage の location のみから取得する。
-                  // garage-admin の origin は Cloudflare Access 配下でクラスタ内から
-                  // fetch できないため、download を切っても退行しない。
+                  // source map によるデミニファイは不採用 (seichi-portal-frontend#934
+                  // 参照。必要になれば productionBrowserSourceMaps + 公開配信 +
+                  // download_from_origins 限定でいつでも導入できる)。
+                  // このブロック自体は SSRF 対策として残す: ブロックが無くても
+                  // デフォルトで download = true + download_from_origins = ["*"] が
+                  // 適用され、ブラウザ由来の任意 URL を Alloy が fetch しうるため、
+                  // 明示的に無効化しておく。
                   download = false
-
-                  // seichi-portal-frontend のリリース CI が Garage の
-                  // seichi-portal-sourcemaps バケットへ
-                  //   {release}/_next/static/**/*.map
-                  // のキーでアップロードする (seichi-portal-frontend#934)。
-                  // path 中の .Release テンプレートは Faro SDK の app.release
-                  // (payload の Meta.App.Release) で置換されるため、frontend 側は
-                  // app.release にリリースバージョンを設定する必要がある。
-                  // (Helm の tpl に食われないよう二重括弧をエスケープしている)
-                  location {
-                    minified_path_prefix = "https://portal.seichi.click/_next/static/"
-                    path                 = "http://seichi-portal-sourcemaps.garage.svc.cluster.local/{{ "{{" }} .Release {{ "}}" }}/_next/static/"
-                  }
                 }
 
                 output {
