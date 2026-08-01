@@ -1,0 +1,56 @@
+# seichi-portal のアプリケーションアラート (#5611, #5618)。
+# kube-prometheus-stack の ruleSelector (release: prometheus) が namespace 横断で
+# PrometheusRule を発見する (seichi-portal-valkey チャートの prometheusRule と同じ仕組み)。
+# ここのアラート名は kured の alertFilterRegexp にも登録している (アプリのエラーで
+# ノード再起動を止めないため)。アラート名を変えたら kured 側も更新すること。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: seichi-portal-alerts
+  namespace: seichi-minecraft
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: seichi-portal-alerts
+      rules:
+        # Tempo metrics-generator (span-metrics processor) が remote_write する
+        # traces_spanmetrics_calls_total を使う。RED metrics の正は Tempo spanmetrics
+        # (#5604 で一本化)。低トラフィック時の単発失敗で発火しないよう、SERVER スパン
+        # 限定 + 直近 10 分で 20 リクエスト以上のトラフィック下限を付ける。
+        # 5% / 20 リクエストは初期値で、本番ベースライン観測後に見直す (#5611)
+        - alert: SeichiPortalHighErrorRate
+          expr: |
+            (
+              sum by (service) (rate(traces_spanmetrics_calls_total{service=~"seichi-portal-(frontend|backend)",span_kind="SPAN_KIND_SERVER",status_code="STATUS_CODE_ERROR"}[5m]))
+              /
+              sum by (service) (rate(traces_spanmetrics_calls_total{service=~"seichi-portal-(frontend|backend)",span_kind="SPAN_KIND_SERVER"}[5m]))
+            ) > 0.05
+            and on (service)
+            sum by (service) (increase(traces_spanmetrics_calls_total{service=~"seichi-portal-(frontend|backend)",span_kind="SPAN_KIND_SERVER"}[10m])) >= 20
+          for: 10m
+          labels:
+            severity: warning
+            notify: discord
+            team: portal
+          annotations:
+            summary: "{{ $labels.service }} のエラーレートが 5% を超えています"
+            description: "{{ $labels.service }} のサーバーサイドスパンのエラーレートが 10 分間 5% を超えています (現在値: {{ $value | humanizePercentage }})。"
+        # 起動直後に即死する panic (CrashLoopBackOff) は stdout が alloy-logs の
+        # file tailer に拾われる前に書き終わるため、Loki ruler の panic ルール (#5618)
+        # では検知できない (2026-08-01 実測: 0.2.0 の起動時 panic ログは Loki に
+        # 1 行も届いていない)。Sentry が担っていた「起動不能の即時通知」は
+        # この CrashLoop アラートで代替する
+        - alert: SeichiPortalBackendCrashLoop
+          expr: |
+            max by (namespace, pod, container) (
+              max_over_time(kube_pod_container_status_waiting_reason{namespace="seichi-minecraft", container="seichi-portal-backend", reason="CrashLoopBackOff", job="kube-state-metrics"}[5m])
+            ) >= 1
+          for: 5m
+          labels:
+            severity: critical
+            notify: discord
+            team: portal
+          annotations:
+            summary: "seichi-portal-backend が CrashLoopBackOff です"
+            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしています。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
