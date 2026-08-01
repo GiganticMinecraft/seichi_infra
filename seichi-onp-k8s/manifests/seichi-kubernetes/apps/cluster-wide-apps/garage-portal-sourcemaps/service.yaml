@@ -1,0 +1,24 @@
+# seichi-portal-frontend の source map を Alloy faro.receiver が取得するための
+# クラスタ内エンドポイント。Garage の s3-web (3902/TCP) を指す。
+#
+# Garage の web エンドポイントは Host ヘッダでバケットを解決する。この Service の
+# FQDN (seichi-portal-sourcemaps.garage.svc.cluster.local) は web の rootDomain
+# (.web.garage.svc.cluster.local) に一致しないため、Garage はホスト名全体を
+# バケットエイリアスとして解決する。そのためバケット側に
+#   global alias: seichi-portal-sourcemaps.garage.svc.cluster.local
+# を付与し、website access を許可しておく必要がある (#5608 の運用手順参照)。
+apiVersion: v1
+kind: Service
+metadata:
+  name: seichi-portal-sourcemaps
+  namespace: garage
+spec:
+  type: ClusterIP
+  ports:
+    - name: s3-web
+      port: 80
+      targetPort: 3902
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: garage

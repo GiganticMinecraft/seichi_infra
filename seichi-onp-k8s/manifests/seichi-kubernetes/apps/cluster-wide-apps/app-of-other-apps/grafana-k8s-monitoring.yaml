@@ -303,12 +303,13 @@ spec:
                   // seichi-portal-sourcemaps バケットへ
                   //   {release}/_next/static/**/*.map
                   // のキーでアップロードする (seichi-portal-frontend#934)。
-                  // {{ .Release }} は Faro SDK の app.release (payload の
-                  // Meta.App.Release) で置換されるため、frontend 側は app.release に
-                  // リリースバージョンを設定する必要がある。
+                  // path 中の .Release テンプレートは Faro SDK の app.release
+                  // (payload の Meta.App.Release) で置換されるため、frontend 側は
+                  // app.release にリリースバージョンを設定する必要がある。
+                  // (Helm の tpl に食われないよう二重括弧をエスケープしている)
                   location {
                     minified_path_prefix = "https://portal.seichi.click/_next/static/"
-                    path                 = "http://seichi-portal-sourcemaps.garage.svc.cluster.local/{{ .Release }}/_next/static/"
+                    path                 = "http://seichi-portal-sourcemaps.garage.svc.cluster.local/{{ "{{" }} .Release {{ "}}" }}/_next/static/"
                   }
                 }
 
