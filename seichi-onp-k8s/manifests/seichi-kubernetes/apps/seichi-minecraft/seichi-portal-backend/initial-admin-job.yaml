@@ -1,0 +1,75 @@
+# `rito_5289` を administrator に昇格するための一時 Job。
+#
+# 対象ユーザーがログインして users テーブルに登録されるまで待機し、
+# 該当ユーザーだけを昇格する。
+# 初回 admin の作成後、このファイルと対応する NetworkPolicy を削除すること。
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seichi-portal-initial-admin
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-initial-admin
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app: seichi-portal-initial-admin
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mariadb-client
+          image: docker-registry1.mariadb.com/library/mariadb:11.8
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+
+              mariadb_args="--protocol=TCP --host=${MYSQL_HOST} --port=${MYSQL_PORT} --user=${MYSQL_USER} --database=${MYSQL_DATABASE} --password=${MYSQL_PASSWORD}"
+
+              until mariadb ${mariadb_args} -e "SELECT 1" >/dev/null 2>&1; do
+                sleep 5
+              done
+
+              until mariadb ${mariadb_args} -e "SELECT 1 FROM users LIMIT 1" >/dev/null 2>&1; do
+                sleep 5
+              done
+
+              while :; do
+                user_count=$(mariadb ${mariadb_args} --batch --skip-column-names -e "SELECT COUNT(*) FROM users WHERE name = '${INITIAL_ADMIN_NAME}'")
+                if [ "${user_count}" -gt 0 ]; then
+                  mariadb ${mariadb_args} -e "UPDATE users SET role = 'ADMINISTRATOR' WHERE name = '${INITIAL_ADMIN_NAME}'"
+                  mariadb ${mariadb_args} -e "SELECT id, name, role FROM users WHERE name = '${INITIAL_ADMIN_NAME}'"
+                  echo "${INITIAL_ADMIN_NAME} を administrator に昇格しました。"
+                  exit 0
+                fi
+
+                sleep 5
+              done
+          env:
+            - name: MYSQL_DATABASE
+              value: seichi-portal
+            - name: MYSQL_USER
+              value: seichi-portal
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-db-credentials
+                  key: password
+            - name: MYSQL_HOST
+              value: mariadb
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: INITIAL_ADMIN_NAME
+              value: rito_5289
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
