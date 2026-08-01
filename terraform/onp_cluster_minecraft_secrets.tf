@@ -280,6 +280,23 @@ resource "kubernetes_secret_v1" "seichi_portal_meilisearch_master_key" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "seichi_portal_frontend_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichi-portal-frontend-secrets"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    MS_APP_CLIENT_ID      = var.seichi_portal_frontend__ms_app_client_id
+    DISCORD_CLIENT_ID     = var.seichi_portal_frontend__discord_client_id
+    DISCORD_CLIENT_SECRET = var.seichi_portal_frontend__discord_client_secret
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "tailscale_approval_bot_secrets" {
   depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
