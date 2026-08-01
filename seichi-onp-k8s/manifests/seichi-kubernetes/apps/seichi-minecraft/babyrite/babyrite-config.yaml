@@ -1,7 +1,7 @@
 # babyrite Config
 # This file is used to configure babyrite.
 # You can change the settings here to customize babyrite's behavior.
-# For more information, see the babyrite documentation at https://babyrite.m1sk9.dev/configuration.html
+# For more information, see the babyrite documentation at https://babyrite.m1sk9.dev/docs/configuration
 
 apiVersion: v1
 kind: ConfigMap
@@ -11,25 +11,20 @@ data:
   config.toml: |
     ### babyrite configuration file ###
     # This file is used for babyrite configuration.
-    # By changing this configuration, you can modify the behavior of babyrite. Please restart babyrite after changing the settings.
     # The settings are written in TOML format. To use the configuration file, specify the recursive path to the configuration file in the environment variable "CONFIG_FILE_PATH" injected into the container.
     # Note that babyrite will run with default settings if not configured.
+    # babyrite reads this file only on startup, so the Pod must be restarted after changing it.
 
-    # Startup settings (Feature Flags)
-    ## Flags to change the behavior of babyrite. Specify them separated by commas. The default is empty.
-    ## The valid flags are as follows:
-    ## - "json_logging": Outputs logs in JSON format (useful when integrating with log collection tools like Grafana Loki)
-    feature_flag = "json_logging"
+    # Logging settings
+    [log]
+    ## Log level filter. Accepts the same syntax as the RUST_LOG environment variable (e.g. "babyrite=debug").
+    ## RUST_LOG takes precedence over this value when it is set.
+    level = "babyrite=info"
+    ## Output format: "compact" (human-readable) or "json".
+    ## JSON is required for Loki to parse the per-request fields (message_id / guild_id / channel_id) with "| json".
+    format = "json"
 
-    # Mention settings for preview generation (default is enabled)
-    ## Mentions the request sender when generating a preview.
-    is_mention = false
-
-    # Preview deletion feature (default is enabled)
-    ## Sets whether to enable the deletion of previews. If enabled, a trash can reaction is added to each preview, and pressing the reaction will delete it.
-    ## If disabled, the reaction is not added, and pressing the reaction will not delete the preview.
-    is_deletable = true
-
-    # Allow NSFW (Not Safe For Work) content (default is disabled)
-    ## Sets whether to allow the generation of messages from channels marked as NSFW. It is strongly recommended to disable this setting on community servers.
-    is_allow_nsfw = false
+    # Feature flags
+    [features]
+    ## Expands GitHub permalinks into syntax-highlighted code blocks.
+    github_permalink = false
