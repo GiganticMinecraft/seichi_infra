@@ -21,15 +21,29 @@ spec:
         - name: rabbitmq
           image: rabbitmq:4.3-management-alpine
           env:
-            - name: RABBITMQ_DEFAULT_USER
+            - name: SEICHI_PORTAL_RABBITMQ_USER
               value: seichi-portal
-            - name: RABBITMQ_DEFAULT_PASS
+            - name: SEICHI_PORTAL_RABBITMQ_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: seichi-portal-rabbitmq-credentials
                   key: password
             - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
               value: '-rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"'
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -ec
+                  - |
+                    rabbitmqctl await_startup --timeout 300
+                    if rabbitmqctl list_users --silent | awk -v user="$SEICHI_PORTAL_RABBITMQ_USER" '$1 == user { found=1 } END { exit(found ? 0 : 1) }'; then
+                      rabbitmqctl change_password "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
+                    else
+                      rabbitmqctl add_user "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
+                    fi
+                    rabbitmqctl set_permissions -p / "$SEICHI_PORTAL_RABBITMQ_USER" '.*' '.*' '.*'
           ports:
             - name: amqp
               containerPort: 5672
