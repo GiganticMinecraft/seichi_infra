@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.1@sha256:f1b683a251027504e8f7f413fa0270a4675c26fc713479d467d5fe23a74a1226
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.2@sha256:5bb41e8d31f4f94e84eb0da10d0b313b91fab7645c9a8093642cdfe606095f77
           resources:
             # OTel exporter のオーバーヘッド吸収のため limit を 100m から 300m へ増強
             # (seichi-game-data-publisher が exporter 導入時に 50m→300m へ増強した実績に倣う)
