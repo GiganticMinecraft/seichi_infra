@@ -74,11 +74,6 @@ import {
 }
 
 import {
-  to = cloudflare_zero_trust_access_application.onp_bugsink
-  id = "zones/77c10fdfa7c65de4d14903ed8879ebcb/81ef7b64-1bfc-4489-a52e-91b28c96bb1f"
-}
-
-import {
   to = cloudflare_zero_trust_access_application.onp_goldilocks
   id = "zones/77c10fdfa7c65de4d14903ed8879ebcb/79b3c4cc-6031-409f-9fd8-34129a61b2e3"
 }
@@ -112,10 +107,6 @@ import {
   id = "77c10fdfa7c65de4d14903ed8879ebcb/6be6095953e09f3178bb8d5bfda5bf51"
 }
 
-import {
-  to = cloudflare_page_rule.disable_security_on_sentry_api
-  id = "77c10fdfa7c65de4d14903ed8879ebcb/8d945497e9d21976ffae5bd475f8a8a6"
-}
 
 # endregion
 

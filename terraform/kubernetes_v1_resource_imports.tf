@@ -575,18 +575,6 @@ import {
   id = "seichi-minecraft/seichiassist-downloader-master-release-notify-webhook"
 }
 removed {
-  from = kubernetes_secret.onp_minecraft_prod_bugsink_admin_password
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-import {
-  to = kubernetes_secret_v1.onp_minecraft_prod_bugsink_admin_password
-  id = "seichi-minecraft/bugsink-admin-password"
-}
-removed {
   from = kubernetes_secret.onp_minecraft_prod_mariadb_root_password
 
   lifecycle {
