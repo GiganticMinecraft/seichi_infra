@@ -280,6 +280,21 @@ resource "kubernetes_secret_v1" "seichi_portal_meilisearch_master_key" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "seichi_portal_discord_bot_token" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichi-portal-discord-bot-token"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    DISCORD_BOT_TOKEN = var.seichi_portal__discord_bot_token
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "tailscale_approval_bot_secrets" {
   depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 

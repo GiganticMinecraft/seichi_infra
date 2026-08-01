@@ -67,3 +67,8 @@ spec:
               value: "5672"
             - name: RABBITMQ_ROUTING_KEY
               value: seichi_portal
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-discord-bot-token
+                  key: DISCORD_BOT_TOKEN
