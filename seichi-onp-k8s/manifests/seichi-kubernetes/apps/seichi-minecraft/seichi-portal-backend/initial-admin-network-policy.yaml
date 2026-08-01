@@ -1,0 +1,20 @@
+# 初回 admin 作成用 Job から MariaDB への接続を許可する。
+# Job の完了後は initial-admin-job.yaml と一緒に削除すること。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-initial-admin--to-mariadb
+  namespace: seichi-minecraft
+spec:
+  endpointSelector:
+    matchLabels:
+      app: seichi-portal-initial-admin
+  egress:
+    - toServices:
+        - k8sService:
+            serviceName: mariadb
+            namespace: seichi-minecraft
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
