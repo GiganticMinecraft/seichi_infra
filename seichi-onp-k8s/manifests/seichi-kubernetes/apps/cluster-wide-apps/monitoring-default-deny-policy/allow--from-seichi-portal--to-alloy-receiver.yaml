@@ -1,0 +1,30 @@
+# seichi-minecraft namespace の seichi-portal (backend/frontend) から
+# Alloy receiver への OTLP HTTP (4318/TCP) / Faro (12347/TCP) の ingress 許可。
+# 対になる seichi-minecraft 側の egress 許可は
+# apps/seichi-minecraft/default-deny-policy/ にある。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal--to-alloy-receiver
+  namespace: monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-receiver
+      app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: seichi-minecraft
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - seichi-portal-backend
+                - seichi-portal-frontend
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP
+            - port: "12347"
+              protocol: TCP

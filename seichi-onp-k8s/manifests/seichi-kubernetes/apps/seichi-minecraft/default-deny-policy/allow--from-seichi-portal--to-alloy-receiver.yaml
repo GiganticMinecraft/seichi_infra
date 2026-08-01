@@ -1,0 +1,32 @@
+# seichi-portal (backend/frontend) が OTel テレメトリを monitoring namespace の
+# Alloy receiver (k8s-monitoring-alloy-receiver) へ送るための egress 許可。
+#   - 4318/TCP:  OTLP HTTP (traces/logs/metrics)
+#   - 12347/TCP: Faro receiver (frontend の Next.js が /collect を receiver へプロキシする)
+# 対になる monitoring 側の ingress 許可は
+# apps/cluster-wide-apps/monitoring-default-deny-policy/ にある。
+# seichi-portal-frontend の Deployment は未追加 (#5610) だが、
+# backend と同じ app ラベル体系を前提に先回りで対象へ含めている。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal--to-alloy-receiver
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - seichi-portal-backend
+          - seichi-portal-frontend
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: alloy-receiver
+            app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP
+            - port: "12347"
+              protocol: TCP
