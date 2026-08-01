@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seichi-portal-frontend
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seichi-portal-frontend
+  template:
+    metadata:
+      labels:
+        app: seichi-portal-frontend
+    spec:
+      containers:
+        - name: seichi-portal-frontend
+          image: ghcr.io/giganticminecraft/seichi-portal-frontend:0.2.0@sha256:d913390091df9bae0f8163cb59e4bcf6f94de970b3cf09afc8b9ad7d03d060b4
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          env:
+            - name: MS_APP_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-frontend-secrets
+                  key: MS_APP_CLIENT_ID
+            - name: MS_APP_REDIRECT_URL
+              value: https://portal.seichi.click
+            - name: BACKEND_SERVER_URL
+              value: http://seichi-portal-backend:80
+            - name: DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-frontend-secrets
+                  key: DISCORD_CLIENT_ID
+            - name: DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-frontend-secrets
+                  key: DISCORD_CLIENT_SECRET
+            - name: DISCORD_REDIRECT_URI
+              value: https://portal.seichi.click/api/discord
+            - name: NEXT_PUBLIC_DEBUG_MODE
+              value: "false"

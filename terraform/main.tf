@@ -598,6 +598,28 @@ variable "meilisearch__master_key" {
 
 #endregion
 
+#region seichi-portal-frontend secrets
+
+variable "seichi_portal_frontend__ms_app_client_id" {
+  description = "Microsoft Entra ID application client ID for seichi-portal-frontend"
+  type        = string
+  sensitive   = true
+}
+
+variable "seichi_portal_frontend__discord_client_id" {
+  description = "Discord application client ID for seichi-portal-frontend"
+  type        = string
+  sensitive   = true
+}
+
+variable "seichi_portal_frontend__discord_client_secret" {
+  description = "Discord application client secret for seichi-portal-frontend"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region tailscale-approval-bot secrets
 
 variable "tailscale_approval_bot__tailnet" {
