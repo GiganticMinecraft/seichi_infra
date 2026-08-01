@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seichi-portal-debezium
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-debezium
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: seichi-portal-debezium
+  template:
+    metadata:
+      labels:
+        app: seichi-portal-debezium
+    spec:
+      securityContext:
+        fsGroup: 185
+      containers:
+        - name: debezium
+          image: quay.io/debezium/server:3.6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DEBEZIUM_SINK_RABBITMQ_CONNECTION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-rabbitmq-credentials
+                  key: password
+            - name: DEBEZIUM_SOURCE_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: debezium-db-credentials
+                  key: password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /debezium/config/application.properties
+              subPath: application.properties
+            - name: data
+              mountPath: /debezium/data
+      volumes:
+        - name: config
+          configMap:
+            name: seichi-portal-debezium-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: seichi-portal-debezium-data

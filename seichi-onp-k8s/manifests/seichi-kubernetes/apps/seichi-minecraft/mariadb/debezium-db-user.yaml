@@ -1,0 +1,47 @@
+apiVersion: "secretgenerator.mittwald.de/v1alpha1"
+kind: "StringSecret"
+metadata:
+  namespace: seichi-minecraft
+  name: debezium-db-credentials
+spec:
+  forceRegenerate: false
+  fields:
+    - fieldName: "password"
+      encoding: "hex"
+      length: "32"
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  namespace: seichi-minecraft
+  name: debezium
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  passwordSecretKeyRef:
+    name: debezium-db-credentials
+    key: password
+  maxUserConnections: 5
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  namespace: seichi-minecraft
+  name: debezium
+spec:
+  mariaDbRef:
+    name: mariadb
+    waitForIt: true
+  privileges:
+    - "SELECT"
+    - "RELOAD"
+    - "SHOW DATABASES"
+    - "REPLICATION SLAVE"
+    - "REPLICATION CLIENT"
+  database: "*"
+  table: "*"
+  username: "debezium"
+  grantOption: false

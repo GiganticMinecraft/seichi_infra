@@ -38,6 +38,12 @@ spec:
     performance_schema_instrument='memory/%=ON'
     max-connections=400
     join_buffer_size=256K
+    log_bin = mariadb-bin
+    binlog_format = ROW
+    binlog_row_image = FULL
+    binlog_legacy_event_pos = 1
+    log_bin_compress = 0
+    binlog_expire_logs_seconds = 604800
 
   resources:
     requests:

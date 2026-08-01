@@ -1,0 +1,23 @@
+# Debezium が MariaDB の binlog を読み取り、RabbitMQ へ CDC イベントを送るための egress 許可。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-debezium--to-datastores
+spec:
+  endpointSelector:
+    matchLabels:
+      app: seichi-portal-debezium
+  egress:
+    - toServices:
+        - k8sService:
+            serviceName: mariadb
+            namespace: seichi-minecraft
+        - k8sService:
+            serviceName: seichi-portal-rabbitmq
+            namespace: seichi-minecraft
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
+            - port: "5672"
+              protocol: TCP

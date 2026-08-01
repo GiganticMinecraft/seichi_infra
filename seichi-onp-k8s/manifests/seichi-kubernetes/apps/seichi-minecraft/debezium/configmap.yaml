@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seichi-portal-debezium-config
+  namespace: seichi-minecraft
+data:
+  application.properties: |
+    debezium.sink.type=rabbitmq
+    debezium.sink.rabbitmq.connection.host=seichi-portal-rabbitmq
+    debezium.sink.rabbitmq.connection.port=5672
+    debezium.sink.rabbitmq.connection.username=seichi-portal
+    debezium.sink.rabbitmq.ackTimeout=3000
+    debezium.sink.rabbitmq.exchange=seichi_portal
+    debezium.sink.rabbitmq.routingKey=seichi_portal
+
+    debezium.source.connector.class=io.debezium.connector.mariadb.MariaDbConnector
+    debezium.source.offset.storage=org.apache.kafka.connect.storage.FileOffsetBackingStore
+    debezium.source.offset.storage.file.filename=data/offsets.dat
+    debezium.source.schema.history.internal=io.debezium.storage.file.history.FileSchemaHistory
+    debezium.source.schema.history.internal.file.filename=data/dbhistory.dat
+    debezium.source.include.schema.changes=false
+    debezium.source.offset.flush.interval.ms=0
+    debezium.source.heartbeat.interval.ms=30000
+    debezium.source.database.hostname=mariadb
+    debezium.source.database.port=3306
+    debezium.source.database.user=debezium
+    debezium.source.database.server.id=1001
+    debezium.source.database.include.list=seichi_portal
+    debezium.source.topic.prefix=seichi_portal
+    debezium.source.snapshot.mode=initial
+
+    debezium.format.key=json
+    debezium.format.value=json
+
+    quarkus.log.console.json=false
