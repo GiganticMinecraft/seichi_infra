@@ -19,7 +19,7 @@ spec:
           create: true
           rules:
             kubeProxy: false
-            alertmanager: false
+            alertmanager: true
             windows: false
         prometheus-windows-exporter:
           prometheus:
@@ -280,8 +280,21 @@ spec:
                     expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
                   - record: node:node_cpu_utilisation:avg5m
                     expr: 1 - avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+        # どこにも通知しない状態(null receiver)で有効化し、Prometheus との接続のみ確立する。
+        # chart デフォルトの config は root receiver が "null" だが、通知が飛ばないことが
+        # 運用上の前提であるため、GitOps 定義として明示的に固定している。
+        # Discord 通知経路の追加は #5601、HA 化は #5600 で行う。
         alertmanager:
-          enabled: false
+          enabled: true
+          config:
+            route:
+              receiver: "null"
+              routes:
+                - receiver: "null"
+                  matchers:
+                    - alertname = "Watchdog"
+            receivers:
+              - name: "null"
         kubeApiServer:
           serviceMonitor:
             metricRelabelings:
