@@ -5,6 +5,8 @@ metadata:
   namespace: seichi-minecraft
   labels:
     app: seichi-portal-backend
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   selector:
@@ -17,7 +19,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:main-649c758@sha256:41644723938d101c004b817e0534f10a36479a8b7b38539df7031aed0e5ac36e
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.0@sha256:c1681fc6d7c3e32c24b77bc28dee2d0d0d3725767785eeaf10a4bf06bea86da6
           resources:
             requests:
               cpu: 50m
@@ -43,6 +45,8 @@ spec:
               value: "9000"
             - name: ENV_NAME
               value: production
+            - name: FRONTEND_URL
+              value: https://portal.seichi.click
             - name: REDIS_HOST
               value: seichi-portal-valkey
             - name: REDIS_PORT
@@ -54,6 +58,16 @@ spec:
                 secretKeyRef:
                   name: seichi-portal-meilisearch-master-key
                   key: MEILI_MASTER_KEY
+            - name: MINECRAFT_BANS_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-backend-secrets
+                  key: MINECRAFT_BANS_DATABASE_URL
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-backend-secrets
+                  key: DISCORD_BOT_TOKEN
             - name: RABBITMQ_USER
               value: seichi-portal
             - name: RABBITMQ_PASSWORD

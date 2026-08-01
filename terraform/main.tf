@@ -598,6 +598,16 @@ variable "meilisearch__master_key" {
 
 #endregion
 
+#region seichi-portal-backend secrets
+
+variable "seichi_portal_backend__discord_bot_token" {
+  description = "Discord bot token for seichi-portal-backend"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region seichi-portal-frontend secrets
 
 variable "seichi_portal_frontend__ms_app_client_id" {
