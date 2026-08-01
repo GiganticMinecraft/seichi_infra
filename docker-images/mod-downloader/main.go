@@ -12,7 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/getsentry/sentry-go"
 )
 
 func init() {
@@ -20,18 +19,9 @@ func init() {
 }
 
 func main() {
-	err := sentry.Init(sentry.ClientOptions{
-		Dsn:              "https://4e29bb46d28a81476f9d565fb4e312a6@sentry.onp.admin.seichi.click//4",
-		TracesSampleRate: 1.0,
-	})
-	if err != nil {
-		log.Fatalf("sentry.Init: %s", err)
-	}
-
 	downloadTargetDirPath := os.Getenv("DOWNLOAD_TARGET_DIR_PATH")
-	err = os.MkdirAll(downloadTargetDirPath, 0600)
+	err := os.MkdirAll(downloadTargetDirPath, 0600)
 	if err != nil {
-		sentry.CaptureException(err)
 		log.Fatalln(err)
 		return
 	}
@@ -60,7 +50,6 @@ func main() {
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")),
 	)
 	if err != nil {
-		sentry.CaptureException(err)
 		log.Fatalln(err)
 		return
 	}
@@ -87,7 +76,6 @@ func main() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
 			slog.Error("Error listing objects:", "error", err)
-			sentry.CaptureException(err)
 			return
 		}
 
@@ -102,7 +90,6 @@ func main() {
 			if dir := filePathToSave[:strings.LastIndex(filePathToSave, "/")]; dir != "" {
 				if err := os.MkdirAll(dir, 0755); err != nil {
 					slog.Error("Error creating directory:", "dir", dir, "error", err)
-					sentry.CaptureException(err)
 					return
 				}
 			}
@@ -110,7 +97,6 @@ func main() {
 			f, err := os.Create(filePathToSave)
 			if err != nil {
 				slog.Error("Error creating file:", "filePath", filePathToSave, "error", err)
-				sentry.CaptureException(err)
 				return
 			}
 
@@ -124,14 +110,12 @@ func main() {
 			}
 			if err != nil {
 				slog.Error("Error downloading object:", "objectKey", key, "error", err)
-				sentry.CaptureException(err)
 				return
 			}
 
 			// 保存したファイルの所有権をitzg/minecraftに渡す ref. https://github.com/itzg/docker-minecraft-server/issues/1583
 			if err := os.Chown(filePathToSave, 1000, 1000); err != nil {
 				slog.Error("Error changing file ownership:", "filePath", filePathToSave, "error", err)
-				sentry.CaptureException(err)
 			} else {
 				slog.Info("File ownership changed successfully", "filePath", filePathToSave)
 			}
