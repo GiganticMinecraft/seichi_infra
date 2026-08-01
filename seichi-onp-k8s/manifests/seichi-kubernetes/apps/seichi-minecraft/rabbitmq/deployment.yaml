@@ -37,7 +37,9 @@ spec:
                   - /bin/sh
                   - -ec
                   - |
-                    rabbitmqctl await_startup --timeout 300
+                    until rabbitmqctl await_startup --timeout 5 >/dev/null 2>&1; do
+                      sleep 1
+                    done
                     if rabbitmqctl list_users --silent | awk -v user="$SEICHI_PORTAL_RABBITMQ_USER" '$1 == user { found=1 } END { exit(found ? 0 : 1) }'; then
                       rabbitmqctl change_password "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
                     else
