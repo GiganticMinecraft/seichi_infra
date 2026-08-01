@@ -354,21 +354,54 @@ spec:
                   repeat_interval: 4h
             receivers:
               - name: "null"
+              # discord_configs ではなく webhook_configs で Discord ネイティブ JSON を
+              # 直接 POST する。理由: prometheus-operator は alertmanager 設定を自前の
+              # 内部モデルで parse しており、discord_configs の webhook_url_file を
+              # 認識できない (operator v0.92.1 時点、main も未対応)。discord_configs で
+              # これを使うと operator の reconcile が
+              #   field webhook_url_file not found in type alertmanager.discordConfig
+              # で失敗し続け、Secret マウントの STS 更新が永久に走らない (2026-08-01 実測)。
+              # webhook_configs の url_file / payload は operator も認識する。
+              #
+              # payload は文字列テンプレートではなく YAML 構造ごと JSON エンコードされる
+              # (各文字列だけがテンプレート評価される) ため、annotation の日本語や引用符も
+              # 安全に JSON 化される。
               # webhook URL は公開リポジトリに書けないため、Terraform 管理の Secret
               # (alertmanagerSpec.secrets でマウント) をファイル参照する。
-              # Alertmanager は allowed_mentions を設定しないため、content 内の
-              # ロールメンションがそのまま ping になる (embed 側の title/message に
-              # 書いても ping しない)。ロール ID はどちらも backup 失敗通知と同じ
-              # 運用ロールを暫定使用。チャンネルごとの専用ロールに変える場合は
-              # 各 content の ID を差し替える (#5601)
+              # content 内のロールメンションと allowed_mentions で ping する (backup
+              # 失敗通知と同じ運用ロールを暫定使用。チャンネル専用ロールに変える場合は
+              # content と allowed_mentions の両方の ID を差し替える #5601)
               - name: "discord-portal"
-                discord_configs:
-                  - webhook_url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
-                    content: '<@&532704116799963168>'
+                webhook_configs:
+                  - url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
+                    # payload に含めるアラート数の上限。embed description の 4096 字制限を
+                    # 超えて Discord に 400 で拒否されないための安全弁 (printf の
+                    # "%.Ns" による各フィールドの切り詰めと併用)
+                    max_alerts: 5
+                    payload:
+                      content: '<@&532704116799963168> {{ template "__subject" . }}'
+                      allowed_mentions:
+                        roles: ["532704116799963168"]
+                      embeds:
+                        - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ printf "%.200s" (.GroupLabels.SortedPairs.Values | join " ") }}'
+                          description: |-
+                            {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
+                            {{ with .Annotations.description }}{{ printf "%.500s" . }}
+                            {{ end }}{{ end }}
               - name: "discord-infra"
-                discord_configs:
-                  - webhook_url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
-                    content: '<@&532704116799963168>'
+                webhook_configs:
+                  - url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
+                    max_alerts: 5
+                    payload:
+                      content: '<@&532704116799963168> {{ template "__subject" . }}'
+                      allowed_mentions:
+                        roles: ["532704116799963168"]
+                      embeds:
+                        - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ printf "%.200s" (.GroupLabels.SortedPairs.Values | join " ") }}'
+                          description: |-
+                            {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
+                            {{ with .Annotations.description }}{{ printf "%.500s" . }}
+                            {{ end }}{{ end }}
           # 通知・Silence の可用性を確保するための HA 構成。
           # Prometheus 自体は 1 レプリカのため、ルール評価までは HA にならない(受容済み)。
           podDisruptionBudget:
