@@ -265,6 +265,11 @@ spec:
               }
           alloy-receiver:
             presets: [deployment]
+            # 運用メモ (#5608):
+            #   - alloy-receiver は 1 replica の Deployment で SPOF。落ちている間の
+            #     ブラウザテレメトリ (garage-admin / seichi-portal) はドロップされる
+            #   - seichi-portal は same-origin の /collect rewrite で送るため
+            #     cors_allowed_origins への追加は不要 (CORS 自体が発生しない)
             extraConfig: |-
               faro.receiver "default" {
                 server {
@@ -274,6 +279,37 @@ spec:
                   cors_allowed_origins = ["https://garage-admin.onp.admin.seichi.click"]
 
                   max_allowed_payload_size = "10MiB"
+
+                  // デフォルト (rate = 50, burst_size = 100, global) は
+                  // seichi-portal の本番ブラウザトラフィックを載せると不足しうるため
+                  // 引き上げる。超過時は 429 でドロップされる。
+                  rate_limiting {
+                    enabled    = true
+                    rate       = 200
+                    burst_size = 400
+                  }
+                }
+
+                sourcemaps {
+                  // デフォルトは download = true + download_from_origins = ["*"] で、
+                  // ブラウザが送ってきた任意 URL 由来のパスを Alloy が fetch しうる
+                  // (クラスタ内からの SSRF 経路になる) ため無効化し、
+                  // クラスタ内 Garage の location のみから取得する。
+                  // garage-admin の origin は Cloudflare Access 配下でクラスタ内から
+                  // fetch できないため、download を切っても退行しない。
+                  download = false
+
+                  // seichi-portal-frontend のリリース CI が Garage の
+                  // seichi-portal-sourcemaps バケットへ
+                  //   {release}/_next/static/**/*.map
+                  // のキーでアップロードする (seichi-portal-frontend#934)。
+                  // {{ .Release }} は Faro SDK の app.release (payload の
+                  // Meta.App.Release) で置換されるため、frontend 側は app.release に
+                  // リリースバージョンを設定する必要がある。
+                  location {
+                    minified_path_prefix = "https://portal.seichi.click/_next/static/"
+                    path                 = "http://seichi-portal-sourcemaps.garage.svc.cluster.local/{{ .Release }}/_next/static/"
+                  }
                 }
 
                 output {

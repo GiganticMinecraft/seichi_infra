@@ -1,0 +1,29 @@
+# Loki ruler の LogQL アラートルール置き場。
+# label "loki_rule" の付いた ConfigMap を loki Pod 内の rules sidecar が検出し、
+# /rules/fake (単一テナント) へ配置して ruler が読み込む。
+# 反映は ArgoCD -> ConfigMap -> sidecar で完結し、CI ツール (lokitool 等) は不要。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-alert-rules-smoke-test
+  namespace: monitoring
+  labels:
+    loki_rule: "1"
+data:
+  smoke-test.yaml: |
+    # ruler がルールをロードできているかを確認するための「絶対に firing しない」ルール。
+    # GET /loki/api/v1/rules (loki-gateway 経由) にこのグループが載っていれば疎通 OK。
+    # 実ルール (#5612, #5618) 導入後は削除してよい。
+    groups:
+      - name: loki-ruler-smoke-test
+        interval: 1m
+        rules:
+          - alert: LokiRulerSmokeTest
+            expr: |
+              sum(count_over_time({namespace="loki-ruler-smoke-nonexistent"}[5m])) > 0
+            for: 10m
+            labels:
+              severity: info
+            annotations:
+              summary: Loki ruler smoke test (never fires)
+              description: This rule exists only to verify that GitOps-managed rules are loaded by the ruler.
