@@ -43,6 +43,7 @@ spec:
     binlog_row_image = FULL
     binlog_legacy_event_pos = 1
     log_bin_compress = 0
+    binlog_expire_logs_seconds = 604800
 
   resources:
     requests:
