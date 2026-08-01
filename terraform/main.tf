@@ -410,6 +410,18 @@ variable "backup_failure_notify_webhook_url" {
   sensitive   = true
 }
 
+variable "portal_alert_discord_webhook_url" {
+  description = "Discord webhook URL used by Alertmanager receiver discord-portal (notify=discord + team=portal alerts)"
+  type        = string
+  sensitive   = true
+}
+
+variable "infra_alert_discord_webhook_url" {
+  description = "Discord webhook URL used by Alertmanager receiver discord-infra (notify=discord alerts without team=portal)"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region on-premise minecraft config secrets

@@ -345,6 +345,41 @@ resource "kubernetes_secret_v1" "truenas_exporter_api_key" {
   type = "Opaque"
 }
 
+# Alertmanager の Discord 通知経路 (#5601)。
+# kube-prometheus-stack の alertmanagerSpec.secrets でマウントされ、
+# 各 receiver の webhook_url_file が
+# /etc/alertmanager/secrets/<name>/webhook-url を参照する。
+# portal アプリ用 (team=portal) とインフラ用で通知先チャンネルを分けている
+resource "kubernetes_secret_v1" "portal_alert_discord" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
+
+  metadata {
+    name      = "portal-alert-discord"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "webhook-url" = var.portal_alert_discord_webhook_url
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret_v1" "infra_alert_discord" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
+
+  metadata {
+    name      = "infra-alert-discord"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "webhook-url" = var.infra_alert_discord_webhook_url
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "onp_kubechecks_github_app_secret" {
   depends_on = [kubernetes_namespace_v1.kubechecks]
 

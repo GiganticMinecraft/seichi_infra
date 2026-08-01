@@ -279,10 +279,42 @@ spec:
                     expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
                   - record: node:node_cpu_utilisation:avg5m
                     expr: 1 - avg by (node) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
-        # どこにも通知しない状態(null receiver)で有効化し、Prometheus との接続のみ確立する。
-        # chart デフォルトの config は root receiver が "null" だが、通知が飛ばないことが
-        # 運用上の前提であるため、GitOps 定義として明示的に固定している。
-        # Discord 通知経路の追加は #5601 で行う。
+          # #5601 の受け入れ確認用の合成アラート (常時 firing)。2 系統の route
+          # (discord-portal / discord-infra) をそれぞれ疎通確認するため 2 本ある。
+          # マージ後に各チャンネルへ firing 通知 (ロールメンション付き) が 1 回ずつ
+          # 届くことを確認し、このブロックを削除する。削除のマージで resolved 通知も
+          # 確認できる。kured の alertFilterRegexp にも登録済み (常時 firing のため、
+          # 登録しないと再起動窓 05:00-07:00 をブロックする)
+          alert-route-smoke-test:
+            groups:
+              - name: alert-route-smoke-test
+                rules:
+                  - alert: PortalAlertRouteSmokeTest
+                    expr: vector(1)
+                    labels:
+                      # chart 既定の inhibit_rules が severity=info を InfoInhibitor で
+                      # 抑制するため、Watchdog と同じ none にして確実に配送させる
+                      severity: none
+                      notify: discord
+                      team: portal
+                    annotations:
+                      summary: Discord 通知経路 (portal 系統) の疎通確認用の合成アラート
+                      description: notify=discord + team=portal ルートの firing/resolved 確認用。確認が済んだらこのルールを削除する。
+                  - alert: InfraAlertRouteSmokeTest
+                    expr: vector(1)
+                    labels:
+                      severity: none
+                      notify: discord
+                    annotations:
+                      summary: Discord 通知経路 (インフラ系統) の疎通確認用の合成アラート
+                      description: team なしの notify=discord ルートの firing/resolved 確認用。確認が済んだらこのルールを削除する。
+        # 既定はどこにも通知しない (root receiver "null")。Discord への通知は
+        # notify=discord ラベルによる明示 opt-in のみ (#5601)。severity ベースの
+        # 一括通知は行わない (既存ルールのノイズをそのまま流さないため。
+        # どのルールに notify=discord を付けるかの監査は #5602)。
+        # 通知先は 2 系統: portal アプリ系 (team=portal) は discord-portal、
+        # それ以外 (インフラ系) は discord-infra。route は先勝ちのため
+        # team=portal の分岐を先に書く
         alertmanager:
           enabled: true
           config:
@@ -292,8 +324,38 @@ spec:
                 - receiver: "null"
                   matchers:
                     - alertname = "Watchdog"
+                - receiver: "discord-portal"
+                  matchers:
+                    - notify = "discord"
+                    - team = "portal"
+                  group_by: ["alertname", "namespace", "service"]
+                  group_wait: 30s
+                  group_interval: 5m
+                  repeat_interval: 4h
+                - receiver: "discord-infra"
+                  matchers:
+                    - notify = "discord"
+                  group_by: ["alertname", "namespace", "service"]
+                  group_wait: 30s
+                  group_interval: 5m
+                  repeat_interval: 4h
             receivers:
               - name: "null"
+              # webhook URL は公開リポジトリに書けないため、Terraform 管理の Secret
+              # (alertmanagerSpec.secrets でマウント) をファイル参照する。
+              # Alertmanager は allowed_mentions を設定しないため、content 内の
+              # ロールメンションがそのまま ping になる (embed 側の title/message に
+              # 書いても ping しない)。ロール ID はどちらも backup 失敗通知と同じ
+              # 運用ロールを暫定使用。チャンネルごとの専用ロールに変える場合は
+              # 各 content の ID を差し替える (#5601)
+              - name: "discord-portal"
+                discord_configs:
+                  - webhook_url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
+                    content: '<@&532704116799963168>'
+              - name: "discord-infra"
+                discord_configs:
+                  - webhook_url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
+                    content: '<@&532704116799963168>'
           # 通知・Silence の可用性を確保するための HA 構成。
           # Prometheus 自体は 1 レプリカのため、ルール評価までは HA にならない(受容済み)。
           podDisruptionBudget:
@@ -302,6 +364,11 @@ spec:
           alertmanagerSpec:
             replicas: 2
             podAntiAffinity: hard
+            # 各 receiver の webhook_url_file が参照する Secret を
+            # /etc/alertmanager/secrets/<name>/ にマウントする (#5601)
+            secrets:
+              - portal-alert-discord
+              - infra-alert-discord
             # Silence・通知状態 (nflog) の永続化。Alertmanager の状態は小さいので 1Gi で十分
             storage:
               volumeClaimTemplate:
