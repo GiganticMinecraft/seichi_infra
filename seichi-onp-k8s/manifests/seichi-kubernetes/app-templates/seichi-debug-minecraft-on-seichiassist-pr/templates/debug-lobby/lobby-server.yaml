@@ -34,7 +34,7 @@ spec:
             - "-c"
             - 'wget -O /root/jmx-exporter-download/jmx-exporter-javaagent.jar "${JMX_EXPORTER_URL}"'
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:b5ab8fd12d05bf43b60cc493f64326cf962370d0ca8d35157d44be8787934068
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:4b0e7bd380f8fe20453e73be09df881ac33a6a246ddcc455f3c75c2dbbc346ca
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
@@ -58,7 +58,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /plugins
         - name: world-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:b5ab8fd12d05bf43b60cc493f64326cf962370d0ca8d35157d44be8787934068
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:4b0e7bd380f8fe20453e73be09df881ac33a6a246ddcc455f3c75c2dbbc346ca
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
