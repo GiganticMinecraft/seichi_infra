@@ -54,8 +54,26 @@ spec:
             # 超過時はドロップではなく切り詰めにして可観測性を維持する。
             max_line_size: 1MB
             max_line_size_truncate: true
-          ruler:
+            # Loki ruler の rule group 上限 (#5603)。ルール肥大とラベル爆発の安全弁
+            ruler_max_rules_per_rule_group: 20
+            ruler_max_rule_groups_per_tenant: 20
+          # NOTE: chart のテンプレートが読むのは loki.rulerConfig であり、
+          # loki.ruler キーはどこからも参照されない (以前の ruler.enable_api は no-op だった)
+          rulerConfig:
             enable_api: true
+            # ClusterIP Service 経由で Alertmanager へ送る。HA 化 (#5600) 後は
+            # 片系障害時に ruler のリトライで他系へ到達する
+            alertmanager_url: http://prometheus-kube-prometheus-alertmanager:9093
+            # ルールは rules sidecar が label "loki_rule" 付き ConfigMap を
+            # /rules/fake (auth_enabled: false の単一テナント) に配置し、
+            # ruler が local storage として読む
+            storage:
+              type: local
+              local:
+                directory: /rules
+            # rule_path (ruler の一時領域) はデフォルト /rules で local storage と
+            # 衝突するため退避する
+            rule_path: /tmp/loki/rules-temp
           structuredConfig:
             memberlist:
               join_members:
@@ -76,6 +94,12 @@ spec:
 
         minio:
           enabled: false
+
+        # rules sidecar (chart デフォルトで singleBinary Pod に同居) の配置先を
+        # 単一テナント "fake" のディレクトリへ向ける
+        sidecar:
+          rules:
+            folder: /rules/fake
 
         deploymentMode: SingleBinary
 
