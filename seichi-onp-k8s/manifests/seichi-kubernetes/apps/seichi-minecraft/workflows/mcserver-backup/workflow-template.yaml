@@ -262,7 +262,7 @@ spec:
           factor: 2
       activeDeadlineSeconds: 300 # 5分でタイムアウト
       script:
-        image: quay.io/argoproj/argocd:v3.4.5
+        image: quay.io/argoproj/argocd:v3.4.6
         command: ["/bin/sh", "-c"]
         env:
           - name: ARGOCD_SERVER
