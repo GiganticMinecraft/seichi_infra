@@ -202,6 +202,19 @@ spec:
                 memory: 12Gi
             retention: 30d
             retentionSize: "120GB"
+            # Discord へ通知するルールの opt-in リスト (#5602)。
+            # 大半のルールは kube-prometheus-stack の defaultRules でラベルを個別に
+            # 足せないため、Alertmanager への送信時に alert relabeling で
+            # notify=discord を付与する。ALERTS メトリクスには影響しないので
+            # kured の alertFilterRegexp の挙動は変わらない。
+            # 選定基準と次バッチ候補は docs/audits/2026-08-01-alert-rules-notify-discord-audit.md
+            # (Loki ruler のルールと自前の PrometheusRule はここではなく
+            # ルール定義側に直接 notify: discord を書く)
+            additionalAlertRelabelConfigs:
+              - source_labels: [alertname, severity]
+                regex: "(etcdInsufficientMembers|etcdNoLeader|KubeAPIDown|KubeControllerManagerDown|KubeSchedulerDown|KubeletDown|NodeRAIDDegraded|KubePersistentVolumeErrors|KubePersistentVolumeFillingUp|NodeFilesystemAlmostOutOfSpace|AlertmanagerClusterDown|PrometheusErrorSendingAlertsToAnyAlertmanager);critical"
+                target_label: notify
+                replacement: discord
             additionalScrapeConfigs:
             - job_name: 'containerd'
               scheme: http
