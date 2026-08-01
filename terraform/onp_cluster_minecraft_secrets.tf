@@ -280,6 +280,25 @@ resource "kubernetes_secret_v1" "seichi_portal_meilisearch_master_key" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "seichi_portal_backend_secrets" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichi-portal-backend-secrets"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    DISCORD_BOT_TOKEN = var.seichi_portal_backend__discord_bot_token
+    MINECRAFT_BANS_DATABASE_URL = format(
+      "mysql://litebans:%s@mariadb:3306/litebans_gigantic_prod",
+      urlencode(random_password.minecraft__prod_mariadb_litebans_password.result),
+    )
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "seichi_portal_frontend_secrets" {
   depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 
