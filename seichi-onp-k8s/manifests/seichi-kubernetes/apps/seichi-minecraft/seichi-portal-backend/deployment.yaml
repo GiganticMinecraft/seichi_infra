@@ -16,16 +16,21 @@ spec:
     metadata:
       labels:
         app: seichi-portal-backend
+      annotations:
+        resource.opentelemetry.io/service.name: seichi-portal-backend
+        resource.opentelemetry.io/service.namespace: seichi-portal
     spec:
       containers:
         - name: seichi-portal-backend
           image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.0@sha256:c1681fc6d7c3e32c24b77bc28dee2d0d0d3725767785eeaf10a4bf06bea86da6
           resources:
+            # OTel exporter のオーバーヘッド吸収のため limit を 100m から 300m へ増強
+            # (seichi-game-data-publisher が exporter 導入時に 50m→300m へ増強した実績に倣う)
             requests:
               cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 100m
+              cpu: 300m
               memory: 256Mi
           env:
             - name: MYSQL_DATABASE
@@ -81,3 +86,13 @@ spec:
               value: "5672"
             - name: RABBITMQ_ROUTING_KEY
               value: seichi_portal
+            - name: OTEL_SERVICE_NAME
+              value: "seichi-portal-backend"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "http/protobuf"
+            - name: OTEL_TRACES_SAMPLER
+              value: "parentbased_always_on"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production,service.version=0.2.0"
