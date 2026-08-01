@@ -272,6 +272,16 @@ spec:
             #     cors_allowed_origins への追加は不要 (CORS 自体が発生しない)
             extraConfig: |-
               faro.receiver "default" {
+                // Loki のストリームラベル。値が空のラベルはペイロードの同名キーから
+                // 抽出される (app_name = Faro SDK の app.name、kind = log/exception/
+                // measurement/event)。未設定だとラベル 0 個のストリームになり Loki に
+                // 保存されない (2026-08-01 実測: faro 由来のログが Loki に 1 行もない)。
+                // #5612 の Loki ruler ルール {app_name=..., kind="exception"} の前提
+                extra_log_labels = {
+                  app_name = "",
+                  kind     = "",
+                }
+
                 server {
                   listen_address = "0.0.0.0"
                   listen_port    = 12347

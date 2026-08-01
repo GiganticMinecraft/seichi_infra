@@ -1,0 +1,56 @@
+# seichi-portal-backend のログベース通知 (#5618)。
+# label "loki_rule" 付き ConfigMap を loki Pod 内の rules sidecar が検出し、
+# /rules/fake (単一テナント) へ配置して ruler が読み込む。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-alert-rules-seichi-portal-backend
+  namespace: monitoring
+  labels:
+    loki_rule: "1"
+data:
+  seichi-portal-backend.yaml: |
+    # 前提: backend 0.2.1+ は stdout に 1 行 1 JSON の構造化ログを出力し、
+    # panic hook が panic=true / level=ERROR を付ける (seichi-portal-backend#1258,
+    # #1280)。`panic = true` フィールドは app 側 panic_hook.rs と本ルールの契約。
+    # 注意:
+    #   - pod はインデックスラベルではなく structured metadata のため、
+    #     {pod=~"..."} ではなく {job="<namespace>/<container>"} で選択する
+    #   - 起動直後に即死する panic は file tailer が拾えず Loki に届かない
+    #     (2026-08-01 実測)。その経路は PrometheusRule の
+    #     SeichiPortalBackendCrashLoop 側でカバーする
+    groups:
+      - name: seichi-portal-backend-logs
+        interval: 1m
+        rules:
+          # 単発 panic から通知する (Sentry の panic 通知の代替)。
+          # 5 分窓のため、firing 後 5 分間新規 panic がなければ自動で resolved になる
+          - alert: SeichiPortalBackendPanic
+            expr: |
+              sum by (service_name) (
+                count_over_time({job="seichi-minecraft/seichi-portal-backend"} | json | panic="true" [5m])
+              ) > 0
+            labels:
+              severity: critical
+              notify: discord
+              team: portal
+              service: seichi-portal-backend
+            annotations:
+              summary: seichi-portal-backend で panic が発生しました
+              description: 直近 5 分間に panic ログが記録されました。trace_id 付きの詳細は Loki で {job="seichi-minecraft/seichi-portal-backend"} | json | panic="true" を実行して確認する。
+          # level=ERROR の頻発を通知する (panic とは別ルールに分ける)。
+          # 閾値 10 件/10 分は暫定値。backend 0.2.1 デプロイ後の実データで見直し、
+          # ノイズになる既知エラーが出たら行フィルタや json フィールド条件で除外を積む
+          - alert: SeichiPortalBackendErrorLogs
+            expr: |
+              sum by (service_name) (
+                count_over_time({job="seichi-minecraft/seichi-portal-backend"} | json | level="ERROR" | panic!="true" [10m])
+              ) > 10
+            labels:
+              severity: warning
+              notify: discord
+              team: portal
+              service: seichi-portal-backend
+            annotations:
+              summary: seichi-portal-backend で ERROR ログが頻発しています
+              description: 直近 10 分間の level=ERROR ログが閾値 (10 件) を超えています。
