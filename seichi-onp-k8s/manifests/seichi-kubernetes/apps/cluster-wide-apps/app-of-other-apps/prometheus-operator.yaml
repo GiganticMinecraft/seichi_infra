@@ -283,7 +283,7 @@ spec:
         # どこにも通知しない状態(null receiver)で有効化し、Prometheus との接続のみ確立する。
         # chart デフォルトの config は root receiver が "null" だが、通知が飛ばないことが
         # 運用上の前提であるため、GitOps 定義として明示的に固定している。
-        # Discord 通知経路の追加は #5601、HA 化は #5600 で行う。
+        # Discord 通知経路の追加は #5601 で行う。
         alertmanager:
           enabled: true
           config:
@@ -295,6 +295,28 @@ spec:
                     - alertname = "Watchdog"
             receivers:
               - name: "null"
+          # 通知・Silence の可用性を確保するための HA 構成。
+          # Prometheus 自体は 1 レプリカのため、ルール評価までは HA にならない(受容済み)。
+          podDisruptionBudget:
+            enabled: true
+            minAvailable: 1
+          alertmanagerSpec:
+            replicas: 2
+            podAntiAffinity: hard
+            # Silence・通知状態 (nflog) の永続化。Alertmanager の状態は小さいので 1Gi で十分
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 1Gi
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                cpu: 100m
+                memory: 128Mi
         kubeApiServer:
           serviceMonitor:
             metricRelabelings:
