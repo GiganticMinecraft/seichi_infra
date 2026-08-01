@@ -524,16 +524,6 @@ variable "truenas_exporter_api_key" {
 
 #endregion
 
-#region env variables for Bugsink
-
-variable "bugsink_admin_password" {
-  description = "Admin password for Bugsink"
-  type        = string
-  sensitive   = true
-}
-
-#endregion
-
 # region ArgoCD backup-workflow account token
 
 variable "argocd_backup_workflow_auth_token" {

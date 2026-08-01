@@ -162,29 +162,6 @@ resource "cloudflare_zero_trust_access_application" "onp_phpmyadmin" {
   }]
 }
 
-resource "cloudflare_zero_trust_access_application" "onp_bugsink" {
-  zone_id          = local.cloudflare_zone_id
-  name             = "Bugsink"
-  domain           = "bugsink.onp-k8s.admin.${local.root_domain}"
-  type             = "self_hosted"
-  session_duration = "24h"
-
-  http_only_cookie_attribute = true
-
-  policies = [{
-    decision   = "allow"
-    name       = "Require to be in a GitHub team to access"
-    precedence = 1
-    include = [{
-      github_organization = {
-        name                 = local.github_org_name
-        team                 = github_team.onp_admin_bugsink.slug
-        identity_provider_id = cloudflare_zero_trust_access_identity_provider.github_oauth.id
-      }
-    }]
-  }]
-}
-
 resource "cloudflare_zero_trust_access_application" "onp_goldilocks" {
   zone_id          = local.cloudflare_zone_id
   name             = "Goldilocks"

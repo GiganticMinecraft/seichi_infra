@@ -71,8 +71,3 @@ resource "github_team" "onp_phpmyadmin" {
   privacy     = "closed"
 }
 
-resource "github_team" "onp_admin_bugsink" {
-  name        = "onp-admin-bugsink"
-  description = "BugsinkにアクセスできるTeam"
-  privacy     = "closed"
-}
