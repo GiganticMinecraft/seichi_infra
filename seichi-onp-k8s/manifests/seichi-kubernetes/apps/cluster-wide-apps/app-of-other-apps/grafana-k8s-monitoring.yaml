@@ -82,6 +82,19 @@ spec:
                   exclude_instrument:
                     - exe_path: ".*alloy.*|.*otelcol.*|.*beyla.*"
                     - k8s_namespace: garage-admin
+                  # HTTP の RED metrics の正は Tempo metrics-generator (span-metrics
+                  # processor) に一本化する (#5604)。OTel SDK 計装済みサービス
+                  # (seichi-portal-frontend/backend 等) は Beyla が二重にトレースを
+                  # 生成しないよう除外する。exclude_otel_instrumented_services は
+                  # Beyla のデフォルト true だが、一本化の決定として明文化する
+                  exclude_otel_instrumented_services: true
+                  # Beyla は除外判定したサービスについても span metrics / service graph
+                  # metrics だけは生成し続けるのがデフォルト (SDK 側がサンプリングする
+                  # 環境向けの挙動)。本クラスタの SDK は parentbased_always_on で全量
+                  # トレースを送るため Tempo 側の spanmetrics が全量を反映しており、
+                  # Beyla 側の生成は将来 Beyla メトリクスのスクレイプを有効化した際に
+                  # 二重計上になるだけなので止める
+                  exclude_otel_instrumented_services_span_metrics: true
             resources:
               requests:
                 cpu: 20m
