@@ -131,6 +131,45 @@ spec:
           cpu: 100m
           memory: 64Mi
 
+    # slow log をサイズベースでローテーションする。MariaDB はログを自動で
+    # ローテーションしないため、公式の案内どおり mv → FLUSH SLOW LOGS で
+    # 新ファイルへ切り替える (mv 中も mysqld は旧 inode へ書き続けるので
+    # ログの破損はない)。tailer の tail -F は名前で追跡するため新ファイルへ
+    # 自動で追従する (切り替わりの数行は失われ得るが、tailer 再起動時と同じ
+    # トレードオフとして許容する)。しきい値 1GiB は emptyDir の sizeLimit (4Gi)
+    # に対し、ローテーション中に旧ファイルが一時的に共存しても余裕がある値。
+    # 接続は同一 Pod 内 TCP (127.0.0.1)。mariadb-operator は root@'%' を管理
+    # しており operator 自身も TCP で接続しているため、この経路で FLUSH できる。
+    - name: slow-log-rotator
+      image: docker-registry1.mariadb.com/library/mariadb:11.8
+      env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb
+              key: root-password
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          LOG=/var/log/mysql/mysql-slow.log
+          LIMIT=$((1024 * 1024 * 1024))
+          while true; do
+            sleep 300
+            SIZE=$(stat -c %s "$LOG" 2>/dev/null || echo 0)
+            if [ "$SIZE" -gt "$LIMIT" ]; then
+              mv "$LOG" "$LOG.1"
+              mariadb -h 127.0.0.1 -u root -p"$MARIADB_ROOT_PASSWORD" -e "FLUSH SLOW LOGS;"
+              rm -f "$LOG.1"
+            fi
+          done
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
   podSecurityContext:
     runAsUser: 0
 
