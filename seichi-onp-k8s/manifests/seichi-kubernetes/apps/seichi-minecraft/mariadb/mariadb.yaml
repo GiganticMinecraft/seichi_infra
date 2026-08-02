@@ -44,6 +44,19 @@ spec:
     binlog_legacy_event_pos = 1
     log_bin_compress = 0
     binlog_expire_logs_seconds = 604800
+    # CoreProtect (s1,s2,s3,s5,s7) は日次 04:00 JST の truncate で全量が入れ替わり、
+    # 書き込みも膨大 (s5 単体で日中 100GiB 超)。ROW + FULL row image の binlog に
+    # 乗せると 7 日保持では PVC (600Gi) を数日で使い切るため binlog から除外する。
+    # ROW 形式では「変更されたテーブルの属する DB」でフィルタされるので
+    # cross-database 更新の取りこぼしはなく、Debezium のキャプチャ対象も
+    # seichi_portal のみなので影響しない。coreprotect__mc_lobby は truncate
+    # 対象外かつ ~20MiB と小さいので binlog に残し PITR を維持する。
+    # カンマ区切り不可 (1 DB 1 行)・動的変更不可のため反映には Pod 再作成が必要。
+    binlog_ignore_db = coreprotect__mc_s1
+    binlog_ignore_db = coreprotect__mc_s2
+    binlog_ignore_db = coreprotect__mc_s3
+    binlog_ignore_db = coreprotect__mc_s5
+    binlog_ignore_db = coreprotect__mc_s7
 
   resources:
     requests:
