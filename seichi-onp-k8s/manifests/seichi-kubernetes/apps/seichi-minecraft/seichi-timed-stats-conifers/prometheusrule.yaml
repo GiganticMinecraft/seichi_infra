@@ -20,19 +20,22 @@ spec:
           # failedJobsHistoryLimit が最後の失敗 Job を保持し続けるため、
           # 「失敗 Job の存在」だけを見ると何日も前の失敗に firing し続ける
           # (2026-08-02 に 4 日前の残骸 Job で誤報した実績)。開始が直近 1 時間の
-          # Job に限定し、履歴の残骸では発火させない
+          # Job に限定し、履歴の残骸では発火させない。
+          # job_name を残すと 5 分ごとの Job 1 個につき 1 アラートになり、
+          # 失敗が続くと Discord 通知が同文の羅列になる (2026-08-02 実績) ため
+          # count で単一インスタンスに集約し、失敗数は $value で伝える
           expr: |
-            (
+            count by (namespace) (
               kube_job_failed{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*", condition="true"} == 1
-            )
-            and on (job_name)
-            (
-              time() - kube_job_status_start_time{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*"} < 3600
-            )
+              and on (job_name)
+              (
+                time() - kube_job_status_start_time{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*"} < 3600
+              )
+            ) > 0
           for: 1m
           labels:
             severity: warning
             notify: discord
           annotations:
             summary: "timed-stats-conifers の ingest Job が失敗しました"
-            description: "Job {{ $labels.job_name }} が失敗しました (retry 上限または実行期限超過)。ログは Loki の {job=\"seichi-minecraft/ingestor\"} で確認する (短命 Pod のため欠落しうる。その場合は kubectl logs)。"
+            description: "直近 1 時間に {{ $value }} 個の ingest Job が失敗しています (retry 上限または実行期限超過)。ログは Loki の {job=\"seichi-minecraft/ingestor\"} で確認する (短命 Pod のため欠落しうる。その場合は kubectl logs)。"
