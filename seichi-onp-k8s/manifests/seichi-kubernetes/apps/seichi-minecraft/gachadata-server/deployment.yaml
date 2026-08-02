@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: gachadata-server
+      annotations:
+        resource.opentelemetry.io/service.name: gachadata-server
     spec:
       containers:
         - name: gachadata-server
@@ -22,9 +24,12 @@ spec:
             requests:
               cpu: 15m
               memory: 32Mi
+            # OTel exporter / Pyroscope サンプリングのオーバーヘッド吸収のため増強
+            # (seichi-game-data-publisher / seichi-portal-backend が exporter 導入時に
+            # 300m へ増強した実績に倣う)
             limits:
-              cpu: 50m
-              memory: 64Mi
+              cpu: 300m
+              memory: 128Mi
           env:
             - name: MYSQL_USER
               value: mcserver
@@ -39,3 +44,21 @@ spec:
               value: "3306"
             - name: HTTP_PORT
               value: "80"
+            # ---- 観測 (gachadata-server#239 の OTel + Pyroscope 対応イメージで有効化) ----
+            # 旧イメージはこれらの env を読まないため、先にマージしても無害
+            - name: ENV_NAME
+              value: production
+            - name: OTEL_SERVICE_NAME
+              value: "gachadata-server"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "http/protobuf"
+            - name: OTEL_TRACES_SAMPLER
+              value: "parentbased_always_on"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment=production,deployment.environment.name=production"
+            - name: PYROSCOPE_SERVER_ADDRESS
+              value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "gachadata-server"
