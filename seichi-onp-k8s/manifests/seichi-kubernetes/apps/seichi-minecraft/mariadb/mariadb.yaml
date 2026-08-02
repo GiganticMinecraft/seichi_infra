@@ -26,7 +26,11 @@ spec:
     [mariadb]
     slow_query_log=true
     slow_query_log-file=/var/log/mysql/mysql-slow.log
-    long_query_time=0.1
+    # 0.1s では CoreProtect のバッチ INSERT が大量に載り、slow log が ~55MiB/h
+    # (当初想定 ~230KB/h の約 240 倍) まで膨張して emptyDir の sizeLimit 超過による
+    # Pod eviction を繰り返した。実測では 0.5s で該当 INSERT の約 96% を落としつつ、
+    # より重いクエリは引き続き捕捉できる。
+    long_query_time=0.5
     innodb_buffer_pool_size = 8G
     innodb_log_file_size = 512M
     innodb_flush_log_at_trx_commit = 2
