@@ -140,6 +140,14 @@ spec:
     # に対し、ローテーション中に旧ファイルが一時的に共存しても余裕がある値。
     # 接続は同一 Pod 内 TCP (127.0.0.1)。mariadb-operator は root@'%' を管理
     # しており operator 自身も TCP で接続しているため、この経路で FLUSH できる。
+    #
+    # .1 の削除は FLUSH の成功が確認できた後に限る。mysqld は rename 後も
+    # 旧 inode (.1) へ書き続けるため、FLUSH 前に消すと open-but-unlinked の
+    # ファイルが emptyDir を消費し続け、$LOG 不在でサイズ検知も効かなくなり
+    # 回復不能になる。FLUSH 失敗時や rename と FLUSH の間で rotator が
+    # 再起動した場合は .1 が残るので、ループ先頭で FLUSH を再試行して回復する。
+    # .1 が未解決の間は次の rotate を行わない (mv で .1 を上書きすると
+    # 旧 inode がリークするため)。その間の増加は sizeLimit (4Gi) が抑える。
     - name: slow-log-rotator
       image: docker-registry1.mariadb.com/library/mariadb:11.8
       env:
@@ -153,14 +161,26 @@ spec:
         - |
           LOG=/var/log/mysql/mysql-slow.log
           LIMIT=$((1024 * 1024 * 1024))
+          flush_slow_logs() {
+            mariadb -h 127.0.0.1 -u root -p"$MARIADB_ROOT_PASSWORD" \
+              --connect-timeout=10 -e "FLUSH SLOW LOGS;"
+          }
           while true; do
-            sleep 300
-            SIZE=$(stat -c %s "$LOG" 2>/dev/null || echo 0)
-            if [ "$SIZE" -gt "$LIMIT" ]; then
+            if [ -f "$LOG.1" ]; then
+              if flush_slow_logs; then
+                rm -f "$LOG.1"
+              else
+                echo "slow-log-rotator: FLUSH SLOW LOGS failed; keeping $LOG.1 and retrying" >&2
+              fi
+            elif [ "$(stat -c %s "$LOG" 2>/dev/null || echo 0)" -gt "$LIMIT" ]; then
               mv "$LOG" "$LOG.1"
-              mariadb -h 127.0.0.1 -u root -p"$MARIADB_ROOT_PASSWORD" -e "FLUSH SLOW LOGS;"
-              rm -f "$LOG.1"
+              if flush_slow_logs; then
+                rm -f "$LOG.1"
+              else
+                echo "slow-log-rotator: FLUSH SLOW LOGS failed after rename; will recover on next cycle" >&2
+              fi
             fi
+            sleep 300
           done
       resources:
         requests:
