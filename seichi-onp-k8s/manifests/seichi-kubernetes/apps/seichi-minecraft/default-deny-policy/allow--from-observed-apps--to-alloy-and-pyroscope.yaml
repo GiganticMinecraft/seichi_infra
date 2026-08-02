@@ -1,0 +1,53 @@
+# 観測対象アプリが monitoring namespace の受け口へテレメトリを送るための egress 許可。
+#   - alloy-receiver 4318/TCP: OTLP HTTP (gachadata-server。portal は既存の
+#     allow--from-seichi-portal--to-alloy-receiver.yaml が担う)
+#   - pyroscope 4040/TCP: 継続プロファイリングの push
+#     (portal backend/frontend, gachadata-server, conifers ingestor)
+# 対になる monitoring 側の ingress 許可は
+# apps/cluster-wide-apps/monitoring-default-deny-policy/ にある。
+# 注意: 現状の default-deny は明示 Deny (ingressDeny/egressDeny) 方式のため、
+# policyAuditMode を解除するとこの allow ごと無効化される。解除前に
+# deny 方式の変換が必要 (#5672)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-gachadata--to-alloy-receiver
+spec:
+  endpointSelector:
+    matchLabels:
+      app: gachadata-server
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: alloy-receiver
+            app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-observed-apps--to-pyroscope
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - seichi-portal-backend
+          - seichi-portal-frontend
+          - gachadata-server
+          - seichi-timed-stats-conifers-ingestor
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: pyroscope
+            app.kubernetes.io/instance: pyroscope
+      toPorts:
+        - ports:
+            - port: "4040"
+              protocol: TCP

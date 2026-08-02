@@ -1,0 +1,29 @@
+# seichi-timed-stats-conifers の ingest 失敗通知。
+# Sentry SDK 撤去 (seichi-timed-stats-conifers#196) 後の通知カバレッジ確保
+# (Codex レビュー指摘: 汎用の KubeJobFailed は notify=discord の opt-in
+# リストに含まれておらず、人的通知が消えていた)。
+# アラート名は kured の alertFilterRegexp にも登録している。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: seichi-timed-stats-conifers-alerts
+  namespace: seichi-minecraft
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: seichi-timed-stats-conifers-alerts
+      rules:
+        - alert: ConifersIngestorJobFailed
+          # backoffLimit (5) / activeDeadlineSeconds 超過で Job が失敗扱いに
+          # なったことを検知する。失敗 Job オブジェクトが残っている間 firing する
+          # (5 分周期のため、後続が成功しても失敗 Job は履歴として残る点に注意)
+          expr: |
+            kube_job_failed{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*", condition="true"} == 1
+          for: 1m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "timed-stats-conifers の ingest Job が失敗しました"
+            description: "Job {{ $labels.job_name }} が失敗しました (retry 上限または実行期限超過)。ログは Loki の {job=\"seichi-minecraft/ingestor\"} で確認する (短命 Pod のため欠落しうる。その場合は kubectl logs)。"

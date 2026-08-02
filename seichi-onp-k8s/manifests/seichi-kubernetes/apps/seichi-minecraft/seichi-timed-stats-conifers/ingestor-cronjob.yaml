@@ -12,7 +12,16 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 5
+      # 実行時間の上限。通常の ingest は数秒〜数十秒で終わる。
+      # ingestor#196 で導入する Pyroscope agent の停止処理は、依存クレート内部の
+      # エラー経路で稀に無期限待機し得るため (Codex レビュー指摘)、Job 側で
+      # 確実に打ち切る (5 分周期 + startingDeadlineSeconds 240 と整合する値)
+      activeDeadlineSeconds: 240
       template:
+        metadata:
+          labels:
+            # CiliumNetworkPolicy の endpointSelector 用
+            app: seichi-timed-stats-conifers-ingestor
         spec:
           restartPolicy: OnFailure
           initContainers:
