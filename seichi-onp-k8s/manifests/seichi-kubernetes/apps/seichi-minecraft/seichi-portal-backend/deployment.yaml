@@ -99,3 +99,9 @@ spec:
             # OTel resource に埋め込むのが正
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production"
+            # 継続プロファイリング (seichi-portal-backend#1290)。
+            # 対応前のイメージはこの env を読まないため先行供給しても無害
+            - name: PYROSCOPE_SERVER_ADDRESS
+              value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "seichi-portal-backend"
