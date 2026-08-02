@@ -1,0 +1,29 @@
+# gachadata-server のアラート。Sentry 撤去 (gachadata-server#239) 後の
+# 通知カバレッジ確保 (Codex レビュー指摘)。
+# 起動時 panic のログは file tailer が拾う前にコンテナが死んで Loki に
+# 届かないため、CrashLoop は PrometheusRule 側で通知する
+# (seichi-portal-alerts の SeichiPortalBackendCrashLoop と同じ理由)。
+# アラート名は kured の alertFilterRegexp にも登録している。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gachadata-server-alerts
+  namespace: seichi-minecraft
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: gachadata-server-alerts
+      rules:
+        - alert: GachadataServerCrashLoop
+          expr: |
+            max by (namespace, pod, container) (
+              max_over_time(kube_pod_container_status_waiting_reason{namespace="seichi-minecraft", container="gachadata-server", reason="CrashLoopBackOff", job="kube-state-metrics"}[5m])
+            ) >= 1
+          for: 5m
+          labels:
+            severity: critical
+            notify: discord
+          annotations:
+            summary: "gachadata-server が CrashLoopBackOff です"
+            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしています。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
