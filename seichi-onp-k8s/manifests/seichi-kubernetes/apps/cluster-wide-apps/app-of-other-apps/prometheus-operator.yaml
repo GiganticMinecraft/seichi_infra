@@ -350,11 +350,14 @@ spec:
                     # "%.Ns" による各フィールドの切り詰めと併用)
                     max_alerts: 5
                     payload:
-                      content: '<@&532704116799963168> {{ template "__subject" . }}'
+                      # デフォルトの __subject は末尾に CommonLabels - GroupLabels を
+                      # 括弧で列挙する (condition/container/endpoint/... のダンプに
+                      # なって読めない) ため、alertname と namespace だけの自作にする
+                      content: '<@&532704116799963168> {{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         roles: ["532704116799963168"]
                       embeds:
-                        - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ printf "%.200s" (.GroupLabels.SortedPairs.Values | join " ") }}'
+                        - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                           description: |-
                             {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
                             {{ with .Annotations.description }}{{ printf "%.500s" . }}
@@ -364,11 +367,14 @@ spec:
                   - url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
                     max_alerts: 5
                     payload:
-                      content: '<@&532704116799963168> {{ template "__subject" . }}'
+                      # デフォルトの __subject は末尾に CommonLabels - GroupLabels を
+                      # 括弧で列挙する (condition/container/endpoint/... のダンプに
+                      # なって読めない) ため、alertname と namespace だけの自作にする
+                      content: '<@&532704116799963168> {{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         roles: ["532704116799963168"]
                       embeds:
-                        - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ printf "%.200s" (.GroupLabels.SortedPairs.Values | join " ") }}'
+                        - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                           description: |-
                             {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
                             {{ with .Annotations.description }}{{ printf "%.500s" . }}
