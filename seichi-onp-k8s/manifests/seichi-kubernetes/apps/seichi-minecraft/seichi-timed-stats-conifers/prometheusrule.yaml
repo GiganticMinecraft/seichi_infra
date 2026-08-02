@@ -16,10 +16,19 @@ spec:
       rules:
         - alert: ConifersIngestorJobFailed
           # backoffLimit (5) / activeDeadlineSeconds 超過で Job が失敗扱いに
-          # なったことを検知する。失敗 Job オブジェクトが残っている間 firing する
-          # (5 分周期のため、後続が成功しても失敗 Job は履歴として残る点に注意)
+          # なったことを検知する。
+          # failedJobsHistoryLimit が最後の失敗 Job を保持し続けるため、
+          # 「失敗 Job の存在」だけを見ると何日も前の失敗に firing し続ける
+          # (2026-08-02 に 4 日前の残骸 Job で誤報した実績)。開始が直近 1 時間の
+          # Job に限定し、履歴の残骸では発火させない
           expr: |
-            kube_job_failed{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*", condition="true"} == 1
+            (
+              kube_job_failed{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*", condition="true"} == 1
+            )
+            and on (job_name)
+            (
+              time() - kube_job_status_start_time{namespace="seichi-minecraft", job_name=~"seichi-timed-stats-conifers-ingestor-.*"} < 3600
+            )
           for: 1m
           labels:
             severity: warning
