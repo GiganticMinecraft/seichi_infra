@@ -84,13 +84,16 @@ spec:
   # stdout に流すための emptyDir。mariadb-operator は spec.volumes / spec.volumeMounts を
   # primary container と sidecar container の両方に自動伝播するため、sidecar 側で
   # 同じ mountPath を書くと "must be unique" エラーになる。
-  # sizeLimit: MariaDB slow log は自動ローテーションされない。実測 ~230 KB/h なので
-  # 500Mi = ~3 ヶ月分。想定外の増加でノードの ephemeral storage を巻き込む前に
-  # Pod が eviction される上限として設定する。
+  # sizeLimit: MariaDB slow log は自動ローテーションされない。500Mi 設定当時は
+  # ~230KB/h 想定だったが、CoreProtect 系クエリで ~55MiB/h まで膨張し、
+  # 2026-07-31〜08-02 に sizeLimit 超過の eviction (= MariaDB の強制再作成) が
+  # 5 回発生した。発生量は long_query_time で抑え、slow-log-rotator sidecar で
+  # ローテーションした上で、rotator 停止時にもノードの ephemeral storage を
+  # 巻き込む前に落ちる最終上限として 4Gi を確保する。
   volumes:
     - name: slow-log
       emptyDir:
-        sizeLimit: 500Mi
+        sizeLimit: 4Gi
   volumeMounts:
     - name: slow-log
       mountPath: /var/log/mysql
