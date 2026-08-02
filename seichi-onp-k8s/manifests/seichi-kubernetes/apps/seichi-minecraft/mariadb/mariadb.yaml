@@ -17,7 +17,7 @@ spec:
   port: 3306
 
   storage:
-    size: 500Gi
+    size: 600Gi
     storageClassName: synology-iscsi-storage
     resizeInUseVolumes: true
     waitForVolumeResize: true
@@ -26,7 +26,11 @@ spec:
     [mariadb]
     slow_query_log=true
     slow_query_log-file=/var/log/mysql/mysql-slow.log
-    long_query_time=0.1
+    # 0.1s では CoreProtect のバッチ INSERT が大量に載り、slow log が ~55MiB/h
+    # (当初想定 ~230KB/h の約 240 倍) まで膨張して emptyDir の sizeLimit 超過による
+    # Pod eviction を繰り返した。実測では 0.5s で該当 INSERT の約 96% を落としつつ、
+    # より重いクエリは引き続き捕捉できる。
+    long_query_time=0.5
     innodb_buffer_pool_size = 8G
     innodb_log_file_size = 512M
     innodb_flush_log_at_trx_commit = 2
@@ -44,6 +48,19 @@ spec:
     binlog_legacy_event_pos = 1
     log_bin_compress = 0
     binlog_expire_logs_seconds = 604800
+    # CoreProtect (s1,s2,s3,s5,s7) は日次 04:00 JST の truncate で全量が入れ替わり、
+    # 書き込みも膨大 (s5 単体で日中 100GiB 超)。ROW + FULL row image の binlog に
+    # 乗せると 7 日保持では PVC (600Gi) を数日で使い切るため binlog から除外する。
+    # ROW 形式では「変更されたテーブルの属する DB」でフィルタされるので
+    # cross-database 更新の取りこぼしはなく、Debezium のキャプチャ対象も
+    # seichi_portal のみなので影響しない。coreprotect__mc_lobby は truncate
+    # 対象外かつ ~20MiB と小さいので binlog に残し PITR を維持する。
+    # カンマ区切り不可 (1 DB 1 行)・動的変更不可のため反映には Pod 再作成が必要。
+    binlog_ignore_db = coreprotect__mc_s1
+    binlog_ignore_db = coreprotect__mc_s2
+    binlog_ignore_db = coreprotect__mc_s3
+    binlog_ignore_db = coreprotect__mc_s5
+    binlog_ignore_db = coreprotect__mc_s7
 
   resources:
     requests:
@@ -67,13 +84,16 @@ spec:
   # stdout に流すための emptyDir。mariadb-operator は spec.volumes / spec.volumeMounts を
   # primary container と sidecar container の両方に自動伝播するため、sidecar 側で
   # 同じ mountPath を書くと "must be unique" エラーになる。
-  # sizeLimit: MariaDB slow log は自動ローテーションされない。実測 ~230 KB/h なので
-  # 500Mi = ~3 ヶ月分。想定外の増加でノードの ephemeral storage を巻き込む前に
-  # Pod が eviction される上限として設定する。
+  # sizeLimit: MariaDB slow log は自動ローテーションされない。500Mi 設定当時は
+  # ~230KB/h 想定だったが、CoreProtect 系クエリで ~55MiB/h まで膨張し、
+  # 2026-07-31〜08-02 に sizeLimit 超過の eviction (= MariaDB の強制再作成) が
+  # 5 回発生した。発生量は long_query_time で抑え、slow-log-rotator sidecar で
+  # ローテーションした上で、rotator 停止時にもノードの ephemeral storage を
+  # 巻き込む前に落ちる最終上限として 4Gi を確保する。
   volumes:
     - name: slow-log
       emptyDir:
-        sizeLimit: 500Mi
+        sizeLimit: 4Gi
   volumeMounts:
     - name: slow-log
       mountPath: /var/log/mysql
@@ -110,6 +130,65 @@ spec:
         limits:
           cpu: 100m
           memory: 64Mi
+
+    # slow log をサイズベースでローテーションする。MariaDB はログを自動で
+    # ローテーションしないため、公式の案内どおり mv → FLUSH SLOW LOGS で
+    # 新ファイルへ切り替える (mv 中も mysqld は旧 inode へ書き続けるので
+    # ログの破損はない)。tailer の tail -F は名前で追跡するため新ファイルへ
+    # 自動で追従する (切り替わりの数行は失われ得るが、tailer 再起動時と同じ
+    # トレードオフとして許容する)。しきい値 1GiB は emptyDir の sizeLimit (4Gi)
+    # に対し、ローテーション中に旧ファイルが一時的に共存しても余裕がある値。
+    # 接続は同一 Pod 内 TCP (127.0.0.1)。mariadb-operator は root@'%' を管理
+    # しており operator 自身も TCP で接続しているため、この経路で FLUSH できる。
+    #
+    # .1 の削除は FLUSH の成功が確認できた後に限る。mysqld は rename 後も
+    # 旧 inode (.1) へ書き続けるため、FLUSH 前に消すと open-but-unlinked の
+    # ファイルが emptyDir を消費し続け、$LOG 不在でサイズ検知も効かなくなり
+    # 回復不能になる。FLUSH 失敗時や rename と FLUSH の間で rotator が
+    # 再起動した場合は .1 が残るので、ループ先頭で FLUSH を再試行して回復する。
+    # .1 が未解決の間は次の rotate を行わない (mv で .1 を上書きすると
+    # 旧 inode がリークするため)。その間の増加は sizeLimit (4Gi) が抑える。
+    - name: slow-log-rotator
+      image: docker-registry1.mariadb.com/library/mariadb:11.8
+      env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb
+              key: root-password
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          LOG=/var/log/mysql/mysql-slow.log
+          LIMIT=$((1024 * 1024 * 1024))
+          flush_slow_logs() {
+            mariadb -h 127.0.0.1 -u root -p"$MARIADB_ROOT_PASSWORD" \
+              --connect-timeout=10 -e "FLUSH SLOW LOGS;"
+          }
+          while true; do
+            if [ -f "$LOG.1" ]; then
+              if flush_slow_logs; then
+                rm -f "$LOG.1"
+              else
+                echo "slow-log-rotator: FLUSH SLOW LOGS failed; keeping $LOG.1 and retrying" >&2
+              fi
+            elif [ "$(stat -c %s "$LOG" 2>/dev/null || echo 0)" -gt "$LIMIT" ]; then
+              mv "$LOG" "$LOG.1"
+              if flush_slow_logs; then
+                rm -f "$LOG.1"
+              else
+                echo "slow-log-rotator: FLUSH SLOW LOGS failed after rename; will recover on next cycle" >&2
+              fi
+            fi
+            sleep 300
+          done
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
 
   podSecurityContext:
     runAsUser: 0
