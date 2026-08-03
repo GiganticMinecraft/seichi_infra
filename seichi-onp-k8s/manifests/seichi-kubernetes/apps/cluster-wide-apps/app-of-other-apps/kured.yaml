@@ -47,7 +47,7 @@ spec:
           # GachadataServerCrashLoop / ConifersIngestorJobFailed:
           # アプリケーションアラート (#5611, #5618, Sentry 撤去後の通知カバレッジ)。
           # アプリのエラーはノード再起動で直らないため、ノード保守をブロックさせない
-          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|GachadataServerCrashLoop|ConifersIngestorJobFailed)$"
+          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、
