@@ -26,7 +26,7 @@ spec:
           restartPolicy: OnFailure
           initContainers:
             - name: migration
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-5fe5b38@sha256:fa3d7f33d6db8d1efeed7e184b9d6d7532e24c6c737373d3c2486b7346dbc916
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-58b84f1@sha256:2da36394a784cd95deabb69c6b553b5c6adbebe9754530c0d6fc4705cad9069b
               env:
                 - name: DB_HOST_AND_PORT
                   value: "mariadb:3306"
