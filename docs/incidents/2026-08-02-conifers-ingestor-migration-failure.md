@@ -1,15 +1,15 @@
 # 2026-08-02 seichi-timed-stats-conifers ingestor 全滅インシデント
 
-ポストモーテム草稿(レビュー 1 巡目反映済み)。検証に必要な再現手順・生出力は付録に含む。
-担当・期限が TBD の項目は未アサイン。
+ポストモーテム草稿(セッション間クロスレビュー 3 巡を反映済み)。検証に必要な再現手順と関連出力の抜粋は付録に含む。
+恒久対策とポストモーテム完了タスクは個別 issue で追跡する(個人アサインは issue 側で行う)。
 
 ## TL;DR
 
 - **事象**: 5 分ごとの ingest CronJob が [06:45, 14:50) UTC の約 8 時間停止。**97 回の予定実行がデータを生成せず**、欠損点は各統計系列 97 点・4 系列合計 388 点(実測)
 - **故障機構(確定)**: migration init コンテナ (diesel_cli) が適用済みの初回マイグレーションを未適用と判定して再実行し、`Table 'break_count_full_snapshot_point' already exists` で exit 1。ingestor 本体は一度も起動せず
-- **最有力の技術的原因(強く支持される推論)**: イメージ再ビルドで入った bookworm のクライアント実行環境 — 最有力は libmariadb `1:10.11.18-0+deb12u1`(動的リンク)— が MariaDB 11.8 サーバーとの組合せで適用済みマイグレーション一覧の取得を壊す。base を trixie(libmariadb `1:11.8.6-0+deb13u1`)に変えるだけで解消することを対照実験と本番復旧で確認
+- **最有力の技術的原因(強く支持される推論)**: イメージ再ビルドで入った bookworm のクライアント実行環境(最有力は動的リンクの libmariadb `1:10.11.18-0+deb12u1`)が、MariaDB 11.8 サーバーとの組合せで適用済みマイグレーション一覧の取得を壊す。base を trixie(libmariadb `1:11.8.6-0+deb13u1`)に変えるだけで解消することを対照実験と本番復旧で確認
 - **運用上の原因(別立て)**: 無関係なアプリ変更で migration イメージまで再ビルド・再配備される構造/base・APT パッケージ・CLI が全て浮動/5 分ごとの全実行に migration init を通す設計(影響拡大要因)
-- **状態**: 応急対応済み・復旧確認済み。恒久対策は未実施(選択肢と設計課題を後述)
+- **状態**: 応急対応済み・復旧確認済み。恒久対策は採用決定済み・未実施(実施計画と追跡 issue を後述)
 
 ## システム構成(前提)
 
@@ -79,11 +79,11 @@
 - ingestor は一度も起動していないため、壊れた可能性のあるライブラリ経由でのデータ書き込みは発生していない(migration ゲートでの停止は結果的に書き込み事故を防いだ)
 - **欠損の実測**(2026-08-03 00:15 UTC 時点、各 `*_diff_point` の行数で確認):
   - 平常時は 12 行/時(5 分間隔)。事故当日は 06 時台 9 行 → **07〜13 時台が完全に 0 行** → 14 時台 2 行(14:50 から再開)。4 系列すべてで区間 [06:45, 14:50) は 0 行、15 時台は 12 行に復帰
-  - 復旧後の追従: 14:50 の復旧点から 5 分間隔の記録が翌日 00:15 UTC まで連続していることを確認。diff は絶対値 (`new_value`) を記録する設計のため、復旧後の系列は正しい現在値を反映しており、失われたのは**期間中の 5 分粒度の中間点のみ**
+  - 復旧後の追従: 14:50 の復旧点から 5 分間隔の記録が翌日 00:15 UTC まで連続していることを確認(実測で言えるのはここまで)。diff は取得した現在値をそのまま `new_value` に挿入する実装([has_tables_impl.rs#L148](https://github.com/GiganticMinecraft/seichi-timed-stats-conifers/blob/5fe5b38/server/infra/db_repository_impl/src/diesel_based_impl/has_tables_impl.rs#L148)、スキーマは [up.sql](https://github.com/GiganticMinecraft/seichi-timed-stats-conifers/blob/5fe5b38/server/database/migrations/20230524025310_create_initial_tables/up.sql) の `new_value bigint unsigned not null`)のため、復旧後の系列は取得元の現在値を反映する。**取得元(ゲームサーバー API)との値の突合は未実施**。失われたのは期間中の 5 分粒度の中間点のみ
   - バックフィル: **現在の ingest 元(ゲームサーバーの現在値 API)と保持データからは再構成不能**。欠損点は一度もどこにも書き込まれていないため DB バックアップにも存在しない。ゲームサーバー側に別の履歴源(ログ等)があるかは**未調査**
-  - 利用者影響: 当該 8 時間分の粒度データを使う表示(期間集計・推移)に空白が出る。影響画面・集計単位・表示上の挙動の列挙は TBD(担当ロール案: 表示側アプリ担当、期限案 8/7)
+  - 利用者影響: 当該 8 時間分の粒度データを使う表示(期間集計・推移)に空白が出る。影響画面・集計単位・表示上の挙動の列挙は [#5694](https://github.com/GiganticMinecraft/seichi_infra/issues/5694) で追跡
 - 検知の課題:
-  - 最初の通知から調査開始まで約 6.5 時間(理由 TBD)。job_name ごとの fire/resolve 連発が認知を阻害した可能性(通知形式は PR #5683 で改善済み)
+  - 最初の通知から調査開始まで約 6 時間 40 分(経緯の記録は [#5695](https://github.com/GiganticMinecraft/seichi_infra/issues/5695) で追跡)。job_name ごとの fire/resolve 連発が認知を阻害した可能性(通知形式は PR #5683 で改善済み)
   - 現行アラートは「失敗 Job の存在」の検知であり、成功の途絶そのものを見ていない。**「最後の成功からの経過時間」の監視を追加すべき**(例: `time() - kube_cronjob_status_last_successful_time{cronjob="seichi-timed-stats-conifers-ingestor"} > 1800`、または統計データ鮮度の直接監視)
 
 ## 実施済み対応(応急)
@@ -99,17 +99,22 @@ trixie 化は壊れたライブラリ版の**回避**であり、潜在欠陥(�
 
 ## 恒久対策(採用決定と実施計画)
 
-担当は個人ではなくロールで割り当てる(個人へのアサインと最終承認: TBD/チーム)。
+担当は個人ではなくロールで割り当て、個人へのアサインは各追跡 issue 側で行う(最終承認: チーム)。
 
-| # | 対策 | 対象層 | 決定 | 主担当(ロール) | 期限案 | 完了条件 |
-|---|---|---|---|---|---|---|
-| 1 | 成功途絶の監視 | 検知 | **採用** | infra 監視担当 | 8/5 | `kube_cronjob_status_last_successful_time` ベースの staleness アラート(または統計データ鮮度の直接監視)を追加し、失敗・復旧・時系列欠落・CronJob suspend 時の各ケースでテスト完了 |
-| 2 | 依存固定と回帰テスト | 潜在欠陥 | **採用**(新規) | アプリ CI 担当 | 8/9 | (a) base イメージを digest で固定(更新は Renovate 追従)、(b) `cargo install --locked` の強制(diesel_cli は #197 で対応済み)、(c) migration イメージのビルド/配備を該当パス変更時のみに限定、(d) **本番相当 MariaDB 11.8 に対し migration を 2 回実行し 2 回目が no-op であることを CI で検証**(今回の故障機構を直接検出する回帰テスト)、(e) ビルド時依存一覧・イメージ digest・SBOM の保存 |
-| 3 | migration の純 Rust 化 | 潜在欠陥 | **採用** | conifers 担当 | 8/16 | diesel_cli をやめ、diesel-async **0.9.2** の `AsyncMigrationHarness`(`migrations` feature、diesel_migrations ~2.3)+ `embed_migrations!` の専用バイナリに置換。C クライアント非依存を SBOM または依存木で確認。制約: multithreaded Tokio runtime 必須・`select!`/`join!` 内不可(その場合 `spawn_blocking`)。diesel-async 0.9.0→0.9.2 bump 要 |
-| 4 | migration のリリース単位 Job 化 + DB ユーザー分離 | 影響拡大要因 | **採用** | conifers + infra 担当(ユーザー分離は DB + infra 担当) | 設計 8/10・実装 8/23 | 5 分ごとの init 実行を廃止しリリース時 1 回の専用 Job に分離。**注: Job 化だけでは DDL 権限は消えない**(現在 migration と ingestor は同一 credentials)。migration 用ユーザー (DDL) と ingestor 用ユーザー (DML 限定) を分離し、**ingestor ユーザーに DDL 権限がないことを実測で確認**。要設計: migration 完了→新 ingestor 配備の順序保証、旧版互換、migration 失敗時に旧 ingest が継続すること |
-| 5 | ガードの追加 | 故障機構の検知 | 案 3 の実装時に併用を判断 | conifers 担当 | — | 採用する場合: version 非空・期待形式(`^\d{14}$`)・埋め込み migration 集合と適用済み集合の関係の妥当性を検査。可能なら通常の取得経路と独立した方法で読む(同じドライバ・同じ経路でのガードは共通原因故障になる)。単純な「既存テーブルあり × 全未適用」判定は正当なベースライン導入でも成立するため不採用 |
-| 6 | mysql-bundled | 潜在欠陥 | **不採用**(案 3 が成立するため。#5102 で解消報告はあり) | — | — | — |
-| 7 | libmariadb の apt pin | — | **不採用**(snapshot.debian.org 依存・セキュリティ更新停止) | — | — | — |
+| # | 対策 | 対象層 | 決定 | 主担当(ロール) | 期限案 | 追跡 | 完了条件 |
+|---|---|---|---|---|---|---|---|
+| 1 | 成功途絶の監視 | 検知 | **採用** | infra 監視担当 | 2026-08-05 | [infra#5692](https://github.com/GiganticMinecraft/seichi_infra/issues/5692) | `kube_cronjob_status_last_successful_time` ベースの staleness アラート(または統計データ鮮度の直接監視)を追加し、失敗・復旧・時系列欠落・CronJob suspend 時の各ケースでテスト完了 |
+| 2 | ビルド入力の固定と回帰テスト | 潜在欠陥 | **採用**(新規) | アプリ CI 担当 | 2026-08-09 | [conifers#200](https://github.com/GiganticMinecraft/seichi-timed-stats-conifers/issues/200) | (a) base イメージを digest で固定(更新は Renovate 追従)、(b) `cargo install --locked` の強制(diesel_cli は #197 で対応済み)、(c) migration イメージのビルド/配備を該当パス変更時のみに限定(migration SQL・Dockerfile・Cargo.lock・workflow・base digest 更新設定を含む)、(d) **本番相当 MariaDB 11.8 に対し migration を 2 回実行し 2 回目が no-op であることを CI で検証**(今回の故障機構を直接検出する回帰テスト)、(e) ビルド時依存一覧・イメージ digest・SBOM の保存。**注: APT パッケージが残る期間は完全な再現可能ビルドにはならず、回帰テストで危険な組合せを検出する設計** |
+| 3 | migration の純 Rust 化 | 潜在欠陥 | **採用** | conifers 担当 | 2026-08-16 | [conifers#201](https://github.com/GiganticMinecraft/seichi-timed-stats-conifers/issues/201) | diesel_cli をやめ、diesel-async **0.9.2** の `AsyncMigrationHarness`(`migrations` feature、diesel_migrations ~2.3)+ `embed_migrations!` の専用バイナリに置換。C クライアント非依存を SBOM または依存木で確認。**ガード(下記 #5)の採否と理由を記録**。制約: multithreaded Tokio runtime 必須・`select!`/`join!` 内不可(その場合 `spawn_blocking`)。diesel-async 0.9.0→0.9.2 bump 要 |
+| 4 | migration のリリース単位 Job 化 + DB ユーザー分離 | 影響拡大要因 | **採用** | conifers + infra 担当(ユーザー分離は DB + infra 担当) | 設計 2026-08-10・実装 2026-08-23 | [infra#5693](https://github.com/GiganticMinecraft/seichi_infra/issues/5693) | 5 分ごとの init 実行を廃止しリリース時 1 回の専用 Job に分離。**注: Job 化だけでは DDL 権限は消えない**(現在 migration と ingestor は同一 credentials)。migration 用ユーザー (DDL) と ingestor 用ユーザー (DML 限定) を分離し、**ingestor ユーザーに DDL 権限がないことを実測で確認**。要設計: migration 完了→新 ingestor 配備の順序保証、旧版互換、migration 失敗時に旧 ingest が継続すること |
+| 5 | ガードの追加 | 故障機構の検知 | 案 3 の実装時に採否を判断(判断期限 = 案 3 の期限 2026-08-16、採否と理由は案 3 の完了条件に含む) | conifers 担当 | — | (案 3 に含む) | 採用する場合: version 非空・期待形式(`^\d{14}$`)・埋め込み migration 集合と適用済み集合の関係の妥当性を検査。可能なら通常の取得経路と独立した方法で読む(同じドライバ・同じ経路でのガードは共通原因故障になる)。単純な「既存テーブルあり × 全未適用」判定は正当なベースライン導入でも成立するため不採用 |
+| 6 | mysql-bundled | 潜在欠陥 | **不採用**(案 3 が成立するため。#5102 で解消報告はあり) | — | — | — | — |
+| 7 | libmariadb の apt pin | — | **不採用**(snapshot.debian.org 依存・セキュリティ更新停止) | — | — | — | — |
+
+ポストモーテム完了タスク(恒久対策とは別に追跡):
+
+- 利用者影響の調査: [infra#5694](https://github.com/GiganticMinecraft/seichi_infra/issues/5694)(表示側アプリ担当、期限案 2026-08-07)
+- 通知から調査開始まで 6 時間 40 分の空白の経緯記録: [infra#5695](https://github.com/GiganticMinecraft/seichi_infra/issues/5695)(当日対応者=調査オーナー)
 
 別件(独立 issue で追跡):
 
@@ -119,7 +124,9 @@ trixie 化は壊れたライブラリ版の**回避**であり、潜在欠陥(�
 
 環境: macOS (Apple Silicon) + apple/container CLI。**アーキテクチャは arm64 であり本番 (amd64) と異なる**(bookworm ビルドが本番と同一の症状を示したため、少なくともこの症状はアーキ非依存で再現する)。
 
-タグ (`mariadb:11.8`, `rust:1.97.1-slim-*`) と APT リポジトリは時間とともに変動するため、実験時に解決されたイメージ digest を記録する(将来の再現はこの digest を使う。libmariadb のパッケージ版数は出力抜粋を参照):
+**再現性の制約**: 下記の base イメージ digest を使っても、ビルド中の `apt-get update` は実行時点の Debian リポジトリを参照するため、**APT 由来の依存(libmariadb 等)は base digest だけでは再現できない**。実験成果物である `probe-diesel:{bookworm,trixie}` の完成イメージ digest は保存しないまま実験後に削除した(本質変数である libmariadb のパッケージ版数は下記抜粋に記録済み)。将来厳密に再現する場合は snapshot.debian.org でリポジトリとパッケージ版数を固定すること。
+
+実験時に解決された base / DB イメージの digest(いずれも index digest、arm64 で実行):
 
 | イメージ | digest (index) |
 |---|---|
@@ -138,9 +145,9 @@ container exec probe-mariadb mariadb -u root -pprobe probe -e "
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
   INSERT IGNORE INTO __diesel_schema_migrations VALUES ('20230524025310', '2025-04-26 14:40:01');"
 
-# 2. 動的リンクの diesel_cli を base 違いで 2 つビルド
-container build -t probe-diesel:trixie   --build-arg BASE=trixie   .
-container build -t probe-diesel:bookworm --build-arg BASE=bookworm .
+# 2. 動的リンクの diesel_cli を base 違いで 2 つビルド (アーキテクチャを明示)
+container build --arch arm64 -t probe-diesel:trixie   --build-arg BASE=trixie   .
+container build --arch arm64 -t probe-diesel:bookworm --build-arg BASE=bookworm .
 
 # 3. 同一 DB に対して実行 (IP は container inspect で取得)
 container run --rm -e DATABASE_URL='mysql://root:probe@<mariadb-ip>:3306/probe' probe-diesel:trixie
