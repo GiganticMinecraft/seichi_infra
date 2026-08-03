@@ -67,3 +67,25 @@ spec:
           annotations:
             summary: "timed-stats-conifers の ingest が停止しています"
             description: "最後に成功した ingest から {{ $value | humanizeDuration }} 経過しています (平常は 5 分周期)。Job の状態は kubectl get jobs -n seichi-minecraft、ログは Loki の {job=\"seichi-minecraft/ingestor\"} で確認する。"
+
+        - alert: ConifersMigrationJobFailed
+          # ArgoCD PreSync hook の migration Job (migration-job.yaml,
+          # infra#5693) の失敗検知。hook 失敗 = sync 中断であり、ingest は
+          # 旧イメージで継続しているが、新リリースの配備が止まっている。
+          # 失敗した hook Job は次の sync まで残るため、直近 1 時間の開始に
+          # 限定して残骸での発火を防ぐ (ConifersIngestorJobFailed と同じ方式)
+          expr: |
+            count by (namespace) (
+              kube_job_failed{namespace="seichi-minecraft", job_name="seichi-timed-stats-conifers-migration", condition="true"} == 1
+              and on (job_name)
+              (
+                time() - kube_job_status_start_time{namespace="seichi-minecraft", job_name="seichi-timed-stats-conifers-migration"} < 3600
+              )
+            ) > 0
+          for: 1m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "timed-stats-conifers の migration Job が失敗しました"
+            description: "ArgoCD PreSync の migration Job が失敗し、sync が中断されています (ingest は旧イメージで継続中)。ログは kubectl logs job/seichi-timed-stats-conifers-migration -n seichi-minecraft、sync 状態は ArgoCD の seichi-minecraft-seichi-timed-stats-conifers を確認する。"

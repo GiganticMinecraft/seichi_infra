@@ -1,0 +1,49 @@
+# DB マイグレーションを ArgoCD の PreSync hook として実行する (infra#5693)。
+#
+# 以前は ingestor CronJob の initContainer で 5 分ごとに migration を実行して
+# いたが、migration の依存障害がそのまま全 ingest 停止に直結した
+# (2026-08-02 インシデントの影響拡大要因)。PreSync 化により:
+# - migration はこの app の sync 時のみ実行される (リリース単位)
+# - hook が失敗すると sync 全体が中断され、CronJob は旧イメージのまま
+#   → ingest は旧バージョンで継続する
+# - 「migration 成功 → 新 ingestor 配備」の順序が ArgoCD により保証される
+#
+# 運用ルール: sync 中〜完了までは旧バージョンの ingestor が動き続けるため、
+# マイグレーションは直前バージョンの ingestor と互換であること
+# (expand-contract。破壊的変更は 2 リリースに分割する)。
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seichi-timed-stats-conifers-migration
+  namespace: seichi-minecraft
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    # 次の sync 開始時に前回の Job を削除してから作り直す。
+    # 失敗した Job は次の sync まで残るためログを調査できる
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        # CiliumNetworkPolicy の endpointSelector 用。ingestor と同一ラベルに
+        # することで mariadb への通信条件を揃える
+        app: seichi-timed-stats-conifers-ingestor
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-35af1fb@sha256:05139d5006e8301855007416cbdc1849d25d4366d4aae8d34ea7e70d272c35d2
+          env:
+            - name: DB_HOST_AND_PORT
+              value: "mariadb:3306"
+            - name: DB_USER
+              value: "seichi-timed-stats-conifers"
+            - name: DB_DATABASE_NAME
+              value: "seichi-timed-stats-conifers"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-timed-stats-conifers-db-credentials
+                  key: password

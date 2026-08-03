@@ -24,21 +24,9 @@ spec:
             app: seichi-timed-stats-conifers-ingestor
         spec:
           restartPolicy: OnFailure
-          initContainers:
-            - name: migration
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-35af1fb@sha256:05139d5006e8301855007416cbdc1849d25d4366d4aae8d34ea7e70d272c35d2
-              env:
-                - name: DB_HOST_AND_PORT
-                  value: "mariadb:3306"
-                - name: DB_USER
-                  value: "seichi-timed-stats-conifers"
-                - name: DB_DATABASE_NAME
-                  value: "seichi-timed-stats-conifers"
-                - name: DB_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: seichi-timed-stats-conifers-db-credentials
-                      key: password
+          # migration は initContainer ではなく ArgoCD の PreSync hook
+          # (migration-job.yaml) で sync 時に 1 回だけ実行する (infra#5693)。
+          # migration の障害が 5 分ごとの全 ingest を止めないようにするため
           containers:
             - name: ingestor
               image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-5fe5b38@sha256:a3992cd8bdd198d5a0a3ce5b473f62c1dcaec7834abd972ddc999f4931a42e89
