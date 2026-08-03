@@ -2,7 +2,7 @@
 # Sentry SDK 撤去 (seichi-timed-stats-conifers#196) 後の通知カバレッジ確保
 # (Codex レビュー指摘: 汎用の KubeJobFailed は notify=discord の opt-in
 # リストに含まれておらず、人的通知が消えていた)。
-# アラート名は kured の alertFilterRegexp にも登録している。
+# 各アラート名は kured の alertFilterRegexp にも登録している。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -39,3 +39,31 @@ spec:
           annotations:
             summary: "timed-stats-conifers の ingest Job が失敗しました"
             description: "直近 1 時間に {{ $value }} 個の ingest Job が失敗しています (retry 上限または実行期限超過)。ログは Loki の {job=\"seichi-minecraft/ingestor\"} で確認する (短命 Pod のため欠落しうる。その場合は kubectl logs)。"
+
+        - alert: ConifersIngestorStalled
+          # 「失敗 Job の存在」(上記) とは独立に、成功の途絶そのものを検知する
+          # (infra#5692、2026-08-02 インシデントの恒久対策)。
+          # Job オブジェクトは concurrencyPolicy: Replace や履歴 limit ですぐ
+          # 消されるため、JobFailed だけでは長時間停止が resolve 済みに見える
+          # ことがある。最後の成功からの経過時間なら Job の残骸に依存しない。
+          # 閾値 30 分 = 5 分周期の 6 回分。suspend 中 (計画停止) は発火させない。
+          # max による集約は kube-state-metrics の pod 入れ替わりでアラート
+          # インスタンスが変わって通知が乱れるのを防ぐため。
+          # kube-state-metrics 自体の停止・欠落は汎用の TargetDown 等が検知する
+          expr: |
+            (
+              time()
+              - max by (namespace, cronjob) (kube_cronjob_status_last_successful_time{namespace="seichi-minecraft", cronjob="seichi-timed-stats-conifers-ingestor"})
+              > 1800
+            )
+            and on (namespace, cronjob)
+            (
+              max by (namespace, cronjob) (kube_cronjob_spec_suspend{namespace="seichi-minecraft", cronjob="seichi-timed-stats-conifers-ingestor"}) == 0
+            )
+          for: 5m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "timed-stats-conifers の ingest が停止しています"
+            description: "最後に成功した ingest から {{ $value | humanizeDuration }} 経過しています (平常は 5 分周期)。Job の状態は kubectl get jobs -n seichi-minecraft、ログは Loki の {job=\"seichi-minecraft/ingestor\"} で確認する。"
