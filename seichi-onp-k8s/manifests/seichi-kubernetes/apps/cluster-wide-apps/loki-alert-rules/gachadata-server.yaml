@@ -33,10 +33,22 @@ data:
               description: 直近 5 分間に panic ログが記録されました。詳細は Loki で {job="seichi-minecraft/gachadata-server"} | json | panic="true" を実行して確認する。
           # level=ERROR の頻発を通知する。低トラフィックサービスのため閾値は低め。
           # dump 失敗・DB 接続失敗は error_handler が ERROR ログを出すためここで拾える
+          #
+          # 除外: pyroscope-rs (log_module_path =~ "pyroscope::.*")
+          #   backend に組み込まれたプロファイリング用ライブラリであり、アプリの
+          #   コードではない。pyroscope サーバの segment-writer が block を
+          #   Garage (S3) へアップロードする際に稀に約 2 秒のデッドラインを超過し、
+          #   push が 500 "service is unavailable" を返す。クライアントはこれを
+          #   ERROR として記録するが、Garage は健全で PUT は継続的に成功しており、
+          #   アプリの動作にも利用者にも影響はない。seichi-portal-backend でも同時期
+          #   に同じ経路で発火し除外済み ( SeichiPortalBackendErrorLogs, 2026-08-04)。
+          #   2026-08-05 にこの経路のみで本アラートが発火したため除外する。
+          #   注意: json parser はキー名の "." を "_" に変換するため、ログ上の
+          #   "log.module_path" は LogQL では log_module_path として参照する。
           - alert: GachadataServerErrorLogs
             expr: |
               sum by (service_name) (
-                count_over_time({job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | panic!="true" [10m])
+                count_over_time({job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | panic!="true" | log_module_path !~ `pyroscope::.*` [10m])
               ) > 3
             labels:
               severity: warning
