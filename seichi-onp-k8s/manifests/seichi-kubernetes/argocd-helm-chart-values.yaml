@@ -176,6 +176,8 @@ applicationSet:
         release: prometheus
 
 notifications:
+  # 通知テンプレート内の Application リンクに実際の外部 URL を使う。
+  argocdUrl: https://argocd.onp-k8s.admin.seichi.click
   resources:
     requests:
       cpu: 15m

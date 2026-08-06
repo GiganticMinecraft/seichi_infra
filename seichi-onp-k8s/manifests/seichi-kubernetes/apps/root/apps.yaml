@@ -192,12 +192,52 @@ spec:
           allowEmpty: true
         syncOptions:
           - ServerSideApply=true
+          - RespectIgnoreDifferences=true
         retry:
           limit: -1
           backoff:
             duration: 5s
             factor: 2
             maxDuration: 2m
+      # backup/start-stop Workflow と KEDA が replicas を制御する StatefulSet に限定する。
+      # Argo CD はその他の StatefulSet の replicas drift を引き続き検知する。
+      ignoreDifferences:
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--s1
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--s2
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--s3
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--s5
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--s7
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--lobby
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--votelistener
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--kagawa
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--one-day-to-reset
+          jsonPointers: [/spec/replicas]
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -229,6 +269,11 @@ spec:
           create: false
 
         deployment:
+          image:
+            pullPolicy: IfNotPresent
+            name: ghcr.io/zapier/kubechecks
+            # renovate: datasource=docker depName=ghcr.io/zapier/kubechecks
+            tag: "v3.2.1@sha256:505bd90a29fd472741bbbe7ae2c58a7bf31f3cb405ca8ae2a0a8442bbd4a342b"
           envFrom:
             - secretRef:
                 name: kubechecks-github-app-secret
@@ -335,9 +380,20 @@ spec:
           allowEmpty: true
         syncOptions:
           - ServerSideApply=true
+          - RespectIgnoreDifferences=true
         retry:
           limit: -1
           backoff:
             duration: 5s
             factor: 2
             maxDuration: 2m
+      # seichiassist-downloader Workflow が replicas を制御する対象だけを除外する。
+      ignoreDifferences:
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--debug-s1
+          jsonPointers: [/spec/replicas]
+        - group: apps
+          kind: StatefulSet
+          name: mcserver--debug-s2
+          jsonPointers: [/spec/replicas]
