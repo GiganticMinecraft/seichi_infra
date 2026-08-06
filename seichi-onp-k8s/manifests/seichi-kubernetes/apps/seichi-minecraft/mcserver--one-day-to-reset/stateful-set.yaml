@@ -28,7 +28,7 @@ spec:
     spec:
       initContainers:
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:9fa17bd832d5c4fe3872a9d0c7014790498d04d9db69ee4fc7623971ee60e1de
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:9965ca15295017309891a5a95241a904074dae22c549a772cd07cff5a846e57c
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
