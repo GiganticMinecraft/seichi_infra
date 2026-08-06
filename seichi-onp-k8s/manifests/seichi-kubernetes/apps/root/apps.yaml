@@ -273,7 +273,9 @@ spec:
             pullPolicy: IfNotPresent
             name: ghcr.io/zapier/kubechecks
             # renovate: datasource=docker depName=ghcr.io/zapier/kubechecks
-            tag: "v3.2.1@sha256:505bd90a29fd472741bbbe7ae2c58a7bf31f3cb405ca8ae2a0a8442bbd4a342b"
+            # kubechecks chart 3.0.0 は tag を app.kubernetes.io/version にも使うため、
+            # digest を連結すると Kubernetes の label 制約を満たさない。
+            tag: "v3.2.1"
           envFrom:
             - secretRef:
                 name: kubechecks-github-app-secret

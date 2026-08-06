@@ -159,13 +159,13 @@
   customManagers: [
     {
       // Helm values が YAML block scalar 内にあるため、組み込みの kubernetes manager
-      // では検出できない kubechecks の tag と digest を追従する。
+      // では検出できない kubechecks の tag を追従する。
       customType: 'regex',
       managerFilePatterns: [
         '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/root/apps[.]yaml$/',
       ],
       matchStrings: [
-        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n\\s+tag: "(?<currentValue>[^@"]+)@(?<currentDigest>sha256:[a-f0-9]+)"',
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)[\\s\\S]*?tag: "(?<currentValue>[^"]+)"',
       ],
       versioningTemplate: 'semver-coerced',
     },
