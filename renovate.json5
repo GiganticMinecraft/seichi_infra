@@ -33,6 +33,20 @@
       ],
     },
     {
+      // chart の patch 更新でも Argo CD 本体の minor 更新を含みうるため、
+      // 汎用の Terraform グループから分離して appVersion の確認を促す。
+      matchManagers: [
+        'terraform',
+      ],
+      matchPackageNames: [
+        'argo-cd',
+      ],
+      groupName: 'Argo CD',
+      prBodyNotes: [
+        ':warning: Helm chart のバージョンだけでなく、Chart.yaml の appVersion と Argo CD の upgrade notes を確認してください。',
+      ],
+    },
+    {
       matchManagers: [
         'dockerfile',
         'kubernetes',
@@ -143,6 +157,18 @@
     ],
   },
   customManagers: [
+    {
+      // Helm values が YAML block scalar 内にあるため、組み込みの kubernetes manager
+      // では検出できない kubechecks の tag と digest を追従する。
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/root/apps[.]yaml$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n\\s+tag: "(?<currentValue>[^@"]+)@(?<currentDigest>sha256:[a-f0-9]+)"',
+      ],
+      versioningTemplate: 'semver-coerced',
+    },
     {
       customType: 'regex',
       managerFilePatterns: [

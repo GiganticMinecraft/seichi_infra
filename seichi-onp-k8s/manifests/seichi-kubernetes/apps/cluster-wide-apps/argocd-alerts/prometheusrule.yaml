@@ -1,0 +1,43 @@
+# Argo CD の異常だけを既存の Alertmanager -> Discord 経路へ通知する。
+# seichi-minecraft の OutOfSync は sync window 中の想定状態なので即時通知せず、
+# 次の allow window を越えて残る 25 時間継続だけを検知する。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: argocd-alerts
+  namespace: argocd
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: argocd-alerts
+      rules:
+        - alert: ArgoCDAppDegraded
+          expr: argocd_app_info{health_status="Degraded"} == 1
+          for: 10m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Argo CD Application {{ $labels.name }} が Degraded です"
+            description: "Application {{ $labels.namespace }}/{{ $labels.name }} (project={{ $labels.project }}) が10分以上 Degradedです。"
+
+        - alert: ArgoCDAppSyncFailed
+          expr: increase(argocd_app_sync_total{phase=~"Error|Failed"}[15m]) > 0
+          for: 1m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Argo CD Application {{ $labels.name }} の同期に失敗しました"
+            description: "Application {{ $labels.namespace }}/{{ $labels.name }} (project={{ $labels.project }}) で直近15分に {{ $labels.phase }} の同期が発生しました。"
+
+        - alert: ArgoCDAppOutOfSyncTooLong
+          expr: argocd_app_info{sync_status="OutOfSync"} == 1
+          for: 25h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Argo CD Application {{ $labels.name }} の OutOfSync が次の同期窓を越えています"
+            description: "Application {{ $labels.namespace }}/{{ $labels.name }} (project={{ $labels.project }}) が25時間以上 OutOfSyncです。日次の allow window で解消されなかった差分を確認してください。"
