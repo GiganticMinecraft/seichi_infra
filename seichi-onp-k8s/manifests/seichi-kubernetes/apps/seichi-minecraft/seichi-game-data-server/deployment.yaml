@@ -38,7 +38,7 @@ spec:
           # digests in. Per-commit pinning happens by setting a sha- tag here
           # if you ever need to roll back (and disabling Image Updater for
           # this image temporarily).
-          image: ghcr.io/giganticminecraft/seichi-game-data-server:master@sha256:2f7fd1c9bca09a2c5ec0101d6ccabbecb5928bbb02d86340c5322568ddf8eedd
+          image: ghcr.io/giganticminecraft/seichi-game-data-server:master@sha256:aa9bdb5b30abb805f93828b87b08a7befa434b3514fd7ecf25b1c7f2cfda9149
           imagePullPolicy: Always
           name: seichi-game-data-server
           ports:
