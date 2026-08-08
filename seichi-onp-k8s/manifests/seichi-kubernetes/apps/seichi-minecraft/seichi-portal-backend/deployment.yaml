@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.3@sha256:168afa73c5dc86205c1801e5a5205805960620bcfde388f2e87142cc9c754df3
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.4@sha256:e62e66626d5186f4eab36853e6d6d0b5442b9b3ae625c27a77638e886076144d
           resources:
             # OTel exporter のオーバーヘッド吸収のため limit を 100m から 300m へ増強
             # (seichi-game-data-publisher が exporter 導入時に 50m→300m へ増強した実績に倣う)
@@ -56,6 +56,11 @@ spec:
               value: seichi-portal-valkey
             - name: REDIS_PORT
               value: "6379"
+            - name: SEICHI_PROXY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-backend-secrets
+                  key: SEICHI_PROXY_SECRET
             - name: MEILISEARCH_HOST
               value: http://seichi-portal-meilisearch:7700
             - name: MEILISEARCH_API_KEY

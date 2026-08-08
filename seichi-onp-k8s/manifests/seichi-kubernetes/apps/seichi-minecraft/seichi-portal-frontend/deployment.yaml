@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-frontend
-          image: ghcr.io/giganticminecraft/seichi-portal-frontend:0.3.2@sha256:9d65f9089513367d260b7c3671d101947ad16a95cc115ddbb73748839f7feb5f
+          image: ghcr.io/giganticminecraft/seichi-portal-frontend:0.3.3@sha256:4b10f8e1e0932d64e6d7ea40369d593754e59cf8bd8d608f609e02da1e09ae47
           ports:
             - name: http
               containerPort: 3000
@@ -41,6 +41,13 @@ spec:
               value: https://portal.seichi.click
             - name: BACKEND_SERVER_URL
               value: http://seichi-portal-backend:80
+            - name: SEICHI_PROXY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-frontend-secrets
+                  key: SEICHI_PROXY_SECRET
+            - name: SEICHI_CLIENT_IP_HEADER
+              value: CF-Connecting-IP
             - name: DISCORD_CLIENT_ID
               valueFrom:
                 secretKeyRef:
