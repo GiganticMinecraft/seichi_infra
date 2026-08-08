@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: cluster-wide-apps
 resources:
   # reloader
-  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.4.19
+  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.4.21
   - service.yaml
   - service-monitor.yaml
 patches:
