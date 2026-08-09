@@ -39,7 +39,7 @@ spec:
             notify: discord
           annotations:
             summary: "{{ $labels.pod }} の GC 後 Old 世代使用率が 85% を超えています"
-            description: "Pod {{ $labels.pod }} で GC (mixed/Full) 後の Old 世代使用量が高止まりしています (直近 15 分のピーク: Old max 比 {{ $value | humanizePercentage }})。放置すると Full GC 連発 → liveness kill に至る可能性があります (2026-08-09 s5 と同型)。保持元の特定には JVM が応答するうちに JFR dump を取ること。コンテナに jcmd はない (JRE イメージ) ため、JMC を JMX につなぐか kubectl debug --target=minecraft (JDK イメージ) の jcmd で name=continuous を /data に dump する。"
+            description: "Pod {{ $labels.pod }} で GC (mixed/Full) 後の Old 世代使用量が高止まりしています (直近 15 分のピーク: Old max 比 {{ $value | humanizePercentage }})。放置すると Full GC 連発 → liveness kill に至る可能性があります (2026-08-09 s5 と同型)。保持元の特定には JVM が応答するうちに JFR dump を取ること。コンテナに jcmd はない (JRE イメージ) ため、JMC を JMX (ClusterIP 10.96.118.86:32000) につなぎ recording continuous を dump する。"
 
         # Full GC (jmx exporter では gc="G1 Old Generation") は平常時ほぼ 0 回のため
         # 閾値 30 秒/10 分でも誤検知しない。発火時点で既にプレイヤー影響が出ている

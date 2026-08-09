@@ -48,8 +48,9 @@ spec:
           # アプリケーションアラート (#5611, #5618, Sentry 撤去後の通知カバレッジ)。
           # アプリのエラーはノード再起動で直らないため、ノード保守をブロックさせない
           # Mcserver*: mcserver JVM の GC 予兆アラート (mcserver-jvm-alerts)。
-          # JVM 内部の状態でありノード再起動で直らない上、賑わい時間帯に warning が
-          # 長時間 firing し続けてノード保守をブロックしうるため除外する
+          # drain による Pod 再作成で heap は一旦初期化されるが根本原因は解消しない
+          # アプリ固有アラートであり、賑わい時間帯に warning が長時間 firing し続けて
+          # クラスタ全体のノード保守を止めうるため除外する
           alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled|ConifersMigrationJobFailed|ArgoCDAppDegraded|ArgoCDAppSyncFailed|ArgoCDAppOutOfSyncTooLong|McserverOldGenHighAfterCollection|McserverFullGcStorm|McserverMemoryNearLimit)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは

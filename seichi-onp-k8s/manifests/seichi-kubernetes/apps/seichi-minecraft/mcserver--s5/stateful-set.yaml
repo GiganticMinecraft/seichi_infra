@@ -104,10 +104,11 @@ spec:
             - name: EULA
               value: "TRUE"
 
-            # mc-server-runner が stop 命令後にサーバー終了を待つ秒数 (デフォルト 60)。
-            # 60 のままだと terminationGracePeriodSeconds を延ばしても runner が先に JVM を
-            # 強制終了して dumponexit が走らない。JVM の shutdown hook (JFR dump 含む) 用に
-            # grace 180 秒から 30 秒残した 150 に設定する。
+            # mc-server-runner は stop 送信から STOP_DURATION 秒後に Java プロセスを
+            # 強制 kill する (デフォルト 60)。サーバー停止処理と JVM shutdown hook
+            # (JFR dumponexit 含む) はこの 150 秒以内に完了する必要がある。
+            # terminationGracePeriodSeconds (180) との差 30 秒は runner 自身と Pod 終了処理の
+            # 余白であり、JVM shutdown hook 用の追加時間ではない。
             - name: STOP_DURATION
               value: "150"
 
@@ -181,9 +182,11 @@ spec:
               # - terminationGracePeriodSeconds を 180 に延長し、liveness kill 時に SIGTERM
               #   からの正常終了 (shutdown hook の dumponexit が OldObjectSample を書き出す)
               #   が完走する確率を上げる (2026-08-09 は猶予 30 秒で足りず SIGKILL された)
-              # - アラート発火中に手動で取る場合、コンテナに jcmd はない (JRE イメージ) ので
-              #   JMC を JMX (10.96.118.86:32000) につなぐか、kubectl debug --target=minecraft
-              #   で JDK イメージの jcmd を使う。アラート起点の自動 dump は今後の課題
+              # - アラート発火中に手動で取る場合は JMC を JMX (10.96.118.86:32000) につないで
+              #   recording "continuous" を dump する。コンテナは JRE イメージで jcmd がなく、
+              #   kubectl debug --target も PID namespace しか共有せず attach socket
+              #   (/tmp/.java_pid*) が debug container から見えないため使えない。
+              #   FlightRecorderMXBean によるアラート起点の自動 dump は今後の課題
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
