@@ -125,6 +125,29 @@ spec:
               # MaxDirectMemorySize: 未設定だとデフォルトで Xmx と同じ 8G まで direct buffer が
               # 伸びられるため、コンテナの memory limit を超えうる。実測ピークは ~450MiB のため
               # 2 倍のマージンを取って 1G に制限する。
+              #
+              # --- 以下 2026-08-09 GC storm 調査用の canary (s5 のみ) ---
+              # 2026-08-09 17:27 の liveness kill は、collection 後の Old 使用量が約 70 分で
+              # 2.5→7.96GiB (ほぼ満杯) に増大し Full GC 連発 (17:20-25 の 5 分で 271 秒) に
+              # 陥ったことが原因。Old に何が保持されていたかは未特定のため、GC ログと
+              # 継続 JFR を /data (PVC) に永続化して次回発生時に特定できるようにする。
+              #
+              # GC ログ: %t なしだと liveness kill 直後の再起動で直前のログが失われるため
+              # %t を付ける。その代償として filecount の rotation は JVM 起動を跨いで効かない
+              # (起動ごとに別 basename になる) ので、全台展開の前に日数/容量ベースの掃除を
+              # 用意すること。canary では 200Gi PVC に対し最大 500MB/起動なので許容する。
+              # gc+age は MaxTenuringThreshold=1 の再評価、gc+humongous は G1HeapRegionSize
+              # 16M 化の要否判断、safepoint は watchdog の停止時間との照合に使う。
+              #
+              # JFR: SIGKILL では dumponexit が発火しないため、repository を PVC 上に置く。
+              # kill 後は `jfr assemble /data/jfr-repository/<subdir> out.jfr` で chunk から復元
+              # できる (未完了の .part は除外される)。repository ディレクトリは JFR が自動作成
+              # する (jdk.jfr.internal.Repository が createDirectories を呼ぶ)。
+              # OldObjectSample は default 設定でも有効 (allocation stack trace なし) のため、
+              # stackTrace のみ追加で有効化する (JDK 17 の CLI イベント設定オーバーライド)。
+              # settings=profile を常用しないのは短期解析向けで default より負荷が高いため。
+              # 注意: path-to-gc-roots は dump 実行時にしか収集されないので、SIGKILL 時の
+              # chunk には保持経路は残らない (クラス名と allocation stack までが取れる)。
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
@@ -135,6 +158,9 @@ spec:
                 -XX:MaxMetaspaceSize=384m
                 -XX:G1PeriodicGCInterval=60000
                 -XX:MaxDirectMemorySize=1g
+                -Xlog:gc*,gc+heap=debug,gc+age=debug,gc+humongous=debug,safepoint=info:file=/data/gc-%t.log:time,uptime,level,tags:filecount=10,filesize=50m
+                -XX:FlightRecorderOptions=repository=/data/jfr-repository,stackdepth=128
+                -XX:StartFlightRecording:name=continuous,disk=true,maxage=6h,maxsize=1g,dumponexit=true,filename=/data/jfr-exit.jfr,settings=default,jdk.OldObjectSample#stackTrace=true
 
             - name: ENABLE_JMX
               value: "true"
