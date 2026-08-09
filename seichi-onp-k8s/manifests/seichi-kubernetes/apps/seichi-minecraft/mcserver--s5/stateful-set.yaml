@@ -19,6 +19,10 @@ spec:
         app: mcserver--s5
         mcserver: s5
     spec:
+      # liveness kill 時に SIGTERM からの正常終了 (JFR dumponexit が OldObjectSample を
+      # 書き出す) が完走する確率を上げる。デフォルト 30 秒では 2026-08-09 の GC storm 時に
+      # 足りず SIGKILL された。正常時の停止は数十秒で終わるため日次再起動には影響しない。
+      terminationGracePeriodSeconds: 180
       initContainers:
         - name: mod-downloader
           image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:fab675dfa2bb2ae0ca8ab17a0b12bebfae977a8d8ac9c8a5306fd479e53bb32c
@@ -69,6 +73,23 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
 
+        # GC storm 調査用テレメトリの掃除 (canary)。
+        # GC ログは %t 付き basename のため JVM の filecount rotation が起動を跨いで効かず、
+        # JFR repository は SIGKILL で残った旧 subdirectory (最大 ~1GiB/回) を次の JVM が
+        # 削除しないため、どちらも起動時にここで削除する。
+        - name: gc-telemetry-cleanup
+          image: busybox:1.38.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              find /data -maxdepth 1 -name 'gc-*.log*' -mtime +14 -exec rm -f {} + || true
+              [ -d /data/jfr-repository ] && find /data/jfr-repository -mindepth 1 -maxdepth 1 -mtime +7 -exec rm -rf {} + || true
+          volumeMounts:
+            - name: mcserver--s5-data
+              mountPath: /data
+
       containers:
         - resources:
             requests:
@@ -82,6 +103,14 @@ spec:
               value: 8G
             - name: EULA
               value: "TRUE"
+
+            # mc-server-runner は stop 送信から STOP_DURATION 秒後に Java プロセスを
+            # 強制 kill する (デフォルト 60)。サーバー停止処理と JVM shutdown hook
+            # (JFR dumponexit 含む) はこの 150 秒以内に完了する必要がある。
+            # terminationGracePeriodSeconds (180) との差 30 秒は runner 自身と Pod 終了処理の
+            # 余白であり、JVM shutdown hook 用の追加時間ではない。
+            - name: STOP_DURATION
+              value: "150"
 
             # glibc の malloc arena の数を制限する。
             # arena の上限はデフォルトで「CPU コア数 × 8」だが、glibc は cgroup を認識しないため
@@ -125,6 +154,39 @@ spec:
               # MaxDirectMemorySize: 未設定だとデフォルトで Xmx と同じ 8G まで direct buffer が
               # 伸びられるため、コンテナの memory limit を超えうる。実測ピークは ~450MiB のため
               # 2 倍のマージンを取って 1G に制限する。
+              #
+              # --- 以下 2026-08-09 GC storm 調査用の canary (s5 のみ) ---
+              # 2026-08-09 17:27 の liveness kill は、collection 後の Old 使用量が約 70 分で
+              # 2.5→7.96GiB (ほぼ満杯) に増大し Full GC 連発 (17:20-25 の 5 分で 271 秒) に
+              # 陥ったことが原因。Old に何が保持されていたかは未特定のため、GC ログと
+              # 継続 JFR を /data (PVC) に永続化して次回発生時に特定できるようにする。
+              #
+              # GC ログ: %t なしだと liveness kill 直後の再起動で直前のログが失われるため
+              # %t を付ける。その代償として filecount の rotation は JVM 起動を跨いで効かない
+              # (起動ごとに別 basename になる) ので、gc-telemetry-cleanup initContainer が
+              # 起動時に古いファイルを掃除する。
+              # gc+age は MaxTenuringThreshold=1 の再評価、gc+humongous は G1HeapRegionSize
+              # 16M 化の要否判断、safepoint は watchdog の停止時間との照合に使う。
+              #
+              # JFR: repository を PVC 上に置くことで、SIGKILL 後も完成済み chunk を
+              # `jfr assemble /data/jfr-repository/<subdir> out.jfr` で連結して読める
+              # (未完了の .part は除外される)。repository ディレクトリは JFR が自動作成する。
+              # OldObjectSample は default 設定でも有効だが allocation stack trace がないため
+              # stackTrace のみ追加で有効化する (JDK 17 の CLI イベント設定オーバーライド)。
+              # settings=profile を常用しないのは短期解析向けで default より負荷が高いため。
+              #
+              # 重要な制約: OldObjectSample イベントは recording の stop/dump 時にしか
+              # chunk へ書き出されない (PlatformRecorder.stop の実装)。SIGKILL で残る chunk に
+              # 含まれるのは GC/safepoint/ObjectAllocationSample 等の通常イベントのみで、
+              # 「生存オブジェクトの allocation stack」(保持元特定に必要) は残らない。対策:
+              # - terminationGracePeriodSeconds を 180 に延長し、liveness kill 時に SIGTERM
+              #   からの正常終了 (shutdown hook の dumponexit が OldObjectSample を書き出す)
+              #   が完走する確率を上げる (2026-08-09 は猶予 30 秒で足りず SIGKILL された)
+              # - アラート発火中に手動で取る場合は JMC を JMX (10.96.118.86:32000) につないで
+              #   recording "continuous" を dump する。コンテナは JRE イメージで jcmd がなく、
+              #   kubectl debug --target も PID namespace しか共有せず attach socket
+              #   (/tmp/.java_pid*) が debug container から見えないため使えない。
+              #   FlightRecorderMXBean によるアラート起点の自動 dump は今後の課題
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
@@ -135,6 +197,9 @@ spec:
                 -XX:MaxMetaspaceSize=384m
                 -XX:G1PeriodicGCInterval=60000
                 -XX:MaxDirectMemorySize=1g
+                -Xlog:gc*,gc+heap=debug,gc+age=debug,gc+humongous=debug,safepoint=info:file=/data/gc-%t.log:time,uptime,level,tags:filecount=10,filesize=50m
+                -XX:FlightRecorderOptions=repository=/data/jfr-repository,stackdepth=128
+                -XX:StartFlightRecording:name=continuous,disk=true,maxage=6h,maxsize=1g,dumponexit=true,filename=/data/jfr-exit.jfr,settings=default,jdk.OldObjectSample#stackTrace=true
 
             - name: ENABLE_JMX
               value: "true"
