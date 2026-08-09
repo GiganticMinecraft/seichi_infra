@@ -1,0 +1,66 @@
+# mcserver JVM の GC 予兆アラート。
+# 2026-08-09 17:27 の mcserver--s5 liveness kill (collection 後 Old 使用量が
+# 約 70 分で 2.5→7.96GiB に増大 → Full GC 連発 → mc-health タイムアウト) では、
+# 予兆 (collection 後 Old 使用率の上昇) が kill の 30-40 分前から現れていたのに
+# アラートがなく、発見が 2 時間後の手動確認だった。s3 でも 2026-07-29 / 08-06 に
+# 同様の Full GC 多発が観測されている (このときは自然回復)。
+# 瞬間の heap used はノコギリ波の頂点で常に高く誤検知するため、
+# 「collection 後」の使用量 (jvm_memory_pool_collection_used_bytes) を使う。
+# アラート名は kured の alertFilterRegexp にも登録している。変えたら kured 側も更新すること。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mcserver-jvm-alerts
+  namespace: seichi-minecraft
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: mcserver-jvm-alerts
+      rules:
+        # 2026-08-09 の実測では 16:40 頃からこの比率が持続的に上昇し、
+        # 85% 超えは kill の 30-40 分前 → 先行検知として機能する
+        - alert: McserverOldGenHighAfterCollection
+          expr: |
+            jvm_memory_pool_collection_used_bytes{namespace="seichi-minecraft", pool="G1 Old Gen"}
+              / jvm_memory_pool_max_bytes{namespace="seichi-minecraft", pool="G1 Old Gen"} > 0.85
+          for: 10m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "{{ $labels.pod }} の GC 後 Old 世代使用率が 85% を超えています"
+            description: "Pod {{ $labels.pod }} で GC (mixed/Full) 後も Old 世代が {{ $value | humanizePercentage }} 残っています。回収不能な保持が増えており、放置すると Full GC 連発 → liveness kill に至る可能性があります (2026-08-09 s5 と同型)。s5 なら /data の GC ログと JFR repository (jfr assemble で復元) で保持元を確認する。"
+
+        # Full GC (jmx exporter では gc="G1 Old Generation") は平常時ほぼ 0 回のため
+        # 閾値 30 秒/10 分でも誤検知しない。発火時点で既にプレイヤー影響が出ている
+        - alert: McserverFullGcStorm
+          expr: |
+            sum by (namespace, pod) (
+              increase(jvm_gc_collection_seconds_sum{namespace="seichi-minecraft", gc="G1 Old Generation"}[10m])
+            ) > 30
+          for: 5m
+          labels:
+            severity: critical
+            notify: discord
+          annotations:
+            summary: "{{ $labels.pod }} で Full GC が多発しています"
+            description: "Pod {{ $labels.pod }} が直近 10 分で Full GC に {{ $value | humanize }} 秒を費やしています。GC 停止で watchdog/liveness タイムアウト → 再起動に至る可能性が高い状態です。"
+
+        # 2026-08-09 は working set が limit 12Gi 比 99.9% まで達していた。
+        # ここが張り付いたまま Xmx を上げると OOMKill するため、容量変更の判断材料にもなる
+        - alert: McserverMemoryNearLimit
+          expr: |
+            max by (namespace, pod, container) (
+              container_memory_working_set_bytes{namespace="seichi-minecraft", container="minecraft"}
+            )
+              / max by (namespace, pod, container) (
+              kube_pod_container_resource_limits{namespace="seichi-minecraft", container="minecraft", resource="memory"}
+            ) > 0.95
+          for: 10m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "{{ $labels.pod }} の working set が memory limit の 95% を超えています"
+            description: "Pod {{ $labels.pod }} の {{ $labels.container }} コンテナの working set が limit 比 {{ $value | humanizePercentage }} です。cgroup OOMKill が近い、または page cache まで含めて逼迫しています。"
