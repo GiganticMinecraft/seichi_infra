@@ -46,7 +46,8 @@ spec:
           # SeichiPortalHighErrorRate / SeichiPortalBackendCrashLoop /
           # GachadataServerCrashLoop / ConifersIngestorJobFailed / ArgoCDApp*:
           # アプリケーションアラート (#5611, #5618, Sentry 撤去後の通知カバレッジ)。
-          # アプリのエラーはノード再起動で直らないため、ノード保守をブロックさせない
+          # drain による Pod 再作成で症状が一旦消えることはあっても根本原因は解消しない
+          # アプリ固有の問題のため、ノード保守をブロックさせない
           # Mcserver*: mcserver JVM の GC 予兆アラート (mcserver-jvm-alerts)。
           # drain による Pod 再作成で heap は一旦初期化されるが根本原因は解消しない
           # アプリ固有アラートであり、賑わい時間帯に warning が長時間 firing し続けて
