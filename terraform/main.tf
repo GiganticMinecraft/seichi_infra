@@ -608,12 +608,6 @@ variable "seichi_portal_backend__discord_bot_token" {
   sensitive   = true
 }
 
-variable "seichi_portal_backend__turnstile_secret_key" {
-  description = "Cloudflare Turnstile secret key for seichi-portal-backend"
-  type        = string
-  sensitive   = true
-}
-
 #endregion
 
 #region seichi-portal-frontend secrets
@@ -632,12 +626,6 @@ variable "seichi_portal_frontend__discord_client_id" {
 
 variable "seichi_portal_frontend__discord_client_secret" {
   description = "Discord application client secret for seichi-portal-frontend"
-  type        = string
-  sensitive   = true
-}
-
-variable "seichi_portal_frontend__turnstile_site_key" {
-  description = "Cloudflare Turnstile site key for seichi-portal-frontend"
   type        = string
   sensitive   = true
 }
