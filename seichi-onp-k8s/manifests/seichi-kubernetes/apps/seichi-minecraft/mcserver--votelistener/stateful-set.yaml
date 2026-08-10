@@ -110,14 +110,26 @@ spec:
               # votifierが投票されたプレイヤーのUUIDを解決できるようにオンラインモードで稼働させる
               value: "TRUE"
 
+            # glibc の malloc arena 数を制限し、解放済みネイティブメモリを
+            # arena の断片化によって RSS に抱え込み続けるのを抑える。
+            # 2026-08-10 の実測では、heap / direct buffer が横ばいでも RSS が
+            # 約 6 時間で 2.81GiB から 4.96GiB まで増加して OOMKilled されており、
+            # 2026-07 に s1, s2, s3, s5, s7 へ適用した対策と同型。
+            - name: MALLOC_ARENA_MAX
+              value: "2"
+
             - name: JVM_OPTS
               # base image 側で JVM_OPTS に対して jmx exporter の設定を追加しているが、上書きが必要なためここで設定する
               # SeichiAssistによるワールドマイグレーションをするとメモリリークが発生するため、Papermc公式が推奨しているJVM Optionを追加する
               # ref: https://docs.papermc.io/paper/aikars-flags
+              #
+              # DisableExplicitGC は、direct buffer の上限到達時に Cleaner の回収を促す
+              # System.gc() まで無効化するため、STW Full GC を避けつつ回収経路を残す
+              # ExplicitGCInvokesConcurrent を使用する。
               value: >-
                 -javaagent:/jmx-exporter/jmx_prometheus_javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
                 -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200
-                -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch
+                -XX:+UnlockExperimentalVMOptions -XX:+ExplicitGCInvokesConcurrent -XX:+AlwaysPreTouch
                 -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M
                 -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4
                 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90
@@ -126,6 +138,12 @@ spec:
                 -Daikars.new.flags=true
 
             - name: JVM_XX_OPTS
+              # G1PeriodicGCInterval: 投票待受中は GC が長時間走らず、Cleaner 経由で
+              # 解放される Deflater / direct buffer 等のネイティブメモリが滞留しうるため、
+              # 1 分 GC がない場合に concurrent cycle を開始して回収機会を作る。
+              #
+              # MaxDirectMemorySize: 実測ピーク約 274MiB に対して約 2 倍の余裕を持たせ、
+              # 5GiB の container limit 内で heap 2GiB とネイティブ領域の余白を確保する。
               value: >-
                 -XX:ErrorFile=/data/hs_err_pid%p.log -XX:+HeapDumpOnOutOfMemoryError
                 -XX:HeapDumpPath=/data/ -XX:+CreateCoredumpOnCrash
@@ -134,6 +152,8 @@ spec:
                 -XX:+DebugNonSafepoints
                 -XX:ReservedCodeCacheSize=384m
                 -XX:MaxMetaspaceSize=384m
+                -XX:G1PeriodicGCInterval=60000
+                -XX:MaxDirectMemorySize=512m
 
             - name: ENABLE_JMX
               value: "true"
