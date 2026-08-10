@@ -260,7 +260,11 @@ spec:
             KUBECHECKS_ARGOCD_API_SERVER_ADDR: "argocd-server.argocd:443"
             KUBECHECKS_ARGOCD_API_INSECURE: "true"
             KUBECHECKS_WEBHOOK_URL_BASE: "https://kubechecks.onp-k8s.admin.seichi.click"
-            KUBECHECKS_FALLBACK_K8S_VERSION: "1.32.1"
+            KUBECHECKS_FALLBACK_K8S_VERSION: "1.36.2"
+            # kubeconform の標準 registry に含まれない CRD
+            # (PrometheusRule / CiliumNetworkPolicy など)を検証する。
+            # CI の結果が外部 repository の更新だけで変わらないよう commit を固定する。
+            KUBECHECKS_SCHEMAS_LOCATION: "https://raw.githubusercontent.com/datreeio/CRDs-catalog/52b0261318acc7dd0b66e032759b1f218216b980/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
             KUBECHECKS_TIDY_OUTDATED_COMMENTS_MODE: "delete"
             KUBECHECKS_LOG_LEVEL: "info"
             KUBECHECKS_MONITOR_ALL_APPLICATIONS: "true"
