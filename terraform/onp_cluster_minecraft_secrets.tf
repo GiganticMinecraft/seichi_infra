@@ -279,8 +279,9 @@ resource "kubernetes_secret_v1" "seichi_portal_backend_secrets" {
   }
 
   data = {
-    DISCORD_BOT_TOKEN   = var.seichi_portal_backend__discord_bot_token
-    SEICHI_PROXY_SECRET = random_password.seichi_portal_proxy_secret.result
+    DISCORD_BOT_TOKEN    = var.seichi_portal_backend__discord_bot_token
+    SEICHI_PROXY_SECRET  = random_password.seichi_portal_proxy_secret.result
+    TURNSTILE_SECRET_KEY = var.seichi_portal_backend__turnstile_secret_key
     MINECRAFT_BANS_DATABASE_URL = format(
       "mysql://litebans:%s@mariadb:3306/litebans_gigantic_prod",
       urlencode(random_password.minecraft__prod_mariadb_litebans_password.result),
@@ -303,6 +304,7 @@ resource "kubernetes_secret_v1" "seichi_portal_frontend_secrets" {
     DISCORD_CLIENT_ID     = var.seichi_portal_frontend__discord_client_id
     DISCORD_CLIENT_SECRET = var.seichi_portal_frontend__discord_client_secret
     SEICHI_PROXY_SECRET   = random_password.seichi_portal_proxy_secret.result
+    TURNSTILE_SITE_KEY    = var.seichi_portal_frontend__turnstile_site_key
   }
 
   type = "Opaque"

@@ -80,6 +80,15 @@ spec:
               value: production
             - name: FRONTEND_URL
               value: https://portal.seichi.click
+            - name: TURNSTILE_ENABLED
+              value: "true"
+            - name: TURNSTILE_ALLOWED_HOSTNAMES
+              value: portal.seichi.click
+            - name: TURNSTILE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-backend-secrets
+                  key: TURNSTILE_SECRET_KEY
             - name: REDIS_HOST
               value: seichi-portal-valkey
             - name: REDIS_PORT

@@ -1,0 +1,28 @@
+# seichi-portal-backend が Turnstile Siteverify を呼び出すための egress 許可。
+# kube-dns への DNS (53/ANY) と challenges.cloudflare.com への HTTPS (443/TCP) に限定する。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-backend--to-cloudflare-turnstile
+spec:
+  endpointSelector:
+    matchLabels:
+      app: seichi-portal-backend
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchName: challenges.cloudflare.com
+    - toFQDNs:
+        - matchName: challenges.cloudflare.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

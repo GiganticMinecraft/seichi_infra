@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-frontend
-          image: ghcr.io/giganticminecraft/seichi-portal-frontend:0.3.4@sha256:60a99a5784543891933cff43b809adf0f1b9cf6dd1fdd1029ae3177d4b61d8c9
+          image: ghcr.io/giganticminecraft/seichi-portal-frontend:0.3.7@sha256:df9b46df28492149e606724aba7ca734e9d03cf1e0f2c48542a6b7a93fddfd85
           ports:
             - name: http
               containerPort: 3000
@@ -32,6 +32,11 @@ spec:
               cpu: 100m
               memory: 256Mi
           env:
+            - name: TURNSTILE_SITE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-frontend-secrets
+                  key: TURNSTILE_SITE_KEY
             - name: MS_APP_CLIENT_ID
               valueFrom:
                 secretKeyRef:
