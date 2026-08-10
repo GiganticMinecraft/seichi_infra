@@ -9,6 +9,13 @@ metadata:
     reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
+  # 単一 replica でも、新 Pod が安定して Ready になるまでは旧 Pod を残す。
+  minReadySeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: seichi-portal-backend
@@ -23,6 +30,27 @@ spec:
       containers:
         - name: seichi-portal-backend
           image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.5@sha256:724f4faf56119005bbb20a3c03201f3f918f2d5c0fd4e58f485f2a2a57a2928a
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          # /health は MariaDB、Meilisearch、RabbitMQ、DiscordBot まで確認する。
+          # rollout 中は依存先を含めて利用可能になった Pod だけを Service に載せる。
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          # 依存サービスの障害では再起動させず、HTTP listener 自体の停止だけを検知する。
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           resources:
             # OTel exporter のオーバーヘッド吸収のため limit を 100m から 300m へ増強
             # (seichi-game-data-publisher が exporter 導入時に 50m→300m へ増強した実績に倣う)

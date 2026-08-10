@@ -40,12 +40,21 @@ spec:
         # file tailer に拾われる前に書き終わるため、Loki ruler の panic ルール (#5618)
         # では検知できない (2026-08-01 実測: 0.2.0 の起動時 panic ログは Loki に
         # 1 行も届いていない)。Sentry が担っていた「起動不能の即時通知」は
-        # この CrashLoop アラートで代替する
+        # この CrashLoop アラートで代替する。rollout 中に旧 Pod がサービスを継続
+        # できている場合は通知せず、Service の ready endpoint が 0 の場合だけ通知する
         - alert: SeichiPortalBackendCrashLoop
           expr: |
-            max by (namespace, pod, container) (
-              max_over_time(kube_pod_container_status_waiting_reason{namespace="seichi-minecraft", container="seichi-portal-backend", reason="CrashLoopBackOff", job="kube-state-metrics"}[5m])
-            ) >= 1
+            (
+              max by (namespace, pod, container) (
+                max_over_time(kube_pod_container_status_waiting_reason{namespace="seichi-minecraft", container="seichi-portal-backend", reason="CrashLoopBackOff", job="kube-state-metrics"}[5m])
+              ) >= 1
+            )
+            and on (namespace)
+            (
+              kube_service_info{namespace="seichi-minecraft", service="seichi-portal-backend", job="kube-state-metrics"}
+              unless on (namespace)
+              kube_endpointslice_endpoints{namespace="seichi-minecraft", endpointslice=~"seichi-portal-backend-.*", ready="true", job="kube-state-metrics"}
+            )
           for: 5m
           labels:
             severity: critical
@@ -53,4 +62,4 @@ spec:
             team: portal
           annotations:
             summary: "seichi-portal-backend が CrashLoopBackOff です"
-            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしています。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
+            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしており、Service seichi-portal-backend に ready endpoint がありません。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
