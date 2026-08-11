@@ -316,6 +316,22 @@ spec:
                   group_wait: 30s
                   group_interval: 5m
                   repeat_interval: 4h
+                # seichi-minecraft AppProject の allow Sync Window (毎日 07:00-08:00 JST)
+                # と同じ時間帯は、StatefulSet の更新で一時的に発火しうる memory limit
+                # アラートの Discord 通知だけを抑止する。Full GC など他の重大アラートは
+                # maintenance 中も通知する。Sync Window を変更した場合はこの interval も
+                # 同時に更新すること。
+                - receiver: "discord-infra"
+                  matchers:
+                    - notify = "discord"
+                    - namespace = "seichi-minecraft"
+                    - alertname = "McserverMemoryNearLimit"
+                  group_by: ["alertname", "namespace", "service"]
+                  group_wait: 30s
+                  group_interval: 5m
+                  repeat_interval: 4h
+                  mute_time_intervals:
+                    - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-infra"
                   matchers:
                     - notify = "discord"
@@ -323,6 +339,13 @@ spec:
                   group_wait: 30s
                   group_interval: 5m
                   repeat_interval: 4h
+            time_intervals:
+              - name: "argocd-seichi-minecraft-sync-window"
+                time_intervals:
+                  - times:
+                      - start_time: "07:00"
+                        end_time: "08:00"
+                    location: "Asia/Tokyo"
             receivers:
               - name: "null"
               # discord_configs ではなく webhook_configs で Discord ネイティブ JSON を
