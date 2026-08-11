@@ -316,6 +316,8 @@ spec:
                   group_wait: 30s
                   group_interval: 5m
                   repeat_interval: 4h
+                  mute_time_intervals:
+                    - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-infra"
                   matchers:
                     - notify = "discord"
@@ -323,6 +325,19 @@ spec:
                   group_wait: 30s
                   group_interval: 5m
                   repeat_interval: 4h
+                  mute_time_intervals:
+                    - "argocd-seichi-minecraft-sync-window"
+            time_intervals:
+              # seichi-minecraft AppProject の allow Sync Window と同じ時間帯は、
+              # Prometheus / Loki から Alertmanager を経由する全 Discord 通知を抑止する。
+              # アラートの評価・状態記録は継続し、window 終了後も firing なら通知する。
+              # Sync Window を変更した場合はこの interval も同時に更新すること。
+              - name: "argocd-seichi-minecraft-sync-window"
+                time_intervals:
+                  - times:
+                      - start_time: "07:00"
+                        end_time: "08:00"
+                    location: "Asia/Tokyo"
             receivers:
               - name: "null"
               # discord_configs ではなく webhook_configs で Discord ネイティブ JSON を
