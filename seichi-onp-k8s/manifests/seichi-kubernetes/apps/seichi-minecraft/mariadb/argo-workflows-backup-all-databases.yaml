@@ -22,6 +22,10 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "Namespace内の全Database CRDを対象に、各.spec.databaseを指定してBackup CRを作成する"
 spec:
+  podResources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
   serviceAccountName: mariadb-workflow-sa
   activeDeadlineSeconds: 7200 # 2時間でタイムアウト（image pullの失敗等での長時間ハングを防ぐ）
   onExit: notify-on-failure

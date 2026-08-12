@@ -8,19 +8,21 @@ spec:
   source:
     chart: argo-workflows
     repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: 1.1.1
+    targetRevision: 2.0.0
     helm:
       releaseName: argo-workflows
       values: |
         controller:
+          initlessPod:
+            enabled: true
           resources:
             requests:
               cpu: 10m
               memory: 64Mi
           extraEnv:
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
               value: "http://tempo.monitoring.svc.cluster.local:4317"
-            - name: OTEL_EXPORTER_OTLP_INSECURE
+            - name: OTEL_EXPORTER_OTLP_TRACES_INSECURE
               value: "true"
           metricsConfig:
             enabled: true
@@ -32,16 +34,20 @@ spec:
             spec:
               podGC:
                 strategy: OnWorkflowSuccess
+              templateDefaults:
+                pendingTimeout: 30m
               ttlStrategy:
                 secondsAfterCompletion: 592200
+          workflowRestrictions:
+            templateReferencing: Secure
           failedPodRestart:
             enabled: true
             maxRestarts: 3
         executor:
           env:
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
               value: "http://tempo.monitoring.svc.cluster.local:4317"
-            - name: OTEL_EXPORTER_OTLP_INSECURE
+            - name: OTEL_EXPORTER_OTLP_TRACES_INSECURE
               value: "true"
         server:
           resources:
@@ -54,7 +60,7 @@ spec:
           sso:
             enabled: true
             issuer: https://argocd.onp-k8s.admin.seichi.click/api/dex
-            sessionExpiry: 240h
+            sessionExpiry: 24h
             clientId:
               name: argo-workflows-sso
               key: client-id
@@ -65,7 +71,141 @@ spec:
             scopes:
               - groups
             rbac:
-              enabled: false
+              enabled: true
+        extraObjects:
+          - apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: argo-workflows-sso-read-only
+              namespace: argo
+              annotations:
+                workflows.argoproj.io/rbac-rule: "true"
+                workflows.argoproj.io/rbac-rule-precedence: "0"
+            automountServiceAccountToken: false
+          - apiVersion: v1
+            kind: Secret
+            metadata:
+              name: argo-workflows-sso-read-only.service-account-token
+              namespace: argo
+              annotations:
+                kubernetes.io/service-account.name: argo-workflows-sso-read-only
+            type: kubernetes.io/service-account-token
+          - apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: argo-workflows-sso-admin
+              namespace: argo
+              annotations:
+                workflows.argoproj.io/rbac-rule: "'GiganticMinecraft:admin-team' in groups"
+                workflows.argoproj.io/rbac-rule-precedence: "10"
+            automountServiceAccountToken: false
+          - apiVersion: v1
+            kind: Secret
+            metadata:
+              name: argo-workflows-sso-admin.service-account-token
+              namespace: argo
+              annotations:
+                kubernetes.io/service-account.name: argo-workflows-sso-admin
+            type: kubernetes.io/service-account-token
+          - apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRole
+            metadata:
+              name: argo-workflows-sso-read-only
+            rules:
+              - apiGroups: [""]
+                resources:
+                  - configmaps
+                  - events
+                  - pods
+                verbs:
+                  - get
+                  - list
+                  - watch
+              - apiGroups: [""]
+                resources:
+                  - pods/log
+                verbs:
+                  - get
+                  - list
+          - apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRole
+            metadata:
+              name: argo-workflows-sso-admin
+            rules:
+              - apiGroups: [""]
+                resources:
+                  - configmaps
+                  - events
+                  - pods
+                verbs:
+                  - get
+                  - list
+                  - watch
+              - apiGroups: [""]
+                resources:
+                  - pods
+                verbs:
+                  - delete
+              - apiGroups: [""]
+                resources:
+                  - pods/log
+                verbs:
+                  - get
+                  - list
+              - apiGroups: [""]
+                resources:
+                  - events
+                verbs:
+                  - create
+                  - patch
+          - apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: argo-workflows-sso-read-only
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: argo-workflows-view
+            subjects:
+              - kind: ServiceAccount
+                name: argo-workflows-sso-read-only
+                namespace: argo
+          - apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: argo-workflows-sso-read-only-core
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: argo-workflows-sso-read-only
+            subjects:
+              - kind: ServiceAccount
+                name: argo-workflows-sso-read-only
+                namespace: argo
+          - apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: argo-workflows-sso-admin
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: argo-workflows-admin
+            subjects:
+              - kind: ServiceAccount
+                name: argo-workflows-sso-admin
+                namespace: argo
+          - apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: argo-workflows-sso-admin-core
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: argo-workflows-sso-admin
+            subjects:
+              - kind: ServiceAccount
+                name: argo-workflows-sso-admin
+                namespace: argo
   destination:
     server: https://kubernetes.default.svc
     namespace: argo

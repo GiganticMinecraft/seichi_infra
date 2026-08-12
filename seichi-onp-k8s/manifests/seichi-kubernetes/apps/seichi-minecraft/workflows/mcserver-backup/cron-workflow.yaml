@@ -11,43 +11,56 @@ spec:
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   workflowSpec:
-    serviceAccountName: mcserver--backup-workflow-sa
-    activeDeadlineSeconds: 14400 # 4時間でタイムアウト（image pullの失敗等での長時間ハングを防ぐ）
-    entrypoint: run-mcserver-backups
-    onExit: notify-on-failure
+    workflowTemplateRef:
+      name: backup--mcservers
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: backup--mcservers
+  namespace: seichi-minecraft
+spec:
+  podResources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+  serviceAccountName: mcserver--backup-workflow-sa
+  activeDeadlineSeconds: 14400 # 4時間でタイムアウト（image pullの失敗等での長時間ハングを防ぐ）
+  entrypoint: run-mcserver-backups
+  onExit: notify-on-failure
 
-    # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
-    templates:
-      - name: run-mcserver-backups
-        steps:
-        - - name: mcserver-backup-steps
+  # ref: https://argo-workflows.readthedocs.io/en/latest/walk-through/loops/#withparam-example
+  templates:
+    - name: run-mcserver-backups
+      steps:
+      - - name: mcserver-backup-steps
+          templateRef:
+            name: mcserver-backup-workflow-template
+            template: mcserver-backup-entrypoint
+          arguments:
+            parameters:
+            - name: statefulset-name
+              value: "{{item.statefulset-name}}"
+            - name: coreprotect-db-name
+              value: "{{item.coreprotect-db-name}}"
+            - name: persistent-volume-claim-name
+              value: "{{item.persistent-volume-claim-name}}"
+          withItems:
+            - { "statefulset-name": "mcserver--s1", "coreprotect-db-name": "coreprotect__mc_s1", "persistent-volume-claim-name": "mcserver--s1-data-mcserver--s1-0" }
+            - { "statefulset-name": "mcserver--s2", "coreprotect-db-name": "coreprotect__mc_s2", "persistent-volume-claim-name": "mcserver--s2-data-mcserver--s2-0" }
+            - { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect__mc_s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" }
+            - { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect__mc_s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" }
+            - { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect__mc_s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" }
+
+    - name: notify-on-failure
+      steps:
+        - - name: send-failure-notification
             templateRef:
-              name: mcserver-backup-workflow-template
-              template: mcserver-backup-entrypoint
+              name: backup-failure-notification
+              template: send-discord-notification
+              clusterScope: true
+            when: "{{workflow.status}} != Succeeded"
             arguments:
               parameters:
-              - name: statefulset-name
-                value: "{{item.statefulset-name}}"
-              - name: coreprotect-db-name
-                value: "{{item.coreprotect-db-name}}"
-              - name: persistent-volume-claim-name
-                value: "{{item.persistent-volume-claim-name}}"
-            withItems:
-              - { "statefulset-name": "mcserver--s1", "coreprotect-db-name": "coreprotect__mc_s1", "persistent-volume-claim-name": "mcserver--s1-data-mcserver--s1-0" }
-              - { "statefulset-name": "mcserver--s2", "coreprotect-db-name": "coreprotect__mc_s2", "persistent-volume-claim-name": "mcserver--s2-data-mcserver--s2-0" }
-              - { "statefulset-name": "mcserver--s3", "coreprotect-db-name": "coreprotect__mc_s3", "persistent-volume-claim-name": "mcserver--s3-data-mcserver--s3-0" }
-              - { "statefulset-name": "mcserver--s5", "coreprotect-db-name": "coreprotect__mc_s5", "persistent-volume-claim-name": "mcserver--s5-data-mcserver--s5-0" }
-              - { "statefulset-name": "mcserver--s7", "coreprotect-db-name": "coreprotect__mc_s7", "persistent-volume-claim-name": "mcserver--s7-data-mcserver--s7-0" }
-
-      - name: notify-on-failure
-        steps:
-          - - name: send-failure-notification
-              templateRef:
-                name: backup-failure-notification
-                template: send-discord-notification
-                clusterScope: true
-              when: "{{workflow.status}} != Succeeded"
-              arguments:
-                parameters:
-                  - name: title
-                    value: "mcserver バックアップ失敗"
+                - name: title
+                  value: "mcserver バックアップ失敗"

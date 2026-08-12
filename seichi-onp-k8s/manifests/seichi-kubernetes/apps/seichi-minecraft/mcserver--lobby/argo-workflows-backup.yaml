@@ -20,6 +20,10 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "mcserver--lobbyのデータをProxmox Backup Serverにバックアップするワークフロー"
 spec:
+  podResources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
   serviceAccountName: mcserver--lobby-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400

@@ -20,6 +20,10 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "GarageのデータをS3 API経由でダンプし、Proxmox Backup Serverにバックアップするワークフロー"
 spec:
+  podResources:
+    requests:
+      cpu: 500m
+      memory: 256Mi
   serviceAccountName: garage-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
