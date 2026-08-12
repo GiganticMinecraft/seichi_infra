@@ -4,6 +4,10 @@ metadata:
   name: mcserver-backup-workflow-template
   namespace: seichi-minecraft
 spec:
+  podResources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
   serviceAccountName: mcserver--backup-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400

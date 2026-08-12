@@ -6,6 +6,10 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "最新PBSバックアップからワールドデータを抽出し、Garageにアップロードするワークフロー"
 spec:
+  podResources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
   serviceAccountName: upload-world-to-garage-workflow-sa
   ttlStrategy:
     secondsAfterCompletion: 86400
