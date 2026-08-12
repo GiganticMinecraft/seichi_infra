@@ -17,14 +17,19 @@ data:
       - name: seichi-portal-browser-exceptions
         interval: 1m
         rules:
-          # type (JS の例外クラス名: TypeError 等) ごとに集計して通知する。
-          # type の値域はブラウザ組み込み例外クラス + アプリ定義例外程度で
-          # 低カーディナリティ。ルール群全体の安全弁は loki の limits_config
-          # (ruler_max_rules_per_rule_group / ruler_max_rule_groups_per_tenant)
+          # type (JS の例外クラス名) だけでは異なる原因が同じ通知に混ざるため、
+          # Faro receiver が付与する hash まで含めて例外を分離する。
+          # 発生元をブラウザの same-origin policy により特定できない Script error.
+          # は単一クライアントで大量発生しうるため、下の低優先度ルールで扱う。
           - alert: SeichiPortalBrowserException
             expr: |
-              sum by (type) (
-                count_over_time({app_name="seichi-portal-browser", kind="exception"} | logfmt [10m])
+              sum by (type, hash) (
+                count_over_time(
+                  {app_name="seichi-portal-browser", kind="exception"}
+                    | logfmt
+                    | value != "Script error."
+                  [10m]
+                )
               ) > 0
             labels:
               severity: warning
@@ -33,4 +38,28 @@ data:
               service: seichi-portal-browser
             annotations:
               summary: seichi-portal のブラウザで {{ $labels.type }} が発生しています
-              description: 直近 10 分間にブラウザ例外 ({{ $labels.type }}) が記録されました。詳細は Loki で {app_name="seichi-portal-browser", kind="exception"} を実行して確認する。
+              description: 直近 10 分間にブラウザ例外 ({{ $labels.type }}, hash={{ $labels.hash }}) が記録されました。詳細は Loki で {app_name="seichi-portal-browser", kind="exception"} | logfmt | hash="{{ $labels.hash }}" を実行して確認する。
+
+          # Script error. はクロスオリジン等のため詳細を取得できない不透明な例外。
+          # 1セッション内の画面遷移ごとの連発では通知せず、30分内に異なる3つ以上の
+          # Faro session で観測された場合だけ、広範な障害の兆候として通知する。
+          - alert: SeichiPortalBrowserOpaqueScriptError
+            expr: |
+              count(
+                sum by (session_id) (
+                  count_over_time(
+                    {app_name="seichi-portal-browser", kind="exception"}
+                      | logfmt
+                      | value = "Script error."
+                    [30m]
+                  )
+                )
+              ) >= 3
+            labels:
+              severity: info
+              notify: discord
+              team: portal
+              service: seichi-portal-browser
+            annotations:
+              summary: seichi-portal の不透明な Script error. が複数セッションで発生しています
+              description: 直近 30 分間に Script error. が3つ以上のブラウザセッションで記録されました。詳細は Loki で {app_name="seichi-portal-browser", kind="exception"} | logfmt | value="Script error." を実行して確認する。
