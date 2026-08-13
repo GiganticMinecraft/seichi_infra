@@ -296,9 +296,10 @@ spec:
         # notify=discord ラベルによる明示 opt-in のみ (#5601)。severity ベースの
         # 一括通知は行わない (既存ルールのノイズをそのまま流さないため。
         # どのルールに notify=discord を付けるかの監査は #5602)。
-        # 通知先は 2 系統: portal アプリ系 (team=portal) は discord-portal、
-        # それ以外 (インフラ系) は discord-infra。route は先勝ちのため
-        # team=portal の分岐を先に書く
+        # 通知先は portal アプリ系 (team=portal) と、それ以外のインフラ系に分け、
+        # さらに severity=critical だけをロールメンション付きにする。
+        # warning / info / error は Discord へ投稿するが ping しない。
+        # route は先勝ちのため、各系統とも critical の分岐を先に書く。
         alertmanager:
           enabled: true
           config:
@@ -308,20 +309,41 @@ spec:
                 - receiver: "null"
                   matchers:
                     - alertname = "Watchdog"
-                - receiver: "discord-portal"
+                - receiver: "discord-portal-critical"
                   matchers:
                     - notify = "discord"
                     - team = "portal"
-                  group_by: ["alertname", "namespace", "service"]
+                    - severity = "critical"
+                  group_by: ["alertname", "namespace", "service", "severity"]
                   group_wait: 30s
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
                     - "argocd-seichi-minecraft-sync-window"
-                - receiver: "discord-infra"
+                - receiver: "discord-portal-noncritical"
                   matchers:
                     - notify = "discord"
-                  group_by: ["alertname", "namespace", "service"]
+                    - team = "portal"
+                  group_by: ["alertname", "namespace", "service", "severity"]
+                  group_wait: 30s
+                  group_interval: 5m
+                  repeat_interval: 4h
+                  mute_time_intervals:
+                    - "argocd-seichi-minecraft-sync-window"
+                - receiver: "discord-infra-critical"
+                  matchers:
+                    - notify = "discord"
+                    - severity = "critical"
+                  group_by: ["alertname", "namespace", "service", "severity"]
+                  group_wait: 30s
+                  group_interval: 5m
+                  repeat_interval: 4h
+                  mute_time_intervals:
+                    - "argocd-seichi-minecraft-sync-window"
+                - receiver: "discord-infra-noncritical"
+                  matchers:
+                    - notify = "discord"
+                  group_by: ["alertname", "namespace", "service", "severity"]
                   group_wait: 30s
                   group_interval: 5m
                   repeat_interval: 4h
@@ -354,10 +376,12 @@ spec:
               # 安全に JSON 化される。
               # webhook URL は公開リポジトリに書けないため、Terraform 管理の Secret
               # (alertmanagerSpec.secrets でマウント) をファイル参照する。
-              # content 内のロールメンションと allowed_mentions で ping する (backup
-              # 失敗通知と同じ運用ロールを暫定使用。チャンネル専用ロールに変える場合は
-              # content と allowed_mentions の両方の ID を差し替える #5601)
-              - name: "discord-portal"
+              # critical の firing だけ content 内のロールメンションと
+              # allowed_mentions で ping する (backup 失敗通知と同じ運用ロールを
+              # 暫定使用)。resolved と noncritical は投稿のみで ping しない。
+              # チャンネル専用ロールに変える場合は critical receiver の content と
+              # allowed_mentions の両方の ID を差し替える (#5601)。
+              - name: "discord-portal-critical"
                 webhook_configs:
                   - url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
                     # payload に含めるアラート数の上限。embed description の 4096 字制限を
@@ -368,7 +392,7 @@ spec:
                       # デフォルトの __subject は末尾に CommonLabels - GroupLabels を
                       # 括弧で列挙する (condition/container/endpoint/... のダンプに
                       # なって読めない) ため、alertname と namespace だけの自作にする
-                      content: '<@&532704116799963168> {{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      content: '{{ if eq .Status "firing" }}<@&532704116799963168> {{ end }}{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         roles: ["532704116799963168"]
                       embeds:
@@ -377,7 +401,21 @@ spec:
                             {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
                             {{ with .Annotations.description }}{{ printf "%.500s" . }}
                             {{ end }}{{ end }}
-              - name: "discord-infra"
+              - name: "discord-portal-noncritical"
+                webhook_configs:
+                  - url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
+                    max_alerts: 5
+                    payload:
+                      content: '{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      allowed_mentions:
+                        parse: []
+                      embeds:
+                        - title: '{{ if eq .Status "firing" }}⚠️ [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                          description: |-
+                            {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
+                            {{ with .Annotations.description }}{{ printf "%.500s" . }}
+                            {{ end }}{{ end }}
+              - name: "discord-infra-critical"
                 webhook_configs:
                   - url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
                     max_alerts: 5
@@ -385,11 +423,25 @@ spec:
                       # デフォルトの __subject は末尾に CommonLabels - GroupLabels を
                       # 括弧で列挙する (condition/container/endpoint/... のダンプに
                       # なって読めない) ため、alertname と namespace だけの自作にする
-                      content: '<@&532704116799963168> {{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      content: '{{ if eq .Status "firing" }}<@&532704116799963168> {{ end }}{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         roles: ["532704116799963168"]
                       embeds:
                         - title: '{{ if eq .Status "firing" }}🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                          description: |-
+                            {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
+                            {{ with .Annotations.description }}{{ printf "%.500s" . }}
+                            {{ end }}{{ end }}
+              - name: "discord-infra-noncritical"
+                webhook_configs:
+                  - url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
+                    max_alerts: 5
+                    payload:
+                      content: '{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      allowed_mentions:
+                        parse: []
+                      embeds:
+                        - title: '{{ if eq .Status "firing" }}⚠️ [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                           description: |-
                             {{ range .Alerts }}**{{ .Labels.alertname }}** ({{ .Status }}){{ with .Annotations.summary }} — {{ printf "%.200s" . }}{{ end }}
                             {{ with .Annotations.description }}{{ printf "%.500s" . }}
