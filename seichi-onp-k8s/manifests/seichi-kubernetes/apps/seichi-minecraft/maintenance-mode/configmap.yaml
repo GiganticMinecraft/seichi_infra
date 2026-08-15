@@ -8,4 +8,15 @@ data:
   # この値を "true" に変更すると、全Minecraftサーバーが即座にReadinessProbeで失敗し、
   # Serviceのエンドポイントから除外される（トラフィック遮断）。
   # Pod自体は起動したままなので、メンテナンス作業は継続可能。
+  # グローバル: "true" で全サーバに影響
   enabled: "false"
+  # 各サーバ個別: "true" で当該サーバのみに影響
+  enabled--s1: "false"
+  enabled--s2: "false"
+  enabled--s3: "false"
+  enabled--s5: "false"
+  enabled--s7: "false"
+  enabled--lobby: "false"
+  enabled--votelistener: "false"
+  enabled--kagawa: "false"
+  enabled--one-day-to-reset: "false"
