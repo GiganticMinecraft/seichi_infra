@@ -47,7 +47,7 @@ spec:
     spec:
       containers:
         - name: cloudflared-k8s-endpoint
-          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2026.7.3@sha256:589dfba7a9bd90611b616c1c5ad688df5e310fb13811c2b8f9fefb5fe9221f0a"
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2026.8.2@sha256:78995af18233082fd91dff7d476ac9ceb03c6830f2cbad1a807a02481f4dcc19"
           env:
             - name: TUNNEL_NAME
               value: "onp-kubernetes-api-endpoint-tunnel"
