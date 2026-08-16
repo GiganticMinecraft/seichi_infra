@@ -127,6 +127,14 @@ spec:
                 verbs:
                   - get
                   - list
+              - apiGroups: ["argoproj.io"]
+                resources:
+                  - eventsources
+                  - sensors
+                verbs:
+                  - get
+                  - list
+                  - watch
           - apiVersion: rbac.authorization.k8s.io/v1
             kind: ClusterRole
             metadata:
@@ -158,6 +166,18 @@ spec:
                 verbs:
                   - create
                   - patch
+              - apiGroups: ["argoproj.io"]
+                resources:
+                  - eventsources
+                  - sensors
+                verbs:
+                  - create
+                  - get
+                  - list
+                  - watch
+                  - update
+                  - patch
+                  - delete
           - apiVersion: rbac.authorization.k8s.io/v1
             kind: ClusterRoleBinding
             metadata:
