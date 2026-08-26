@@ -88,6 +88,7 @@ Messages:
 - '&6[Tips]&f最新情報は公式ホームページまたは公式Discordサーバーで！'
 - '&6[Tips]&cご自身のエリアで災害が発生した際は、ゲーム内チャットの災害情報は鵜呑みにせず &l"すぐにゲームを終了"&cしてテレビやラジオなどのメディアで災害情報を入手しましょう。'
 - '&6[Tips]&cコマンドの使い方がわからないときはコマンドガイドを見てみよう！→&e https://playguide.seichi.click/command/overview.html'
+- '&6[Tips]&f10周年記念イベント開催中！ガチャを引くと&e復刻&新規GTを獲得可能！&f詳しくはこちら→&e https://www.seichi.network/post/10th_anniv'
 TellRawMessages:
 - '{"text":"[Get more info on TellRaws here: minecraft.tools/en/tellraw.php ]","color":"dark_purple"}'
 - '{"text":"[This is a test message!] ","color":"aqua"}'
