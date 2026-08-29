@@ -55,7 +55,7 @@ spec:
 
     - name: check-maintenance-mode
       script:
-        image: alpine/kubectl:1.36.4
+        image: alpine/kubectl:1.37.0
         command: [sh]
         source: |
           set -e
@@ -68,14 +68,14 @@ spec:
 
     - name: get-timestamp
       script:
-        image: alpine/kubectl:1.36.4
+        image: alpine/kubectl:1.37.0
         command: [sh]
         source: |
           date +%Y%m%d-%H%M%S
 
     - name: list-databases
       script:
-        image: alpine/kubectl:1.36.4
+        image: alpine/kubectl:1.37.0
         command: [sh]
         source: |
           kubectl get databases.k8s.mariadb.com -n "$TARGET_NAMESPACE" -o jsonpath='{.items[*].metadata.name}' \
@@ -94,7 +94,7 @@ spec:
           - name: name
           - name: timestamp
       script:
-        image: alpine/kubectl:1.36.4
+        image: alpine/kubectl:1.37.0
         command: [sh]
         source: |
           set -e
@@ -147,7 +147,7 @@ spec:
 
     - name: cleanup-old-backups
       script:
-        image: alpine/kubectl:1.36.4
+        image: alpine/kubectl:1.37.0
         command: [sh]
         source: |
           set -e
