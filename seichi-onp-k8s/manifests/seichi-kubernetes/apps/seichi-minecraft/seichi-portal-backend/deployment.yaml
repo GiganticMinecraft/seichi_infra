@@ -29,13 +29,14 @@ spec:
     spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.6@sha256:b56414440c27d68d5853aa36bee32c169c8b0d9802a2c37d85adf02e936248a8
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.7@sha256:b69c3203efb564580a734217d48018a5bda1071936c0b7de154c9b6898c366f0
           ports:
             - name: http
               containerPort: 9000
               protocol: TCP
-          # /health は MariaDB、Meilisearch、RabbitMQ、DiscordBot まで確認する。
-          # rollout 中は依存先を含めて利用可能になった Pod だけを Service に載せる。
+          # /health は MariaDB と Valkey を必須依存として確認する。
+          # Meilisearch、RabbitMQ、Discord Bot の障害は degraded として報告されるが、
+          # 主要機能を提供できる Pod は Service から外さない。
           readinessProbe:
             httpGet:
               path: /health
