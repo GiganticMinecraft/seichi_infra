@@ -50,24 +50,16 @@ spec:
         parameters:
           - name: server-name
       script:
-        image: debian:13
+        # proxmox-backup-client / AWS CLI / zstd / python3 は pbs-client イメージに
+        # 焼き込まれている。実行時に Proxmox の CDN へ取りに行くと、疎通しない
+        # CDN ノードを掴んだときに落ちるため (詳細は docker-images/pbs-client/Dockerfile)。
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:054a8803d9d9a9ba855ee232128490432d5979c707b28155135de3a9000f1a4f
         command: ["/bin/sh", "-c"]
         source: |
           set -e
 
           rm -rf /work/restore /work/pbs-cache
           mkdir -p /work/restore /work/pbs-cache
-
-          echo "=== Installing proxmox-backup-client ==="
-          apt update
-          apt install -y curl zstd python3
-
-          echo "Adding Proxmox Backup Client repository..."
-          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
-          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
-
-          apt update
-          apt install -y proxmox-backup-client=4.0.14-1
 
           echo "=== Finding latest {{inputs.parameters.server-name}} snapshot ==="
           LATEST_SNAPSHOT=$(proxmox-backup-client snapshot list \
@@ -95,13 +87,6 @@ spec:
 
           echo "=== Restore contents ==="
           ls -la /work/restore/
-
-          echo "=== Installing AWS CLI ==="
-          apt install -y unzip
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
-          unzip -q /tmp/awscliv2.zip -d /tmp
-          /tmp/aws/install
-          rm -rf /tmp/awscliv2.zip /tmp/aws
 
           echo "=== Compressing and uploading each world ==="
           WORLD_NAMES="world_2 world_2_the_end world_SW world_SW_2 world_SW_3 world_SW_4 world_SW_nether world_SW_the_end"

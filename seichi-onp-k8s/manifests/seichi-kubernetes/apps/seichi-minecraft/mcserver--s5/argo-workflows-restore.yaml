@@ -70,26 +70,13 @@ spec:
 
     - name: run-restore
       script:
-        image: debian:13
+        # proxmox-backup-client は pbs-client イメージに焼き込まれている。
+        # 実行時に Proxmox の CDN へ取りに行くと、疎通しない CDN ノードを掴んだ
+        # ときにジョブごと落ちるため (詳細は docker-images/pbs-client/Dockerfile)。
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:054a8803d9d9a9ba855ee232128490432d5979c707b28155135de3a9000f1a4f
         command: ["/bin/sh", "-c"]
         source: |
           set -e
-
-          echo "Updating package lists..."
-          apt update
-
-          echo "Installing packages..."
-          apt install -y curl
-
-          echo "Adding Proxmox restore Client repository..."
-          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
-          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
-
-          echo "Updating package lists..."
-          apt update
-
-          echo "Installing proxmox-backup-client version 4.0.14-1..."
-          apt install -y proxmox-backup-client=4.0.14-1
 
           echo "Deleting RESTORE_TARGET_DIR before restore..."
           rm -vrf ${RESTORE_TARGET_DIR}/*
