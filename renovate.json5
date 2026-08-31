@@ -205,6 +205,35 @@
       depNameTemplate: 'giganticminecraft/SrvStopper',
       versioningTemplate: 'semver',
     },
+    // pbs-client イメージが焼き込む proxmox-backup-client を追従する。
+    // Proxmox の apt リポジトリは公式 datasource が無いため deb datasource で直接読む。
+    // (実行時 apt install をやめた代わりに、バージョン更新はここに集約される)
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^docker-images/pbs-client/Dockerfile$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=deb depName=proxmox-backup-client\\nARG PBS_CLIENT_VERSION=(?<currentValue>[\\d.-]+)',
+      ],
+      datasourceTemplate: 'deb',
+      depNameTemplate: 'proxmox-backup-client',
+      registryUrlTemplate: 'http://download.proxmox.com/debian/pbs-client?suite=trixie&components=main&binaryArch=amd64',
+      versioningTemplate: 'deb',
+    },
+    // pbs-client イメージが焼き込む AWS CLI v2 を追従する
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^docker-images/pbs-client/Dockerfile$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=github-releases depName=aws/aws-cli\\nARG AWSCLI_VERSION=(?<currentValue>[\\d.]+)',
+      ],
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: 'aws/aws-cli',
+      versioningTemplate: 'semver',
+    },
     // ノードの containerd / runc のピン留めバージョンを更新する
     // (node-runtime-updater DaemonSet がノード上のバイナリを追従させ、kured が再起動する)
     {
