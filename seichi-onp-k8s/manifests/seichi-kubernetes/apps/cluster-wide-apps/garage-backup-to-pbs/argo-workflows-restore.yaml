@@ -26,26 +26,13 @@ spec:
 
     - name: run-restore
       script:
-        image: debian:13
+        # proxmox-backup-client と AWS CLI は pbs-client イメージに焼き込まれている。
+        # 実行時に Proxmox の CDN へ取りに行くと、疎通しない CDN ノードを掴んだときに
+        # リストアごと落ちるため (詳細は docker-images/pbs-client/Dockerfile)。
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:0000000000000000000000000000000000000000000000000000000000000000
         command: ["/bin/sh", "-c"]
         source: |
           set -e
-
-          echo "=== Installing dependencies ==="
-          apt-get update
-          apt-get install -y curl unzip
-
-          # AWS CLI のインストール
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
-          unzip -q /tmp/awscliv2.zip -d /tmp
-          /tmp/aws/install
-          rm -rf /tmp/awscliv2.zip /tmp/aws
-
-          # Proxmox Backup Client のインストール
-          echo "deb http://download.proxmox.com/debian/pbs-client trixie main" > /etc/apt/sources.list.d/pbs-client.list
-          curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -o /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
-          apt-get update
-          apt-get install -y proxmox-backup-client
 
           echo "=== Restoring from PBS ==="
           RESTORE_DIR="/data/garage-restore"
