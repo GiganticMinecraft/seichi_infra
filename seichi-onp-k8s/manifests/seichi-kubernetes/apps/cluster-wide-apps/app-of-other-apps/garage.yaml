@@ -56,6 +56,18 @@ spec:
             cpu: 1000m
             memory: 2Gi
 
+        # replica が同一ノードに同居すると、そのノードの障害だけで
+        # replicationFactor=2 のクォーラムが割れる (2026-09-01 に wk-3 の
+        # フェンシングで garage-1/garage-2 が同時喪失し S3 が読み書き不能になった)
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: garage
+                    app.kubernetes.io/instance: garage
+                topologyKey: kubernetes.io/hostname
+
         environment:
           - name: GARAGE_ADMIN_TOKEN
             valueFrom:
