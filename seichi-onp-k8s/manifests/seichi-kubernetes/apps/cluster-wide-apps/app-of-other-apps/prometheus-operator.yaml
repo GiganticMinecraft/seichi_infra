@@ -243,6 +243,14 @@ spec:
                 - 192.168.32.11:2381
                 - 192.168.32.12:2381
                 - 192.168.32.13:2381
+            # CP ノード上の K8s API 用 haproxy (systemd 管理、frontend prometheus :8405)
+            - job_name: 'haproxy'
+              scheme: http
+              static_configs:
+              - targets:
+                - 192.168.32.11:8405
+                - 192.168.32.12:8405
+                - 192.168.32.13:8405
         additionalPrometheusRulesMap:
           thanos:
             groups:
