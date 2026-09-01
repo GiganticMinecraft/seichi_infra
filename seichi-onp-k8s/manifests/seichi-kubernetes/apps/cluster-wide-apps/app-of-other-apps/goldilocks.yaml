@@ -8,7 +8,7 @@ spec:
   source:
     chart: goldilocks
     repoURL: https://charts.fairwinds.com/stable
-    targetRevision: 11.0.0
+    targetRevision: 11.1.0
     helm:
       releaseName: goldilocks
       values: |
