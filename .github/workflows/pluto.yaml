@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Download Pluto
-        uses: FairwindsOps/pluto/github-action@54e8bc77632e0be5d6b3ad6cd3f32c7460eea9c9 # master
+        uses: FairwindsOps/pluto/github-action@64ae01dc9909d680e2c3f809f2b4a81e5ab6b935 # master
 
       - name: Use pluto
         run: |
