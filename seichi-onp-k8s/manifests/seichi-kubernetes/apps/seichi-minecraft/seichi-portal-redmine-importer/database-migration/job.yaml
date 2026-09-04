@@ -44,37 +44,61 @@ spec:
                 --database=${MYSQL_DATABASE}
               "
 
-              schema_is_ready() {
-                schema_table_count="$(
-                  mariadb ${mariadb_args} \
-                    --batch \
-                    --skip-column-names \
-                    -e "
-                      SELECT COUNT(*)
-                      FROM information_schema.tables
-                      WHERE table_schema = DATABASE()
-                        AND table_name IN (
-                          'users',
-                          'form_meta_data',
-                          'form_questions',
-                          'form_choices',
-                          'label_for_form_answers',
-                          'form_discord_webhooks',
-                          'global_discord_webhook_settings'
-                        );
-                    " 2>/dev/null
-                )"
-                [ "${schema_table_count}" = "7" ]
+              schema_table_count() {
+                # mariadb_args is intentionally split into separate client options.
+                # shellcheck disable=SC2086
+                mariadb ${mariadb_args} \
+                  --batch \
+                  --skip-column-names \
+                  -e "
+                    SELECT COUNT(*)
+                    FROM information_schema.tables
+                    WHERE table_schema = DATABASE()
+                      AND table_name IN (
+                        'users',
+                        'form_meta_data',
+                        'form_questions',
+                        'form_choices',
+                        'label_for_form_answers',
+                        'form_discord_webhooks',
+                        'global_discord_webhook_settings'
+                      );
+                  " 2>/dev/null
               }
 
-              until schema_is_ready; do
+              schema_check_attempt=0
+              printf '%s\n' 'migration: waiting for Portal schema (7 tables required)'
+              while :; do
+                schema_check_attempt=$((schema_check_attempt + 1))
+                if table_count="$(schema_table_count)"; then
+                  if [ "${table_count}" = "7" ]; then
+                    printf '%s\n' 'migration: Portal schema is ready (7/7 tables)'
+                    break
+                  fi
+                  if [ $((schema_check_attempt % 6)) -eq 1 ]; then
+                    printf 'migration: Portal schema is not ready (%s/7 tables, check %s); retrying\n' \
+                      "${table_count}" "${schema_check_attempt}"
+                  fi
+                elif [ $((schema_check_attempt % 6)) -eq 1 ]; then
+                  printf 'migration: unable to read Portal schema (check %s); retrying\n' \
+                    "${schema_check_attempt}"
+                fi
                 sleep 5
               done
 
-              mariadb ${mariadb_args} \
+              printf '%s\n' 'migration: applying seed SQL'
+              # mariadb_args is intentionally split into separate client options.
+              # shellcheck disable=SC2086
+              if mariadb ${mariadb_args} \
                 --batch \
                 --skip-column-names \
-                < /migration/001-pre-redmine-seed.sql
+                < /migration/001-pre-redmine-seed.sql; then
+                printf '%s\n' 'migration: seed SQL applied successfully'
+              else
+                mariadb_exit_status=$?
+                printf 'migration: seed SQL failed (exit status %s)\n' "${mariadb_exit_status}" >&2
+                exit "${mariadb_exit_status}"
+              fi
               unset MYSQL_PWD
           env:
             - name: MYSQL_DATABASE
