@@ -3,7 +3,7 @@
 ## 目的と前提
 
 Redmine の issue、journal comment、issue relation を SeichiPortal のフォーム回答へ移行するための、
-一回限りの Kubernetes Job の運用手順。Importer は次の固定 image を使用する。
+一回限りの data migration／import Kubernetes Job の運用手順。Importer は次の固定 image を使用する。
 
 ```text
 ghcr.io/giganticminecraft/seichi-portal-redmine-importer:163de71799135a2445b99707cde02bf5621eea18@sha256:5406a8b58d56020bb6256711a73ca25a5bacb99fe8452ec3b557a50e5dede9cf
@@ -13,8 +13,13 @@ ghcr.io/giganticminecraft/seichi-portal-redmine-importer:163de71799135a2445b9970
 backend の Domain / Usecase / Repository 経由で行い、backend HTTP API、Redis、RabbitMQ、Meilisearch には
 接続しない。
 
-SQL dump は、このリポジトリの Git、ConfigMap、Secret、image のいずれにも保存しない。バックアップと
-復元は、運用者が承認済みの DB 運用経路で行う。
+SQL dump (`seichi-portal-pre-redmine-import-without-debug-users.sql`) 自体は、このリポジトリの Git、
+ConfigMap、Secret、image のいずれにも保存しない。dump に含まれる importer 実行前の Portal 初期データは、
+schema と `_sqlx_migrations` を除いた data-only migration として
+`seichi-portal-redmine-importer/database-migration/001-pre-redmine-seed.sql` に反映している。この migration は
+GitOps で一度だけ適用する ConfigMap と MariaDB client Job から構成し、完了後に directory ごと削除する。
+schema と SQLx migration の管理は backend 側に任せる。バックアップと復元は、運用者が承認済みの DB 運用経路で
+行う。
 
 ## Secret の事前準備
 
@@ -22,14 +27,17 @@ SQL dump は、このリポジトリの Git、ConfigMap、Secret、image のい�
 Terraform の `kubernetes_secret_v1` resource で Kubernetes Secret を作成している。この移行でも同じ方式を
 使う。
 
-1. この PR を merge する前に、GitHub Actions の repository secret として
-   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__API_KEY` を out-of-band で登録する。値は GitHub の Secret
-   設定画面または標準入力を使う CLI から登録し、コマンドライン引数、シェル履歴、ログへ出さない。
-2. この PR の merge 後、既存の Terraform apply workflow が成功することを確認する。workflow は Secret の
-   値を Terraform variable `seichi_portal_redmine_importer__api_key` に渡し、namespace
-   `seichi-minecraft` の `seichi-portal-redmine-importer-credentials` Secret に
+1. この PR の Terraform plan が実行される前に、GitHub Actions の repository secret として
+   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__API_KEY` を out-of-band で登録する。値は GitHub の Secret 設定画面
+   または標準入力を使う CLI から登録し、コマンドライン引数、シェル履歴、ログへ出さない。この Secret がない
+   状態では、必須 Terraform variable に値が入らず plan が失敗する。
+2. Secret 登録後、PR の `tf plan` が成功することを確認する。既存 workflow の
+   `expose-all-tf-vars-to-github-env.sh` が Secret 名の `TF_VAR_` 以降を小文字化し、Terraform variable
+   `seichi_portal_redmine_importer__api_key` へ渡す。
+3. PR merge 後、既存の Terraform apply workflow が成功することを確認する。workflow は Secret の値を
+   namespace `seichi-minecraft` の `seichi-portal-redmine-importer-credentials` Secret に
    `REDMINE_API_KEY` として保存する。
-3. Kubernetes Secret の存在と `REDMINE_API_KEY` key の存在だけを確認する。Secret の値は表示しない。
+4. Kubernetes Secret の存在と `REDMINE_API_KEY` key の存在だけを確認する。Secret の値は表示しない。
 
 API key と DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
 NetworkPolicy を prune したことを確認してから、Terraform の Secret resource／variable を削除する cleanup
@@ -37,13 +45,20 @@ PR を作成し、その merge 後に GitHub Actions の repository secret も�
 
 ## ArgoCD の実行 gate
 
-`seichi-minecraft-seichi-portal-redmine-importer` は ApplicationSet が生成する Application である。base の
-Job と CiliumNetworkPolicy には `argocd.argoproj.io/sync-options: Skip` が付いているため、この PR を merge
-しただけでは live resource は作成されない。
+`seichi-minecraft-seichi-portal-redmine-importer` は ApplicationSet が生成する Application である。importer の
+Job／CiliumNetworkPolicy と、data migration の ConfigMap／Job／CiliumNetworkPolicy には
+`argocd.argoproj.io/sync-options: Skip` が付いているため、この PR を merge しただけでは live resource は
+作成されない。
 
-DB 復元と `plan` の確認後、運用者が Job と NetworkPolicy の `Skip` annotation だけを削除する有効化 PR を
-作成して merge する。base Job の `args` は常に `["import"]` のままにする。ArgoCD が Job を作成した後は、
-desired manifest を変更しない限り、完了した Job が自動的に再実行されることはない。
+DB 復元後、まず data migration だけを有効化する Git change を作成して merge する。具体的には
+`database-migration/kustomization.yaml` の ConfigMap、`database-migration/job.yaml` の Job、
+`database-migration/network-policy.yaml` の CiliumNetworkPolicy から `Skip` annotation を削除し、base の
+importer Job／NetworkPolicy は `Skip` のままにする。ConfigMap／NetworkPolicy は sync wave `-1`、migration Job は
+wave `0`、importer Job は wave `1` なので、同じ Application の sync になっても data migration が先に適用される。
+data migration の resource は直接 `kubectl apply` せず、この Git change の merge と ArgoCD sync だけで作成する。
+最初の migration Job が完了したことを確認してから `plan` を実行し、その後 importer Job／NetworkPolicy の
+`Skip` だけを削除する別の enable change を merge する。base Job の `args` は常に `["import"]` のままにする。
+ArgoCD が Job を作成した後は、desired manifest を変更しない限り、完了した Job が自動的に再実行されることはない。
 
 移行完了後は one-off directory 全体を Git から削除する cleanup change を merge する。ApplicationSet が
 generated Application を削除し、ArgoCD の Application finalizer による prune で live resource も削除される。
@@ -82,11 +97,28 @@ MariaDB の restore resource、restore Job、対象 database の接続状態を�
 前に次の手順へ進まない。Importer が使用する接続先は `mariadb:3306`、database/user は
 `seichi-portal` である。
 
-### 5. 必要なフォーム、質問、ラベルを確認する
+### 5. data migration を適用し、必要なフォーム、質問、ラベルを確認する
 
-Importer image 内の `/etc/seichi-portal/redmine-import.json` と、復元した Portal DB の値が一致することを
-確認する。少なくとも tracker に対応するフォーム、各 form の全 question、choice、label が存在し、必須 question
-に mapping があることを確認する。特に次を確認する。
+まず、schema migration が完了し、`seichi-portal` DB user が対象 database に接続できることを確認する。次に
+data migration だけを有効化する change を作成して merge し、ApplicationSet が生成した Application の sync と
+次の Job の完了を待つ。
+
+```bash
+kubectl -n seichi-minecraft wait \
+  --for=condition=complete \
+  job/seichi-portal-pre-redmine-migration \
+  --timeout=1h
+kubectl -n seichi-minecraft logs job/seichi-portal-pre-redmine-migration
+```
+
+Job のログに SQL 実行エラーがなく、`seichi-portal-pre-redmine-migration` が `Complete` になっていることを
+確認する。この Job は dump 全体を restore するものではなく、Git 管理の data-only migration を既存 schema へ
+適用するものである。今回の migration が投入する行数の確認目安は users 1、forms 18、questions 46、choices 47、
+labels 18、form_discord_webhooks 18、global_discord_webhook_settings 1 である。
+
+data migration 完了後、Importer image 内の `/etc/seichi-portal/redmine-import.json` と Portal DB の値が一致する
+ことを確認する。少なくとも tracker に対応するフォーム、各 form の全 question、choice、label が存在し、必須
+question に mapping があることを確認する。特に次を確認する。
 
 - アイデア投稿フォーム
 - 公共建築フォーム
@@ -102,7 +134,8 @@ Importer image 内の `/etc/seichi-portal/redmine-import.json` と、復元し�
 
 ### 6. 同じ image で plan を実行する
 
-base Job はまだ `Skip` のままにしておき、次の overlay だけを apply する。overlay は base と同じ image、
+data migration Job が成功し、フォーム、question、choice、label の確認が終わるまで base importer Job は
+`Skip` のままにする。その後、次の overlay だけを apply する。overlay は base と同じ image、
 Secret、resources、securityContext、egress policy を使い、Job 名に `-plan` を付けた一時 resource を作る。
 
 ```bash
@@ -125,15 +158,16 @@ plan の出力で、アイデア投稿が専用フォームへ分類されるこ
 と custom field question へ割り当てられることを確認する。Portal 側の公開範囲は、現在の image の設定では
 アイデア投稿だけが `PUBLIC`、それ以外が `PRIVATE` になる。これは後述の import 後の DB 確認でも検証する。
 
-plan が成功し、DB restore とフォーム確認にも問題がなければ、Job と NetworkPolicy の `Skip` annotation を
-削除するだけの有効化 PR を merge する。ArgoCD Application が作成され、live の Job がまだ存在しないことを
-確認してから sync を待つ。
+plan が成功し、DB restore と data migration、フォーム確認にも問題がなければ、base importer Job と importer
+NetworkPolicy の `Skip` annotation だけを削除する有効化 PR を merge する。data migration の resource は既に
+完了済みなので、再度作成・実行しない。ArgoCD Application が importer Job を作成してから sync を待つ。
 
 ### 7. 問題がなければ import Job を実行する
 
 有効化 PR の merge 後、ApplicationSet が生成した
-`seichi-minecraft-seichi-portal-redmine-importer` の sync を待つ。Job を手動で別名作成したり、base Job の
-args を書き換えたりしない。
+`seichi-minecraft-seichi-portal-redmine-importer` の sync を待つ。data migration Job が Complete の状態で
+残っていることと、importer Job が sync wave `1` で作成されたことを確認する。Job を手動で別名作成したり、base
+Job の args を書き換えたりしない。
 
 ### 8. Job のログと完了状態を確認する
 
@@ -242,17 +276,24 @@ kubectl -n argocd get applicationset seichi-minecraft-apps \
 ```
 
 ApplicationSet が `seichi-portal-redmine-importer` Application を削除し、ArgoCD の Application finalizer による
-prune が完了して、次が存在しなくなったことを確認する。
+prune が完了して、次の Job、ConfigMap、CiliumNetworkPolicy がすべて存在しなくなったことを確認する。
 
 - `seichi-portal-redmine-importer` Job
+- `seichi-portal-pre-redmine-migration` Job
+- `seichi-portal-pre-redmine-migration-sql` ConfigMap
 - `allow--from-seichi-portal-redmine-importer--to-import-dependencies` CiliumNetworkPolicy
+- `allow--from-seichi-portal-pre-redmine-migration--to-mariadb` CiliumNetworkPolicy
 
 確認例:
 
 ```bash
 kubectl -n seichi-minecraft get job seichi-portal-redmine-importer
+kubectl -n seichi-minecraft get job seichi-portal-pre-redmine-migration
+kubectl -n seichi-minecraft get configmap seichi-portal-pre-redmine-migration-sql
 kubectl -n seichi-minecraft get ciliumnetworkpolicy \
   allow--from-seichi-portal-redmine-importer--to-import-dependencies
+kubectl -n seichi-minecraft get ciliumnetworkpolicy \
+  allow--from-seichi-portal-pre-redmine-migration--to-mariadb
 ```
 
 `NotFound` になったことを確認してから、Terraform の importer Secret resource と variable、GitHub Actions
