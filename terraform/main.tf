@@ -610,6 +610,16 @@ variable "seichi_portal_backend__discord_bot_token" {
 
 #endregion
 
+#region seichi-portal-redmine-importer secrets
+
+variable "seichi_portal_redmine_importer__api_key" {
+  description = "Redmine API key for the one-off seichi-portal importer"
+  type        = string
+  sensitive   = true
+}
+
+#endregion
+
 #region seichi-portal-frontend secrets
 
 variable "seichi_portal_frontend__ms_app_client_id" {

@@ -1,0 +1,73 @@
+# Redmine の issue を SeichiPortal へ移行する一回限りの Job。
+#
+# 初回 merge では ArgoCD の Skip により作成されない。DB 復元と plan の確認後、
+# この annotation を削除する変更を merge して初めて import Job を作成すること。
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seichi-portal-redmine-importer
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-redmine-importer
+  annotations:
+    argocd.argoproj.io/sync-options: Skip
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 43200
+  template:
+    metadata:
+      labels:
+        app: seichi-portal-redmine-importer
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: redmine-importer
+          image: ghcr.io/giganticminecraft/seichi-portal-redmine-importer:163de71799135a2445b99707cde02bf5621eea18@sha256:5406a8b58d56020bb6256711a73ca25a5bacb99fe8452ec3b557a50e5dede9cf
+          args: ["import"]
+          env:
+            - name: MYSQL_DATABASE
+              value: seichi-portal
+            - name: MYSQL_USER
+              value: seichi-portal
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-db-credentials
+                  key: password
+            - name: MYSQL_HOST
+              value: mariadb
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: REDMINE_BASE_URL
+              value: https://redmine.seichi.click
+            - name: REDMINE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-redmine-importer-credentials
+                  key: REDMINE_API_KEY
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

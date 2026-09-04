@@ -291,6 +291,21 @@ resource "kubernetes_secret_v1" "seichi_portal_backend_secrets" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "seichi_portal_redmine_importer_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
+
+  metadata {
+    name      = "seichi-portal-redmine-importer-credentials"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    REDMINE_API_KEY = var.seichi_portal_redmine_importer__api_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "seichi_portal_frontend_secrets" {
   depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
 

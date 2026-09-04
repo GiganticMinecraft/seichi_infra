@@ -1,0 +1,42 @@
+# Importer が移行中に使う宛先だけを許可する一時 CiliumNetworkPolicy。
+#
+# 初回 merge では ArgoCD の Skip により作成されない。DB 復元後に Job と同時に
+# 有効化し、移行完了後は kustomization から外して ArgoCD に prune させること。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-redmine-importer--to-import-dependencies
+  namespace: seichi-minecraft
+  annotations:
+    argocd.argoproj.io/sync-options: Skip
+spec:
+  endpointSelector:
+    matchLabels:
+      app: seichi-portal-redmine-importer
+  egress:
+    - toServices:
+        - k8sService:
+            serviceName: mariadb
+            namespace: seichi-minecraft
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchName: redmine.seichi.click
+              - matchName: mariadb.seichi-minecraft.svc.cluster.local
+    - toFQDNs:
+        - matchName: redmine.seichi.click
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
