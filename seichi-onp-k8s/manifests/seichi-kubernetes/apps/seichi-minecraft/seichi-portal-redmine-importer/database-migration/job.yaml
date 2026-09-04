@@ -1,0 +1,119 @@
+# Portal DB の schema migration 後に、Redmine importer が参照する初期データを一度だけ投入する Job。
+#
+# 初回 merge では ArgoCD の Skip により実行されない。DB の schema と Secret を確認した後、
+# この Job／NetworkPolicy／ConfigMap の Skip を削除する変更を merge して実行すること。
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seichi-portal-pre-redmine-migration
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-pre-redmine-migration
+  annotations:
+    argocd.argoproj.io/sync-options: Skip
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app: seichi-portal-pre-redmine-migration
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mariadb-client
+          image: docker-registry1.mariadb.com/library/mariadb:11.8@sha256:2439dcd7d14010ecd1ff7a4e1c5abe8e208c34fe35290744deeeaac3569043c3
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+
+              export MYSQL_PWD="${MYSQL_PASSWORD}"
+              mariadb_args="
+                --protocol=TCP
+                --host=${MYSQL_HOST}
+                --port=${MYSQL_PORT}
+                --user=${MYSQL_USER}
+                --database=${MYSQL_DATABASE}
+              "
+
+              schema_is_ready() {
+                schema_table_count="$(
+                  mariadb ${mariadb_args} \
+                    --batch \
+                    --skip-column-names \
+                    -e "
+                      SELECT COUNT(*)
+                      FROM information_schema.tables
+                      WHERE table_schema = DATABASE()
+                        AND table_name IN (
+                          'users',
+                          'form_meta_data',
+                          'form_questions',
+                          'form_choices',
+                          'label_for_form_answers',
+                          'form_discord_webhooks',
+                          'global_discord_webhook_settings'
+                        );
+                    " 2>/dev/null
+                )"
+                [ "${schema_table_count}" = "7" ]
+              }
+
+              until schema_is_ready; do
+                sleep 5
+              done
+
+              mariadb ${mariadb_args} \
+                --batch \
+                --skip-column-names \
+                < /migration/001-pre-redmine-seed.sql
+              unset MYSQL_PWD
+          env:
+            - name: MYSQL_DATABASE
+              value: seichi-portal
+            - name: MYSQL_USER
+              value: seichi-portal
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-db-credentials
+                  key: password
+            - name: MYSQL_HOST
+              value: mariadb
+            - name: MYSQL_PORT
+              value: "3306"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: migration
+              mountPath: /migration
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: migration
+          configMap:
+            name: seichi-portal-pre-redmine-migration-sql
+            defaultMode: 0444
+        - name: tmp
+          emptyDir: {}

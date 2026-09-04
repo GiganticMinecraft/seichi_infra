@@ -1,11 +1,11 @@
-# Importer が移行中に使う宛先だけを許可する一時 CiliumNetworkPolicy。
+# Portal DB の初期データ migration Job が使う宛先だけを許可する一時 CiliumNetworkPolicy。
 #
-# 初回 merge では ArgoCD の Skip により作成されない。DB 復元、事前 data migration、plan の確認後に Job と
-# 同時に有効化し、移行完了後は kustomization から外して ArgoCD に prune させること。
+# 初回 merge では ArgoCD の Skip により作成されない。migration Job と同時に有効化し、
+# 移行完了後は Job／ConfigMap と一緒に prune させること。
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: allow--from-seichi-portal-redmine-importer--to-import-dependencies
+  name: allow--from-seichi-portal-pre-redmine-migration--to-mariadb
   namespace: seichi-minecraft
   annotations:
     argocd.argoproj.io/sync-options: Skip
@@ -13,7 +13,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app: seichi-portal-redmine-importer
+      app: seichi-portal-pre-redmine-migration
   egress:
     - toServices:
         - k8sService:
@@ -33,11 +33,4 @@ spec:
               protocol: ANY
           rules:
             dns:
-              - matchName: redmine.seichi.click
               - matchName: mariadb.seichi-minecraft.svc.cluster.local
-    - toFQDNs:
-        - matchName: redmine.seichi.click
-      toPorts:
-        - ports:
-            - port: "443"
-              protocol: TCP
