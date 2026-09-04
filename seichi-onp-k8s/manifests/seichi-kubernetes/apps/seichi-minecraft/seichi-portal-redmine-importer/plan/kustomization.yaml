@@ -7,6 +7,8 @@ nameSuffix: -plan
 resources:
   - ../base
 
+# 初回 merge では base から Skip を継承する。実行時は、DB 復元と data migration の完了後に、Job と
+# CiliumNetworkPolicy の Skip を削除する Git change をこの overlay に追加して ArgoCD で同期する。
 patches:
   - target:
       group: batch
@@ -14,16 +16,9 @@ patches:
       kind: Job
       name: seichi-portal-redmine-importer
     patch: |-
-      - op: remove
-        path: /metadata/annotations/argocd.argoproj.io~1sync-options
+      - op: replace
+        path: /metadata/annotations/argocd.argoproj.io~1sync-wave
+        value: "1"
       - op: replace
         path: /spec/template/spec/containers/0/args
         value: ["plan"]
-  - target:
-      group: cilium.io
-      version: v2
-      kind: CiliumNetworkPolicy
-      name: allow--from-seichi-portal-redmine-importer--to-import-dependencies
-    patch: |-
-      - op: remove
-        path: /metadata/annotations/argocd.argoproj.io~1sync-options

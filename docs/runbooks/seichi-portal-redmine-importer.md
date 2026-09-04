@@ -45,20 +45,35 @@ PR を作成し、その merge 後に GitHub Actions の repository secret も�
 
 ## ArgoCD の実行 gate
 
-`seichi-minecraft-seichi-portal-redmine-importer` は ApplicationSet が生成する Application である。importer の
-Job／CiliumNetworkPolicy と、data migration の ConfigMap／Job／CiliumNetworkPolicy には
-`argocd.argoproj.io/sync-options: Skip` が付いているため、この PR を merge しただけでは live resource は
-作成されない。
+`seichi-minecraft-seichi-portal-redmine-importer` は ApplicationSet が生成する Application である。root
+kustomization には importer、data migration、plan、verify の全 resource を含めているが、初回 merge では
+一回限りの Job／ConfigMap／CiliumNetworkPolicy のすべてに `argocd.argoproj.io/sync-options: Skip` が付いている
+ため、live resource は作成されない。`plan`／`verify` もこの Application の同期対象であり、直接
+`kubectl apply` して作成するものではない。以下に出てくる `kubectl` は、状態・ログ・削除確認の read-only 操作
+だけに使う。
+
+同期 wave は CiliumNetworkPolicy／ConfigMap が `-1`、data migration Job が `0`、plan Job が `1`、importer
+Job が `2`、verify Job が `3` である。各 Job は Kubernetes API を呼び出さず、`automountServiceAccountToken: false`
+のため、Role／RoleBinding／専用 ServiceAccount は定義しない。DB と Redmine への接続権限は Secret と
+CiliumNetworkPolicy で与える。
 
 DB 復元後、まず data migration だけを有効化する Git change を作成して merge する。具体的には
 `database-migration/kustomization.yaml` の ConfigMap、`database-migration/job.yaml` の Job、
 `database-migration/network-policy.yaml` の CiliumNetworkPolicy から `Skip` annotation を削除し、base の
-importer Job／NetworkPolicy は `Skip` のままにする。ConfigMap／NetworkPolicy は sync wave `-1`、migration Job は
-wave `0`、importer Job は wave `1` なので、同じ Application の sync になっても data migration が先に適用される。
-data migration の resource は直接 `kubectl apply` せず、この Git change の merge と ArgoCD sync だけで作成する。
-最初の migration Job が完了したことを確認してから `plan` を実行し、その後 importer Job／NetworkPolicy の
-`Skip` だけを削除する別の enable change を merge する。base Job の `args` は常に `["import"]` のままにする。
-ArgoCD が Job を作成した後は、desired manifest を変更しない限り、完了した Job が自動的に再実行されることはない。
+importer Job／NetworkPolicy と plan／verify overlay は `Skip` のままにする。この Git change の merge と
+ArgoCD の自動同期だけで resource を作成する。
+
+data migration が完了したら、`plan/kustomization.yaml` の Job patch に Job の `Skip` を削除する JSON patch を
+追加し、同じ overlay に plan 用 CiliumNetworkPolicy の `Skip` を削除する patch を追加する Git change を merge
+する。これにより wave `1` の plan Job と wave `-1` の plan 用 NetworkPolicy が ArgoCD によって作成される。
+plan 完了後は、base の importer Job／NetworkPolicy の `Skip` だけを削除する別の enable change を merge する。
+base Job の `args` は常に `["import"]` のままにする。import 完了後は同じ方法で
+`verify/kustomization.yaml` の Job／NetworkPolicy の `Skip` を削除する Git change を merge する。
+各段階で、後続の Job を有効化する前に直前の Job の Complete とログを確認する。
+
+ArgoCD が Job を作成した後は、desired manifest を変更しない限り、完了した Job が自動的に再実行されることは
+ない。実行済みの Job／NetworkPolicy を途中で直接削除せず、最後に one-off directory を Git から削除して
+ApplicationSet と ArgoCD の prune に任せる。
 
 移行完了後は one-off directory 全体を Git から削除する cleanup change を merge する。ApplicationSet が
 generated Application を削除し、ArgoCD の Application finalizer による prune で live resource も削除される。
@@ -134,20 +149,26 @@ question に mapping があることを確認する。特に次を確認する�
 
 ### 6. 同じ image で plan を実行する
 
-data migration Job が成功し、フォーム、question、choice、label の確認が終わるまで base importer Job は
-`Skip` のままにする。その後、次の overlay だけを apply する。overlay は base と同じ image、
-Secret、resources、securityContext、egress policy を使い、Job 名に `-plan` を付けた一時 resource を作る。
+data migration Job が成功し、フォーム、question、choice、label の確認が終わるまで plan overlay と base
+importer Job は `Skip` のままにする。`plan` overlay は root kustomization から常に render されているため、
+実行時には `plan/kustomization.yaml` の Job patch と CiliumNetworkPolicy patch に、それぞれ次の JSON patch を
+追加する Git change を作成して merge する。
+
+```yaml
+- op: remove
+  path: /metadata/annotations/argocd.argoproj.io~1sync-options
+```
+
+この change の merge と ArgoCD の自動同期によってだけ、同じ image、Secret、resources、securityContext、egress
+policy を使う `seichi-portal-redmine-importer-plan` Job と NetworkPolicy が作成される。
+`kubectl apply -k` は実行しない。作成後の状態とログは次の read-only コマンド、または ArgoCD の画面で確認する。
 
 ```bash
-plan_dir=seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/seichi-portal-redmine-importer/plan
-
-kubectl apply -k "${plan_dir}"
 kubectl -n seichi-minecraft wait \
   --for=condition=complete \
   job/seichi-portal-redmine-importer-plan \
   --timeout=12h
 kubectl -n seichi-minecraft logs job/seichi-portal-redmine-importer-plan
-kubectl delete -k "${plan_dir}" --ignore-not-found
 ```
 
 `plan` は Redmine の対象 issue と詳細、フォーム、question、status、label、既存回答を照合する。ログに
@@ -158,15 +179,16 @@ plan の出力で、アイデア投稿が専用フォームへ分類されるこ
 と custom field question へ割り当てられることを確認する。Portal 側の公開範囲は、現在の image の設定では
 アイデア投稿だけが `PUBLIC`、それ以外が `PRIVATE` になる。これは後述の import 後の DB 確認でも検証する。
 
-plan が成功し、DB restore と data migration、フォーム確認にも問題がなければ、base importer Job と importer
-NetworkPolicy の `Skip` annotation だけを削除する有効化 PR を merge する。data migration の resource は既に
-完了済みなので、再度作成・実行しない。ArgoCD Application が importer Job を作成してから sync を待つ。
+plan が成功し、DB restore と data migration、フォーム確認にも問題がなければ、plan Job と plan NetworkPolicy は
+そのまま残す。base importer Job と importer NetworkPolicy の `Skip` annotation だけを削除する有効化 PR を
+merge し、ArgoCD Application が importer Job を作成するのを待つ。data migration と plan の resource は既に
+完了済みなので、再度作成・実行しない。
 
 ### 7. 問題がなければ import Job を実行する
 
 有効化 PR の merge 後、ApplicationSet が生成した
 `seichi-minecraft-seichi-portal-redmine-importer` の sync を待つ。data migration Job が Complete の状態で
-残っていることと、importer Job が sync wave `1` で作成されたことを確認する。Job を手動で別名作成したり、base
+残っていることと、importer Job が sync wave `2` で作成されたことを確認する。Job を手動で別名作成したり、base
 Job の args を書き換えたりしない。
 
 ### 8. Job のログと完了状態を確認する
@@ -188,19 +210,25 @@ kubectl -n seichi-minecraft logs job/seichi-portal-redmine-importer
 
 ### 9. 同じ image で verify を実行する
 
-import Job が完了し、ログを確認した後、`verify` overlay で一時 Job を作る。verify でも DB への read-only
-照合と Redmine API の GET が行われる。
+import Job が完了し、ログを確認した後、`verify/kustomization.yaml` の Job patch と
+CiliumNetworkPolicy patch に、それぞれ Job／NetworkPolicy の `Skip` を削除する次の JSON patch を追加する Git
+change を作成して merge する。
+
+```yaml
+- op: remove
+  path: /metadata/annotations/argocd.argoproj.io~1sync-options
+```
+
+ArgoCD の自動同期によって `seichi-portal-redmine-importer-verify` Job が作成される。verify でも DB への
+read-only 照合と Redmine API の GET が行われる。`kubectl apply -k` や `kubectl delete -k` は実行せず、作成後の
+状態とログだけを read-only に確認する。
 
 ```bash
-verify_dir=seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/seichi-portal-redmine-importer/verify
-
-kubectl apply -k "${verify_dir}"
 kubectl -n seichi-minecraft wait \
   --for=condition=complete \
   job/seichi-portal-redmine-importer-verify \
   --timeout=12h
 kubectl -n seichi-minecraft logs job/seichi-portal-redmine-importer-verify
-kubectl delete -k "${verify_dir}" --ignore-not-found
 ```
 
 全対象 issue の `VERIFY ... result=AlreadyImported` を確認する。`ImportRequired`、エラー、または件数の
@@ -256,8 +284,8 @@ ORDER BY form.title, answer.publication;
 
 ### 11. Job と一時 NetworkPolicy の manifest を削除する
 
-plan／verify の overlay resource が残っていないことを確認した後、次の one-off directory 全体を Git から
-削除する cleanup change を作成して merge する。
+plan／verify を含むすべての Job のログと DB 確認が終わった後、次の one-off directory 全体を Git から削除する
+cleanup change を作成して merge する。Job や NetworkPolicy を先に `kubectl delete` してはいけない。
 
 ```text
 seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/seichi-portal-redmine-importer/
@@ -279,19 +307,29 @@ ApplicationSet が `seichi-portal-redmine-importer` Application を削除し、A
 prune が完了して、次の Job、ConfigMap、CiliumNetworkPolicy がすべて存在しなくなったことを確認する。
 
 - `seichi-portal-redmine-importer` Job
+- `seichi-portal-redmine-importer-plan` Job
+- `seichi-portal-redmine-importer-verify` Job
 - `seichi-portal-pre-redmine-migration` Job
 - `seichi-portal-pre-redmine-migration-sql` ConfigMap
 - `allow--from-seichi-portal-redmine-importer--to-import-dependencies` CiliumNetworkPolicy
+- `allow--from-seichi-portal-redmine-importer--to-import-dependencies-plan` CiliumNetworkPolicy
+- `allow--from-seichi-portal-redmine-importer--to-import-dependencies-verify` CiliumNetworkPolicy
 - `allow--from-seichi-portal-pre-redmine-migration--to-mariadb` CiliumNetworkPolicy
 
 確認例:
 
 ```bash
 kubectl -n seichi-minecraft get job seichi-portal-redmine-importer
+kubectl -n seichi-minecraft get job seichi-portal-redmine-importer-plan
+kubectl -n seichi-minecraft get job seichi-portal-redmine-importer-verify
 kubectl -n seichi-minecraft get job seichi-portal-pre-redmine-migration
 kubectl -n seichi-minecraft get configmap seichi-portal-pre-redmine-migration-sql
 kubectl -n seichi-minecraft get ciliumnetworkpolicy \
   allow--from-seichi-portal-redmine-importer--to-import-dependencies
+kubectl -n seichi-minecraft get ciliumnetworkpolicy \
+  allow--from-seichi-portal-redmine-importer--to-import-dependencies-plan
+kubectl -n seichi-minecraft get ciliumnetworkpolicy \
+  allow--from-seichi-portal-redmine-importer--to-import-dependencies-verify
 kubectl -n seichi-minecraft get ciliumnetworkpolicy \
   allow--from-seichi-portal-pre-redmine-migration--to-mariadb
 ```

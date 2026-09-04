@@ -1,7 +1,8 @@
 # Redmine の issue を SeichiPortal へ移行する一回限りの Job。
 #
 # 初回 merge では ArgoCD の Skip により作成されない。DB 復元、事前 data migration、plan の確認後、
-# この annotation を削除する変更を merge して初めて import Job を作成すること。
+# この annotation を削除する変更を merge して初めて import Job を作成すること。plan／verify は同じ
+# Application に含まれるが、各 overlay の Skip を Git change で削除するまで作成されない。
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -11,7 +12,7 @@ metadata:
     app: seichi-portal-redmine-importer
   annotations:
     argocd.argoproj.io/sync-options: Skip
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 43200
