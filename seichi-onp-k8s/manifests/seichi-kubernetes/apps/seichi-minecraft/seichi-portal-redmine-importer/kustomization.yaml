@@ -5,3 +5,5 @@ namespace: seichi-minecraft
 resources:
   - base
   - database-migration
+  - plan
+  - verify
