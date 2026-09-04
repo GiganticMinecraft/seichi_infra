@@ -8,7 +8,6 @@ metadata:
   name: allow--from-seichi-portal-pre-redmine-migration--to-mariadb
   namespace: seichi-minecraft
   annotations:
-    argocd.argoproj.io/sync-options: Skip
     argocd.argoproj.io/sync-wave: "-1"
 spec:
   endpointSelector:

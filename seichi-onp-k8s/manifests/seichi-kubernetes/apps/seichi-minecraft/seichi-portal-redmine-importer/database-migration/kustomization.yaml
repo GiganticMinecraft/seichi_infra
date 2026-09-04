@@ -14,5 +14,4 @@ configMapGenerator:
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
-    argocd.argoproj.io/sync-options: Skip
     argocd.argoproj.io/sync-wave: "-1"
