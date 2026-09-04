@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: seichi-minecraft
+
+nameSuffix: -plan
+
+resources:
+  - ../base
+
+patches:
+  - target:
+      group: batch
+      version: v1
+      kind: Job
+      name: seichi-portal-redmine-importer
+    patch: |-
+      - op: remove
+        path: /metadata/annotations/argocd.argoproj.io~1sync-options
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value: ["plan"]
+  - target:
+      group: cilium.io
+      version: v2
+      kind: CiliumNetworkPolicy
+      name: allow--from-seichi-portal-redmine-importer--to-import-dependencies
+    patch: |-
+      - op: remove
+        path: /metadata/annotations/argocd.argoproj.io~1sync-options
