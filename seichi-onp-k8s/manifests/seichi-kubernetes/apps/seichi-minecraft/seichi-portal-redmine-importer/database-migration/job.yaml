@@ -10,7 +10,6 @@ metadata:
   labels:
     app: seichi-portal-pre-redmine-migration
   annotations:
-    argocd.argoproj.io/sync-options: Skip
     argocd.argoproj.io/sync-wave: "0"
 spec:
   backoffLimit: 0
