@@ -53,14 +53,14 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
           resources:
-            # OTel exporter のオーバーヘッド吸収のため limit を 100m から 300m へ増強
-            # (seichi-game-data-publisher が exporter 導入時に 50m→300m へ増強した実績に倣う)
+            # 起動・復旧時のメモリ増加と CPU throttling を吸収する。
+            # 平常時の CPU 使用量は小さいため、CPU request は据え置く。
             requests:
               cpu: 50m
-              memory: 128Mi
-            limits:
-              cpu: 300m
               memory: 256Mi
+            limits:
+              cpu: 600m
+              memory: 512Mi
           env:
             - name: MYSQL_DATABASE
               value: seichi-portal
