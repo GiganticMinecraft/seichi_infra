@@ -23,6 +23,7 @@ spec:
   passwordSecretKeyRef:
     name: seichi-portal-db-credentials
     key: password
+  maxUserConnections: 50
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
