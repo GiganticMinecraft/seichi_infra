@@ -53,14 +53,13 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
           resources:
-            # 起動・復旧時のメモリ増加と CPU throttling を吸収する。
+            # 大量同期時のメモリ増加と CPU throttling を吸収する。
             # 実際に必要なメモリ量を観測できるよう、memory limit は一時的に 3Gi とする。
-            # 平常時の CPU 使用量は小さいため、CPU request は据え置く。
             requests:
-              cpu: 50m
-              memory: 256Mi
+              cpu: 500m
+              memory: 1Gi
             limits:
-              cpu: 600m
+              cpu: "2"
               memory: 3Gi
           env:
             - name: MYSQL_DATABASE

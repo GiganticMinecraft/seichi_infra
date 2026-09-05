@@ -24,12 +24,13 @@ spec:
           enabled: true
           size: 10Gi
         resources:
+          # Redmine 移行後の大量同期を処理できるよう、一時的に余裕を持たせる。
           requests:
-            cpu: "15m"
-            memory: "512Mi"
-          limits:
-            cpu: "50m"
+            cpu: "500m"
             memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
   destination:
     server: https://kubernetes.default.svc
     namespace: seichi-minecraft
