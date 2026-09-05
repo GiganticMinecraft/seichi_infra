@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.12@sha256:ddd84cb7dbb88a0eecbb387fbaa15123b06f34a407eb572bed33fdc94b0be1f3
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.13@sha256:07bf719b833f8b2641294653da3dd9145e02bfc317b7546692d99f99b41d9a92
           ports:
             - name: http
               containerPort: 9000
