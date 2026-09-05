@@ -387,7 +387,7 @@ spec:
         - resources:
             limits:
               memory: 128Mi
-          image: nginx:1.31.4
+          image: nginx:1.31.5
           name: dynmap
           ports:
             - containerPort: 80
