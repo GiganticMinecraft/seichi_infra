@@ -618,12 +618,6 @@ variable "seichi_portal_redmine_importer__api_key" {
   sensitive   = true
 }
 
-variable "seichi_portal_redmine_importer__portal_api_session_id" {
-  description = "Portal API session ID for the one-off seichi-portal importer"
-  type        = string
-  sensitive   = true
-}
-
 #endregion
 
 #region seichi-portal-frontend secrets

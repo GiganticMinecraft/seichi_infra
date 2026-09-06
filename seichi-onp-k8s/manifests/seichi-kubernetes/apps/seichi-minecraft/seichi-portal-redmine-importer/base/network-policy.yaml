@@ -25,11 +25,11 @@ spec:
               protocol: TCP
     - toServices:
         - k8sService:
-            serviceName: seichi-portal-backend
-            namespace: seichi-minecraft
+            serviceName: garage
+            namespace: garage
       toPorts:
         - ports:
-            - port: "80"
+            - port: "3900"
               protocol: TCP
     - toEndpoints:
         - matchLabels:
@@ -43,7 +43,7 @@ spec:
             dns:
               - matchName: redmine.seichi.click
               - matchName: mariadb.seichi-minecraft.svc.cluster.local
-              - matchName: seichi-portal-backend.seichi-minecraft.svc.cluster.local
+              - matchName: garage.garage.svc.cluster.local
     - toFQDNs:
         - matchName: redmine.seichi.click
       toPorts:

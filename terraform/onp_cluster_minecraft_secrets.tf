@@ -300,8 +300,7 @@ resource "kubernetes_secret_v1" "seichi_portal_redmine_importer_credentials" {
   }
 
   data = {
-    REDMINE_API_KEY       = var.seichi_portal_redmine_importer__api_key
-    PORTAL_API_SESSION_ID = var.seichi_portal_redmine_importer__portal_api_session_id
+    REDMINE_API_KEY = var.seichi_portal_redmine_importer__api_key
   }
 
   type = "Opaque"
