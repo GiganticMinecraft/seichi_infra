@@ -11,7 +11,8 @@ ghcr.io/giganticminecraft/seichi-portal-redmine-importer:069a320084287ba21fc3987
 
 この Job は Redmine API から GET するだけで、Redmine へ書き込まない。Portal DB への保存は image 内の
 backend の Domain / Usecase / Repository 経由で行い、添付ファイルは Redmine から取得して Portal の
-オブジェクトストレージと DB へ直接保存する。添付ファイル保存には Garage の S3 API を使用する。移行先
+オブジェクトストレージと DB へ直接保存する。添付ファイル保存には Portal 専用 Garage S3 キーで Garage の
+S3 API を使用する。移行先
 フォームのアーカイブは importer の対象外で、必要に応じて手動で実行する。Redis、RabbitMQ、Meilisearch、
 Portal HTTP API には接続しない。
 
@@ -29,21 +30,33 @@ schema と SQLx migration の管理は backend 側に任せる。バックアッ
 Terraform の `kubernetes_secret_v1` resource で Kubernetes Secret を作成している。この移行でも同じ方式を
 使う。
 
+Garage 側では `seichi-portal` bucket の存在を確認し、Portal 専用の S3 access key を新規作成する。
+既存の `garage-s3-credentials` のキーは流用しない。作成したキーには `seichi-portal` bucket への read/write
+権限だけを付与し、キー ID と secret を安全に保管する。Garage のキー作成は Admin Console または Garage CLI
+から行う。
+
 1. この PR の Terraform plan が実行される前に、GitHub Actions の repository secret として
-   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__API_KEY` を out-of-band で登録する。値は GitHub の Secret 設定画面
+   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__API_KEY`、
+   `TF_VAR_GARAGE_SEICHI_PORTAL_ACCESS_KEY_ID`、
+   `TF_VAR_GARAGE_SEICHI_PORTAL_SECRET_ACCESS_KEY` を out-of-band で登録する。値は GitHub の Secret 設定画面
    または標準入力を使う CLI から登録し、コマンドライン引数、シェル履歴、ログへ出さない。この Secret がない
-   状態では、必須 Terraform variable に値が入らず plan が失敗する。
+   状態では、必須 Terraform variable に値が入らず plan が失敗する。Garage の新しい Portal 専用キーは、
+   `seichi-portal` bucket に read/write 権限だけを付与し、既存の `garage-s3-credentials` とは分ける。
 2. Secret 登録後、PR の `tf plan` が成功することを確認する。既存 workflow の
    `expose-all-tf-vars-to-github-env.sh` が Secret 名の `TF_VAR_` 以降を小文字化し、Terraform variable
-   `seichi_portal_redmine_importer__api_key` へ渡す。
+   `seichi_portal_redmine_importer__api_key`、`garage_seichi_portal_access_key_id`、
+   `garage_seichi_portal_secret_access_key` へ渡す。
 3. PR merge 後、既存の Terraform apply workflow が成功することを確認する。workflow は Secret の値を
    namespace `seichi-minecraft` の `seichi-portal-redmine-importer-credentials` Secret に
-   `REDMINE_API_KEY` として保存する。
-4. Kubernetes Secret の存在と `REDMINE_API_KEY` key の存在だけを確認する。Secret の値は表示しない。
+   `REDMINE_API_KEY` として保存し、Portal 専用の Garage S3 キーを
+   `garage-seichi-portal-credentials` Secret に `AWS_ACCESS_KEY_ID` と
+   `AWS_SECRET_ACCESS_KEY` として保存する。
+4. Kubernetes Secret の存在と、各 Secret の key の存在だけを確認する。Secret の値は表示しない。
 
-API key、DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
-NetworkPolicy を prune したことを確認してから、Terraform の Secret resource／variable を削除する cleanup
-PR を作成し、その merge 後に GitHub Actions の repository secret も削除する。
+API key、Garage access key、Garage secret access key、DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
+NetworkPolicy を prune したことを確認してから、importer 用 Terraform Secret resource／variable と
+Redmine API key の GitHub Actions repository secret を削除する cleanup PR を作成する。Portal backend の通常運用に
+必要な `garage-seichi-portal-credentials` Secret と、その Terraform variable／GitHub Actions Secret は削除しない。
 
 ## ArgoCD の実行 gate
 
@@ -336,9 +349,10 @@ kubectl -n seichi-minecraft get ciliumnetworkpolicy \
   allow--from-seichi-portal-pre-redmine-migration--to-mariadb
 ```
 
-`NotFound` になったことを確認してから、Terraform の importer Secret resource と variable、GitHub Actions
-repository secret の削除も cleanup PR として行う。Job のログと DB 確認が終わるまで、base resource を
-`kubectl delete` してはいけない。
+`NotFound` になったことを確認してから、Terraform の importer Secret resource と variable、Redmine API key の
+GitHub Actions repository secret の削除を cleanup PR として行う。Portal backend の通常運用に必要な
+`garage-seichi-portal-credentials` Secret と関連する Terraform variable／GitHub Actions Secret は残す。Job のログと
+DB 確認が終わるまで、base resource を `kubectl delete` してはいけない。
 
 ### 12. backend の通常運用を再開する
 

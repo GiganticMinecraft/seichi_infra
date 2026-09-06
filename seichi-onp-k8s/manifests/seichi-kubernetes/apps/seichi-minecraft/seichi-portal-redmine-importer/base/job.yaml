@@ -56,12 +56,12 @@ spec:
             - name: S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: garage-s3-credentials
+                  name: garage-seichi-portal-credentials
                   key: AWS_ACCESS_KEY_ID
             - name: S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: garage-s3-credentials
+                  name: garage-seichi-portal-credentials
                   key: AWS_SECRET_ACCESS_KEY
             - name: REDMINE_BASE_URL
               value: https://redmine.seichi.click

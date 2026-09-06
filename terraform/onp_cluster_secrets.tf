@@ -233,6 +233,22 @@ resource "kubernetes_secret_v1" "garage_seichi_minecraft_credentials" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "garage_seichi_portal_credentials" {
+  depends_on = [kubernetes_namespace_v1.onp_seichi_minecraft]
+
+  metadata {
+    name      = "garage-seichi-portal-credentials"
+    namespace = "seichi-minecraft"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_seichi_portal_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_seichi_portal_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "garage_backup_s3_credentials" {
   depends_on = [kubernetes_namespace_v1.garage]
 
@@ -489,4 +505,3 @@ resource "kubernetes_secret_v1" "babyrite_discord_token" {
     BABYRITE_DISCORD_TOKEN = var.discord_bot__babyrite__discord_token
   }
 }
-

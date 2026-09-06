@@ -324,6 +324,18 @@ variable "garage_seichi_minecraft_secret_access_key" {
   sensitive   = true
 }
 
+variable "garage_seichi_portal_access_key_id" {
+  description = "Garage access key ID for seichi-portal object storage"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_seichi_portal_secret_access_key" {
+  description = "Garage secret access key for seichi-portal object storage"
+  type        = string
+  sensitive   = true
+}
+
 variable "garage_backup_access_key_id" {
   description = "Garage access key ID for PBS backup (requires access to all buckets)"
   type        = string
