@@ -6,12 +6,14 @@ Redmine の issue、journal comment、issue relation を SeichiPortal のフォ�
 一回限りの data migration／import Kubernetes Job の運用手順。Importer は次の固定 image を使用する。
 
 ```text
-ghcr.io/giganticminecraft/seichi-portal-redmine-importer:163de71799135a2445b99707cde02bf5621eea18@sha256:5406a8b58d56020bb6256711a73ca25a5bacb99fe8452ec3b557a50e5dede9cf
+ghcr.io/giganticminecraft/seichi-portal-redmine-importer:069a320084287ba21fc39879e831d32784860b72@sha256:04612641fa71d065fb465b2bfa3cf34b25e83cf07327e75e3c8b854c6f783632
 ```
 
 この Job は Redmine API から GET するだけで、Redmine へ書き込まない。Portal DB への保存は image 内の
-backend の Domain / Usecase / Repository 経由で行い、backend HTTP API、Redis、RabbitMQ、Meilisearch には
-接続しない。
+backend の Domain / Usecase / Repository 経由で行い、添付ファイルは Redmine から取得して Portal の
+オブジェクトストレージと DB へ直接保存する。添付ファイル保存には Garage の S3 API を使用する。移行先
+フォームのアーカイブは importer の対象外で、必要に応じて手動で実行する。Redis、RabbitMQ、Meilisearch、
+Portal HTTP API には接続しない。
 
 SQL dump (`seichi-portal-pre-redmine-import-without-debug-users.sql`) 自体は、このリポジトリの Git、
 ConfigMap、Secret、image のいずれにも保存しない。dump に含まれる importer 実行前の Portal 初期データは、
@@ -39,7 +41,7 @@ Terraform の `kubernetes_secret_v1` resource で Kubernetes Secret を作成し
    `REDMINE_API_KEY` として保存する。
 4. Kubernetes Secret の存在と `REDMINE_API_KEY` key の存在だけを確認する。Secret の値は表示しない。
 
-API key と DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
+API key、DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
 NetworkPolicy を prune したことを確認してから、Terraform の Secret resource／variable を削除する cleanup
 PR を作成し、その merge 後に GitHub Actions の repository secret も削除する。
 
@@ -54,7 +56,7 @@ kustomization には importer、data migration、plan、verify の全 resource �
 
 同期 wave は CiliumNetworkPolicy／ConfigMap が `-1`、data migration Job が `0`、plan Job が `1`、importer
 Job が `2`、verify Job が `3` である。各 Job は Kubernetes API を呼び出さず、`automountServiceAccountToken: false`
-のため、Role／RoleBinding／専用 ServiceAccount は定義しない。DB と Redmine への接続権限は Secret と
+のため、Role／RoleBinding／専用 ServiceAccount は定義しない。DB、Redmine、Garage への接続権限は Secret と
 CiliumNetworkPolicy で与える。
 
 DB 復元後、まず data migration だけを有効化する Git change を作成して merge する。具体的には

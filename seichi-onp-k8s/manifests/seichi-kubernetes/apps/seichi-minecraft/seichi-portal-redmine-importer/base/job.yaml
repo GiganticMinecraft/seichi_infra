@@ -31,7 +31,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: redmine-importer
-          image: ghcr.io/giganticminecraft/seichi-portal-redmine-importer:163de71799135a2445b99707cde02bf5621eea18@sha256:5406a8b58d56020bb6256711a73ca25a5bacb99fe8452ec3b557a50e5dede9cf
+          image: ghcr.io/giganticminecraft/seichi-portal-redmine-importer:069a320084287ba21fc39879e831d32784860b72@sha256:04612641fa71d065fb465b2bfa3cf34b25e83cf07327e75e3c8b854c6f783632
           args: ["import"]
           env:
             - name: MYSQL_DATABASE
@@ -47,6 +47,22 @@ spec:
               value: mariadb
             - name: MYSQL_PORT
               value: "3306"
+            - name: S3_ENDPOINT
+              value: http://garage.garage.svc.cluster.local:3900
+            - name: S3_BUCKET
+              value: seichi-portal
+            - name: S3_REGION
+              value: seichi-cloud
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
             - name: REDMINE_BASE_URL
               value: https://redmine.seichi.click
             - name: REDMINE_API_KEY
