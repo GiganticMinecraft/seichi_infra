@@ -23,6 +23,14 @@ spec:
         - ports:
             - port: "3306"
               protocol: TCP
+    - toServices:
+        - k8sService:
+            serviceName: seichi-portal-backend
+            namespace: seichi-minecraft
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system
@@ -35,6 +43,7 @@ spec:
             dns:
               - matchName: redmine.seichi.click
               - matchName: mariadb.seichi-minecraft.svc.cluster.local
+              - matchName: seichi-portal-backend.seichi-minecraft.svc.cluster.local
     - toFQDNs:
         - matchName: redmine.seichi.click
       toPorts:

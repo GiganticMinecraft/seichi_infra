@@ -1,0 +1,30 @@
+# seichi-portal-backend がコメント添付を Garage S3 へ保存するための egress 許可。
+# Garage の S3 API (3900/TCP) と、その名前解決だけを許可する。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-backend--to-garage
+spec:
+  endpointSelector:
+    matchLabels:
+      app: seichi-portal-backend
+  egress:
+    - toServices:
+        - k8sService:
+            serviceName: garage
+            namespace: garage
+      toPorts:
+        - ports:
+            - port: "3900"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchName: garage.garage.svc.cluster.local

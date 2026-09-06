@@ -6,12 +6,12 @@ Redmine の issue、journal comment、issue relation を SeichiPortal のフォ�
 一回限りの data migration／import Kubernetes Job の運用手順。Importer は次の固定 image を使用する。
 
 ```text
-ghcr.io/giganticminecraft/seichi-portal-redmine-importer:163de71799135a2445b99707cde02bf5621eea18@sha256:5406a8b58d56020bb6256711a73ca25a5bacb99fe8452ec3b557a50e5dede9cf
+ghcr.io/giganticminecraft/seichi-portal-redmine-importer:971557d4780a4a826092842cfcb5a37233b1291b@sha256:d769358a1dba7fa66fd7a2b1fff2d41ce70b79c9d2f2b3677064163beb4a4d46
 ```
 
 この Job は Redmine API から GET するだけで、Redmine へ書き込まない。Portal DB への保存は image 内の
-backend の Domain / Usecase / Repository 経由で行い、backend HTTP API、Redis、RabbitMQ、Meilisearch には
-接続しない。
+backend の Domain / Usecase / Repository 経由で行い、添付ファイルの移行と移行先フォームのアーカイブ時だけ
+backend HTTP API に接続する。Redis、RabbitMQ、Meilisearch には接続しない。
 
 SQL dump (`seichi-portal-pre-redmine-import-without-debug-users.sql`) 自体は、このリポジトリの Git、
 ConfigMap、Secret、image のいずれにも保存しない。dump に含まれる importer 実行前の Portal 初期データは、
@@ -28,18 +28,19 @@ Terraform の `kubernetes_secret_v1` resource で Kubernetes Secret を作成し
 使う。
 
 1. この PR の Terraform plan が実行される前に、GitHub Actions の repository secret として
-   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__API_KEY` を out-of-band で登録する。値は GitHub の Secret 設定画面
+   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__API_KEY` と
+   `TF_VAR_SEICHI_PORTAL_REDMINE_IMPORTER__PORTAL_API_SESSION_ID` を out-of-band で登録する。値は GitHub の Secret 設定画面
    または標準入力を使う CLI から登録し、コマンドライン引数、シェル履歴、ログへ出さない。この Secret がない
    状態では、必須 Terraform variable に値が入らず plan が失敗する。
 2. Secret 登録後、PR の `tf plan` が成功することを確認する。既存 workflow の
    `expose-all-tf-vars-to-github-env.sh` が Secret 名の `TF_VAR_` 以降を小文字化し、Terraform variable
-   `seichi_portal_redmine_importer__api_key` へ渡す。
+   `seichi_portal_redmine_importer__api_key` と `seichi_portal_redmine_importer__portal_api_session_id` へ渡す。
 3. PR merge 後、既存の Terraform apply workflow が成功することを確認する。workflow は Secret の値を
    namespace `seichi-minecraft` の `seichi-portal-redmine-importer-credentials` Secret に
-   `REDMINE_API_KEY` として保存する。
-4. Kubernetes Secret の存在と `REDMINE_API_KEY` key の存在だけを確認する。Secret の値は表示しない。
+   `REDMINE_API_KEY` と `PORTAL_API_SESSION_ID` として保存する。
+4. Kubernetes Secret の存在と `REDMINE_API_KEY`、`PORTAL_API_SESSION_ID` key の存在だけを確認する。Secret の値は表示しない。
 
-API key と DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
+API key、Portal API session ID、DB password の値は、Git、YAML、Job の args、ログ、README に書かない。移行完了後、Job と
 NetworkPolicy を prune したことを確認してから、Terraform の Secret resource／variable を削除する cleanup
 PR を作成し、その merge 後に GitHub Actions の repository secret も削除する。
 
@@ -54,7 +55,7 @@ kustomization には importer、data migration、plan、verify の全 resource �
 
 同期 wave は CiliumNetworkPolicy／ConfigMap が `-1`、data migration Job が `0`、plan Job が `1`、importer
 Job が `2`、verify Job が `3` である。各 Job は Kubernetes API を呼び出さず、`automountServiceAccountToken: false`
-のため、Role／RoleBinding／専用 ServiceAccount は定義しない。DB と Redmine への接続権限は Secret と
+のため、Role／RoleBinding／専用 ServiceAccount は定義しない。DB、Portal backend、Redmine への接続権限は Secret と
 CiliumNetworkPolicy で与える。
 
 DB 復元後、まず data migration だけを有効化する Git change を作成して merge する。具体的には

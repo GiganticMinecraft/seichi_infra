@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.13@sha256:07bf719b833f8b2641294653da3dd9145e02bfc317b7546692d99f99b41d9a92
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:0.2.14@sha256:902e1967400483790a7d6ac4c2d1d049798a93ccd64ac7a8e995b9d9da6b8cda
           ports:
             - name: http
               containerPort: 9000
@@ -75,6 +75,22 @@ spec:
               value: mariadb
             - name: MYSQL_PORT
               value: "3306"
+            - name: S3_ENDPOINT
+              value: http://garage.garage.svc.cluster.local:3900
+            - name: S3_BUCKET
+              value: seichi-portal
+            - name: S3_REGION
+              value: seichi-cloud
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
             - name: HTTP_PORT
               value: "9000"
             - name: ENV_NAME
