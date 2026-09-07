@@ -1,0 +1,51 @@
+# Garage の異常を既存の Alertmanager -> Discord 経路へ通知する。
+#
+# 重要: Garage 自身が公開するクラスタ健全性メトリクス
+# (cluster_healthy / cluster_available / cluster_storage_nodes_ok /
+#  cluster_partitions_quorum / cluster_partitions_all_ok) は
+# ノード間のネットワーク疎通ベースで、ストレージ障害には反応しない。
+# 2026-09-06〜09-07 に garage-2 の iSCSI LUN が offline 化して
+# 全 PUT が 503 になった障害でも、これらは最後まで正常値
+# (cluster_healthy=1, storage_nodes_ok=3/3, partitions_quorum=256/256) のままだった。
+# そのため「Garage が健全か」は下記 2 つで判断する。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: garage-alerts
+  namespace: garage
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: garage-alerts
+      rules:
+        - alert: GarageS3ServerErrors
+          # 症状側の一次シグナル。書き込みが quorum 不足で 503 になると
+          # Loki / Thanos / ワールドアップロード / バックアップが軒並み失敗する。
+          # 実測: 2026-08-15〜09-06 の日次 503 増分はほぼ全日 0 で、
+          # 障害中のみ約 8/秒。閾値 0.1/秒 は障害時実測の約 1/80 で十分な余裕がある。
+          expr: sum(rate(api_s3_error_counter{status_code="503"}[5m])) > 0.1
+          for: 10m
+          labels:
+            severity: critical
+            notify: discord
+          annotations:
+            summary: "Garage が S3 リクエストを 503 で拒否しています"
+            description: "Garage の 503 応答が 10 分以上継続しています。いずれかのノードのブロックストアが応答していない可能性が高いです。garage status はネットワーク疎通しか見ないため healthy に見える点に注意してください。各ノードで /sys/block/<dev>/device/state が offline になっていないか確認してください。"
+
+        - alert: GarageBlockResyncErrors
+          # 原因側のシグナル。ディスク I/O エラーなどでブロックの再同期に
+          # 失敗し続けている状態を捉える。
+          # 実測: 平常時は garage-0=20 / garage-1=13 / garage-2=29 前後で
+          # 23 日間ほぼ不動。障害時のみ garage-2 が 2199 まで上昇した。
+          # 閾値 100 は平常最大値の約 3 倍かつ障害時実測の約 1/20。
+          # 障害からの復旧中(resync キュー消化中)も一時的に上がるため、
+          # resync が終わるまで鳴り続けるのは期待どおりの挙動。
+          expr: max by (pod) (block_resync_errored_blocks) > 100
+          for: 30m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Garage {{ $labels.pod }} で再同期に失敗しているブロックが増えています"
+            description: "{{ $labels.pod }} の block_resync_errored_blocks が 30 分以上 100 を超えています。ノードのカーネルログで I/O エラーを、garage block list-errors で参照が残るブロック(RC>0)を確認してください。"
