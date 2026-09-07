@@ -57,6 +57,17 @@ spec:
             # Loki ruler の rule group 上限 (#5603)。ルール肥大とラベル爆発の安全弁
             ruler_max_rules_per_rule_group: 20
             ruler_max_rule_groups_per_tenant: 20
+            # 全ストリーム共通の保持期間。未設定 (Loki のデフォルト) だと
+            # チャンクが永久に残り、garage の loki バケットが際限なく増える
+            # (2026-09-07 時点で 1.1 TB / 126 万オブジェクト)。
+            retention_period: 720h # 30d
+            # hubble-observer のフローログだけは短くする。#6006 で AUDIT のみに
+            # 絞った後も Loki 全体の約半分を占める見込みで、かつ AUDIT は
+            # 「今すぐ許可ルールを書くための TODO」であって長期保存の価値が薄いため。
+            retention_stream:
+              - selector: '{service_name="hubble-observer"}'
+                priority: 1
+                period: 168h # 7d
           # NOTE: chart のテンプレートが読むのは loki.rulerConfig であり、
           # loki.ruler キーはどこからも参照されない (以前の ruler.enable_api は no-op だった)
           rulerConfig:
@@ -87,6 +98,14 @@ spec:
               compactor_ring:
                 kvstore:
                   store: memberlist
+              # retention は compactor が実行する。SingleBinary では compactor は
+              # in-process で動くため追加コンポーネントは不要
+              # (values の compactor.replicas: 0 は microservices 用の Deployment を
+              # 潰しているだけで、in-process の compactor とは別物)。
+              retention_enabled: true
+              # Loki 3.x では retention_enabled: true のとき delete_request_store が
+              # 必須で、未設定だと Loki が起動に失敗する
+              delete_request_store: s3
             common:
               ring:
                 kvstore:
