@@ -287,6 +287,24 @@ spec:
                     annotations:
                       summary: Thanos object storage operation failures
                       description: Thanos object storage operation {{ "{{ $labels.operation }}" }} is failing for {{ "{{ $labels.job }}" }}.
+                  - alert: ThanosCompactHalted
+                    # compactor は critical error を踏むと halt して自動復帰しない。
+                    # halt 後もブロックメタデータの同期だけは回り続けるため Pod は Running/Ready のままで、
+                    # 「動いているように見えて compaction もブロック削除も止まっている」状態になる。
+                    # 実績: 2026-09-01 10:37Z に compact 作業ディレクトリ枯渇 (preallocate: no space left on device)
+                    # で halt し、6 日間気付かれなかった。その間 thanos バケットの増加が
+                    # 2.3 GiB/日 -> 17 GiB/日 に加速し、garage-backup-dump PVC (400Gi) を溢れさせて
+                    # backup--garage-to-pbs を ENOSPC で失敗させた。
+                    # この指標は halt 中ずっと 1 で安定するため == 1 を見るだけでよい
+                    # (for: 15m は Pod 再作成直後の一過性を吸収するため)。
+                    expr: thanos_compact_halted == 1
+                    for: 15m
+                    labels:
+                      severity: error
+                      notify: discord
+                    annotations:
+                      summary: Thanos compactor が halt しています
+                      description: compaction とブロック削除が停止しています。放置するとオブジェクトストレージが増え続けるため、thanos-compact のログから halt 理由を確認し、解消後に Pod を再作成してください。
           resource-usage:
             groups:
               - name: resource-usage
