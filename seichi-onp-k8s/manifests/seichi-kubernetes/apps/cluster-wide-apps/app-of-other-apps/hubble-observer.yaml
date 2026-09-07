@@ -12,7 +12,25 @@ spec:
     helm:
       releaseName: hubble-observer
       values: |
-        verdictFilter: "none"
+        # AUDIT のみを記録する。none (全 verdict) だと FORWARDED が
+        # フロー件数の 94.8% を占め、Loki の取り込み量 約130 GiB/日 の
+        # ほぼ全量がこれになる (2026-09-07 実測: 5分間 234,552 フロー中
+        # FORWARDED 222,305 / AUDIT 12,056 / TRACED 191)。
+        #
+        # policyAuditMode: true (cilium.yaml) の下では、ポリシー上は拒否
+        # されるはずの通信が DROPPED ではなく AUDIT として記録される。
+        # つまり AUDIT が「audit モードを切ったら遮断される通信」＝
+        # まだ書けていない許可ルールの一覧であり、NetworkPolicy 導入
+        # 作業に必要な信号はこれだけで足りる。FORWARDED (許可済みの通信)
+        # は作業上の価値がないため落とす。
+        #
+        # 将来 policyAuditMode を false にすると、遮断された通信は AUDIT
+        # ではなく DROPPED として出るようになる。そのときはこの値を
+        # DROPPED に変更すること (変更しないと何も記録されなくなる)。
+        # なお両方を同時に指定することはできない。チャートは値を
+        # `--verdict <値>` にそのまま埋め込むが、hubble CLI はカンマ区切りを
+        # 受け付けない (実測: invalid argument "DROPPED,AUDIT")。
+        verdictFilter: "AUDIT"
         hubbleRelay:
           serviceName: hubble-relay
           port: "80"
