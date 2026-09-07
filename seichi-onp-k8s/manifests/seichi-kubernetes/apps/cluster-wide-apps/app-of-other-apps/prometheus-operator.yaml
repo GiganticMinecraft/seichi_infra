@@ -407,6 +407,20 @@ spec:
               # 暫定使用)。resolved と noncritical は投稿のみで ping しない。
               # チャンネル専用ロールに変える場合は critical receiver の content と
               # allowed_mentions の両方の ID を差し替える (#5601)。
+              #
+              # 【重要】payload 内の各文字列は、テンプレート描画後の結果が YAML として
+              # 再解釈される。パースに成功して非文字列型になると、その型のまま JSON 化されて
+              # Discord に送られ 400 で拒否される。
+              # 実例: content が "[FIRING:1] Alert (ns)" に描画されると Go の yaml.v3 は
+              # 先頭をフローシーケンスとして解釈し ["FIRING:1"] だけを残す(以降は捨てる)。
+              # Discord は content を文字列として期待するため
+              #   {"content": ["Could not interpret \"['FIRING:1']\" as string."]}
+              # を返し、通知が丸ごと失われる。2026-08-13〜09-07 の約 1 か月間、
+              # webhook 通知 2625 件中 2613 件がこれで失われていた (critical の firing だけは
+              # 先頭が <@&...> のロールメンションだったため偶然成功していた)。
+              # そのため content は必ず絵文字などの安全な文字で始める。
+              # 逆に description が "**Alert**" 始まりなのは問題ない。YAML のエイリアス参照
+              # として解釈に失敗し、生文字列にフォールバックするため。
               - name: "discord-portal-critical"
                 webhook_configs:
                   - url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
@@ -418,7 +432,7 @@ spec:
                       # デフォルトの __subject は末尾に CommonLabels - GroupLabels を
                       # 括弧で列挙する (condition/container/endpoint/... のダンプに
                       # なって読めない) ため、alertname と namespace だけの自作にする
-                      content: '{{ if eq .Status "firing" }}<@&532704116799963168> {{ end }}{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      content: '{{ if eq .Status "firing" }}<@&532704116799963168> 🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         roles: ["532704116799963168"]
                       embeds:
@@ -432,7 +446,7 @@ spec:
                   - url_file: /etc/alertmanager/secrets/portal-alert-discord/webhook-url
                     max_alerts: 5
                     payload:
-                      content: '{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      content: '{{ if eq .Status "firing" }}⚠️ [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         parse: []
                       embeds:
@@ -449,7 +463,7 @@ spec:
                       # デフォルトの __subject は末尾に CommonLabels - GroupLabels を
                       # 括弧で列挙する (condition/container/endpoint/... のダンプに
                       # なって読めない) ため、alertname と namespace だけの自作にする
-                      content: '{{ if eq .Status "firing" }}<@&532704116799963168> {{ end }}{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      content: '{{ if eq .Status "firing" }}<@&532704116799963168> 🔥 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         roles: ["532704116799963168"]
                       embeds:
@@ -463,7 +477,7 @@ spec:
                   - url_file: /etc/alertmanager/secrets/infra-alert-discord/webhook-url
                     max_alerts: 5
                     payload:
-                      content: '{{ if eq .Status "firing" }}[FIRING:{{ .Alerts.Firing | len }}]{{ else }}[RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
+                      content: '{{ if eq .Status "firing" }}⚠️ [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .GroupLabels.alertname }}{{ with .GroupLabels.namespace }} ({{ . }}){{ end }}'
                       allowed_mentions:
                         parse: []
                       embeds:
