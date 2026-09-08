@@ -209,7 +209,7 @@ spec:
         # proxmox-backup-client は pbs-client イメージに焼き込まれている。
         # 実行時に Proxmox の CDN へ取りに行くと、疎通しない CDN ノードを掴んだ
         # ときにジョブごと落ちるため (詳細は docker-images/pbs-client/Dockerfile)。
-        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:054a8803d9d9a9ba855ee232128490432d5979c707b28155135de3a9000f1a4f
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:98a68cb2e6780e05344603a2cf719e0d673ef7e8f59049a95d295dd733e17228
         command: ["/bin/sh", "-c"]
         source: |
           set -e
