@@ -50,7 +50,7 @@ spec:
               mountPath: /downloaded-plugins
 
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa:1.0.0@sha256:6b0a32282220c5780462ea8886f1f97c71122ad6cfabab356bf5157138f8f14b
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_kagawa:1.0.0@sha256:83a063326e019f0bf413452d30c6f1746018a70d10c0a694d858bc12ba47503b
           name: minecraft
           resources:
             requests:
