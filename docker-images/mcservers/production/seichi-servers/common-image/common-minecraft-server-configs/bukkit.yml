@@ -27,7 +27,7 @@ spawn-limits:
   axolotls: 5
   water-ambient: 20
   water-underground-creature: 5
-  monsters: 50 # default: 70
+  monsters: 30 # default: 70
   animals: 10
   water-animals: 3 # default: 15
   ambient: 4 # default: 15
@@ -38,7 +38,7 @@ ticks-per:
   water-ambient-spawns: 1
   water-underground-creature-spawns: 1
   animal-spawns: 400
-  monster-spawns: 5 # default: 1
+  monster-spawns: 20 # default: 1
   water-spawns: 1
   ambient-spawns: 1
   autosave: 6000
