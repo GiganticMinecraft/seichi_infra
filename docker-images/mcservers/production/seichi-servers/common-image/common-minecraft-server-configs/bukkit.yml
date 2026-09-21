@@ -38,7 +38,7 @@ ticks-per:
   water-ambient-spawns: 1
   water-underground-creature-spawns: 1
   animal-spawns: 400
-  monster-spawns: 5 # default: 1
+  monster-spawns: 20 # default: 1
   water-spawns: 1
   ambient-spawns: 1
   autosave: 6000
