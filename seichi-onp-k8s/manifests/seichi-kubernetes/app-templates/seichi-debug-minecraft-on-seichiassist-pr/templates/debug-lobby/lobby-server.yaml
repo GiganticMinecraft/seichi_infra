@@ -192,7 +192,7 @@ spec:
                 lp group default permission set worldguard.region.flag.regions.own.* true
                 lp group default permission set joinleave.silentleave true
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:1.0.0@sha256:aa462e6dc9282169c3b0916a8b80e03f3158f67f99c0ac4363e286e6076b151a
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:1.0.0@sha256:fc7475fb48d2a36a2f6b10434e594570bb1b405a1f8a7cfa7c72811801c91d45
           name: minecraft
           ports:
             - containerPort: 25565
