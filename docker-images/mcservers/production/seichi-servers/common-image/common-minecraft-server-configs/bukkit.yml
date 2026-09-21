@@ -27,7 +27,7 @@ spawn-limits:
   axolotls: 5
   water-ambient: 20
   water-underground-creature: 5
-  monsters: 50 # default: 70
+  monsters: 30 # default: 70
   animals: 10
   water-animals: 3 # default: 15
   ambient: 4 # default: 15
