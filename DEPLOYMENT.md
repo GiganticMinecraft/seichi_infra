@@ -86,30 +86,39 @@ spec:
 
 ### 概要
 
-メンテナンスモードを有効化すると、全Minecraftサーバーが自動的にKubernetesのServiceエンドポイントから除外され、新規接続を受け付けなくなります。Pod自体は起動したままのため、管理者はサーバーにアクセスしてメンテナンス作業を継続できます。
+メンテナンスモードを有効化すると、対象のMinecraftサーバーが自動的にKubernetesのServiceエンドポイントから除外され、新規接続を受け付けなくなります。Pod自体は起動したままのため、管理者はサーバーにアクセスしてメンテナンス作業を継続できます。
 
 ### 仕組み
 
-- 各MinecraftサーバーのreadinessProbeが、5秒ごとに `maintenance-mode` ConfigMapの `enabled` フィールドを確認
-- `enabled: "true"` の場合、readinessProbeが失敗し続ける
+- 各MinecraftサーバーのreadinessProbeが、5秒ごとに `maintenance-mode` ConfigMapを確認
+- `enabled: "true"`（全サーバー共通）または `enabled--{suffix}: "true"`（サーバー個別）の場合、readinessProbeが失敗し続ける
 - `failureThreshold: 18` × `periodSeconds: 5` = 90秒後にServiceエンドポイントから除外され、トラフィックが遮断される
 - Pod再起動は不要で、ConfigMap変更後5秒以内に反映開始
 - GitOpsによる管理のため、変更履歴が全てGitに記録される
 
 ### メンテナンスモードの有効化
 
-[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集し、`enabled` を `"true"` に変更してコミット＆プッシュします。
+[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集してコミット＆プッシュします。ArgoCDが自動的に変更を検知し、数分以内に反映されます。
+
+**全サーバーを対象にする場合:**
 
 ```yaml
 data:
-  enabled: "true"  # falseをtrueに変更
+  enabled: "true"
 ```
 
-ArgoCDが自動的に変更を検知し、数分以内に反映されます。反映後、5秒以内に全サーバーのreadinessProbeが失敗し始め、90秒後に全トラフィックが遮断されます。
+**特定サーバーのみを対象にする場合（例: s1のみ）:**
+
+```yaml
+data:
+  enabled--s1: "true"
+```
+
+対応するsuffix: `s1` / `s2` / `s3` / `s5` / `s7` / `lobby` / `votelistener` / `kagawa` / `one-day-to-reset`
 
 ### メンテナンスモードの無効化
 
-同じファイルで `enabled: "false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映後、5秒以内にreadinessProbeが成功し始め、即座にServiceエンドポイントに復帰します。
+同じファイルで変更したキーを `"false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映後、5秒以内にreadinessProbeが成功し始め、即座にServiceエンドポイントに復帰します。
 
 ### 注意事項
 
