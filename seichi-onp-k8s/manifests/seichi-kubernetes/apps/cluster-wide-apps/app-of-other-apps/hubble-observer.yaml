@@ -8,7 +8,7 @@ spec:
   source:
     chart: hubble-observer
     repoURL: ghcr.io/onzack/helm-charts
-    targetRevision: 2.5.0
+    targetRevision: 2.7.0
     helm:
       releaseName: hubble-observer
       values: |
