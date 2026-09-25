@@ -46,7 +46,7 @@ LABEL org.opencontainers.image.source="https://github.com/GiganticMinecraft/seic
 LABEL org.opencontainers.image.description="proxmox-backup-client, AWS CLI v2, zstd, python3 を同梱した Argo Workflows のバックアップ/リストア用イメージ"
 
 # renovate: datasource=deb depName=proxmox-backup-client
-ARG PBS_CLIENT_VERSION=4.2.5-1
+ARG PBS_CLIENT_VERSION=4.2.6-1
 
 # ビルド時は Proxmox の CDN に触れざるを得ないため、リトライを厚くしておく。
 # ここでコケても CI を再実行すれば済み、バックアップ本番には影響しない。
