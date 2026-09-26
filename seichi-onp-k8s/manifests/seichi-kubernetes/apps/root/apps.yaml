@@ -249,7 +249,7 @@ spec:
   source:
     repoURL: https://zapier.github.io/kubechecks/
     chart: kubechecks
-    targetRevision: 3.0.0
+    targetRevision: 3.0.1
     helm:
       releaseName: kubechecks
       values: |
