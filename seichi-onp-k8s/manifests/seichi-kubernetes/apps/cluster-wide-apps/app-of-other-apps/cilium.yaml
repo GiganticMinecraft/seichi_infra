@@ -23,6 +23,13 @@ spec:
           enabled: true
         loadBalancer:
           algorithm: maglev
+        # Pod netns では socket LB を使わず tc の per-packet LB にする。
+        # reverse_sk マップ枯渇で socket termination が漏れ、長寿命の connected UDP
+        # ソケット (nginx resolver 等) が消えたバックエンドに張り付くのを避けるため。
+        # upstream の修正 (cilium/cilium#44767) が入ったら外すか再検討する。
+        # ref. #6144
+        socketLB:
+          hostNamespaceOnly: true
         routingMode: native
         autoDirectNodeRoutes: true
         directRoutingSkipUnreachable: true
