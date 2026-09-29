@@ -66,7 +66,7 @@ event-handling:
   interaction-whitelist: []
   emit-block-use-at-feet: []
   ignore-hopper-item-move-events: false
-  break-hoppers-on-denied-move: true
+  break-hoppers-on-denied-move: false
 protection:
   item-durability: true
   remove-infinite-stacks: false
