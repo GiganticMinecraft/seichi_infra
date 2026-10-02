@@ -35,9 +35,11 @@ spec:
               interval: 30s
               scrapeTimeout: 30s
               relabelings:
-                - targetLabel: instance
+                - action: replace
+                  targetLabel: instance
                   replacement: 192.168.19.253
-                - targetLabel: target
+                - action: replace
+                  targetLabel: target
                   replacement: prd-x510
                 - action: labeldrop
                   regex: pod|container|endpoint
@@ -53,9 +55,11 @@ spec:
               interval: 30s
               scrapeTimeout: 30s
               relabelings:
-                - targetLabel: instance
+                - action: replace
+                  targetLabel: instance
                   replacement: 192.168.1.1
-                - targetLabel: target
+                - action: replace
+                  targetLabel: target
                   replacement: prd-rtx830
                 - action: labeldrop
                   regex: pod|container|endpoint
@@ -71,9 +75,11 @@ spec:
               interval: 30s
               scrapeTimeout: 30s
               relabelings:
-                - targetLabel: instance
+                - action: replace
+                  targetLabel: instance
                   replacement: 192.168.16.240
-                - targetLabel: target
+                - action: replace
+                  targetLabel: target
                   replacement: seichi-cloud
                 - action: labeldrop
                   regex: pod|container|endpoint
@@ -89,9 +95,11 @@ spec:
               interval: 30s
               scrapeTimeout: 30s
               relabelings:
-                - targetLabel: instance
+                - action: replace
+                  targetLabel: instance
                   replacement: 192.168.16.230
-                - targetLabel: target
+                - action: replace
+                  targetLabel: target
                   replacement: unchama-sv-nas3
                 - action: labeldrop
                   regex: pod|container|endpoint
