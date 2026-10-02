@@ -48,6 +48,9 @@ spec:
               labelValue: "1"
               folderAnnotation: grafana_folder
               searchNamespace: ALL
+              # enforce_domain により localhost 宛ての reload API は 301 で外部ドメインへ飛ばされ認証が外れる。
+              # provider の定期スキャン (updateIntervalSeconds) で反映されるので reload は使わない
+              skipReload: true
               provider:
                 foldersFromFilesStructure: true
           defaultDashboardsTimezone: Asia/Tokyo
