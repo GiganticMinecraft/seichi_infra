@@ -9,12 +9,18 @@ jobs:
   tf_plan:
     name: tf plan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # plan の結果を PR にコメントするため
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
         with:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
           terraform_version: v1.16.4
+          # wrapper は stdout に "[command]..." 行を混ぜるうえ、その step output も使わないので無効にする
+          terraform_wrapper: false
 
       - name: Terraform fmt
         run: terraform fmt -check
@@ -36,16 +42,16 @@ jobs:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
 
       - name: Plan Terraform infrastructure changes
-        run: terraform plan -input=false -no-color -lock-timeout=10m
-        id: tfplan
+        # plan の出力は大きくなりうるので、step output や環境変数ではなくファイルで次の step に渡す。
+        # shell: bash を明示すると pipefail が有効になり、plan の失敗が tee に隠れない
+        shell: bash
+        run: terraform plan -input=false -no-color -lock-timeout=10m | tee "${RUNNER_TEMP}/tfplan.txt"
         working-directory: "./terraform"
 
       - name: Comment result to Pull Request
-        uses: robburger/terraform-pr-commenter@72c6e45eced6641488a6cf3ff104b7b9bda9c66c # v1
+        run: bash "./.github/workflows/scripts/comment-tf-plan-to-pr.sh"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          commenter_type: plan
-          # Terraform rarely writes to stdout and stderr in the same action, so we concatenate
-          commenter_input: ${{ format('{0}{1}', steps.tfplan.outputs.stdout, steps.tfplan.outputs.stderr) }}
-          commenter_exitcode: ${{ steps.tfplan.outputs.exitcode }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PLAN_FILE: ${{ runner.temp }}/tfplan.txt
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
