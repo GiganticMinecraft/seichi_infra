@@ -102,6 +102,28 @@ resource "kubernetes_secret_v1" "onp_grafana_github_oauth_app_secret" {
   type = "Opaque"
 }
 
+# Grafana chart に admin パスワードを生成させると、ArgoCD のマニフェスト再生成ごとに値が変わって Pod が作り直されるため、ここで固定する
+resource "random_password" "onp_grafana_admin_password" {
+  length  = 32
+  special = false
+}
+
+resource "kubernetes_secret_v1" "onp_grafana_admin" {
+  depends_on = [kubernetes_namespace_v1.onp_monitoring]
+
+  metadata {
+    name      = "grafana-admin"
+    namespace = "monitoring"
+  }
+
+  data = {
+    "admin-user"     = "admin"
+    "admin-password" = random_password.onp_grafana_admin_password.result
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "onp_synology_csi" {
   depends_on = [kubernetes_namespace_v1.onp_synology_csi]
 
