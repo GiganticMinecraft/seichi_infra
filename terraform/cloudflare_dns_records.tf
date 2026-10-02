@@ -18,7 +18,8 @@ resource "cloudflare_dns_record" "play_debug" {
 
 resource "cloudflare_dns_record" "github_pages" {
   zone_id = local.cloudflare_zone_id
-  name    = "_github-pages-challenge-GiganticMinecraft.seichi.click"
+  # Cloudflare はレコード名を小文字で保存するので、大文字を含めると plan に毎回差分が出る
+  name    = "_github-pages-challenge-giganticminecraft.seichi.click"
   content = "e6145d3fd4824da7133309fa2dd2c6"
   type    = "TXT"
   ttl     = 1 # automatic
