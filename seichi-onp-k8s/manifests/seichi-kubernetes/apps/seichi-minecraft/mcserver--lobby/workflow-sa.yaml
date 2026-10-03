@@ -19,6 +19,11 @@ rules:
   - apiGroups: ["argoproj.io"]
     resources: ["workflowtaskresults"]
     verbs: ["create", "patch"]
+  # check-maintenance-mode がメンテナンスモードの状態を読むため
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["maintenance-mode"]
+    verbs: ["get"]
   - apiGroups: ["k8s.mariadb.com"]
     resources: ["backups"]
     verbs: ["create", "get", "list", "watch"]

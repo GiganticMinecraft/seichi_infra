@@ -25,6 +25,11 @@ rules:
   - apiGroups: ["argoproj.io"]
     resources: ["workflowtaskresults"]
     verbs: ["create", "patch"]
+  # check-maintenance-mode がメンテナンスモードの状態を読むため
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["maintenance-mode"]
+    verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
