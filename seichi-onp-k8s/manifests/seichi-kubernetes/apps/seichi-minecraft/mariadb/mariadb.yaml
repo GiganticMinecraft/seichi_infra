@@ -11,7 +11,7 @@ spec:
     generate: false
     key: root-password
 
-  image: docker-registry1.mariadb.com/library/mariadb:11.8
+  image: public.ecr.aws/docker/library/mariadb:11.8.8
   imagePullPolicy: IfNotPresent
 
   port: 3306
@@ -119,10 +119,14 @@ spec:
         - name: LD_PRELOAD
           value: ""
       command: ["/bin/sh", "-c"]
+      # PID 1 の sh / tail は SIGTERM のハンドラを持たず無視するため、明示的に trap しないと
+      # terminationGracePeriodSeconds を使い切るまで Pod の停止がブロックされる
       args:
         - |
-          until [ -f /var/log/mysql/mysql-slow.log ]; do sleep 1; done
-          exec tail -F /var/log/mysql/mysql-slow.log
+          trap 'exit 0' TERM
+          until [ -f /var/log/mysql/mysql-slow.log ]; do sleep 1 & wait $!; done
+          tail -F /var/log/mysql/mysql-slow.log &
+          wait $!
       resources:
         requests:
           cpu: 10m
@@ -149,7 +153,7 @@ spec:
     # .1 が未解決の間は次の rotate を行わない (mv で .1 を上書きすると
     # 旧 inode がリークするため)。その間の増加は sizeLimit (4Gi) が抑える。
     - name: slow-log-rotator
-      image: docker-registry1.mariadb.com/library/mariadb:11.8
+      image: public.ecr.aws/docker/library/mariadb:11.8.8
       env:
         - name: MARIADB_ROOT_PASSWORD
           valueFrom:
@@ -159,6 +163,7 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
+          trap 'exit 0' TERM
           LOG=/var/log/mysql/mysql-slow.log
           LIMIT=$((1024 * 1024 * 1024))
           flush_slow_logs() {
@@ -180,7 +185,8 @@ spec:
                 echo "slow-log-rotator: FLUSH SLOW LOGS failed after rename; will recover on next cycle" >&2
               fi
             fi
-            sleep 300
+            sleep 300 &
+            wait $!
           done
       resources:
         requests:
@@ -197,6 +203,10 @@ spec:
     allowPrivilegeEscalation: false
 
   serviceAccountName: mariadb
+
+  # Pod デフォルトの 30s では dirty page の flush が終わる前に SIGKILL され、
+  # 次回起動時に InnoDB の crash recovery が走りうるため延長する
+  terminationGracePeriodSeconds: 300
 
   livenessProbe:
     exec:

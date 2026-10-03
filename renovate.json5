@@ -7,10 +7,23 @@
   reviewers: [
     'outductor',
   ],
-  ignoreDeps: [
-    'docker-registry1.mariadb.com/library/mariadb',
-  ],
   packageRules: [
+    {
+      // MariaDB サーバのシリーズ (11.8 → 12.3 等) をまたぐ更新は mariadb-upgrade による
+      // system table 移行 (updateStrategy.mariadbAutoUpgradeEnabled) とクライアント互換の確認が
+      // 必要で、データディレクトリも戻せないため Renovate には同一シリーズ内の patch 更新のみ出させる
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'public.ecr.aws/docker/library/mariadb',
+      ],
+      matchUpdateTypes: [
+        'major',
+        'minor',
+      ],
+      enabled: false,
+    },
     {
       matchManagers: [
         'gomod',
@@ -85,8 +98,8 @@
     },
     {
       matchPackageNames: [
-        'mariadb-operator',
-        'mariadb-operator-crds',
+        'ghcr.io/mariadb-operator/charts/mariadb-operator',
+        'ghcr.io/mariadb-operator/charts/mariadb-operator-crds',
       ],
       groupName: 'mariadb-operator',
     },

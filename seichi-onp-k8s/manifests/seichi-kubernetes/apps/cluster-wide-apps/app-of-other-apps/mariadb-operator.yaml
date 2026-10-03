@@ -7,7 +7,7 @@ spec:
   project: cluster-wide-apps
   source:
     chart: mariadb-operator-crds
-    repoURL: https://mariadb-operator.github.io/mariadb-operator
+    repoURL: ghcr.io/mariadb-operator/charts
     targetRevision: 26.10.1
     helm:
       releaseName: mariadb-operator-crds
@@ -31,7 +31,7 @@ spec:
   project: cluster-wide-apps
   source:
     chart: mariadb-operator
-    repoURL: https://mariadb-operator.github.io/mariadb-operator
+    repoURL: ghcr.io/mariadb-operator/charts
     targetRevision: 26.10.1
     helm:
       releaseName: mariadb-operator

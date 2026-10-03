@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: mariadb
-          image: docker-registry1.mariadb.com/library/mariadb:11.8
+          image: public.ecr.aws/docker/library/mariadb:11.8.8
           imagePullPolicy: IfNotPresent
           resources:
             requests:
