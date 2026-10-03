@@ -25,7 +25,9 @@ data:
     debezium.source.database.port=3306
     debezium.source.database.user=debezium
     debezium.source.database.server.id=1001
-    debezium.source.database.include.list=seichi_portal
+    # 本番のスキーマ名はハイフン区切り (mariadb/seichi-portal-db.yaml)。
+    # ローカル開発環境の seichi_portal とは異なる
+    debezium.source.database.include.list=seichi-portal
     debezium.source.topic.prefix=seichi_portal
     debezium.source.snapshot.mode=initial
 
