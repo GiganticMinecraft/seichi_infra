@@ -3,7 +3,7 @@
 ## 概要
 
 整地鯖の主要 Minecraft サーバー（s1, s2, s3, s5, s7）の world データと、
-MariaDB の業務 database（flyway, seichi-portal, seichi-timed-stats-conifers, seichiassist）を
+MariaDB の業務 database（flyway, seichi-timed-stats-conifers, seichiassist）を
 バックアップ時点までロールバックする手順。
 
 トラフィック遮断（メンテナンスモード）→ Argo Workflows でリストアジョブ実行 → 解除 → 動作確認、の流れ。
@@ -27,9 +27,9 @@ MariaDB の業務 database（flyway, seichi-portal, seichi-timed-stats-conifers,
 | 種別 | 対象 | 備考 |
 |------|------|------|
 | Minecraft world | `mcserver--s1`, `mcserver--s2`, `mcserver--s3`, `mcserver--s5`, `mcserver--s7` | |
-| MariaDB database | `flyway`, `seichi-portal`, `seichi-timed-stats-conifers`, `seichiassist` | Database CRD 名（namespace: `seichi-minecraft`） |
+| MariaDB database | `flyway`, `seichi-timed-stats-conifers`, `seichiassist` | Database CRD 名（namespace: `seichi-minecraft`） |
 
-`mcserver--lobby`, `mcserver--votelistener`, `mcserver--kagawa`, `mcserver--one-day-to-reset` および coreprotect 系 database は本手順の対象外。
+`mcserver--lobby`, `mcserver--votelistener`, `mcserver--kagawa`, `mcserver--one-day-to-reset` および coreprotect 系と `seichi-portal` の database は本手順の対象外。
 
 ## バックアップ仕様
 
@@ -127,14 +127,13 @@ ssh seichi-onp-k8s-cp-1.seichi.internal -l cloudinit \
 #### 4b. ロールバック実行
 
 Argo Workflows UI から `restore--mariadb--with-prefix`（namespace: `seichi-minecraft`）を、
-対象 database ごとに 4 回 Submit する。
+対象 database ごとに Submit する。
 
 **パラメータ:**
 
 | Database | `RESTORE_PREFIX` | `RESTORE_TARGET_DATE_DB` |
 |----------|------------------|--------------------------|
 | flyway | `database--flyway` | 復旧したい時刻（RFC3339, 例: `2026-04-28T19:00:00Z`） |
-| seichi-portal | `database--seichi-portal` | 同上 |
 | seichi-timed-stats-conifers | `database--seichi-timed-stats-conifers` | 同上 |
 | seichiassist | `database--seichiassist` | 同上 |
 
@@ -266,6 +265,8 @@ ERROR や Exception が出ていたらそのサーバーは別途調査が必要
   workflow が Succeeded でも Restore CR の `STATUS` が `Failed` でないかを必ず手動確認する。
   恒久対策候補: workflow 側で `conditions[?(@.type=='Complete')].message` も `Success` か
   チェックするように修正。
+- `seichi-portal` の DB も、`restore--mariadb--with-prefix` の workflow でロールバックを行えるが、ゲームサーバのデータとは直接関係ないので、本手順では対象外としている。
+
 
 ## 関連リンク
 
