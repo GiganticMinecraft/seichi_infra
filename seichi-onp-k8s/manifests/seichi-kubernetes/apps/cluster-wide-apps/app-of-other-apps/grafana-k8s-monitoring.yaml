@@ -73,7 +73,9 @@ spec:
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, ".* /loki.*")'
 
         autoInstrumentation:
-          enabled: true
+          # 2026-10-03: Ubuntu 26 (kernel 7.0.0-38) 移行後、Beyla の eBPF プログラム
+          # (obi_protocol_tcp) 内でカーネルパニックが発生しノードが再起動を繰り返したため一時無効化
+          enabled: false
           collector: alloy-singleton
           beyla:
             config:
