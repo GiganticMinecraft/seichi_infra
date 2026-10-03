@@ -138,6 +138,26 @@ spec:
                   key: AWS_SECRET_ACCESS_KEY
           MANIFEST
 
+          # Backup CR を作っただけで成功扱いにすると、Job が失敗してもワークフローは Succeeded になり
+          # 失敗に気づけない (2026-09-30〜10-02 に Garage の 503 で全 DB の Job が失敗していたが通知されなかった)。
+          # 成功・失敗ともに type=Complete,status=True になり reason で区別されるので、それを待って判定する。
+          # 全体のタイムアウトはワークフローの activeDeadlineSeconds に任せる
+          while :; do
+            STATUS=$(kubectl get backups.k8s.mariadb.com "$BACKUP_NAME" -n "$NAMESPACE" \
+              -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')
+            if [ "$STATUS" = "True" ]; then
+              break
+            fi
+            sleep 10
+          done
+
+          REASON=$(kubectl get backups.k8s.mariadb.com "$BACKUP_NAME" -n "$NAMESPACE" \
+            -o jsonpath='{.status.conditions[?(@.type=="Complete")].reason}')
+          if [ "$REASON" != "JobComplete" ]; then
+            echo "失敗: ${BACKUP_NAME} (reason: ${REASON})"
+            exit 1
+          fi
+
           echo "成功: ${BACKUP_NAME}"
         env:
           - name: TARGET_NAMESPACE
@@ -186,23 +206,31 @@ spec:
         command: [sh]
         source: |
           set -e
-          RETENTION_DAYS=3
-          CUTOFF=$(date -u -d "@$(($(date +%s) - RETENTION_DAYS * 86400))" +%Y-%m-%dT%H:%M:%SZ)
+          # 日数で消すと、バックアップの失敗が続いた時に最後の成功分まで消えてしまう
+          # (2026-10-03 に flyway 等のバックアップが S3 から全て消えていた)。
+          # prefix (= DB) ごとに新しい順で KEEP 件を残し、それより古いものだけを消す
+          KEEP=3
 
-          echo "=== ${RETENTION_DAYS}日より古いS3バックアップオブジェクトを削除します (cutoff: ${CUTOFF}) ==="
+          echo "=== DB ごとに最新${KEEP}件を残して古いS3バックアップオブジェクトを削除します ==="
 
           S3_ENDPOINT="http://garage.garage.svc.cluster.local:3900"
           S3_REGION="seichi-cloud"
           BUCKET="mariadb-backups"
 
-          OBJECTS_TO_DELETE=$(aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
-            s3api list-objects-v2 --bucket "$BUCKET" \
-            --query "Contents[?starts_with(Key, 'database--') && LastModified<'${CUTOFF}'].{Key: Key}" \
+          ALL_OBJECTS=$(aws --endpoint-url "$S3_ENDPOINT" --region "$S3_REGION" \
+            s3api list-objects-v2 --bucket "$BUCKET" --prefix "database--" \
+            --query "Contents[].{Key: Key, LastModified: LastModified}" \
             --output json)
 
-          if [ "$OBJECTS_TO_DELETE" = "null" ]; then
-            OBJECTS_TO_DELETE="[]"
+          if [ "$ALL_OBJECTS" = "null" ]; then
+            ALL_OBJECTS="[]"
           fi
+
+          OBJECTS_TO_DELETE=$(echo "$ALL_OBJECTS" | jq --argjson keep "$KEEP" '
+            group_by(.Key | split("/")[0])
+            | map(sort_by(.LastModified) | reverse | .[$keep:])
+            | add // []
+            | map({Key: .Key})')
 
           COUNT=$(echo "$OBJECTS_TO_DELETE" | jq 'length')
           if [ "$COUNT" -gt 0 ]; then
