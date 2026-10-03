@@ -80,6 +80,12 @@ configs:
       name: deliveryhero
       type: helm
       enableOCI: "true"
+    # mariadb-operator / mariadb-operator-crds の Helm チャート取得先 (26.6 以降は OCI が推奨)
+    mariadb-operator-helm-oci:
+      url: ghcr.io/mariadb-operator/charts
+      name: mariadb-operator
+      type: helm
+      enableOCI: "true"
   rbac:
     create: true
     # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
