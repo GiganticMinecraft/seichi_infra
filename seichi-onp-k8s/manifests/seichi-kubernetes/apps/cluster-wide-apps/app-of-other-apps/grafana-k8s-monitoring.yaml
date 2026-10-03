@@ -73,8 +73,11 @@ spec:
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, ".* /loki.*")'
 
         autoInstrumentation:
-          # 2026-10-03: Ubuntu 26 (kernel 7.0.0-38) 移行後、Beyla の eBPF プログラム
-          # (obi_protocol_tcp) 内でカーネルパニックが発生しノードが再起動を繰り返したため一時無効化
+          # 2026-10-03: kernel 6.13+ の BPF private stack のバグで、プリエンプション可能な uprobe 経路では
+          # 同じ CPU 上で同じ prog が重なるとスタックが壊れる。wk-2 の mariadbd (libssl uprobe →
+          # obi_protocol_tcp) で NULL 参照パニックが繰り返し起きたため無効化している。
+          # upstream の修正 "bpf: guard uprobes against..." が Ubuntu カーネルに入るまで有効化しないこと。
+          # 経緯: https://github.com/GiganticMinecraft/seichi_infra/pull/6220
           enabled: false
           collector: alloy-singleton
           beyla:
