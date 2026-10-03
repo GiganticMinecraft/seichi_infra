@@ -308,7 +308,7 @@ spec:
               realtime: true
               value: "{{duration}}"
       script:
-        image: mirror.gcr.io/mariadb:12.1
+        image: mirror.gcr.io/mariadb:12.3
         env:
           - name: COREPROTECT_DB_USER_PASSWORD
             valueFrom:
