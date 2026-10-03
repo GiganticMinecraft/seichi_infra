@@ -57,6 +57,10 @@ func main() {
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
 		o.BaseEndpoint = aws.String("http://" + endpoint)
 		o.UsePathStyle = true
+		// Garage はレスポンスに x-amz-checksum-* を付けないため、transfermanager の
+		// 分割 GET ごとに「検証をスキップした」という DEBUG ログが出て数 GB で数百行になる。
+		// 検証自体はチェックサムが返ってきた場合に効くよう残し、ログだけを止める
+		o.DisableLogOutputChecksumValidationSkipped = true
 	})
 
 	bucketName := os.Getenv("BUCKET_NAME")
@@ -76,7 +80,7 @@ func main() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
 			slog.Error("Error listing objects:", "error", err)
-			return
+			os.Exit(1)
 		}
 
 		for _, object := range page.Contents {
@@ -90,14 +94,14 @@ func main() {
 			if dir := filePathToSave[:strings.LastIndex(filePathToSave, "/")]; dir != "" {
 				if err := os.MkdirAll(dir, 0755); err != nil {
 					slog.Error("Error creating directory:", "dir", dir, "error", err)
-					return
+					os.Exit(1)
 				}
 			}
 
 			f, err := os.Create(filePathToSave)
 			if err != nil {
 				slog.Error("Error creating file:", "filePath", filePathToSave, "error", err)
-				return
+				os.Exit(1)
 			}
 
 			_, err = tm.DownloadObject(ctx, &transfermanager.DownloadObjectInput{
@@ -107,10 +111,14 @@ func main() {
 			})
 			if closeErr := f.Close(); closeErr != nil {
 				slog.Error("Error closing file:", "filePath", filePathToSave, "error", closeErr)
+				os.Exit(1)
 			}
+			// 失敗時に exit 0 で終わると、途中までのファイルが emptyDir に残ったまま
+			// 後続の init コンテナ (world-extractor 等) に進み、Pod を作り直すまで直らない。
+			// 非 0 で終わらせて、init コンテナごとダウンロードからやり直させる
 			if err != nil {
 				slog.Error("Error downloading object:", "objectKey", key, "error", err)
-				return
+				os.Exit(1)
 			}
 
 			// 保存したファイルの所有権をitzg/minecraftに渡す ref. https://github.com/itzg/docker-minecraft-server/issues/1583
