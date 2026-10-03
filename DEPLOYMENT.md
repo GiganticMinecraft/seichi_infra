@@ -93,7 +93,7 @@ spec:
 - 各MinecraftサーバーのreadinessProbeが、5秒ごとに `maintenance-mode` ConfigMapを確認
 - `enabled: "true"`（全サーバー共通）または `enabled--{suffix}: "true"`（サーバー個別）の場合、readinessProbeが失敗し続ける
 - `failureThreshold: 18` × `periodSeconds: 5` = 90秒後にServiceエンドポイントから除外され、トラフィックが遮断される
-- Pod再起動は不要で、ConfigMap変更後5秒以内に反映開始
+- Pod再起動は不要。ただしConfigMapの変更がPod内のファイルに届くまでkubeletの同期待ちがあり、通常は数十秒〜1分強かかる（5秒はreadinessProbeの実行間隔であって、反映までの時間ではない）
 - GitOpsによる管理のため、変更履歴が全てGitに記録される
 
 ### メンテナンスモードの有効化
@@ -118,9 +118,11 @@ data:
 
 ### メンテナンスモードの無効化
 
-同じファイルで変更したキーを `"false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映後、5秒以内にreadinessProbeが成功し始め、即座にServiceエンドポイントに復帰します。
+同じファイルで変更したキーを `"false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映し、ConfigMapの変更がPodに届くと（通常1分強以内）、readinessProbeが成功してServiceエンドポイントに復帰します。
 
 ### 注意事項
 
 - Pod自体は起動し続けるため、リソース（CPU/メモリ）は解放されません
+- メンテナンスモード中のサーバーは、夜間のmcserverバックアップ（サーバーを0台にしてから取得する処理）がスキップされます。スキップは失敗扱いにならないので、失敗通知も出ません
+- 全サーバー共通の `enabled` が `"true"` の間は、MariaDBのバックアップも止まります。こちらは従来どおり失敗として通知されます
 - 完全にサーバーを停止したい場合は、既存のArgo Workflows（`argo-workflows-stop-server.yaml`）を使用してください

@@ -10,7 +10,7 @@
 - 各MinecraftサーバーのreadinessProbeが、5秒ごとに`maintenance-mode` ConfigMapを確認
 - `enabled: "true"`（全サーバー共通）または`enabled--{suffix}: "true"`（サーバー個別）の場合、readinessProbeが失敗し続ける
 - `failureThreshold: 18` × `periodSeconds: 5` = 90秒後にServiceエンドポイントから除外され、トラフィックが遮断される
-- Pod再起動不要、ConfigMap変更後5秒以内に反映開始
+- Pod再起動は不要。ただしConfigMapの変更がPod内のファイルに届くまでkubeletの同期待ちがあり、通常は数十秒〜1分強かかる（5秒はreadinessProbeの実行間隔であって、反映までの時間ではない）
 - GitOpsによる管理のため、変更履歴が全てGitに記録される
 
 ## 手順
@@ -23,7 +23,7 @@
      enabled: "true"
    ```
 2. コミット＆プッシュ
-3. ArgoCDが自動反映（数分以内）。反映後、5秒以内に全サーバーのreadinessProbeが失敗し始め、90秒後に全トラフィックが遮断される
+3. ArgoCDが自動反映（数分以内）。ConfigMapの変更がPodに届くと（通常1分強以内）全サーバーのreadinessProbeが失敗し始め、その90秒後に全トラフィックが遮断される
 
 ### 特定サーバーのみメンテナンスモードを有効化
 
@@ -34,18 +34,20 @@
    ```
    対応するsuffix: `s1` / `s2` / `s3` / `s5` / `s7` / `lobby` / `votelistener` / `kagawa` / `one-day-to-reset`
 2. コミット＆プッシュ
-3. ArgoCDが自動反映（数分以内）。反映後、対象サーバーのみreadinessProbeが失敗し始め、90秒後にトラフィックが遮断される
+3. ArgoCDが自動反映（数分以内）。ConfigMapの変更がPodに届くと（通常1分強以内）対象サーバーだけreadinessProbeが失敗し始め、その90秒後にトラフィックが遮断される
 
 ### メンテナンスモードの無効化
 
 1. 同ファイルで変更したキーを`"false"`に戻す
 2. コミット＆プッシュ
-3. ArgoCDが反映後、5秒以内にreadinessProbeが成功し始め、即座にServiceエンドポイントに復帰する
+3. ArgoCDが反映し、ConfigMapの変更がPodに届くと（通常1分強以内）、readinessProbeが成功してServiceエンドポイントに復帰する
 
 ## 注意事項
 
 - Pod自体は起動し続けるため、リソースは解放されない
 - 完全停止が必要な場合はArgo Workflowsを使用
+- メンテナンスモード中のサーバーは、夜間のmcserverバックアップ（サーバーを0台にしてから取得する処理）がスキップされる。スキップは失敗扱いにならないので、失敗通知も出ない
+- 全サーバー共通の `enabled` が `"true"` の間は、MariaDBのバックアップも止まる。こちらは従来どおり失敗として通知される
 
 ## 関連リンク
 
