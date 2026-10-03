@@ -28,15 +28,38 @@ spec:
           - name: statefulset-name
           - name: coreprotect-db-name
           - name: persistent-volume-claim-name
+      # メンテナンス中のサーバーはスケール操作ごとスキップする（失敗扱いにはしない）。
+      # DAG の各タスクに when を付けると、スキップされたタスクに依存する後続がそのまま走るため、
+      # バックアップ本体を別テンプレートに切り出して丸ごと when で制御する
+      steps:
+        - - name: check-maintenance-mode
+            template: check-maintenance-mode
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{inputs.parameters.statefulset-name}}"
+        - - name: backup
+            template: mcserver-backup-dag
+            when: "{{steps.check-maintenance-mode.outputs.result}} == false"
+            arguments:
+              parameters:
+                - name: statefulset-name
+                  value: "{{inputs.parameters.statefulset-name}}"
+                - name: coreprotect-db-name
+                  value: "{{inputs.parameters.coreprotect-db-name}}"
+                - name: persistent-volume-claim-name
+                  value: "{{inputs.parameters.persistent-volume-claim-name}}"
+
+    - name: mcserver-backup-dag
+      inputs:
+        parameters:
+          - name: statefulset-name
+          - name: coreprotect-db-name
+          - name: persistent-volume-claim-name
       dag:
         tasks:
-          - name: check-maintenance-mode
-            template: check-maintenance-mode
-
           - name: get-timestamp
             template: get-timestamp
-            dependencies:
-              - check-maintenance-mode
 
           - name: patch-statefulset-to-0
             template: patch-statefulset-to-0
@@ -44,8 +67,6 @@ spec:
               parameters:
                 - name: statefulset-name
                   value: "{{inputs.parameters.statefulset-name}}"
-            dependencies:
-              - check-maintenance-mode
 
           - name: wait-for-scale-to-0
             template: wait-for-scale-to-0
@@ -105,17 +126,28 @@ spec:
               - wait-for-scale-to-1
 
     - name: check-maintenance-mode
+      inputs:
+        parameters:
+          - name: statefulset-name
       script:
         image: alpine/kubectl:1.37.1
         command: ["/bin/sh", "-c"]
+        # 標準出力の "true" / "false" を outputs.result として後続の when で使うため、メッセージは標準エラーに出す
         source: |
-          set -e
-          MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
-          if [ "$MAINTENANCE_ENABLED" = "true" ]; then
-            echo "メンテナンスモードが有効です。バックアップワークフローをスキップします。"
-            exit 1
+          set -eu
+          STATEFULSET_NAME="{{inputs.parameters.statefulset-name}}"
+          SUFFIX="${STATEFULSET_NAME#mcserver--}"
+          # ConfigMap を読めない時はメンテ状態が分からないので、「無効」とみなさずに失敗させる
+          # （メンテ中のサーバーをスケール操作で起こしてしまうのを防ぐ）
+          ALL_SERVERS_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}')
+          PER_SERVER_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath="{.data['enabled--${SUFFIX}']}")
+          if [ "$ALL_SERVERS_MAINTENANCE_ENABLED" = "true" ] || [ "$PER_SERVER_MAINTENANCE_ENABLED" = "true" ]; then
+            echo "メンテナンスモードが有効です。${STATEFULSET_NAME} のバックアップをスキップします。" >&2
+            echo true
+          else
+            echo "メンテナンスモードは無効です。${STATEFULSET_NAME} のバックアップを続行します。" >&2
+            echo false
           fi
-          echo "メンテナンスモードは無効です。バックアップを続行します。"
 
     - name: get-timestamp
       script:

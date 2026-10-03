@@ -86,32 +86,43 @@ spec:
 
 ### 概要
 
-メンテナンスモードを有効化すると、全Minecraftサーバーが自動的にKubernetesのServiceエンドポイントから除外され、新規接続を受け付けなくなります。Pod自体は起動したままのため、管理者はサーバーにアクセスしてメンテナンス作業を継続できます。
+メンテナンスモードを有効化すると、対象のMinecraftサーバーが自動的にKubernetesのServiceエンドポイントから除外され、新規接続を受け付けなくなります。Pod自体は起動したままのため、管理者はサーバーにアクセスしてメンテナンス作業を継続できます。
 
 ### 仕組み
 
-- 各MinecraftサーバーのreadinessProbeが、5秒ごとに `maintenance-mode` ConfigMapの `enabled` フィールドを確認
-- `enabled: "true"` の場合、readinessProbeが失敗し続ける
+- 各MinecraftサーバーのreadinessProbeが、5秒ごとに `maintenance-mode` ConfigMapを確認
+- `enabled: "true"`（全サーバー共通）または `enabled--{suffix}: "true"`（サーバー個別）の場合、readinessProbeが失敗し続ける
 - `failureThreshold: 18` × `periodSeconds: 5` = 90秒後にServiceエンドポイントから除外され、トラフィックが遮断される
-- Pod再起動は不要で、ConfigMap変更後5秒以内に反映開始
+- Pod再起動は不要。ただしConfigMapの変更がPod内のファイルに届くまでkubeletの同期待ちがあり、通常は数十秒〜1分強かかる（5秒はreadinessProbeの実行間隔であって、反映までの時間ではない）
 - GitOpsによる管理のため、変更履歴が全てGitに記録される
 
 ### メンテナンスモードの有効化
 
-[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集し、`enabled` を `"true"` に変更してコミット＆プッシュします。
+[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集してコミット＆プッシュします。ArgoCDが自動的に変更を検知し、数分以内に反映されます。
+
+**全サーバーを対象にする場合:**
 
 ```yaml
 data:
-  enabled: "true"  # falseをtrueに変更
+  enabled: "true"
 ```
 
-ArgoCDが自動的に変更を検知し、数分以内に反映されます。反映後、5秒以内に全サーバーのreadinessProbeが失敗し始め、90秒後に全トラフィックが遮断されます。
+**特定サーバーのみを対象にする場合（例: s1のみ）:**
+
+```yaml
+data:
+  enabled--s1: "true"
+```
+
+対応するsuffix: `s1` / `s2` / `s3` / `s5` / `s7` / `lobby` / `votelistener` / `kagawa` / `one-day-to-reset`
 
 ### メンテナンスモードの無効化
 
-同じファイルで `enabled: "false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映後、5秒以内にreadinessProbeが成功し始め、即座にServiceエンドポイントに復帰します。
+同じファイルで変更したキーを `"false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映し、ConfigMapの変更がPodに届くと（通常1分強以内）、readinessProbeが成功してServiceエンドポイントに復帰します。
 
 ### 注意事項
 
 - Pod自体は起動し続けるため、リソース（CPU/メモリ）は解放されません
+- メンテナンスモード中のサーバーは、夜間のmcserverバックアップ（サーバーを0台にしてから取得する処理）がスキップされます。スキップは失敗扱いにならないので、失敗通知も出ません
+- 全サーバー共通の `enabled` が `"true"` の間は、MariaDBのバックアップも止まります。こちらは従来どおり失敗として通知されます
 - 完全にサーバーを停止したい場合は、既存のArgo Workflows（`argo-workflows-stop-server.yaml`）を使用してください

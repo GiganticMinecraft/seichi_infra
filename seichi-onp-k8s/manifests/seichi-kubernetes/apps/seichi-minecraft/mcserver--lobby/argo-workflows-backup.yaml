@@ -32,9 +32,16 @@ spec:
   entrypoint: default
   templates:
     - name: default
+      # メンテナンス中はスケール操作ごとスキップする（失敗扱いにはしない）
       steps:
         - - name: check-maintenance-mode
             template: check-maintenance-mode
+        - - name: backup
+            template: backup
+            when: "{{steps.check-maintenance-mode.outputs.result}} == false"
+
+    - name: backup
+      steps:
         - - name: generate-timestamp
             template: get-timestamp
         - - name: patch-statefulset-to-0
@@ -52,14 +59,19 @@ spec:
       script:
         image: alpine/kubectl:1.37.1
         command: ["/bin/sh", "-c"]
+        # 標準出力の "true" / "false" を outputs.result として後続の when で使うため、メッセージは標準エラーに出す
         source: |
-          set -e
-          MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}' 2>/dev/null || echo "false")
-          if [ "$MAINTENANCE_ENABLED" = "true" ]; then
-            echo "メンテナンスモードが有効です。バックアップワークフローをスキップします。"
-            exit 1
+          set -eu
+          # ConfigMap を読めない時はメンテ状態が分からないので、「無効」とみなさずに失敗させる
+          ALL_SERVERS_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath='{.data.enabled}')
+          PER_SERVER_MAINTENANCE_ENABLED=$(kubectl get configmap maintenance-mode -n seichi-minecraft -o jsonpath="{.data['enabled--lobby']}")
+          if [ "$ALL_SERVERS_MAINTENANCE_ENABLED" = "true" ] || [ "$PER_SERVER_MAINTENANCE_ENABLED" = "true" ]; then
+            echo "メンテナンスモードが有効です。バックアップをスキップします。" >&2
+            echo true
+          else
+            echo "メンテナンスモードは無効です。バックアップを続行します。" >&2
+            echo false
           fi
-          echo "メンテナンスモードは無効です。バックアップを続行します。"
 
     - name: get-timestamp
       script:
