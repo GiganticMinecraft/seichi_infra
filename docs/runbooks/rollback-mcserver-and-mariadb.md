@@ -54,7 +54,8 @@ MariaDB の業務 database（flyway, seichi-portal, seichi-timed-stats-conifers,
 ### 1. メンテナンスモード有効化
 
 [maintenance-mode.md](./maintenance-mode.md) の手順に従い、`maintenance-mode` ConfigMap の
-`enabled` を `"true"` に変更して PR をマージ → ArgoCD で同期。
+`enabled` を `"true"` に変更して PR をマージ、Argo CD の
+`seichi-minecraft-maintenance-mode` Application を手動Sync。
 
 全 mcserver Pod が NotReady になり、Service エンドポイントから除外されたことを確認する：
 
@@ -207,7 +208,8 @@ ERROR や Exception が出ていたらそのサーバーは別途調査が必要
 ### 6. メンテナンスモード解除
 
 [maintenance-mode.md](./maintenance-mode.md#メンテナンスモードの無効化) の手順に従い、
-`enabled` を `"false"` に戻す PR をマージ → ArgoCD で同期。
+`enabled` を `"false"` に戻す PR をマージ、Argo CD の
+`seichi-minecraft-maintenance-mode` Application を手動Sync。
 
 ### 7. 動作確認
 

@@ -95,10 +95,11 @@ spec:
 - `failureThreshold: 18` × `periodSeconds: 5` = 90秒後にServiceエンドポイントから除外され、トラフィックが遮断される
 - Pod再起動は不要。ただしConfigMapの変更がPod内のファイルに届くまでkubeletの同期待ちがあり、通常は数十秒〜1分強かかる（5秒はreadinessProbeの実行間隔であって、反映までの時間ではない）
 - GitOpsによる管理のため、変更履歴が全てGitに記録される
+- AppProjectのSync Windowにより自動Syncが走るのは毎日7:00〜8:00（JST）だけなので、それ以外の時間はArgo CDで手動Syncしないと反映されない
 
 ### メンテナンスモードの有効化
 
-[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集してコミット＆プッシュします。ArgoCDが自動的に変更を検知し、数分以内に反映されます。
+[maintenance-mode/configmap.yaml](./seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/maintenance-mode/configmap.yaml) を編集してコミット＆プッシュし、Argo CDのApplication `seichi-minecraft-maintenance-mode` を開いて手動Syncします。
 
 **全サーバーを対象にする場合:**
 
@@ -118,7 +119,7 @@ data:
 
 ### メンテナンスモードの無効化
 
-同じファイルで変更したキーを `"false"` に戻してコミット＆プッシュするだけです。ArgoCDが反映し、ConfigMapの変更がPodに届くと（通常1分強以内）、readinessProbeが成功してServiceエンドポイントに復帰します。
+同じファイルで変更したキーを `"false"` に戻してコミット＆プッシュし、Argo CDのApplication `seichi-minecraft-maintenance-mode` を手動Syncします。Sync後、ConfigMapの変更がPodに届くと（通常1分強以内）、readinessProbeが成功してServiceエンドポイントに復帰します。
 
 ### 注意事項
 
