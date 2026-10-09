@@ -39,13 +39,47 @@ spec:
                 secretKeyRef:
                   name: debezium-db-credentials
                   key: password
+            # イメージ同梱の OpenTelemetry Java Agent (lib_metrics/enable_otel_agent.sh) を有効化する。
+            # - metrics: config/debezium-jmx-config.yaml の JMX Metric Insight で Debezium の
+            #   connector-metrics (binlog からの遅延、イベント数、内部キュー残量) と JVM を OTLP で送る
+            # - traces: amqp-client 計装が RabbitMQ への publish を PRODUCER span にし、AMQP ヘッダへ
+            #   traceparent を載せる。seichi-portal-backend の CDC consumer がこれを親にして trace がつながる
+            - name: OTEL_ENABLED
+              value: "true"
+            - name: OTEL_SDK_DISABLED
+              value: "false"
+            - name: OTEL_SERVICE_NAME
+              value: "seichi-portal-debezium"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "http/protobuf"
+            - name: OTEL_TRACES_SAMPLER
+              value: "parentbased_always_on"
+            # ログは Pod ログ経由で Loki に入っているので二重送信しない
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: "30000"
+            # CDC の観測に必要なのは amqp-client (publish span + traceparent 注入) と JMX のみ。
+            # vertx / netty は probe (/q/health/*) の SERVER span、jdbc は Debezium が数秒おきに
+            # 発行する内部クエリの root span になりノイズなので切る
+            - name: OTEL_INSTRUMENTATION_VERTX_ENABLED
+              value: "false"
+            - name: OTEL_INSTRUMENTATION_NETTY_ENABLED
+              value: "false"
+            - name: OTEL_INSTRUMENTATION_JDBC_ENABLED
+              value: "false"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production"
           resources:
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 384Mi
+            # Java Agent の分 (metaspace / 計装クラス) を見込んで limit を上げる。導入前の実使用は ~460Mi
             limits:
               cpu: 500m
-              memory: 768Mi
+              memory: 1Gi
           livenessProbe:
             httpGet:
               path: /q/health/live

@@ -50,3 +50,24 @@ spec:
         - ports:
             - port: "4040"
               protocol: TCP
+---
+# seichi-portal-debezium (OpenTelemetry Java Agent) からの OTLP HTTP の ingress 許可
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-debezium--to-alloy-receiver
+  namespace: monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-receiver
+      app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: seichi-minecraft
+            app: seichi-portal-debezium
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP

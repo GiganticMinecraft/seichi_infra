@@ -22,7 +22,10 @@ spec:
         destinations:
           localPrometheus:
             type: prometheus
-            url: http://prometheus-kube-prometheus-prometheus:9090
+            # remote write の受け口 (enableRemoteWriteReceiver) は /api/v1/write。
+            # ルートを指していた間は全サンプルが 405 で捨てられ、OTLP で受けたメトリクスが
+            # Prometheus に入っていなかった
+            url: http://prometheus-kube-prometheus-prometheus:9090/api/v1/write
 
           localLoki:
             type: loki
