@@ -52,7 +52,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
       containers:
-        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:4ea05d99fc051622f5a7f1da5cfe4b9dece6c093058ffc6a3481666aaa22e6c9
+        - image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_one_day_to_reset:1.0.0@sha256:47a7b1b17fd8e7d7fb65f9bff1fd0337226a056388702970a99d2347d31d6033
           name: minecraft
           resources:
             requests:
