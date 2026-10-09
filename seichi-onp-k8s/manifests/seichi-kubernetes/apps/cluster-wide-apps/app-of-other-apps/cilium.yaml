@@ -61,13 +61,18 @@ spec:
             enabled: true
           metrics:
             enabled:
-              - dns:query;ignoreAAAA
+              # NetworkPolicy 策定用: どのワークロードが「どの FQDN を引き」「どのワークロードのどのポートへ」
+              # 「クラスタ外のどのポートへ」出ているかを workload 単位で残す。
+              # port-distribution は Hubble が reply を数えないので、エフェメラルポートで series は増えない。
+              - dns:query;ignoreAAAA;labelsContext=source_namespace,source_workload
               - drop:sourceContext=identity;destinationContext=identity
               - tcp
               - flow
               - icmp
               - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
               - policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelsContext=source_namespace,destination_namespace
+              - port-distribution:labelsContext=source_namespace,source_workload,destination_namespace,destination_workload
+              - flows-to-world:any-drop;port;syn-only;labelsContext=source_namespace,source_workload
             enableOpenMetrics: true
             serviceMonitor:
               enabled: true
