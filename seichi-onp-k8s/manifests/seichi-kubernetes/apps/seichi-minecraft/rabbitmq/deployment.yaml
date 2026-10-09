@@ -28,8 +28,11 @@ spec:
                 secretKeyRef:
                   name: seichi-portal-rabbitmq-credentials
                   key: password
+            # Erlang VM はノードの全コア数 (24) 分スケジューラを立て busy-wait するため、
+            # CPU limit 1 では待機中でも CFS throttling が常時 40% 程度発生する。
+            # スケジューラを 1 本にし busy-wait を無効化する
             - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
-              value: '-rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"'
+              value: '+S 1:1 +sbwt none +sbwtdcpu none +sbwtdio none -rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"'
           lifecycle:
             postStart:
               exec:

@@ -36,7 +36,22 @@ spec:
         loki:
           isDefault: false
         grafana:
+          # 未設定だと BestEffort になりノード逼迫時に真っ先に evict される。
+          # 直近 7 日の実測 (2026-10): CPU 最大 30m / メモリ 平常 ~700Mi・ピーク ~1Gi
+          resources:
+            requests:
+              cpu: 50m
+              memory: 768Mi
+            limits:
+              memory: 1536Mi
           sidecar:
+            # 実測: CPU 最大 16m / メモリ 平常 ~76Mi・ピーク ~110Mi
+            resources:
+              requests:
+                cpu: 10m
+                memory: 96Mi
+              limits:
+                memory: 256Mi
             datasources:
               enabled: false
               defaultDatasourceEnabled: false
