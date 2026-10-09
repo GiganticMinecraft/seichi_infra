@@ -19,7 +19,12 @@ spec:
         tempo:
           metricsGenerator:
             enabled: true
-            remoteWriteUrl: "http://prometheus-kube-prometheus-prometheus.monitoring:9090/api/v1/write"
+            storage:
+              remote_write:
+                - url: "http://prometheus-kube-prometheus-prometheus.monitoring:9090/api/v1/write"
+                  # span-metrics のヒストグラムに traceID の exemplar を付けて送る
+                  # (Prometheus 側は exemplar-storage を有効にしている)
+                  send_exemplars: true
           overrides:
             defaults:
               metrics_generator:
@@ -27,6 +32,14 @@ spec:
                   - local-blocks
                   - service-graphs
                   - span-metrics
+                processor:
+                  span_metrics:
+                    # seichi-portal の入口 span (HTTP リクエスト / CDC / 通知 / 定期実行) に付く
+                    # 処理の起点。値は user / cdc / notification / scheduled の 4 つだけで、
+                    # 属性がない span ではラベルが付かないため系列はほとんど増えない。
+                    # Prometheus では seichi_portal_flow ラベルになる。
+                    dimensions:
+                      - seichi_portal.flow
           server:
             grpc_server_max_recv_msg_size: 16777216
             grpc_server_max_send_msg_size: 16777216

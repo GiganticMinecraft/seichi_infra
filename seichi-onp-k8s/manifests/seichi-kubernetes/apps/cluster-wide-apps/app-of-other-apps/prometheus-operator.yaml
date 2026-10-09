@@ -123,6 +123,11 @@ spec:
                   type: prometheus
                   url: http://thanos-query:9090
                   isDefault: true
+                  jsonData:
+                    # Tempo span-metrics の exemplar (ラベル traceID) からトレースへ飛ぶ
+                    exemplarTraceIdDestinations:
+                      - name: traceID
+                        datasourceUid: P214B5B846CF3925F
                 - name: Prometheus Direct
                   uid: P8689B564F8D4EF51
                   type: prometheus
@@ -133,6 +138,16 @@ spec:
                   type: loki
                   url: http://loki-gateway
                   isDefault: false
+                  jsonData:
+                    # ログ行の trace ID から Tempo のトレースへ飛べるようにする。
+                    # seichi-portal-backend の JSON ログは "openTelemetry":{..,"traceId":"<id>"}、
+                    # Faro (seichi-portal-browser) の logfmt は traceID=<id> で出る。
+                    derivedFields:
+                      - name: TraceID
+                        matcherRegex: '(?:"traceId":"|traceID=)(\w+)'
+                        url: '$${__value.raw}'
+                        datasourceUid: P214B5B846CF3925F
+                        urlDisplayLabel: 'Tempo でトレースを開く'
                 - name: Pyroscope
                   uid: P02E4190217B50628
                   type: grafana-pyroscope-datasource
@@ -155,7 +170,8 @@ spec:
                           value: 'namespace'
                         - key: 'service.name'
                           value: 'service_name'
-                      filterByTraceID: false
+                      # 同じトレースのログだけに絞る (ログ行に trace ID を出しているサービスのみ当たる)
+                      filterByTraceID: true
                       filterBySpanID: false
                       spanStartTimeShift: '-1h'
                       spanEndTimeShift: '1h'
@@ -206,6 +222,11 @@ spec:
           prometheusSpec:
             enableOTLPReceiver: true
             enableRemoteWriteReceiver: true
+            # Tempo の span-metrics が remote write で送ってくる exemplar (traceID) を保存し、
+            # Grafana のグラフ上の点から該当トレースへ飛べるようにする。
+            # Thanos sidecar 経由で thanos-query の /api/v1/query_exemplars からも引ける。
+            enableFeatures:
+              - exemplar-storage
             thanos:
               objectStorageConfig:
                 existingSecret:
