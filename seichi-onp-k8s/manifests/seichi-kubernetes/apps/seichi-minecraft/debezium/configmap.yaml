@@ -21,6 +21,15 @@ data:
     debezium.source.include.schema.changes=false
     debezium.source.offset.flush.interval.ms=0
     debezium.source.heartbeat.interval.ms=30000
+    # ハートビートは binlog のオフセットを進めるためのもので、Debezium 内部で役目を終える。
+    # seichi-portal-backend はテーブルを持たないイベントとして読み捨てるだけなので RabbitMQ へは送らない。
+    # 送ると 30 秒ごとに publish と backend の処理のトレースが 1 本ずつでき、CDC のトレース一覧が埋まる
+    debezium.transforms=dropheartbeat
+    debezium.transforms.dropheartbeat.type=org.apache.kafka.connect.transforms.Filter
+    debezium.transforms.dropheartbeat.predicate=isheartbeat
+    debezium.predicates=isheartbeat
+    debezium.predicates.isheartbeat.type=org.apache.kafka.connect.transforms.predicates.TopicNameMatches
+    debezium.predicates.isheartbeat.pattern=__debezium-heartbeat\\..*
     debezium.source.database.hostname=mariadb
     debezium.source.database.port=3306
     debezium.source.database.user=debezium
