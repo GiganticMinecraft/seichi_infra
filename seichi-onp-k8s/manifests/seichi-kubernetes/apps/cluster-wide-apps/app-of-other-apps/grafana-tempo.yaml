@@ -17,6 +17,15 @@ spec:
     helm:
       values: |
         tempo:
+          # トレースの保持期間。チャートの retention は backend_scheduler にしか入らず、
+          # 実際に削除する backend_worker は Tempo の既定値 (336h) のままになるため、両方に同じ値を書く。
+          # 現在の流入量は 1 日 10〜20MB 程度 (SDK 計装のサービスのみ) で、30 日でも 1GB に満たない。
+          # Beyla (autoInstrumentation) を有効にしていた 2026-09 下旬は 1 日 8〜9GB あり、
+          # その量だと 30 日は 100Gi に収まらない。Beyla を戻すときは保持期間かディスクを見直すこと。
+          retention: 720h
+          backendWorker:
+            compaction:
+              block_retention: 720h
           metricsGenerator:
             enabled: true
             storage:
