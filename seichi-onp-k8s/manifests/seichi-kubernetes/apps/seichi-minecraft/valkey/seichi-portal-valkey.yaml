@@ -42,7 +42,9 @@ spec:
                 memory: "192Mi"
           serviceMonitor:
             enabled: true
-            additionalLabels:
+            # chart (valkey-io/valkey-helm) のキーは extraLabels。additionalLabels は無視され、
+            # release ラベルが付かず Prometheus の serviceMonitorSelector から漏れていた
+            extraLabels:
               release: prometheus
           prometheusRule:
             enabled: true

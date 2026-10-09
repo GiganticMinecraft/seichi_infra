@@ -51,3 +51,24 @@ spec:
         - ports:
             - port: "4040"
               protocol: TCP
+---
+# Debezium Server (OpenTelemetry Java Agent) が CDC のメトリクスと publish span を
+# OTLP HTTP で送るための egress 許可
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-seichi-portal-debezium--to-alloy-receiver
+spec:
+  endpointSelector:
+    matchLabels:
+      app: seichi-portal-debezium
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: alloy-receiver
+            app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP

@@ -30,6 +30,8 @@ data:
     debezium.source.database.include.list=seichi-portal
     debezium.source.topic.prefix=seichi_portal
     debezium.source.snapshot.mode=initial
+    # MilliSecondsBehindSource の P50/P95/P99 を JMX に出す (OTel Java Agent 経由で Prometheus へ)
+    debezium.source.statistics.metrics.enabled=true
 
     debezium.format.key=json
     debezium.format.value=json
