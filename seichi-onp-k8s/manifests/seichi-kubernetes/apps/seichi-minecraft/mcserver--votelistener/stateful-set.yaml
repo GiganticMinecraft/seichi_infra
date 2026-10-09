@@ -240,7 +240,7 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: "mcserver-votelistener"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:8bdb9e8c5ab10706c674800072d2261f1b98846894c8d5906c6c8cd6f10ae818
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_votelistener:1.0.0@sha256:0adbd2f78e1640a54feb606e6a12eaf56ca7b79b5d927da9b885db2ea709cf65
           name: minecraft
           ports:
             - containerPort: 25565
