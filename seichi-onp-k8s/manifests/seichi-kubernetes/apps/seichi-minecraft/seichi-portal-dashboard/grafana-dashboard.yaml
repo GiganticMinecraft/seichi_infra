@@ -1,6 +1,8 @@
 # seichi-portal の総合ダッシュボード。
+# 処理の起点 (seichi_portal.flow: user / cdc / notification / scheduled) ごとに行を分けている。
 # 生成元の考え方: HTTP の RED は Tempo span-metrics、CDC は Debezium (OTel Java Agent) /
-# RabbitMQ (rabbitmq_prometheus) / backend (OTLP) のメトリクス、ブラウザは Faro (Loki) から引く。
+# RabbitMQ (rabbitmq_prometheus) / backend (OTLP) のメトリクス、ブラウザは Faro (Loki)、
+# トレース一覧は Tempo (TraceQL) から引く。
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -59,7 +61,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "利用者が触る経路 (ブラウザ → frontend → backend) と、MariaDB の変更が検索に反映されるまでの CDC 経路の健全性。 HTTP の RED は Tempo の span-metrics、CDC は各コンポーネントの OTLP / Prometheus メトリクス。"
+            "content": "seichi-portal の処理は起点ごとに 4 種類の流れに分かれ、backend の入口 span に `seichi_portal.flow` 属性が付く。 **user**: 利用者の操作 (ブラウザ → frontend → backend) / **cdc**: MariaDB の変更を検索に反映 (Debezium → RabbitMQ → backend → Meilisearch) / **notification**: 操作を受けた Discord 通知 / **scheduled**: 検索インデックスの定期チェック。 各流れのトレースは下の行から Tempo で開け、ログ行の trace ID からも同じトレースに飛べる。"
           },
           "transparent": true
         },
@@ -86,7 +88,8 @@ data:
               "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -143,7 +146,8 @@ data:
               "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) / sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -209,7 +213,8 @@ data:
               "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval])))",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -274,7 +279,8 @@ data:
               "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval])))",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -405,7 +411,8 @@ data:
               "expr": "histogram_quantile(0.95, sum by (le) (rate(seichi_portal_search_sync_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -471,7 +478,8 @@ data:
               "expr": "sum(rabbitmq_detailed_queue_messages{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"})",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -536,7 +544,8 @@ data:
               "expr": "max(seichi_portal_search_out_of_sync_indexes{job=\"seichi-portal/seichi-portal-backend\"})",
               "refId": "A",
               "legendFormat": "",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -580,37 +589,892 @@ data:
           "description": "定期チェックで DB と件数が食い違っていたインデックス数。0 が正常"
         },
         {
-          "type": "row",
-          "title": "ブラウザ (Faro)",
+          "type": "table",
+          "title": "流れごとの件数・エラー・所要時間 (表示期間内)",
           "id": 11,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 10,
+            "x": 0,
+            "y": 7
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (seichi_portal_flow) (increase(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", seichi_portal_flow!=\"\"}[$__range]))",
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "件数"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (seichi_portal_flow) (increase(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", seichi_portal_flow!=\"\", status_code=\"STATUS_CODE_ERROR\"}[$__range]))",
+              "refId": "B",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "エラー"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, seichi_portal_flow) (increase(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", seichi_portal_flow!=\"\"}[$__range])))",
+              "refId": "C",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "p95"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.99, sum by (le, seichi_portal_flow) (increase(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", seichi_portal_flow!=\"\"}[$__range])))",
+              "refId": "D",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "p99"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "renameByName": {
+                  "Value #A": "件数",
+                  "Value #B": "エラー",
+                  "Value #C": "p95",
+                  "Value #D": "p99"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 3
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "件数"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "エラー"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p95"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p99"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "件数",
+                "desc": true
+              }
+            ]
+          },
+          "description": "backend の入口 span (seichi_portal.flow 属性付き) から Tempo span-metrics で集計"
+        },
+        {
+          "type": "nodeGraph",
+          "title": "サービスの呼び出し関係",
+          "id": 12,
+          "datasource": {
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 14,
+            "x": 10,
+            "y": 7
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "refId": "A",
+              "queryType": "serviceMap",
+              "serviceMapQuery": "{client=~\"seichi-portal.*\"}"
+            }
+          ],
+          "options": {},
+          "description": "Tempo の service graph。矢印は呼び出し元 → 呼び出し先。ノードをクリックするとそのサービスのトレースやメトリクスを開ける"
+        },
+        {
+          "type": "row",
+          "title": "ユーザー起点 (user): ブラウザ → frontend → backend",
+          "id": 13,
           "collapsed": false,
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 7
+            "y": 17
           },
           "panels": []
         },
         {
           "type": "text",
-          "id": 12,
+          "id": 14,
           "gridPos": {
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 8
+            "y": 18
           },
           "options": {
             "mode": "markdown",
-            "content": "Faro が送る Web Vitals (p75) とフロントエンドの例外。bot のアクセスも含む。"
+            "content": "利用者の操作に対応するリクエスト。backend の HTTP サーバー span (= flow user) をルート別に見る。 レイテンシのグラフ上の点 (exemplar) をクリックすると、その時刻の実際のトレースを開ける。"
           },
           "transparent": true
         },
         {
           "type": "timeseries",
-          "title": "LCP p75",
-          "id": 13,
+          "title": "リクエスト/s (ルート別)",
+          "id": 15,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 20
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": false
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "レイテンシ p95 (ルート別)",
+          "id": 16,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 20
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval])))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "エラー/s (ルート別)",
+          "id": 17,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 20
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval]))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": false
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "table",
+          "title": "ルート別の件数・エラー・所要時間 (表示期間内)",
+          "id": 18,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 28
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (span_name) (increase(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__range]))",
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "件数"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (span_name) (increase(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__range]))",
+              "refId": "B",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "エラー"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.5, sum by (le, span_name) (increase(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__range])))",
+              "refId": "C",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "p50"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, span_name) (increase(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__range])))",
+              "refId": "D",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "p95"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.99, sum by (le, span_name) (increase(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__range])))",
+              "refId": "E",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "p99"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "renameByName": {
+                  "Value #A": "件数",
+                  "Value #B": "エラー",
+                  "Value #C": "p50",
+                  "Value #D": "p95",
+                  "Value #E": "p99"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 3
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "件数"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "エラー"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p50"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p95"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "p99"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "件数",
+                "desc": true
+              }
+            ]
+          },
+          "description": "遅い・失敗の多いルートを探す入口。分位数は span-metrics のヒストグラムのバケットからの推定値"
+        },
+        {
+          "type": "table",
+          "title": "エラーを含むリクエスト",
+          "id": 19,
+          "datasource": {
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 37
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ span.seichi_portal.flow = \"user\" } && { status = error }",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "description": "入口が user の流れで、途中のどこか (DB / Meilisearch / Discord など) でエラーになったトレース\n\nTraceQL: `{ span.seichi_portal.flow = \"user\" } && { status = error }`"
+        },
+        {
+          "type": "table",
+          "title": "1 秒以上かかったリクエスト",
+          "id": 20,
+          "datasource": {
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 37
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ span.seichi_portal.flow = \"user\" && duration > 1s }",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "description": "TraceQL: `{ span.seichi_portal.flow = \"user\" && duration > 1s }`"
+        },
+        {
+          "type": "timeseries",
+          "title": "frontend: リクエスト/s (ルート別)",
+          "id": 21,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 45
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": false
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "frontend: レイテンシ p95 (ルート別)",
+          "id": 22,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 45
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval])))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "frontend → backend の fetch p95",
+          "id": 23,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 45
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_CLIENT\"}[$__rate_interval])))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "backend → 外部依存の呼び出し p95",
+          "id": 24,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 53
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_CLIENT\"}[$__rate_interval])))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "backend → 外部依存の呼び出し/s",
+          "id": 25,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 53
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_CLIENT\"}[$__rate_interval]))",
+              "refId": "A",
+              "legendFormat": "{{span_name}}",
+              "range": true,
+              "exemplar": false
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none"
+                }
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "type": "timeseries",
+          "title": "ブラウザ: LCP p75",
+          "id": 26,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -619,7 +1483,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 0,
-            "y": 10
+            "y": 61
           },
           "targets": [
             {
@@ -681,8 +1545,8 @@ data:
         },
         {
           "type": "timeseries",
-          "title": "INP p75",
-          "id": 14,
+          "title": "ブラウザ: INP p75",
+          "id": 27,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -691,7 +1555,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 6,
-            "y": 10
+            "y": 61
           },
           "targets": [
             {
@@ -753,8 +1617,8 @@ data:
         },
         {
           "type": "timeseries",
-          "title": "CLS p75",
-          "id": 15,
+          "title": "ブラウザ: CLS p75",
+          "id": 28,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -763,7 +1627,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 12,
-            "y": 10
+            "y": 61
           },
           "targets": [
             {
@@ -825,8 +1689,8 @@ data:
         },
         {
           "type": "timeseries",
-          "title": "TTFB p75",
-          "id": 16,
+          "title": "ブラウザ: TTFB p75",
+          "id": 29,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -835,7 +1699,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 18,
-            "y": 10
+            "y": 61
           },
           "targets": [
             {
@@ -898,7 +1762,7 @@ data:
         {
           "type": "timeseries",
           "title": "ブラウザの例外",
-          "id": 17,
+          "id": 30,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -907,7 +1771,7 @@ data:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 17
+            "y": 68
           },
           "targets": [
             {
@@ -949,655 +1813,35 @@ data:
         },
         {
           "type": "row",
-          "title": "frontend (Next.js)",
-          "id": 18,
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 23
-          },
-          "panels": []
-        },
-        {
-          "type": "text",
-          "id": 19,
-          "gridPos": {
-            "h": 2,
-            "w": 24,
-            "x": 0,
-            "y": 24
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "サーバー側のリクエスト (span-metrics) と Node.js ランタイム。イベントループ遅延が伸びると全リクエストが遅くなる。"
-          },
-          "transparent": true
-        },
-        {
-          "type": "timeseries",
-          "title": "リクエスト/s (ルート別)",
-          "id": 20,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 26
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "reqps",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "レイテンシ p95 (ルート別)",
-          "id": 21,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 8,
-            "y": 26
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval])))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "backend への fetch p95",
-          "id": 22,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 16,
-            "y": 26
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-frontend\", span_kind=\"SPAN_KIND_CLIENT\"}[$__rate_interval])))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "イベントループ遅延",
-          "id": 23,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 0,
-            "y": 34
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "max(nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
-              "refId": "A",
-              "legendFormat": "p99",
-              "range": true
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "max(nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
-              "refId": "B",
-              "legendFormat": "p50",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "イベントループ使用率",
-          "id": 24,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 6,
-            "y": 34
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "max(nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"})",
-              "refId": "A",
-              "legendFormat": "utilization",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "percentunit",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "V8 ヒープ使用量",
-          "id": 25,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 12,
-            "y": 34
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum(v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
-              "refId": "A",
-              "legendFormat": "used",
-              "range": true
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum(v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
-              "refId": "B",
-              "legendFormat": "size",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "bytes",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "GC 時間 /s",
-          "id": 26,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 6,
-            "x": 18,
-            "y": 34
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum by (v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "{{v8js_gc_type}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 60,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "normal"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "row",
-          "title": "backend API",
-          "id": 27,
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 42
-          },
-          "panels": []
-        },
-        {
-          "type": "text",
-          "id": 28,
-          "gridPos": {
-            "h": 2,
-            "w": 24,
-            "x": 0,
-            "y": 43
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "HTTP サーバーの RED (span-metrics) と、外部依存 (MariaDB / Meilisearch / Valkey / Discord など) への呼び出し。"
-          },
-          "transparent": true
-        },
-        {
-          "type": "timeseries",
-          "title": "リクエスト/s (ルート別)",
-          "id": 29,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 45
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "reqps",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "レイテンシ p95 (ルート別)",
-          "id": 30,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 8,
-            "y": 45
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval])))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "エラー/s (ルート別)",
+          "title": "イベント駆動 (cdc): MariaDB → Debezium → RabbitMQ → backend → Meilisearch",
           "id": 31,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
+          "collapsed": false,
           "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 16,
-            "y": 45
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "reqps",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "timeseries",
-          "title": "外部依存の呼び出し p95",
-          "id": 32,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
+            "h": 1,
+            "w": 24,
             "x": 0,
-            "y": 53
+            "y": 74
           },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_CLIENT\"}[$__rate_interval])))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
+          "panels": []
+        },
+        {
+          "type": "text",
+          "id": 32,
+          "gridPos": {
+            "h": 2,
+            "w": 24,
+            "x": 0,
+            "y": 75
           },
           "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
+            "mode": "markdown",
+            "content": "データが流れる順に左から並べている。どの区間で遅れているかは「遅延」パネルを左から見る。 トレースは Debezium の publish から backend の cdc.process → search_engine.sync までつながる。"
+          },
+          "transparent": true
         },
         {
           "type": "timeseries",
-          "title": "外部依存の呼び出し/s",
+          "title": "① Debezium: binlog からの遅延",
           "id": 33,
           "datasource": {
             "type": "prometheus",
@@ -1605,89 +1849,9 @@ data:
           },
           "gridPos": {
             "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 53
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum by (span_name) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_CLIENT\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "{{span_name}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "ops",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "row",
-          "title": "CDC: MariaDB → Debezium → RabbitMQ → backend → Meilisearch",
-          "id": 34,
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 61
-          },
-          "panels": []
-        },
-        {
-          "type": "text",
-          "id": 35,
-          "gridPos": {
-            "h": 2,
-            "w": 24,
-            "x": 0,
-            "y": 62
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "左から右へデータが流れる順に並べている。どの区間で遅れているかは「遅延」パネルを左から見る。 トレースは Tempo で `{ resource.service.name = \"seichi-portal-debezium\" }` から backend の search_engine.sync までつながる。"
-          },
-          "transparent": true
-        },
-        {
-          "type": "timeseries",
-          "title": "① Debezium: binlog からの遅延",
-          "id": 36,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
             "w": 6,
             "x": 0,
-            "y": 64
+            "y": 77
           },
           "targets": [
             {
@@ -1698,7 +1862,8 @@ data:
               "expr": "max(debezium_source_lag_seconds{job=\"seichi-portal/seichi-portal-debezium\", debezium_context=\"streaming\"})",
               "refId": "A",
               "legendFormat": "lag",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -1731,7 +1896,7 @@ data:
         {
           "type": "timeseries",
           "title": "② backend: 受信までの遅延",
-          "id": 37,
+          "id": 34,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -1740,7 +1905,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 6,
-            "y": 64
+            "y": 77
           },
           "targets": [
             {
@@ -1751,7 +1916,8 @@ data:
               "expr": "histogram_quantile(0.5, sum by (le) (rate(seichi_portal_cdc_receive_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "A",
               "legendFormat": "p50",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -1761,7 +1927,8 @@ data:
               "expr": "histogram_quantile(0.95, sum by (le) (rate(seichi_portal_cdc_receive_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "B",
               "legendFormat": "p95",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -1771,7 +1938,8 @@ data:
               "expr": "histogram_quantile(0.99, sum by (le) (rate(seichi_portal_cdc_receive_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "C",
               "legendFormat": "p99",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -1804,7 +1972,7 @@ data:
         {
           "type": "timeseries",
           "title": "③ 検索反映までの遅延 (end-to-end)",
-          "id": 38,
+          "id": 35,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -1813,7 +1981,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 12,
-            "y": 64
+            "y": 77
           },
           "targets": [
             {
@@ -1824,7 +1992,8 @@ data:
               "expr": "histogram_quantile(0.5, sum by (le) (rate(seichi_portal_search_sync_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "A",
               "legendFormat": "p50",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -1834,7 +2003,8 @@ data:
               "expr": "histogram_quantile(0.95, sum by (le) (rate(seichi_portal_search_sync_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "B",
               "legendFormat": "p95",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -1844,7 +2014,8 @@ data:
               "expr": "histogram_quantile(0.99, sum by (le) (rate(seichi_portal_search_sync_lag_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
               "refId": "C",
               "legendFormat": "p99",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -1877,7 +2048,7 @@ data:
         {
           "type": "timeseries",
           "title": "Meilisearch 同期 1 回の時間 p95",
-          "id": 39,
+          "id": 36,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -1886,7 +2057,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 18,
-            "y": 64
+            "y": 77
           },
           "targets": [
             {
@@ -1894,10 +2065,22 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "histogram_quantile(0.95, sum by (le, outcome) (rate(seichi_portal_search_sync_duration_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_name=\"search_engine.sync\"}[$__rate_interval])))",
               "refId": "A",
-              "legendFormat": "{{outcome}}",
-              "range": true
+              "legendFormat": "search_engine.sync",
+              "range": true,
+              "exemplar": true
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "histogram_quantile(0.95, sum by (le, outcome) (rate(seichi_portal_search_sync_duration_seconds_bucket{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval])))",
+              "refId": "B",
+              "legendFormat": "{{outcome}} (1 試行)",
+              "range": true,
+              "exemplar": true
             }
           ],
           "fieldConfig": {
@@ -1924,12 +2107,13 @@ data:
               "mode": "multi",
               "sort": "desc"
             }
-          }
+          },
+          "description": "search_engine.sync はリトライを含めた 1 イベント分の span。点 (exemplar) からトレースを開ける"
         },
         {
           "type": "timeseries",
           "title": "Debezium: 変更イベント/s",
-          "id": 40,
+          "id": 37,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -1938,7 +2122,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 0,
-            "y": 72
+            "y": 85
           },
           "targets": [
             {
@@ -1949,7 +2133,8 @@ data:
               "expr": "sum by (debezium_event_type) (rate(debezium_event_count_total{job=\"seichi-portal/seichi-portal-debezium\", debezium_context=\"streaming\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "{{debezium_event_type}}",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -1981,7 +2166,7 @@ data:
         {
           "type": "timeseries",
           "title": "Debezium: 内部キュー残量",
-          "id": 41,
+          "id": 38,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -1990,7 +2175,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 6,
-            "y": 72
+            "y": 85
           },
           "targets": [
             {
@@ -2001,7 +2186,8 @@ data:
               "expr": "min(debezium_queue_remaining_capacity{job=\"seichi-portal/seichi-portal-debezium\"})",
               "refId": "A",
               "legendFormat": "remaining",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -2011,7 +2197,8 @@ data:
               "expr": "max(debezium_queue_limit{job=\"seichi-portal/seichi-portal-debezium\"})",
               "refId": "B",
               "legendFormat": "limit",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2044,7 +2231,7 @@ data:
         {
           "type": "timeseries",
           "title": "RabbitMQ: キュー内メッセージ",
-          "id": 42,
+          "id": 39,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -2053,7 +2240,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 12,
-            "y": 72
+            "y": 85
           },
           "targets": [
             {
@@ -2064,7 +2251,8 @@ data:
               "expr": "sum(rabbitmq_detailed_queue_messages_ready{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"})",
               "refId": "A",
               "legendFormat": "ready",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -2074,7 +2262,8 @@ data:
               "expr": "sum(rabbitmq_detailed_queue_messages_unacked{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"})",
               "refId": "B",
               "legendFormat": "unacked",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2107,7 +2296,7 @@ data:
         {
           "type": "timeseries",
           "title": "RabbitMQ: 流量",
-          "id": 43,
+          "id": 40,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -2116,7 +2305,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 18,
-            "y": 72
+            "y": 85
           },
           "targets": [
             {
@@ -2127,7 +2316,8 @@ data:
               "expr": "sum(rate(rabbitmq_detailed_exchange_messages_published_total{job=\"seichi-portal-rabbitmq\", exchange=\"seichi_portal\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "published",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -2137,7 +2327,8 @@ data:
               "expr": "sum(rate(rabbitmq_detailed_queue_messages_delivered_ack_total{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"}[$__rate_interval]))",
               "refId": "B",
               "legendFormat": "delivered",
-              "range": true
+              "range": true,
+              "exemplar": false
             },
             {
               "datasource": {
@@ -2147,7 +2338,8 @@ data:
               "expr": "sum(rate(rabbitmq_detailed_queue_messages_acked_total{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"}[$__rate_interval]))",
               "refId": "C",
               "legendFormat": "acked",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2179,7 +2371,7 @@ data:
         {
           "type": "timeseries",
           "title": "backend: 受信メッセージ/s (結果別)",
-          "id": 44,
+          "id": 41,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -2188,7 +2380,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 80
+            "y": 93
           },
           "targets": [
             {
@@ -2199,7 +2391,8 @@ data:
               "expr": "sum by (outcome) (rate(seichi_portal_cdc_deliveries_total{job=\"seichi-portal/seichi-portal-backend\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "{{outcome}}",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2232,7 +2425,7 @@ data:
         {
           "type": "timeseries",
           "title": "backend: 受信メッセージ/s (テーブル別)",
-          "id": 45,
+          "id": 42,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -2241,7 +2434,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 80
+            "y": 93
           },
           "targets": [
             {
@@ -2252,7 +2445,8 @@ data:
               "expr": "sum by (db_collection_name, db_operation_name) (rate(seichi_portal_cdc_deliveries_total{job=\"seichi-portal/seichi-portal-backend\", outcome=\"forwarded\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "{{db_collection_name}} {{db_operation_name}}",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2284,7 +2478,7 @@ data:
         {
           "type": "timeseries",
           "title": "backend: 同期待ちイベント",
-          "id": 46,
+          "id": 43,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -2293,7 +2487,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 80
+            "y": 93
           },
           "targets": [
             {
@@ -2304,7 +2498,8 @@ data:
               "expr": "max(seichi_portal_cdc_pending_sync_events{job=\"seichi-portal/seichi-portal-backend\"})",
               "refId": "A",
               "legendFormat": "pending",
-              "range": true
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2335,21 +2530,112 @@ data:
           "description": "consumer から同期タスクへのチャンネル (容量 100) に溜まっている数。Meilisearch が遅い・止まっていると増える"
         },
         {
+          "type": "table",
+          "title": "失敗した CDC 処理",
+          "id": 44,
+          "datasource": {
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 101
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ span.seichi_portal.flow = \"cdc\" && status = error }",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "description": "TraceQL: `{ span.seichi_portal.flow = \"cdc\" && status = error }`"
+        },
+        {
+          "type": "table",
+          "title": "5 秒以上かかった検索同期",
+          "id": 45,
+          "datasource": {
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 101
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ name = \"search_engine.sync\" && duration > 5s }",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "description": "TraceQL: `{ name = \"search_engine.sync\" && duration > 5s }`"
+        },
+        {
           "type": "row",
-          "title": "backend ランタイムとデータストア",
-          "id": 47,
+          "title": "通知 (notification): 操作 → Discord webhook",
+          "id": 46,
           "collapsed": false,
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 88
+            "y": 109
           },
           "panels": []
         },
         {
+          "type": "text",
+          "id": 47,
+          "gridPos": {
+            "h": 2,
+            "w": 24,
+            "x": 0,
+            "y": 110
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "フォームの回答やメッセージなどの操作を受けて、バックグラウンドで Discord に通知する。 通知のトレースは起点になったリクエストのトレースの子としてつながる。"
+          },
+          "transparent": true
+        },
+        {
           "type": "timeseries",
-          "title": "tokio タスク",
+          "title": "通知/s (結果別)",
           "id": 48,
           "datasource": {
             "type": "prometheus",
@@ -2359,7 +2645,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 89
+            "y": 112
           },
           "targets": [
             {
@@ -2367,32 +2653,23 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "max(seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"})",
+              "expr": "sum by (status_code) (rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_name=\"discord_webhook.notify\"}[$__rate_interval]))",
               "refId": "A",
-              "legendFormat": "alive tasks",
-              "range": true
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "max(seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"})",
-              "refId": "B",
-              "legendFormat": "global queue",
-              "range": true
+              "legendFormat": "{{status_code}}",
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
+              "unit": "ops",
               "custom": {
                 "lineWidth": 1,
-                "fillOpacity": 10,
+                "fillOpacity": 60,
                 "showPoints": "never",
                 "spanNulls": true,
                 "stacking": {
-                  "mode": "none"
+                  "mode": "normal"
                 }
               }
             },
@@ -2411,7 +2688,7 @@ data:
         },
         {
           "type": "timeseries",
-          "title": "DB コネクションプール",
+          "title": "通知にかかった時間",
           "id": 49,
           "datasource": {
             "type": "prometheus",
@@ -2421,7 +2698,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 89
+            "y": 112
           },
           "targets": [
             {
@@ -2429,73 +2706,22 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum by (db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"})",
+              "expr": "histogram_quantile(0.5, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_name=\"discord_webhook.notify\"}[$__rate_interval])))",
               "refId": "A",
-              "legendFormat": "{{db_client_connection_pool_name}} used",
-              "range": true
+              "legendFormat": "p50",
+              "range": true,
+              "exemplar": true
             },
             {
               "datasource": {
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "max by (db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"})",
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_name=\"discord_webhook.notify\"}[$__rate_interval])))",
               "refId": "B",
-              "legendFormat": "{{db_client_connection_pool_name}} max",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "short",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          },
-          "description": "used が max に張り付くとクエリがコネクション待ちになる"
-        },
-        {
-          "type": "timeseries",
-          "title": "MariaDB: seichi-portal スキーマの遅いクエリ (合計時間/s)",
-          "id": 50,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 16,
-            "y": 89
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "topk(5, sum by (digest_text) (rate(mysql_perf_schema_events_statements_seconds_total{schema=\"seichi-portal\"}[$__rate_interval])))",
-              "refId": "A",
-              "legendFormat": "{{digest_text}}",
-              "range": true
+              "legendFormat": "p95",
+              "range": true,
+              "exemplar": true
             }
           ],
           "fieldConfig": {
@@ -2525,112 +2751,74 @@ data:
           }
         },
         {
-          "type": "timeseries",
-          "title": "Valkey: コマンド/s",
+          "type": "table",
+          "title": "失敗した通知",
+          "id": 50,
+          "datasource": {
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 112
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ span.seichi_portal.flow = \"notification\" && status = error }",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "description": "親のリクエストのトレースごと開くと、どの操作の通知だったかが分かる\n\nTraceQL: `{ span.seichi_portal.flow = \"notification\" && status = error }`"
+        },
+        {
+          "type": "row",
+          "title": "定期実行 (scheduled): 検索インデックスの整合性チェック",
           "id": 51,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
+          "collapsed": false,
           "gridPos": {
-            "h": 8,
-            "w": 8,
+            "h": 1,
+            "w": 24,
             "x": 0,
-            "y": 97
+            "y": 120
           },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "sum(rate(redis_commands_processed_total{service=\"seichi-portal-valkey-metrics\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "commands",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "ops",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
+          "panels": []
         },
         {
-          "type": "timeseries",
-          "title": "Valkey: メモリ",
+          "type": "text",
           "id": 52,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
           "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 8,
-            "y": 97
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "expr": "max(redis_memory_used_bytes{service=\"seichi-portal-valkey-metrics\"})",
-              "refId": "A",
-              "legendFormat": "used",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "bytes",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
-            "overrides": []
+            "h": 2,
+            "w": 24,
+            "x": 0,
+            "y": 121
           },
           "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
+            "mode": "markdown",
+            "content": "DB と Meilisearch の件数を定期的に突き合わせ、食い違っていれば再同期する。1 回のチェックが 1 つの独立したトレースになる。"
+          },
+          "transparent": true
         },
         {
           "type": "timeseries",
-          "title": "Valkey: 接続数",
+          "title": "検索インデックス乖離",
           "id": 53,
           "datasource": {
             "type": "prometheus",
@@ -2639,8 +2827,8 @@ data:
           "gridPos": {
             "h": 8,
             "w": 8,
-            "x": 16,
-            "y": 97
+            "x": 0,
+            "y": 123
           },
           "targets": [
             {
@@ -2648,10 +2836,11 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "max(redis_connected_clients{service=\"seichi-portal-valkey-metrics\"})",
+              "expr": "max(seichi_portal_search_out_of_sync_indexes{job=\"seichi-portal/seichi-portal-backend\"})",
               "refId": "A",
-              "legendFormat": "clients",
-              "range": true
+              "legendFormat": "out of sync",
+              "range": true,
+              "exemplar": false
             }
           ],
           "fieldConfig": {
@@ -2664,72 +2853,27 @@ data:
                 "spanNulls": true,
                 "stacking": {
                   "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "line"
                 }
-              }
-            },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "type": "row",
-          "title": "リソース",
-          "id": 54,
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 105
-          },
-          "panels": []
-        },
-        {
-          "type": "timeseries",
-          "title": "CPU (Pod 別)",
-          "id": 55,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 106
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"}[$__rate_interval]))",
-              "refId": "A",
-              "legendFormat": "{{pod}}",
-              "range": true
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "cores",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 3
+                  }
+                ]
               }
             },
             "overrides": []
@@ -2747,8 +2891,8 @@ data:
         },
         {
           "type": "timeseries",
-          "title": "メモリ (Pod 別)",
-          "id": 56,
+          "title": "チェック 1 回の時間",
+          "id": 54,
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
@@ -2757,7 +2901,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 106
+            "y": 123
           },
           "targets": [
             {
@@ -2765,15 +2909,16 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"})",
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"seichi-portal-backend\", span_name=\"search_engine.watch_out_of_sync\"}[$__rate_interval])))",
               "refId": "A",
-              "legendFormat": "{{pod}}",
-              "range": true
+              "legendFormat": "p95",
+              "range": true,
+              "exemplar": true
             }
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "bytes",
+              "unit": "s",
               "custom": {
                 "lineWidth": 1,
                 "fillOpacity": 10,
@@ -2798,74 +2943,75 @@ data:
           }
         },
         {
-          "type": "timeseries",
-          "title": "CPU スロットリング率 (Pod 別)",
-          "id": 57,
+          "type": "table",
+          "title": "最近のチェック",
+          "id": 55,
           "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "type": "tempo",
+            "uid": "P214B5B846CF3925F"
           },
           "gridPos": {
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 106
+            "y": 123
           },
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
               },
-              "expr": "sum by (pod) (rate(container_cpu_cfs_throttled_periods_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"}[$__rate_interval])) / sum by (pod) (rate(container_cpu_cfs_periods_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"}[$__rate_interval]))",
               "refId": "A",
-              "legendFormat": "{{pod}}",
-              "range": true
+              "queryType": "traceql",
+              "query": "{ span.seichi_portal.flow = \"scheduled\" } | select(span.search.out_of_sync_indexes, span.search.resync_in_progress)",
+              "limit": 10,
+              "spss": 3,
+              "tableType": "traces"
             }
           ],
           "fieldConfig": {
-            "defaults": {
-              "unit": "percentunit",
-              "custom": {
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": true,
-                "stacking": {
-                  "mode": "none"
-                }
-              }
-            },
+            "defaults": {},
             "overrides": []
           },
           "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom"
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "description": "TraceQL: `{ span.seichi_portal.flow = \"scheduled\" } | select(span.search.out_of_sync_indexes, span.search.resync_in_progress)`"
         },
         {
           "type": "row",
           "title": "ログ",
-          "id": 58,
+          "id": 56,
           "collapsed": false,
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 114
+            "y": 131
           },
           "panels": []
         },
         {
+          "type": "text",
+          "id": 57,
+          "gridPos": {
+            "h": 2,
+            "w": 24,
+            "x": 0,
+            "y": 132
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "ログ行の trace ID (backend は openTelemetry.traceId、ブラウザは traceID) からそのトレースを開ける。"
+          },
+          "transparent": true
+        },
+        {
           "type": "logs",
           "title": "backend のエラー / 警告",
-          "id": 59,
+          "id": 58,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -2874,7 +3020,7 @@ data:
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 115
+            "y": 134
           },
           "targets": [
             {
@@ -2898,8 +3044,8 @@ data:
         },
         {
           "type": "logs",
-          "title": "frontend のエラー",
-          "id": 60,
+          "title": "backend の 5xx アクセスログ",
+          "id": 59,
           "datasource": {
             "type": "loki",
             "uid": "P8E80F9AEF21F6940"
@@ -2908,7 +3054,41 @@ data:
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 115
+            "y": 134
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "expr": "{service_name=\"seichi-portal-backend\"} |= \"entrypoint::access\" | json | status >= 500",
+              "refId": "A",
+              "legendFormat": "",
+              "queryType": "range"
+            }
+          ],
+          "options": {
+            "showTime": true,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          }
+        },
+        {
+          "type": "logs",
+          "title": "frontend のエラー",
+          "id": 60,
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 144
           },
           "targets": [
             {
@@ -2929,6 +3109,783 @@ data:
             "enableLogDetails": true,
             "prettifyLogMessage": false
           }
+        },
+        {
+          "type": "row",
+          "title": "frontend ランタイム (Node.js)",
+          "id": 61,
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 152
+          },
+          "panels": [
+            {
+              "type": "timeseries",
+              "title": "イベントループ遅延",
+              "id": 62,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 0,
+                "y": 153
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "refId": "A",
+                  "legendFormat": "p99",
+                  "range": true,
+                  "exemplar": false
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "refId": "B",
+                  "legendFormat": "p50",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "description": "伸びると全リクエストが遅くなる"
+            },
+            {
+              "type": "timeseries",
+              "title": "イベントループ使用率",
+              "id": 63,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 6,
+                "y": 153
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "refId": "A",
+                  "legendFormat": "utilization",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percentunit",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "V8 ヒープ使用量",
+              "id": 64,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 153
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum(v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "refId": "A",
+                  "legendFormat": "used",
+                  "range": true,
+                  "exemplar": false
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum(v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "refId": "B",
+                  "legendFormat": "size",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bytes",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "GC 時間 /s",
+              "id": 65,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 153
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum by (v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval]))",
+                  "refId": "A",
+                  "legendFormat": "{{v8js_gc_type}}",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 60,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "normal"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "row",
+          "title": "backend ランタイムとデータストア",
+          "id": 66,
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 153
+          },
+          "panels": [
+            {
+              "type": "timeseries",
+              "title": "tokio タスク",
+              "id": 67,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 0,
+                "y": 154
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "refId": "A",
+                  "legendFormat": "alive tasks",
+                  "range": true,
+                  "exemplar": false
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "refId": "B",
+                  "legendFormat": "global queue",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "DB コネクションプール",
+              "id": 68,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 8,
+                "y": 154
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum by (db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"})",
+                  "refId": "A",
+                  "legendFormat": "{{db_client_connection_pool_name}} used",
+                  "range": true,
+                  "exemplar": false
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max by (db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "refId": "B",
+                  "legendFormat": "{{db_client_connection_pool_name}} max",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "description": "used が max に張り付くとクエリがコネクション待ちになる"
+            },
+            {
+              "type": "timeseries",
+              "title": "MariaDB: seichi-portal スキーマの遅いクエリ (合計時間/s)",
+              "id": 69,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 16,
+                "y": 154
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "topk(5, sum by (digest_text) (rate(mysql_perf_schema_events_statements_seconds_total{schema=\"seichi-portal\"}[$__rate_interval])))",
+                  "refId": "A",
+                  "legendFormat": "{{digest_text}}",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "Valkey: コマンド/s",
+              "id": 70,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 0,
+                "y": 162
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum(rate(redis_commands_processed_total{service=\"seichi-portal-valkey-metrics\"}[$__rate_interval]))",
+                  "refId": "A",
+                  "legendFormat": "commands",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "ops",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "Valkey: メモリ",
+              "id": 71,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 8,
+                "y": 162
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(redis_memory_used_bytes{service=\"seichi-portal-valkey-metrics\"})",
+                  "refId": "A",
+                  "legendFormat": "used",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bytes",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "Valkey: 接続数",
+              "id": 72,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 16,
+                "y": 162
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "max(redis_connected_clients{service=\"seichi-portal-valkey-metrics\"})",
+                  "refId": "A",
+                  "legendFormat": "clients",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "row",
+          "title": "リソース",
+          "id": 73,
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 154
+          },
+          "panels": [
+            {
+              "type": "timeseries",
+              "title": "CPU (Pod 別)",
+              "id": 74,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 0,
+                "y": 155
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"}[$__rate_interval]))",
+                  "refId": "A",
+                  "legendFormat": "{{pod}}",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "cores",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "メモリ (Pod 別)",
+              "id": 75,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 8,
+                "y": 155
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"})",
+                  "refId": "A",
+                  "legendFormat": "{{pod}}",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "bytes",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "type": "timeseries",
+              "title": "CPU スロットリング率 (Pod 別)",
+              "id": 76,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 16,
+                "y": 155
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "PBFA97CFB590B2093"
+                  },
+                  "expr": "sum by (pod) (rate(container_cpu_cfs_throttled_periods_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"}[$__rate_interval])) / sum by (pod) (rate(container_cpu_cfs_periods_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", container!=\"\", container!=\"POD\"}[$__rate_interval]))",
+                  "refId": "A",
+                  "legendFormat": "{{pod}}",
+                  "range": true,
+                  "exemplar": false
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percentunit",
+                  "custom": {
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": true,
+                    "stacking": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            }
+          ]
         }
       ]
     }
