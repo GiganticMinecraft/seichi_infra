@@ -141,6 +141,9 @@ spec:
                   key: AWS_SECRET_ACCESS_KEY
 
         chunksCache:
+          # memcached の -m はこの値から決まる (chart default 8192)。resources だけ下げると
+          # キャッシュが limit を超えて OOMKill されるので、limit 4Gi に収まるよう合わせる
+          allocatedMemory: 3072
           resources:
             requests:
               cpu: 20m
