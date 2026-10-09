@@ -30,6 +30,10 @@ data:
     debezium.source.database.include.list=seichi-portal
     debezium.source.topic.prefix=seichi_portal
     debezium.source.snapshot.mode=initial
+    # 削除イベントの後に送られる tombstone (value が空のメッセージ) を止める。
+    # seichi-portal-backend は削除イベント (op=d) の before を使って検索から消すため tombstone は不要で、
+    # 空ボディは JSON デコードに失敗して ack されず unacked のまま滞留する
+    debezium.source.tombstones.on.delete=false
     # MilliSecondsBehindSource の P50/P95/P99 を JMX に出す (OTel Java Agent 経由で Prometheus へ)
     debezium.source.statistics.metrics.enabled=true
 
