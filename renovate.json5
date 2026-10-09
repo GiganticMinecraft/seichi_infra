@@ -33,6 +33,17 @@
       ],
     },
     {
+      // mod-downloader は依存更新のたびにイメージが再ビルドされ、全 mcserver の
+      // StatefulSet の digest 更新につながるため、Go モジュールの更新は 1 本にまとめる
+      matchManagers: [
+        'gomod',
+      ],
+      matchFileNames: [
+        'docker-images/mod-downloader/**',
+      ],
+      groupName: 'mod-downloader go modules',
+    },
+    {
       matchManagers: [
         'terraform',
       ],

@@ -1,6 +1,14 @@
 name: CI
-on: 
+on:
+  # ブランチへの push で起動すると、Renovate の rebase で main 側の差分が paths に
+  # 引っかかり無関係なブランチでもビルドが走るため、main 以外は pull_request で拾う
   push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/mod_downloader.yaml"
+      - "docker-images/mod-downloader/**"
+  pull_request:
     paths:
       - ".github/workflows/mod_downloader.yaml"
       - "docker-images/mod-downloader/**"
@@ -27,7 +35,7 @@ jobs:
           working-directory: docker-images/mod-downloader
 
   build-image:
-    name: Build docker image (and publish on master)
+    name: Build docker image (and publish on main if app changed)
     needs: [lint-and-test]
     runs-on: ubuntu-26.04
     permissions:
@@ -41,6 +49,22 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      # ワークフローファイルだけの変更 (action の digest 更新など) でも push すると、
+      # provenance/SBOM の差分で digest が変わり Renovate の digest 更新 PR と
+      # StatefulSet の入れ替えが発生するため、アプリ側に変更があるときだけ push する
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
+        id: changes
+        with:
+          filters: |
+            app:
+              - docker-images/mod-downloader/**
+
+      - id: should_push
+        run: |
+          echo "should_push=${{ github.ref == 'refs/heads/main' && steps.changes.outputs.app == 'true' }}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         id: buildx
@@ -68,13 +92,13 @@ jobs:
             type=schedule,pattern={{date 'YYYYMMDD'}}
             type=raw,value=1.0.0
 
-      - name: Build (and push if on main)
+      - name: Build (and push if on main and app changed)
         id: build
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
           context: ./docker-images/mod-downloader/
           builder: ${{ steps.buildx.outputs.name }}
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ steps.should_push.outputs.should_push == 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           sbom: true
@@ -84,7 +108,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Sign container image with Cosign
-        if: github.ref == 'refs/heads/main'
+        if: steps.should_push.outputs.should_push == 'true'
         run: |
           # ghcr.io は OCI 1.1 referrers API 非対応で、cosign v3 デフォルトの bundle 形式の
           # 署名は Kyverno が発見できないため、レガシー形式 (.sig タグ) で署名する
@@ -96,7 +120,7 @@ jobs:
       # Kyverno のポリシー (verify-image-signatures.yaml) と同じ条件で検証し、
       # 署名と検証側のモードがズレた瞬間に CI を fail させる。
       - name: Verify signature like Kyverno does
-        if: github.ref == 'refs/heads/main'
+        if: steps.should_push.outputs.should_push == 'true'
         run: |
           cosign verify \
             --certificate-identity-regexp 'https://github\.com/GiganticMinecraft/.+' \
