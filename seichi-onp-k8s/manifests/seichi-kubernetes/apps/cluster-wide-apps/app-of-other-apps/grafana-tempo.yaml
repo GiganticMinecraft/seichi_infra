@@ -28,8 +28,9 @@ spec:
           overrides:
             defaults:
               metrics_generator:
+                # local-blocks は Tempo 3 で廃止され、指定しても
+                # "ignoring unknown metrics-generator processor" の警告が出るだけなので外している
                 processors:
-                  - local-blocks
                   - service-graphs
                   - span-metrics
                 processor:
@@ -48,6 +49,43 @@ spec:
               protocols:
                 grpc:
                   max_recv_msg_size_mib: 16
+        # Tempo は SIGTERM を受けると、live-store が完成させたブロックのバックエンド
+        # (/var/tempo/traces) への書き出しを即座に打ち切る。打ち切られたブロックは
+        # 0 バイトの meta.json だけが残り、以後のブロック一覧の読み込みが
+        # "failed reading unknown blocks: unexpected end of JSON input" で毎回失敗して、
+        # 過去のトレースが一切検索できなくなる (2026-10-03〜10-09 に発生)。
+        # 壊れるのは終了時なので、起動前にそうしたブロックを quarantine へ退避する。
+        # 退避先は Tempo が読まない場所で、中身の確認後に手で消してよい。
+        initContainers:
+          - name: quarantine-broken-blocks
+            image: busybox:1.38.0
+            command:
+              - sh
+              - -c
+              - |
+                set -eu
+                quarantine=/var/tempo/quarantine/$(date -u +%Y%m%dT%H%M%SZ)
+                for meta in /var/tempo/traces/*/*/meta.json; do
+                  [ -e "$meta" ] || continue
+                  # 正常な meta.json は JSON オブジェクトなので "}" で終わる
+                  if [ -s "$meta" ] && tail -c 2 "$meta" | grep -q '}'; then
+                    continue
+                  fi
+                  block=$(dirname "$meta")
+                  tenant=$(basename "$(dirname "$block")")
+                  mkdir -p "$quarantine/$tenant"
+                  mv "$block" "$quarantine/$tenant/"
+                  echo "quarantined $tenant/$(basename "$block")"
+                done
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                memory: 64Mi
+            volumeMounts:
+              - name: storage
+                mountPath: /var/tempo
         persistence:
           enabled: true
           accessModes:
