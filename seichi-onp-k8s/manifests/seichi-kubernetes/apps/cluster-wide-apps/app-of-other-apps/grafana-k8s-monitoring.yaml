@@ -74,6 +74,10 @@ spec:
               span:
                 - 'resource.attributes["service.name"] == "garage" and name == "GET /metrics"'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, ".* /loki.*")'
+                # Debezium (OTel Java Agent) が publish ごとに出す確認待ちの span。親を持たず
+                # 単独のトレースになるだけなので落とす。このフィルタは span 名の付け直し
+                # (set_semconv_span_name) の後に動くため、元の名前で判定する
+                - 'resource.attributes["service.name"] == "seichi-portal-debezium" and attributes["original_span_name"] == "Channel.waitForConfirmsOrDie"'
 
         autoInstrumentation:
           # 2026-10-03: kernel 6.13+ の BPF private stack のバグで、プリエンプション可能な uprobe 経路では
