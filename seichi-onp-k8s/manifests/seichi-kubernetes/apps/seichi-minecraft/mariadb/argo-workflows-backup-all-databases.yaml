@@ -202,7 +202,7 @@ spec:
 
     - name: cleanup-old-s3-objects
       script:
-        image: amazon/aws-cli:2.37.11
+        image: amazon/aws-cli:2.37.12
         command: [sh]
         source: |
           set -e
