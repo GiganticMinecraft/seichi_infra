@@ -131,6 +131,7 @@
       schedule: [
         'at any time',
       ],
+      automerge: true,
     },
     {
       // ghcr.io/giganticminecraft/* は Kyverno の verify-ghcr-image-signatures
