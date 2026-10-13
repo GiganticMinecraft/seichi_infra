@@ -46,6 +46,9 @@ nav:
       - Garageオブジェクトストレージ設計 (2026-03): plans/2026-03-01-garage-object-storage-design.md
   - Audits:
       - インフラ実態調査とドキュメントの乖離 (2026-07): audits/2026-07-08-infra-docs-audit.md
+      - アラートルール監査と notify=discord 段階付与の方針 (2026-08): audits/2026-08-01-alert-rules-notify-discord-audit.md
+  - Incidents:
+      - seichi-timed-stats-conifers ingestor 全滅 (2026-08): incidents/2026-08-02-conifers-ingestor-migration-failure.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -57,6 +60,9 @@ markdown_extensions:
   - pymdownx.details
   - toc:
       permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
 
 plugins:
   - search:
