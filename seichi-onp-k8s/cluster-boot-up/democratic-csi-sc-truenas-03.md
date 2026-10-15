@@ -8,12 +8,12 @@ iSCSI バックエンドとして使用する CSI ドライバー `democratic-cs
 
 `democratic-csi` の認証情報は Terraform 経由で Kubernetes Secret として注入されます。
 Terraform 変数の実体は **GitHub Actions の Repository Secret** として管理されており、
-`TF_VAR_` プレフィックスを持つ Secret は CI が自動で Terraform 変数として渡します。
+Secret は `.github/workflows/terraform_pr.yaml` / `terraform_apply.yaml` の `env:` で Terraform 変数に明示的にマッピングされています。
 
 ```
 GitHub Actions Secret
   TF_VAR_ONP_K8S_DEMOCRATIC_CSI_SC_TRUENAS_03_DRIVER_CONFIG
-        ↓ .github/workflows/scripts/expose-all-tf-vars-to-github-env.sh が変換
+        ↓ .github/workflows/terraform_*.yaml の env: でマッピング
 Terraform variable
   onp_k8s_democratic_csi_sc_truenas_03_driver_config
         ↓ terraform/onp_cluster_secrets.tf が apply

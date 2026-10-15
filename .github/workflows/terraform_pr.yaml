@@ -36,17 +36,96 @@ jobs:
       - name: Open tunnel to OnP k8s cluster
         run: bash "./.github/workflows/scripts/open-tunnel-to-onp-k8s-and-export-tf-var-to-github-env.sh"
 
-      - name: Expose all Terraform variables to environment variables from secrets
-        run: bash "./.github/workflows/scripts/expose-all-tf-vars-to-github-env.sh"
-        env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
-
       - name: Plan Terraform infrastructure changes
         # plan の出力は大きくなりうるので、step output や環境変数ではなくファイルで次の step に渡す。
         # shell: bash を明示すると pipefail が有効になり、plan の失敗が tee に隠れない
         shell: bash
         run: terraform plan -input=false -no-color -lock-timeout=10m | tee "${RUNNER_TEMP}/tfplan.txt"
         working-directory: "./terraform"
+        env:
+          # NOTE: Terraform variable は secret ごとに明示的に渡す。
+          #       以前は secrets コンテキスト全体を JSON 化して全 secret を列挙していたが、GitHub がその記述を
+          #       「悪意のある可能性があるワークフロー」と判定して実行を承認待ちにするようになったため廃止した。
+          #       variable を追加したら、terraform_pr.yaml と terraform_apply.yaml の両方にここと同じ行を足すこと。
+          #       (TF_VAR_onp_k8s_server_url はトンネル作成スクリプトが GITHUB_ENV 経由で設定する)
+          TF_VAR_argo_events_github_access_token: ${{ secrets.TF_VAR_ARGO_EVENTS_GITHUB_ACCESS_TOKEN }}
+          TF_VAR_argocd_backup_workflow_auth_token: ${{ secrets.TF_VAR_ARGOCD_BACKUP_WORKFLOW_AUTH_TOKEN }}
+          TF_VAR_backup_failure_notify_webhook_url: ${{ secrets.TF_VAR_BACKUP_FAILURE_NOTIFY_WEBHOOK_URL }}
+          TF_VAR_cloudflare_api_key: ${{ secrets.TF_VAR_CLOUDFLARE_API_KEY }}
+          TF_VAR_cloudflare_email: ${{ secrets.TF_VAR_CLOUDFLARE_EMAIL }}
+          TF_VAR_discord_bot__babyrite__discord_token: ${{ secrets.TF_VAR_DISCORD_BOT__BABYRITE__DISCORD_TOKEN }}
+          TF_VAR_discord_bot__idea_reaction__discord_token: ${{ secrets.TF_VAR_DISCORD_BOT__IDEA_REACTION__DISCORD_TOKEN }}
+          TF_VAR_discord_bot__idea_reaction__redmine_api_key: ${{ secrets.TF_VAR_DISCORD_BOT__IDEA_REACTION__REDMINE_API_KEY }}
+          TF_VAR_garage_admin_api_token: ${{ secrets.TF_VAR_GARAGE_ADMIN_API_TOKEN }}
+          TF_VAR_garage_admin_github_client_id: ${{ secrets.TF_VAR_GARAGE_ADMIN_GITHUB_CLIENT_ID }}
+          TF_VAR_garage_admin_github_client_secret: ${{ secrets.TF_VAR_GARAGE_ADMIN_GITHUB_CLIENT_SECRET }}
+          TF_VAR_garage_admin_s3_access_key_id: ${{ secrets.TF_VAR_GARAGE_ADMIN_S3_ACCESS_KEY_ID }}
+          TF_VAR_garage_admin_s3_secret_access_key: ${{ secrets.TF_VAR_GARAGE_ADMIN_S3_SECRET_ACCESS_KEY }}
+          TF_VAR_garage_admin_session_secret: ${{ secrets.TF_VAR_GARAGE_ADMIN_SESSION_SECRET }}
+          TF_VAR_garage_backup_access_key_id: ${{ secrets.TF_VAR_GARAGE_BACKUP_ACCESS_KEY_ID }}
+          TF_VAR_garage_backup_secret_access_key: ${{ secrets.TF_VAR_GARAGE_BACKUP_SECRET_ACCESS_KEY }}
+          TF_VAR_garage_loki_access_key_id: ${{ secrets.TF_VAR_GARAGE_LOKI_ACCESS_KEY_ID }}
+          TF_VAR_garage_loki_secret_access_key: ${{ secrets.TF_VAR_GARAGE_LOKI_SECRET_ACCESS_KEY }}
+          TF_VAR_garage_pyroscope_access_key_id: ${{ secrets.TF_VAR_GARAGE_PYROSCOPE_ACCESS_KEY_ID }}
+          TF_VAR_garage_pyroscope_secret_access_key: ${{ secrets.TF_VAR_GARAGE_PYROSCOPE_SECRET_ACCESS_KEY }}
+          TF_VAR_garage_seichi_minecraft_access_key_id: ${{ secrets.TF_VAR_GARAGE_SEICHI_MINECRAFT_ACCESS_KEY_ID }}
+          TF_VAR_garage_seichi_minecraft_secret_access_key: ${{ secrets.TF_VAR_GARAGE_SEICHI_MINECRAFT_SECRET_ACCESS_KEY }}
+          TF_VAR_garage_thanos_access_key_id: ${{ secrets.TF_VAR_GARAGE_THANOS_ACCESS_KEY_ID }}
+          TF_VAR_garage_thanos_secret_access_key: ${{ secrets.TF_VAR_GARAGE_THANOS_SECRET_ACCESS_KEY }}
+          TF_VAR_github_cloudflare_oauth_client_id: ${{ secrets.TF_VAR_GITHUB_CLOUDFLARE_OAUTH_CLIENT_ID }}
+          TF_VAR_github_cloudflare_oauth_client_secret: ${{ secrets.TF_VAR_GITHUB_CLOUDFLARE_OAUTH_CLIENT_SECRET }}
+          TF_VAR_infra_alert_discord_webhook_url: ${{ secrets.TF_VAR_INFRA_ALERT_DISCORD_WEBHOOK_URL }}
+          TF_VAR_meilisearch__master_key: ${{ secrets.TF_VAR_MEILISEARCH__MASTER_KEY }}
+          TF_VAR_minecraft__debug_s1_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__DEBUG_S1_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__debug_s2_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__DEBUG_S2_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__discordsrv_bot_token: ${{ secrets.TF_VAR_MINECRAFT__DISCORDSRV_BOT_TOKEN }}
+          TF_VAR_minecraft__gt_seichi_discordsrv_bot_token: ${{ secrets.TF_VAR_MINECRAFT__GT_SEICHI_DISCORDSRV_BOT_TOKEN }}
+          TF_VAR_minecraft__prod_game_db__password: ${{ secrets.TF_VAR_MINECRAFT__PROD_GAME_DB__PASSWORD }}
+          TF_VAR_minecraft__prod_kagawa__morning_glory_seed_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_KAGAWA__MORNING_GLORY_SEED_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_lobby_anti_proxy_api_key: ${{ secrets.TF_VAR_MINECRAFT__PROD_LOBBY_ANTI_PROXY_API_KEY }}
+          TF_VAR_minecraft__prod_one_day_to_reset__morning_glory_seed_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_ONE_DAY_TO_RESET__MORNING_GLORY_SEED_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_s1_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_S1_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_s2_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_S2_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_s3_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_S3_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_s5_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_S5_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_s7_seichiassist_webhook_url: ${{ secrets.TF_VAR_MINECRAFT__PROD_S7_SEICHIASSIST_WEBHOOK_URL }}
+          TF_VAR_minecraft__prod_votelistener_default_token: ${{ secrets.TF_VAR_MINECRAFT__PROD_VOTELISTENER_DEFAULT_TOKEN }}
+          TF_VAR_onp_k8s_argo_workflows_sso_client_secret: ${{ secrets.TF_VAR_ONP_K8S_ARGO_WORKFLOWS_SSO_CLIENT_SECRET }}
+          TF_VAR_onp_k8s_argocd_applicationset_controller_github_app_id: ${{ secrets.TF_VAR_ONP_K8S_ARGOCD_APPLICATIONSET_CONTROLLER_GITHUB_APP_ID }}
+          TF_VAR_onp_k8s_argocd_applicationset_controller_github_app_installation_id: ${{ secrets.TF_VAR_ONP_K8S_ARGOCD_APPLICATIONSET_CONTROLLER_GITHUB_APP_INSTALLATION_ID }}
+          TF_VAR_onp_k8s_argocd_applicationset_controller_github_app_pem: ${{ secrets.TF_VAR_ONP_K8S_ARGOCD_APPLICATIONSET_CONTROLLER_GITHUB_APP_PEM }}
+          TF_VAR_onp_k8s_argocd_github_oauth_app_secret: ${{ secrets.TF_VAR_ONP_K8S_ARGOCD_GITHUB_OAUTH_APP_SECRET }}
+          TF_VAR_onp_k8s_cloudflared_tunnel_credential: ${{ secrets.TF_VAR_ONP_K8S_CLOUDFLARED_TUNNEL_CREDENTIAL }}
+          TF_VAR_onp_k8s_democratic_csi_sc_truenas_03_driver_config: ${{ secrets.TF_VAR_ONP_K8S_DEMOCRATIC_CSI_SC_TRUENAS_03_DRIVER_CONFIG }}
+          TF_VAR_onp_k8s_grafana_github_oauth_app_id: ${{ secrets.TF_VAR_ONP_K8S_GRAFANA_GITHUB_OAUTH_APP_ID }}
+          TF_VAR_onp_k8s_grafana_github_oauth_app_secret: ${{ secrets.TF_VAR_ONP_K8S_GRAFANA_GITHUB_OAUTH_APP_SECRET }}
+          TF_VAR_onp_k8s_kubechecks_argocd_api_token: ${{ secrets.TF_VAR_ONP_K8S_KUBECHECKS_ARGOCD_API_TOKEN }}
+          TF_VAR_onp_k8s_kubechecks_github_app_id: ${{ secrets.TF_VAR_ONP_K8S_KUBECHECKS_GITHUB_APP_ID }}
+          TF_VAR_onp_k8s_kubechecks_github_app_installation_id: ${{ secrets.TF_VAR_ONP_K8S_KUBECHECKS_GITHUB_APP_INSTALLATION_ID }}
+          TF_VAR_onp_k8s_kubechecks_github_app_pem: ${{ secrets.TF_VAR_ONP_K8S_KUBECHECKS_GITHUB_APP_PEM }}
+          TF_VAR_onp_k8s_kubeconfig: ${{ secrets.TF_VAR_ONP_K8S_KUBECONFIG }}
+          TF_VAR_onp_k8s_synology_csi_config: ${{ secrets.TF_VAR_ONP_K8S_SYNOLOGY_CSI_CONFIG }}
+          TF_VAR_portal_alert_discord_webhook_url: ${{ secrets.TF_VAR_PORTAL_ALERT_DISCORD_WEBHOOK_URL }}
+          TF_VAR_proxmox_backup_client__datastore: ${{ secrets.TF_VAR_PROXMOX_BACKUP_CLIENT__DATASTORE }}
+          TF_VAR_proxmox_backup_client__fingerprint: ${{ secrets.TF_VAR_PROXMOX_BACKUP_CLIENT__FINGERPRINT }}
+          TF_VAR_proxmox_backup_client__host: ${{ secrets.TF_VAR_PROXMOX_BACKUP_CLIENT__HOST }}
+          TF_VAR_proxmox_backup_client__password: ${{ secrets.TF_VAR_PROXMOX_BACKUP_CLIENT__PASSWORD }}
+          TF_VAR_proxmox_backup_client__user: ${{ secrets.TF_VAR_PROXMOX_BACKUP_CLIENT__USER }}
+          TF_VAR_seichi_portal_backend__discord_bot_token: ${{ secrets.TF_VAR_SEICHI_PORTAL_BACKEND__DISCORD_BOT_TOKEN }}
+          TF_VAR_seichi_portal_frontend__discord_client_id: ${{ secrets.TF_VAR_SEICHI_PORTAL_FRONTEND__DISCORD_CLIENT_ID }}
+          TF_VAR_seichi_portal_frontend__discord_client_secret: ${{ secrets.TF_VAR_SEICHI_PORTAL_FRONTEND__DISCORD_CLIENT_SECRET }}
+          TF_VAR_seichi_portal_frontend__ms_app_client_id: ${{ secrets.TF_VAR_SEICHI_PORTAL_FRONTEND__MS_APP_CLIENT_ID }}
+          TF_VAR_seichiassist_downloader_develop_release_notify_webhook_url: ${{ secrets.TF_VAR_SEICHIASSIST_DOWNLOADER_DEVELOP_RELEASE_NOTIFY_WEBHOOK_URL }}
+          TF_VAR_seichiassist_downloader_master_release_notify_webhook_url: ${{ secrets.TF_VAR_SEICHIASSIST_DOWNLOADER_MASTER_RELEASE_NOTIFY_WEBHOOK_URL }}
+          TF_VAR_tailscale_approval_bot__api_key: ${{ secrets.TF_VAR_TAILSCALE_APPROVAL_BOT__API_KEY }}
+          TF_VAR_tailscale_approval_bot__discord_bot_token: ${{ secrets.TF_VAR_TAILSCALE_APPROVAL_BOT__DISCORD_BOT_TOKEN }}
+          TF_VAR_tailscale_approval_bot__discord_channel_id: ${{ secrets.TF_VAR_TAILSCALE_APPROVAL_BOT__DISCORD_CHANNEL_ID }}
+          TF_VAR_tailscale_approval_bot__discord_guild_id: ${{ secrets.TF_VAR_TAILSCALE_APPROVAL_BOT__DISCORD_GUILD_ID }}
+          TF_VAR_tailscale_approval_bot__tailnet: ${{ secrets.TF_VAR_TAILSCALE_APPROVAL_BOT__TAILNET }}
+          TF_VAR_terraform_github_app_id: ${{ secrets.TF_VAR_TERRAFORM_GITHUB_APP_ID }}
+          TF_VAR_terraform_github_app_installation_id: ${{ secrets.TF_VAR_TERRAFORM_GITHUB_APP_INSTALLATION_ID }}
+          TF_VAR_terraform_github_app_pem: ${{ secrets.TF_VAR_TERRAFORM_GITHUB_APP_PEM }}
+          TF_VAR_truenas_exporter_api_key: ${{ secrets.TF_VAR_TRUENAS_EXPORTER_API_KEY }}
 
       - name: Comment result to Pull Request
         run: bash "./.github/workflows/scripts/comment-tf-plan-to-pr.sh"

@@ -28,7 +28,7 @@ Terraformで管理しているインフラの運用ガイド。
 
 Terraform variableは**すべて小文字のスネークケース**で定義すること。
 対応するGitHub Actions Secretは `TF_VAR_` + 大文字スネークケース（例: `TF_VAR_CLOUDFLARE_API_KEY`）で登録する。
-`expose-all-tf-vars-to-github-env.sh` がSecret名の `TF_VAR_` 以降を小文字に変換して環境変数として注入するため、この対応関係を崩さないこと。
+さらに `.github/workflows/terraform_pr.yaml` と `terraform_apply.yaml` の `env:` に `TF_VAR_<小文字名>: ${{ secrets.TF_VAR_<大文字名> }}` の行を両方とも追加すること（Secretは自動では渡されない）。
 
 ## 関連リンク
 
