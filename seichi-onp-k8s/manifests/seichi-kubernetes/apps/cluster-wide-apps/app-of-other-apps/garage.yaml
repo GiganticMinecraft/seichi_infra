@@ -44,7 +44,14 @@ spec:
         persistence:
           enabled: true
           meta:
-            storageClass: "synology-iscsi-storage"
+            # LMDB メタデータはノードローカル NVMe (Proxmox local-lvm 上の topolvm-vg) に置く。
+            # Synology iSCSI 上では fsync 1 回 3ms 超で、metadata_fsync=true にした後の
+            # 再同期 (2026-10-15 の garage-0 再構築) が 15 件/s = 40 時間ペースになった。
+            # NVMe では fsync 0.5ms。Pod 停止時に iSCSI logout でデバイスが消えて LMDB が
+            # 壊れる経路 (10/3 garage-2、10/15 garage-0) からも外れる。
+            # volumeClaimTemplates は immutable なので、既存ノードは PVC を作り直した時点で
+            # 切り替わる (garage-0 は 2026-10-15 に実施。garage-1/2 は Synology のまま)。
+            storageClass: "topolvm-provisioner"
             size: 100Gi
           data:
             storageClass: "sc-truenas-03-iscsi"
