@@ -48,13 +48,18 @@ spec:
           repository: dxflrs/amd64_garage
           pullPolicy: IfNotPresent
 
+        # Garage はブロック読み出し時にブロックファイル全体 (blockSize=64MiB) を RAM に
+        # 載せるため、Thanos Store の長期レンジクエリのように range GET が並列で来ると
+        # 使用量が平常時の 500Mi から一気に跳ねる。2026-10-14 23:52 UTC に 7 日レンジの
+        # クエリで 3 pod とも limit 2Gi で OOMKilled され、その間 S3 書き込みが 503 になった。
+        # request は据え置きでスケジューリングに影響させず、limit だけ広げる。
         resources:
           requests:
             cpu: 250m
             memory: 512Mi
           limits:
             cpu: 1000m
-            memory: 2Gi
+            memory: 6Gi
 
         # replica が同一ノードに同居すると、そのノードの障害だけで
         # replicationFactor=2 のクォーラムが割れる (2026-09-01 に wk-3 の
