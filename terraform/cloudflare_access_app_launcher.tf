@@ -22,4 +22,11 @@ resource "cloudflare_zero_trust_access_application" "app_launcher" {
       }
     }]
   }]
+
+  # provider は landing_page_design.title (computed) にデフォルト "Welcome!" を補うため、
+  # 未指定や {} のままだと plan のたびに差分が出る (ignore_changes でも抑止できない)。
+  # 画面に出ているデフォルトと同じ値を明示して、API 側にも持たせて収束させる。
+  landing_page_design = {
+    title = "Welcome!"
+  }
 }
