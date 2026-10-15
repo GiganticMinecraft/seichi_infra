@@ -115,6 +115,25 @@ spec:
             # 状態が壊れて数日間気付けないよりは望ましい。
             metastore.raft.log-store-timeout: "0"
 
+            # 2026-10-03 の Garage 障害でコンパクションジョブが 3 回ずつ失敗して failed になり、
+            # 既定の compaction-max-failures=3 と compaction-max-job-queue-size=10000 の
+            # 組み合わせで「キューが failed ジョブ 10,000 件ちょうどで埋まり、退避
+            # (size > limit のときだけ) も新規追加 (size >= limit で拒否) もされず、failed
+            # ジョブが各レベルの先頭で割り当てを塞ぐ」状態に陥った。2026-10-15 時点で
+            # 12 日間ジョブが 1 件も実行されず (5 秒ごとに "compaction job rejected by
+            # scheduler")、L0 ブロックが 67 万件溜まっていた。失敗上限を外して failed
+            # ジョブをリース切れ (abandoned) として再割り当てできるようにする
+            metastore.compaction-max-failures: "0"
+            # Garage の読み書きが遅いときに、実行中のジョブのリースが切れて別スロットへ
+            # 二重に割り当てられるのを防ぐ (既定 15s)
+            metastore.compaction-job-lease-duration: 1m
+
+            # segment の Garage へのアップロードが既定の 2 秒を超えると push が 500 になり、
+            # Rust SDK / Alloy 側はそのプロファイルを捨てる (平常時でも 1 日 100〜150 回、
+            # Garage の再起動時は数百回)。クライアントの送信タイムアウト 10 秒より
+            # 短い範囲で待つ
+            segment-writer.upload-timeout: 8s
+
             # architecture.storage=v2 では write-path=segment-writer も必須だが
             # chart 2.0.1 は v2 を立てても write-path を自動セットしない (確認済)。
             # 起動時に "write-path=segment-writer is required for v2 storage layer"
