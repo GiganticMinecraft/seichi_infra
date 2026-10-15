@@ -69,6 +69,12 @@ spec:
             otlp:
               http:
                 enabled: true
+              # Garage の trace_sink は OTLP gRPC しか話せない (4317)。http だけ開けていた
+              # ため Garage は 2026-05 の設定以来ずっと "the grpc server returns error ...
+              # transport error" を 3 秒ごとに出し、溜まった span で "channel is full" を
+              # 5 分に 7,000 行吐いていた
+              grpc:
+                enabled: true
           traces:
             filters:
               span:

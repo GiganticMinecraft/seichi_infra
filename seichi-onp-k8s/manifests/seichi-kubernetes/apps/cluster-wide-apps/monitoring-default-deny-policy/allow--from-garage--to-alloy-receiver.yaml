@@ -1,0 +1,22 @@
+# garage namespace の Garage (trace_sink) から Alloy receiver への
+# OTLP gRPC (4317/TCP) の ingress 許可。garage namespace 側に egress の
+# default-deny は無いので、こちらの ingress 許可だけで足りる。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-garage--to-alloy-receiver
+  namespace: monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-receiver
+      app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: garage
+            app.kubernetes.io/name: garage
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP

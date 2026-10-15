@@ -101,7 +101,9 @@ spec:
               interval: 30s
               scrapeTimeout: 10s
           tracing:
-            sink: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+            # Garage の OpenTelemetry exporter は OTLP gRPC なので、alloy-receiver の
+            # gRPC ポート (4317) に送る。4318 は OTLP HTTP で、gRPC では繋がらない
+            sink: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4317"
   destination:
     server: https://kubernetes.default.svc
     namespace: garage
