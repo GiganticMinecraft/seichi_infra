@@ -8,7 +8,7 @@ spec:
   source:
     chart: node-problem-detector
     repoURL: ghcr.io/deliveryhero/helm-charts
-    targetRevision: 2.4.1
+    targetRevision: 2.4.2
     helm:
       releaseName: node-problem-detector
       values: |
