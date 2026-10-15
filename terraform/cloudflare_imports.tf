@@ -128,6 +128,15 @@ import {
 
 # endregion
 
-# region Access Identity Provider (既にステートにあるが念のため)
-# cloudflare_zero_trust_access_identity_provider.github_oauth は既にインポート済み
+# region Access Identity Provider
+# NOTE: v5 移行時に import されず新規作成されたため、旧 IdP (c42964d7-…) は 2026-10-15 にダッシュボードから手動削除した。
+# endregion
+
+# region Access App Launcher (ダッシュボードで作成済みのものを取り込む)
+
+import {
+  to = cloudflare_zero_trust_access_application.app_launcher
+  id = "accounts/9e9e88e2b19878c4a911c3c8a715a168/ca78f49c-6fed-4913-a32c-e953a95f17e3"
+}
+
 # endregion
