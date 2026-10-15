@@ -23,10 +23,10 @@ resource "cloudflare_zero_trust_access_application" "app_launcher" {
     }]
   }]
 
-  lifecycle {
-    # ランディングページの外観 (landing_page_design) は Terraform で管理しない。
-    # API は常に {} を返す一方、provider は未指定なら null、{} を書けば title のデフォルト "Welcome!" を
-    # 補うため、どちらを書いても plan のたびに差分が出る。無視して収束させる。
-    ignore_changes = [landing_page_design]
+  # provider は landing_page_design.title (computed) にデフォルト "Welcome!" を補うため、
+  # 未指定や {} のままだと plan のたびに差分が出る (ignore_changes でも抑止できない)。
+  # 画面に出ているデフォルトと同じ値を明示して、API 側にも持たせて収束させる。
+  landing_page_design = {
+    title = "Welcome!"
   }
 }
