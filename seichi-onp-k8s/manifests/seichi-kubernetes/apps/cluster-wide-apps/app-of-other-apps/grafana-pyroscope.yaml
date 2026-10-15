@@ -127,6 +127,11 @@ spec:
             # Garage の読み書きが遅いときに、実行中のジョブのリースが切れて別スロットへ
             # 二重に割り当てられるのを防ぐ (既定 15s)
             metastore.compaction-job-lease-duration: 1m
+            # 既定の並列度は CPU コア数 (24)。12 日分のバックログを 24 並列で消化し始めたら
+            # Garage の data LUN (TrueNAS iSCSI、3 ノード共通) が busy 70〜93% に張り付き、
+            # PutObject が 6〜12 秒かかって segment の flush (8 秒) が再びタイムアウトし、
+            # プロファイルの取り込みが落ちた。取り込みを優先し、ディスクに余裕を残す並列度にする
+            compaction-worker.job-concurrency: "4"
 
             # segment の Garage へのアップロードが既定の 2 秒を超えると push が 500 になり、
             # Rust SDK / Alloy 側はそのプロファイルを捨てる (平常時でも 1 日 100〜150 回、
