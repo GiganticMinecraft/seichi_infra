@@ -11,6 +11,10 @@ resource "cloudflare_zero_trust_access_application" "app_launcher" {
 
   allowed_idps = [cloudflare_zero_trust_access_identity_provider.github_oauth.id]
 
+  # API は App Launcher の landing_page_design を常に {} で返すため、未指定 (null) のままだと
+  # 毎回 `{} -> null` の差分が出る。空オブジェクトを明示して API の値と一致させる。
+  landing_page_design = {}
+
   policies = [{
     decision   = "allow"
     name       = "Require to be in the GitHub organization to access"
