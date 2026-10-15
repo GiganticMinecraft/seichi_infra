@@ -14,6 +14,13 @@ spec:
   sourceNamespace: olm
   installPlanApproval: Automatic
   startingCSV: node-healthcheck-operator.v0.12.0
+  # CSV 既定の memory request 20Mi に対して manager の実使用は 90〜105Mi
+  # (2026-10 時点) で常時 request 超過になっていたため実態に合わせる
+  config:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription

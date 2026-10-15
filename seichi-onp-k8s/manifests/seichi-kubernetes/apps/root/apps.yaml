@@ -287,6 +287,17 @@ spec:
           envFrom:
             - secretRef:
                 name: kubechecks-github-app-secret
+          # チャート既定の memory limit 1Gi では Renovate PR のように多数の Application を
+          # 並列で描画すると 7 日ピーク 1022Mi に達し、OOMKilled を 7 日で 20 回繰り返していた
+          # (2026-10 時点)。描画は helm/kustomize の並列実行で CPU も最大 16 core まで伸びる
+          # ため、ノードを食い潰さないよう CPU limit も置く
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 4
+              memory: 2Gi
 
         ingress:
           create: false

@@ -24,13 +24,15 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
+          # 2026-10 時点の 7 日ピークが 230Mi で limit 256Mi に迫り、VPA の upper bound
+          # (303Mi) も limit を超えていたため memory を倍に広げる
           resources:
             requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 256Mi
             limits:
               cpu: 100m
-              memory: 256Mi
+              memory: 512Mi
           env:
             - name: TURNSTILE_SITE_KEY
               valueFrom:

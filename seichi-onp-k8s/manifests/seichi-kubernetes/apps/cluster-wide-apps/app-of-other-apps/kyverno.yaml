@@ -18,20 +18,41 @@ spec:
             enabled: true
             additionalLabels:
               release: prometheus
+        # チャート既定の memory limit 128Mi は実測ピーク(2026-10 時点で reports 127Mi /
+        # background 122Mi / cleanup 125Mi)に張り付いていて、reports-controller は
+        # OOMKilled を繰り返していた。reports は 512Mi、他 2 つは 256Mi に広げる。
         backgroundController:
           replicas: 2
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
           serviceMonitor:
             enabled: true
             additionalLabels:
               release: prometheus
         cleanupController:
           replicas: 2
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
           serviceMonitor:
             enabled: true
             additionalLabels:
               release: prometheus
         reportsController:
           replicas: 2
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           serviceMonitor:
             enabled: true
             additionalLabels:

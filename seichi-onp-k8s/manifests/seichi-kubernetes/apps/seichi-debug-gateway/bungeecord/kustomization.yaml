@@ -18,6 +18,17 @@ resources:
   - ./network-policy.yaml
 
 patches:
+  # テンプレートの request 768Mi はヒープ (-Xmx768m) と同値で、JVM 全体では常時
+  # 1.0Gi 強 (2026-10 時点の実測ピーク 1056Mi) を使うため request を実態に合わせる
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 1280Mi
+    target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: bungeecord
   - path: bungeecord-metrics-patch.yaml
   - path: bungeecord-plugin-configs-patch.yaml
   - path: service-bungeecord-loadbalancer.yaml
