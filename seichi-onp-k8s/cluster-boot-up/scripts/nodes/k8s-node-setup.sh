@@ -111,6 +111,17 @@ EOF
 # Apply sysctl params without reboot
 sudo sysctl --system
 
+# iSCSI initiator (democratic-csi / synology-csi が利用) のセッション復旧待ち時間。
+# 既定の 120 秒では NAS の再起動や HA フェイルオーバー中にブロックデバイスが
+# offline 化されて EIO になり、ext4 は journal abort、Garage の LMDB は消失した
+# (2026-09-28 の garage-0、2026-10-15 の rolling restart)。I/O を 15 分間保留して
+# ターゲットの復帰を待つ。稼働中ノードには 2026-10-15 に sysfs 経由で同じ値を
+# 適用済みで、ここはノード再構築時に戻らないようにするための設定。
+sudo apt-get install -y open-iscsi
+sudo sed -i -E 's/^(node\.session\.timeo\.replacement_timeout = ).*/\1900/' /etc/iscsi/iscsid.conf
+grep -qE '^node\.session\.timeo\.replacement_timeout = 900$' /etc/iscsi/iscsid.conf
+sudo systemctl enable --now iscsid
+
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2
@@ -119,9 +130,11 @@ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyring
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
 # Add the repository to Apt sources:
+# $ をエスケープしていると dpkg / os-release が展開されずに文字列のまま
+# docker.list に書かれる (Docker 公式手順どおり展開させる。shellcheck SC2140 も解消)
 echo \
-    "deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-    \$(. /etc/os-release && echo "\$VERSION_CODENAME") stable" | \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 
