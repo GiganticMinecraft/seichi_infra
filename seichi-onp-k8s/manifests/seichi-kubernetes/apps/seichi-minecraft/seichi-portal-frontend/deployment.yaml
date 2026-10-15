@@ -25,13 +25,18 @@ spec:
               containerPort: 3000
               protocol: TCP
           # 2026-10 時点の 7 日ピークが 230Mi で limit 256Mi に迫り、VPA の upper bound
-          # (303Mi) も limit を超えていたため memory を倍に広げる
+          # (303Mi) も limit を超えていたため memory を倍に広げる。
+          # CPU は平均 10m 程度 (VPA target 23m) だが、Next.js の SSR はリクエストが
+          # 重なった瞬間に 1 コアを使い切る。limit 100m では脆弱性スキャナのバーストや
+          # 回答一覧の SSR で CFS throttling が 50% を超え (7 日ピーク 54%)、backend が
+          # 5ms で返す /users/me の fetch に 650ms、ページ応答に 1.5〜2.7 秒かかっていた
+          # ため limit を 500m にする。request は実使用に合わせて据え置く。
           resources:
             requests:
               cpu: 50m
               memory: 256Mi
             limits:
-              cpu: 100m
+              cpu: 500m
               memory: 512Mi
           env:
             - name: TURNSTILE_SITE_KEY
