@@ -56,6 +56,14 @@ spec:
           volumeMounts:
             - name: host-root
               mountPath: /host
+              # 既定 (None) だとコンテナ起動時点のホストのマウントツリーが private に複製され、
+              # その後ホスト側で PVC が umount されてもこのコンテナ内の複製が残る。
+              # superblock が解放されないため kubelet/CSI の umount は書き戻しを待たずに
+              # 成功扱いになり、直後の iSCSI logout でジャーナル abort が起きる
+              # (2026-10-15 時点で wk-1 のこの Pod が既に存在しない Pod 7 個分の PVC を保持していた)。
+              # HostToContainer (rslave) ならホストの umount がコンテナ側にも伝播する。
+              # chroot 用途には影響しない。
+              mountPropagation: HostToContainer
             - name: scripts
               mountPath: /scripts
               readOnly: true
