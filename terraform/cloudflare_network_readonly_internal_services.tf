@@ -1,5 +1,6 @@
 # 整地鯖管理者が、デバッグ目的などで内部的なサービスに接続する必要がある際に経由するネットワーク。
 # NOTE: Certificate Pack は Cloudflare 側で自動管理されているため、Terraform 管理外としています。
+# NOTE: allowed_idps を省略するとアカウント内の全 IdP がログイン画面に並ぶため、Terraform 管理の GitHub OAuth に限定しています。
 
 resource "cloudflare_zero_trust_access_application" "game_data_server" {
   zone_id          = local.cloudflare_zone_id
@@ -9,6 +10,8 @@ resource "cloudflare_zero_trust_access_application" "game_data_server" {
   session_duration = "24h"
 
   http_only_cookie_attribute = true
+
+  allowed_idps = [cloudflare_zero_trust_access_identity_provider.github_oauth.id]
 
   policies = [{
     decision   = "allow"
