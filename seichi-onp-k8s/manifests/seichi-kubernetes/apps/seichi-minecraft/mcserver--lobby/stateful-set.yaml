@@ -186,7 +186,7 @@ spec:
             - name: REMOVE_OLD_MODS
               value: "TRUE"
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:1c2c93bedf824a6dfff58134abb35c57724cd3d328cb9491eb84ed38f26bfcba
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_production_lobby:1.0.0@sha256:06f98b03ed39f483c8055282743693f0c96ad93282c3cc32f4e01e18857e92ca
           name: minecraft
           ports:
             - containerPort: 25565
