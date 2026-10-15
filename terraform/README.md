@@ -80,24 +80,20 @@ Kubernetes API サーバーまで TCP 通信ができるようにすると、`k8
 
 ## GitHub Actions から渡される Terraform variableについて
 
-GitHub Actions ワークフロー上で Terraform を実行する都合上、 Terraform の variable は GitHub Actions Secret を元に生成したものを環境変数経由で `terraform` CLI に流し込んでいます。
+GitHub Actions ワークフロー上で Terraform を実行する都合上、 Terraform の variable は GitHub Actions Secret の値を環境変数 `TF_VAR_*` 経由で `terraform` CLI に流し込んでいます([参考](https://www.terraform.io/language/values/variables#environment-variables))。
 
-これは以下に示す手順で行っており、 Terraform CLI には小文字化された変数しか variable として入力されないため、**Terraform variableを新規に追加する場合は、すべて小文字のスネークケースにて定義するよう注意してください**。
+Secret と環境変数の対応は、[`terraform_pr.yaml`](../.github/workflows/terraform_pr.yaml) と [`terraform_apply.yaml`](../.github/workflows/terraform_apply.yaml) の `terraform plan` / `terraform apply` ステップの `env:` に **1 変数 1 行で明示的に** 書いています。
 
-### GitHub Actions Secret を環境変数に変換する手順
+以前は `toJson(secrets)` で全 Secret を列挙して自動変換していましたが、GitHub がその記述を「悪意のある可能性があるワークフロー」と判定して apply を承認待ちにするようになったため、明示的な列挙に切り替えました。
 
-Terraform は `TF_VAR_*` の形をした環境変数を用いて variable への入力を作成します([参考](https://www.terraform.io/language/values/variables#environment-variables))。GitHub Actions Secret と環境変数の間には
+### variable を追加するときの手順
 
- - GitHub Actions Secret は case insensitive
- - 環境変数、及び Terraform variable は case sensitive
+1. `main.tf` に variable を **すべて小文字のスネークケース** で定義する(例: `foo_bar_token`)
+1. GitHub Actions Secret を `TF_VAR_` + 大文字スネークケース で登録する(例: `TF_VAR_FOO_BAR_TOKEN`)
+1. `terraform_pr.yaml` と `terraform_apply.yaml` の両方の `env:` に `TF_VAR_foo_bar_token: ${{ secrets.TF_VAR_FOO_BAR_TOKEN }}` を足す
 
-という差異があります。
-
-そのため、`TF_VAR_(\w+)` の形をした GitHub Actions Secret のキーとその値のペアをすべて列挙したうえで、各ペアについて、
- 1. キー `TF_VAR_(\w+)` から `$1` の部分を取り出し、`$1` を**小文字化したものを** `lower_var_name` とする
- 1. `TF_VAR_${lower_var_name}` という名前の環境変数に Secret 値をセットする
-
-のステップを繰り返したのち、 `terraform` CLI を実行するようにしています。
+3 を忘れると `terraform plan` が "No value for required variable" で失敗するので、PR の CI で気づけます。
+なお `TF_VAR_onp_k8s_server_url` だけは Secret ではなく、トンネル作成スクリプトが `GITHUB_ENV` 経由で設定しています。
 
 ## Terraform Variable の一覧について
 
