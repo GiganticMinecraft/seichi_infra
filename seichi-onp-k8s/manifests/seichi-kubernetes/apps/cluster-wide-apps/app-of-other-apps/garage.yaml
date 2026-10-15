@@ -20,6 +20,17 @@ spec:
           replicationFactor: "2"
           consistencyMode: "consistent"
           compressionLevel: "1"
+          # LMDB は強制終了や書き戻し中のデバイス切断で壊れやすく、公式も snapshot の
+          # 常設を推奨している。2026-10-03 (garage-2) と 2026-10-15 (garage-0) に
+          # Pod 再起動でメタデータ DB が失われ、ピアからの全再同期になった。
+          # Garage は直近 2 世代だけ残して古いものを消す。一時的に 3 世代 + 本体で
+          # DB サイズの最大 4 倍 (現状 4〜8GiB × 4) を meta ボリューム (100Gi) 上に使う。
+          metadataAutoSnapshotInterval: "6h"
+          # metadata_fsync=false (既定) だと LMDB は MDB_NOSYNC で動き、ページキャッシュ上の
+          # 更新がディスクに届く前にデバイスが消えると DB ごと失われる。書き込み性能は
+          # 落ちるが、このクラスタの書き込み量 (PutObject 約 5.6 万/日) では問題にならない。
+          additionalTopLevelConfig: |
+            metadata_fsync = true
           rpcBindAddr: "[::]:3901"
           kubernetesSkipCrd: false
           s3:
