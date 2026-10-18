@@ -14,6 +14,7 @@ https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 - [Cloudflare証明書更新](./runbooks/cloudflare-cert-renewal.md)
 - [Minecraftメンテナンスモード](./runbooks/maintenance-mode.md)
 - [Minecraftワールド・MariaDBロールバック](./runbooks/rollback-mcserver-and-mariadb.md)
+- [Garage meta ボリュームの storageClass 切り替え](./runbooks/garage-meta-volume-migration.md)
 
 ## Guides（ガイド）
 
