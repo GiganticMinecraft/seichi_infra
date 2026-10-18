@@ -18,18 +18,34 @@ StatefulSet の `volumeClaimTemplates` は immutable で、Argo CD も `ignoreDi
 - LMDB が健全なら**空の PVC で再同期させず、ファイルをコピーして移す**。
   テーブル全件の再取得が不要になり、resync queue の中身もそのまま引き継がれる。
   10/3 と 10/15 のように LMDB が壊れている場合だけ、`node_key` 等の識別ファイルを退避して空の PVC から再同期させる。
+- **Pod を止めている間、そのノードが担当するパーティション (全体の 2/3) への書き込みは 503 になる**。
+  `replicationFactor: 2` の書き込みクォーラムは 2 で、片方が落ちると満たせないため。
+  読み出しは残った 1 台から返る。コピー中 (70GiB で約 8 分、Synology → NVMe で約 160MB/s) は
+  Loki / Thanos / Pyroscope などの書き込みが失敗し続けるので、各クライアントのリトライに任せる前提で短時間で終える。
+  2026-10-19 の garage-0 作業では garage-1/2 合計で 503 が約 36 件/s 出た。
 
 ## 手順 (garage-N を切り替える。N=0 の例)
 
 ### 0. マージと sts の作り直し (初回のみ)
 
+**注意: sts を作り直すと rolling restart が走ることがある。** 新しい sts の Pod テンプレートが
+live の sts と 1 バイトでも違えば ControllerRevision のハッシュが変わり、garage-2 → 1 → 0 の順に
+全 Pod が再起動される。2026-10-19 の実施時は、7/14 の `kubectl rollout restart` が残した
+`kubectl.kubernetes.io/restartedAt` アノテーションが live 側にだけあったため全台が約 1 分で再起動し、
+その間 S3 の書き込みクォーラムが欠けた (LMDB は 3 台とも無事だった)。
+事前に Argo の desired manifest と live の `.spec.template` を diff し、差があれば再起動を織り込んで時間帯を選ぶ。
+
 ```bash
 # PR をマージ → Argo が sync しても live sts の vct は古いまま
+kubectl -n garage get sts garage -o yaml > sts-before.yaml                                 # 控え
+kubectl -n garage get sts garage -o jsonpath='{.spec.template.metadata.annotations}{"\n"}'  # restartedAt 等の手作業アノテーションが残っていないか
 kubectl -n garage delete sts garage --cascade=orphan   # Pod は残る
 # Argo (selfHeal) が数秒で sts を再作成し、既存 Pod を adopt する
 kubectl -n garage get sts garage -o jsonpath='{range .spec.volumeClaimTemplates[*]}{.metadata.name}={.spec.storageClassName}/{.spec.resources.requests.storage}{"\n"}{end}'
-kubectl -n garage get sts garage -o jsonpath='{.status.currentRevision} {.status.updateRevision}{"\n"}'  # 両方が Pod の controller-revision-hash と一致すること (rolling update が始まらない)
+kubectl -n garage get sts garage -o jsonpath='{.status.currentRevision} {.status.updateRevision}{"\n"}'  # Pod の controller-revision-hash と違えば rolling restart が始まっている
 ```
+
+2 台目以降はこの手順は不要 (vct は既に新しい)。
 
 ### 1. 旧 PV を保全する
 
@@ -85,7 +101,8 @@ spec:
   containers:
     - name: copy
       image: busybox:stable
-      command: ["sh", "-c", "set -e; df -h /src /dst; time cp -a /src/. /dst/; sync; chown -R 1000:1000 /dst; ls -la /dst; df -h /dst; echo COPY_DONE"]
+      # db.lmdb.corrupt-* (壊れた LMDB を Garage が退避したもの) はコピーしない
+      command: ["sh", "-c", "set -e; ls -la /src; df -h /src /dst; for f in /src/* /src/.[!.]*; do case \"$(basename \"$f\")\" in db.lmdb.corrupt-*) echo skip \"$f\";; *) cp -a \"$f\" /dst/;; esac; done; sync; chown -R 1000:1000 /dst; ls -la /dst; df -h /dst; echo COPY_DONE"]
       volumeMounts:
         - { name: src, mountPath: /src, readOnly: true }
         - { name: dst, mountPath: /dst }
@@ -105,6 +122,14 @@ kubectl -n garage delete pod garage-0-meta-copy
 kubectl uncordon seichi-onp-k8s-wk-1            # garage-0 がスケジュールされ、コピーした LMDB で起動する
 kubectl -n garage exec garage-0 -c garage -- /garage status   # ノード ID が以前と同じこと
 kubectl -n garage exec garage-0 -c garage -- /garage worker list | head
+kubectl -n garage exec garage-0 -c garage -- /garage stats | grep -E 'object|version|block_ref|resync'  # 件数が停止前と同程度
+```
+
+起動後、再同期を速めるなら:
+
+```bash
+kubectl -n garage exec garage-0 -c garage -- /garage worker set resync-tranquility 0
+kubectl -n garage exec garage-0 -c garage -- /garage worker set resync-worker-count 4
 ```
 
 ### 5. 後片付け (数日様子を見てから)
