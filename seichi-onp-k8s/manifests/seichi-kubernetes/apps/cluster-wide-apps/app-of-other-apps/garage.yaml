@@ -53,7 +53,10 @@ spec:
             # 既存 3 ノードの meta PVC は Synology のまま。ノードごとに PVC を作り直して
             # (sts を --cascade=orphan で再作成 → PVC/Pod 削除 → node_key 等を戻す) 切り替える。
             storageClass: "topolvm-provisioner"
-            size: 100Gi
+            # garage-0 の LMDB は再同期中に 70GiB まで膨れた (garage-1: 32GiB、garage-2: 17GiB)。
+            # 6h ごとの自動スナップショット 2 世代もここに置かれるので 100Gi では足りない。
+            # 各ノードの topolvm 空きは 990Gi 以上ある。
+            size: 200Gi
           data:
             storageClass: "sc-truenas-03-iscsi"
             size: 4Ti
