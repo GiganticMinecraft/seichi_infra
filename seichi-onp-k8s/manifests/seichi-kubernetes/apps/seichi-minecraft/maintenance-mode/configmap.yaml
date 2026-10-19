@@ -9,7 +9,7 @@ data:
   # Serviceのエンドポイントから除外される（トラフィック遮断）。
   # Pod自体は起動したままなので、メンテナンス作業は継続可能。
   # グローバル: "true" で全サーバに影響
-  enabled: "true"
+  enabled: "false"
   # 各サーバ個別: "true" で当該サーバのみに影響
   enabled--s1: "false"
   enabled--s2: "false"
