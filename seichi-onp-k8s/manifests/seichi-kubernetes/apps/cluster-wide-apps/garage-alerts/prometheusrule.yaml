@@ -36,16 +36,84 @@ spec:
         - alert: GarageBlockResyncErrors
           # 原因側のシグナル。ディスク I/O エラーなどでブロックの再同期に
           # 失敗し続けている状態を捉える。
-          # 実測: 平常時は garage-0=20 / garage-1=13 / garage-2=29 前後で
-          # 23 日間ほぼ不動。障害時のみ garage-2 が 2199 まで上昇した。
-          # 閾値 100 は平常最大値の約 3 倍かつ障害時実測の約 1/20。
-          # 障害からの復旧中(resync キュー消化中)も一時的に上がるため、
-          # resync が終わるまで鳴り続けるのは期待どおりの挙動。
-          expr: max by (pod) (block_resync_errored_blocks) > 100
-          for: 30m
+          # 実測: 2026-09 までの「平常値 13〜29」は 10/3・10/15 の LMDB 破損で
+          # 失われたブロックの残骸で、2026-10-19 に repair block-refs と
+          # block purge で全ノード 0 にした。以後の平常値は 0。
+          # ノード再起動や repair の直後に数十〜100 程度まで一時的に上がり
+          # 1 時間以内に戻るので、10 超が 2 時間続いたら鳴らす。
+          expr: max by (pod) (block_resync_errored_blocks) > 10
+          for: 2h
           labels:
             severity: warning
             notify: discord
           annotations:
             summary: "Garage {{ $labels.pod }} で再同期に失敗しているブロックが増えています"
-            description: "{{ $labels.pod }} の block_resync_errored_blocks が 30 分以上 100 を超えています。ノードのカーネルログで I/O エラーを、garage block list-errors で参照が残るブロック(RC>0)を確認してください。"
+            description: "{{ $labels.pod }} の block_resync_errored_blocks が 2 時間以上 10 を超えています。ノードのカーネルログで I/O エラーを、garage block list-errors で参照が残るブロック(RC>0)を確認してください。"
+
+        - alert: GarageS3InternalErrors
+          # 500 はクォーラム不足ではなく、メタデータの不整合 (object が指す version が
+          # 削除済み、ブロック欠損など) で返る。2026-10-19 に pyroscope の 48 キーが
+          # 毎秒 6.5 件の 500 を 3 日以上返し続けていたが、503 のアラートしか無く
+          # 気付けなかった。Pyroscope の削除レースで数件/分は平常時も出るので、
+          # 1 件/秒超が 15 分続いたら鳴らす。
+          expr: sum(rate(api_s3_error_counter{status_code="500"}[5m])) > 1
+          for: 15m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Garage が S3 リクエストに 500 を返し続けています"
+            description: "Garage の 500 応答が 15 分以上毎秒 1 件を超えています。Loki で {namespace=\"garage\"} |= \"Internal error\" を見てキーを特定してください。object/version 不整合なら該当キーの DeleteObject、ブロック欠損なら garage block list-errors / purge が対処です (docs/runbooks/garage-meta-volume-migration.md の関連項参照)。"
+
+        - alert: GarageS3SlowWrites
+          # metadata_fsync=true のため meta ボリュームの fsync レイテンシが PutObject に
+          # そのまま乗る。Synology iSCSI 上では PutObject p99 が 6 秒前後で数週間
+          # 推移していたが誰も気付かなかった。NVMe (topolvm) 移行後は 0.2 秒。
+          expr: histogram_quantile(0.99, sum by (le) (rate(api_s3_request_duration_bucket{api_endpoint="PutObject"}[10m]))) > 2
+          for: 30m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Garage の PutObject p99 が {{ $value | humanizeDuration }} に悪化しています"
+            description: "PutObject の p99 が 30 分以上 2 秒を超えています。テーブル書き込み p99 (table_put_request_duration) が同時に悪化していれば meta ボリュームの fsync 性能、block_write_duration なら data ボリューム (TrueNAS) 側を疑ってください。"
+
+        - alert: GarageStorageNodeDisconnected
+          # replicationFactor=2 では 1 台欠けた時点で 2/3 のパーティションの書き込み
+          # クォーラムが満たせず 503 になる。503 アラートより先に原因を指す。
+          # 注意: この指標はノード間のネットワーク疎通ベースで、ストレージ障害
+          # (2026-09-06 の iSCSI LUN offline) では反応しない。
+          expr: min(cluster_storage_nodes_ok) < min(cluster_storage_nodes)
+          for: 10m
+          labels:
+            severity: critical
+            notify: discord
+          annotations:
+            summary: "Garage のストレージノードが {{ $value }} 台しか接続されていません"
+            description: "garage status で欠けているノードを確認してください。Pod が Pending なら topolvm の PV があるノードにしか乗れない制約 (nodeAffinity) を疑ってください。"
+
+        - alert: GarageMetaVolumeLow
+          # LMDB は再同期中に 3 倍以上に膨れる (2026-10-15: 22GiB → 70GiB、100Gi の
+          # ボリュームで 72% まで使用)。満杯になると Garage が書けなくなり LMDB も
+          # 壊れうるので、再同期を始める前に余裕があるかをここで見る。
+          expr: garage_local_disk_avail{volume="metadata"} / garage_local_disk_total{volume="metadata"} < 0.2
+          for: 15m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Garage {{ $labels.pod }} の meta ボリューム空きが {{ $value | humanizePercentage }} です"
+            description: "meta (LMDB) ボリュームの空きが 20% を切っています。topolvm なら PVC を拡張 (allowVolumeExpansion=true)、snapshots/ と db.lmdb.corrupt-* の掃除も検討してください。"
+
+        - alert: GarageResyncBacklog
+          # ノード再構築後の再同期が進んでいないことを捉える。NVMe 上なら 35 万件を
+          # 10 分で消化できる (2026-10-19 実測) ので、1 万件超が 6 時間続くのは異常。
+          # resync-tranquility / resync-worker-count (garage worker get) を確認する。
+          expr: max by (pod) (block_resync_queue_length) > 10000
+          for: 6h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Garage {{ $labels.pod }} の resync キューが 6 時間以上 1 万件を超えています"
+            description: "block_resync_queue_length が減っていません。garage worker list で resync worker の状態と tranquility を、ノードのディスク I/O を確認してください。"
