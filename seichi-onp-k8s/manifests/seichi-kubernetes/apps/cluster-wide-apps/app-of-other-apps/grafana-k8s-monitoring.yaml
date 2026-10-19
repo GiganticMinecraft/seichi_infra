@@ -90,7 +90,9 @@ spec:
                 # ("Acquire mutation_lock #0〜#255") で、span 名のカーディナリティも高い。
                 # S3 API のルート span と、そのレイテンシ内訳になる BlockManager / テーブル操作の
                 # 子 span は残し、それ以外の内部処理と admin API (metrics scrape 含む) を落とす。
-                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^RPC \\[.*")'
+                # (正規表現にバックスラッシュを入れると YAML → Helm → Alloy → OTTL の各段で
+                #  エスケープ解釈が変わるので、"RPC [" ではなく "RPC " で前方一致させる)
+                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^RPC ")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Acquire mutation_lock #.*")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Admin API .*")'
                 - 'resource.attributes["service.name"] == "garage" and name == "admin/gather_metrics"'
