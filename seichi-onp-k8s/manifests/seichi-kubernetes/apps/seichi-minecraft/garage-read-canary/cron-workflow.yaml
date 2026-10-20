@@ -87,9 +87,14 @@ spec:
           # Garage は 64MiB ブロック + メモリ上限が厳しく、並列の range GET で OOM した前歴がある。
           # 転送は 1 本ずつ、かつ multipart_threshold を実質無効にして 1 オブジェクト = 1 GET にする
           # (本文が途中で切れる欠損は、1 本の GET の short read としてそのまま検出できる)。
+          # response_checksum_validation: AWS CLI v2 は既定で全体 CRC32 を検証するが、Garage は
+          # マルチパートでアップロードされたオブジェクトに対してパートごとの複合チェックサムを返すため
+          # 必ず不一致になる (2026-10-20 の初回実行で SeichiAssist.jar など 3 件が誤検知)。
+          # 欠損の検出はサイズ照合で行うので、チェックサム検証は要求されたときだけにする。
           export AWS_CONFIG_FILE="$WORK/aws-config"
           cat > "$AWS_CONFIG_FILE" <<'CFG'
           [default]
+          response_checksum_validation = when_required
           s3 =
               max_concurrent_requests = 1
               multipart_threshold = 5GB
