@@ -40,10 +40,6 @@ metadata:
   annotations:
     workflows.argoproj.io/description: "Garage の seichi-plugins / seichiassist バケットの全オブジェクトを読み出し、欠損 (本文の途中切れ) がないか確認するワークフロー"
 spec:
-  podResources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
   # CiliumNetworkPolicy allow--from-garage-read-canary--to-garage の selector
   podMetadata:
     labels:
@@ -86,7 +82,7 @@ spec:
 
           WORK=/tmp/canary
           mkdir -p "$WORK"
-          : > "$WORK/failures.txt"
+          : > "$WORK/failures.list"
 
           # Garage は 64MiB ブロック + メモリ上限が厳しく、並列の range GET で OOM した前歴がある。
           # 転送は 1 本ずつ、かつ multipart_threshold を実質無効にして 1 オブジェクト = 1 GET にする
@@ -106,11 +102,10 @@ spec:
           failed=0
 
           fail() {
-            # $1: 対象, $2: 理由。Discord の JSON に埋め込むので引用符・バックスラッシュは落とす
+            # $1: 対象, $2: 理由
             failed=$((failed + 1))
             echo "NG   $1: $2"
-            # shellcheck disable=SC1003  # tr 自身のエスケープで \\ はバックスラッシュ 1 文字
-            printf '%s (%s) / ' "$1" "$2" | tr -d '"\\' >> "$WORK/failures.txt"
+            printf '%s (%s) / ' "$1" "$2" >> "$WORK/failures.list"
           }
 
           for bucket in $BUCKETS; do
@@ -166,10 +161,14 @@ spec:
           done
 
           echo "=== Checked $total objects, $failed failed ==="
-          if [ "$failed" -ne 0 ]; then
-            echo "Failed: $(cat "$WORK/failures.txt")"
-            exit 1
+          # 通知本文用 (Discord の description 上限 4096 文字)。全量はログに出す
+          if [ -s "$WORK/failures.list" ]; then
+            echo "Failed: $(cat "$WORK/failures.list")"
+            { head -c 1500 "$WORK/failures.list"; [ "$(wc -c < "$WORK/failures.list")" -gt 1500 ] && printf '... (全 %d 件、残りはログ参照) ' "$failed"; } > "$WORK/failures.txt"
+          else
+            : > "$WORK/failures.txt"
           fi
+          [ "$failed" -eq 0 ]
         env:
           - name: AWS_ACCESS_KEY_ID
             valueFrom:
@@ -213,5 +212,7 @@ spec:
                   value: "Garage 読み出しカナリア失敗"
                 - name: workflow-kind
                   value: "Garage 読み出しカナリア"
+                # read-all-objects が完了しなかった (deadline / Pod 起動失敗) ときは
+                # outputs が無いので、未解決で通知ステップごと落ちないよう式で既定値を与える
                 - name: details
-                  value: "失敗: {{workflow.outputs.parameters.canary-failures}} "
+                  value: "失敗: {{=workflow.outputs.parameters['canary-failures'] ?? ''}} "

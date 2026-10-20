@@ -37,5 +37,8 @@ spec:
               protocol: ANY
           rules:
             dns:
-              - matchName: garage.garage.svc.cluster.local
-              - matchName: discord.com
+              # resolv.conf の ndots:5 により、まず検索ドメインを付けた名前
+              # (garage.garage.svc.cluster.local.seichi-minecraft.svc.cluster.local など) が
+              # 問い合わされ、Cilium の DNS プロキシが REFUSED を返すとリゾルバはそこで
+              # 諦める。問い合わせ自体は全て許可し、接続先は toFQDNs / toServices で絞る
+              - matchPattern: "*"
