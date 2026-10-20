@@ -8,6 +8,14 @@ spec:
       inputs:
         parameters:
           - name: title
+          # 本文の「〜 `<workflow 名>` が失敗しました」の主語。
+          # バックアップ以外のワークフロー (garage-read-canary など) が通知に使うときに上書きする
+          - name: workflow-kind
+            default: "バックアップワークフロー"
+          # 本文に追記する補足 (失敗したオブジェクトの一覧など)。JSON 用のエスケープは
+          # このテンプレート側で行う。Discord の description 上限 4096 文字に収まる長さで渡す
+          - name: details
+            default: ""
       container:
         image: curlimages/curl:8.23.0
         env:
@@ -16,17 +24,30 @@ spec:
               secretKeyRef:
                 name: backup-failure-notify-webhook
                 key: DISCORD_WEBHOOK_URL
+          # パラメータはスクリプト本文に展開せず環境変数で渡す。本文に展開すると
+          # 値に含まれる $(...) や ` がシェルで実行され、" や改行で JSON が壊れる
+          - name: NOTIFY_TITLE
+            value: "{{inputs.parameters.title}}"
+          - name: NOTIFY_KIND
+            value: "{{inputs.parameters.workflow-kind}}"
+          - name: NOTIFY_DETAILS
+            value: "{{inputs.parameters.details}}"
+          - name: NOTIFY_WORKFLOW
+            value: "{{workflow.name}}"
         command: [sh, -ceu]
         args:
           - |
+            # JSON 文字列用に \ と " をエスケープし、制御文字 (改行・タブなど) は落とす
+            esc() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr -d '\000-\037'; }
+            description="$(esc "$NOTIFY_KIND") \`$(esc "$NOTIFY_WORKFLOW")\` が失敗しました。$(esc "$NOTIFY_DETAILS")ArgoWorkflows を確認してください。"
             curl -fSs -X POST \
               -H "Content-Type: application/json" \
               --data "{
                 \"content\": \"<@&532704116799963168>\",
                 \"allowed_mentions\": {\"roles\": [\"532704116799963168\"]},
                 \"embeds\": [{
-                  \"title\": \"{{inputs.parameters.title}}\",
-                  \"description\": \"バックアップワークフロー \`{{workflow.name}}\` が失敗しました。ArgoWorkflows を確認してください。\",
+                  \"title\": \"$(esc "$NOTIFY_TITLE")\",
+                  \"description\": \"$description\",
                   \"color\": 15548997
                 }]
               }" \

@@ -1,0 +1,218 @@
+# Garage のオブジェクトを実際に最後まで読み出して欠損を検出するカナリア。
+#
+# 2026-10-19 に garage-1 切断中の repair block-refs で block_ref が誤って削除され、
+# 参照先ブロックが GC されて約 70 オブジェクトが読めなくなった。欠損したオブジェクトへの
+# GET は 200 と正しい Content-Length を返したあと本文が途中で切れるため、
+# api_s3_error_counter にも 5xx にも現れない (ヘッダ送信後の失敗は数えられない)。
+# seichi-plugins/common-plugins/ObserverUtils-*.jar が切れていたことで本番の
+# Minecraft サーバー 5 台が起動できなくなるまで誰も気付けなかった。
+#
+# そこで mod-downloader (各 Minecraft サーバーの init container) が依存する
+# seichi-plugins と seichiassist の全オブジェクトを 1 時間ごとに読み、
+# ダウンロード失敗またはサイズ不一致があればワークフローを失敗させて
+# backup-failure-notification 経由で Discord に通知する。
+# 対象は 2026-10 時点で約 245 オブジェクト / 約 510MiB。
+#
+# 認証情報は mod-downloader と同じ garage-s3-credentials を使う (同じ鍵で読めることを確認する意味もある)。
+# この Secret と通知用の backup-failure-notify-webhook が seichi-minecraft namespace に
+# あるため、cluster-wide-apps ではなくここに置いている。
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: garage-read-canary
+  namespace: seichi-minecraft
+spec:
+  schedules:
+    - "23 * * * *"
+  timezone: Asia/Tokyo
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  workflowSpec:
+    workflowTemplateRef:
+      name: garage-read-canary
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: garage-read-canary
+  namespace: seichi-minecraft
+  annotations:
+    workflows.argoproj.io/description: "Garage の seichi-plugins / seichiassist バケットの全オブジェクトを読み出し、欠損 (本文の途中切れ) がないか確認するワークフロー"
+spec:
+  # CiliumNetworkPolicy allow--from-garage-read-canary--to-garage の selector
+  podMetadata:
+    labels:
+      app: garage-read-canary
+  serviceAccountName: garage-read-canary-workflow-sa
+  ttlStrategy:
+    secondsAfterSuccess: 3600
+    secondsAfterFailure: 86400
+  # 1 時間ごとに起動するので、次の起動までには必ず終わらせる
+  activeDeadlineSeconds: 2400
+  onExit: notify-on-failure
+  entrypoint: default
+  templates:
+    - name: default
+      steps:
+        - - name: read-all-objects
+            template: read-all-objects
+
+    - name: read-all-objects
+      retryStrategy:
+        # 一時的な接続断で通知が飛ばないよう 1 回だけやり直す。
+        # 欠損したオブジェクトは何度読んでも同じ所で切れるので、2 回続けて失敗したら本物。
+        limit: "1"
+        retryPolicy: OnFailure
+      outputs:
+        parameters:
+          # 失敗したオブジェクトの一覧。onExit の通知本文に載せる (失敗時は Argo が
+          # exit code に関係なく outputs を回収する)
+          - name: failures
+            globalName: canary-failures
+            valueFrom:
+              path: /tmp/canary/failures.txt
+              default: ""
+      script:
+        # AWS CLI と bash が入っている既存のバックアップ用イメージを使う
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:0249304b6d227ac472947c895c3cba7449ccac648ecddc883e1eb7e9ceeb1cc4
+        command: ["/bin/bash"]
+        source: |
+          set -uo pipefail
+
+          WORK=/tmp/canary
+          mkdir -p "$WORK"
+          : > "$WORK/failures.list"
+
+          # Garage は 64MiB ブロック + メモリ上限が厳しく、並列の range GET で OOM した前歴がある。
+          # 転送は 1 本ずつ、かつ multipart_threshold を実質無効にして 1 オブジェクト = 1 GET にする
+          # (本文が途中で切れる欠損は、1 本の GET の short read としてそのまま検出できる)。
+          export AWS_CONFIG_FILE="$WORK/aws-config"
+          cat > "$AWS_CONFIG_FILE" <<'CFG'
+          [default]
+          s3 =
+              max_concurrent_requests = 1
+              multipart_threshold = 5GB
+          CFG
+
+          S3_OPTS=(--endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud)
+          BUCKETS="seichi-plugins seichiassist"
+
+          total=0
+          failed=0
+
+          fail() {
+            # $1: 対象, $2: 理由
+            failed=$((failed + 1))
+            echo "NG   $1: $2"
+            printf '%s (%s) / ' "$1" "$2" >> "$WORK/failures.list"
+          }
+
+          for bucket in $BUCKETS; do
+            echo "=== Listing s3://$bucket ==="
+            # 一覧の失敗は set -e で落とさず、そのバケットの失敗として記録して次へ進む
+            # (summary と通知本文を必ず出すため)
+            if ! listing=$(aws "${S3_OPTS[@]}" s3api list-objects-v2 \
+              --bucket "$bucket" \
+              --query 'Contents[].[Size,Key]' \
+              --output text); then
+              fail "s3://$bucket" "list failed"
+              continue
+            fi
+
+            if [ -z "$listing" ] || [ "$listing" = "None" ]; then
+              # 空になっている時点で mod-downloader は何も取れないので異常として扱う
+              fail "s3://$bucket" "empty"
+              continue
+            fi
+
+            # 1 プロセスで全オブジェクトを取る (オブジェクトごとに CLI を起動すると起動コストが支配的になる)。
+            # 途中で切れたオブジェクトは一時ファイルごと捨てられて終了コードが 1 になるが、
+            # 残りの転送は続くので、ここでは止めずに下のサイズ照合で個別に拾う
+            dest="$WORK/$bucket"
+            rm -rf "$dest"
+            mkdir -p "$dest"
+            if ! aws "${S3_OPTS[@]}" s3 sync "s3://$bucket" "$dest" --only-show-errors; then
+              echo "WARN s3 sync reported errors for s3://$bucket (details below)"
+            fi
+
+            # Size を先頭に置いているので、キーにスペースが含まれても 2 列目以降に全部入る
+            while IFS=$'\t' read -r expected key; do
+              [ -n "$key" ] || continue
+              # ディレクトリマーカー (末尾 /, 0 byte) はファイルにならないので対象外
+              case "$key" in */) continue ;; esac
+              total=$((total + 1))
+              # [ -ne ] は非数値だと exit 2 で「不一致ではない」扱いになるので先に弾く
+              if ! [[ "$expected" =~ ^[0-9]+$ ]]; then
+                fail "s3://$bucket/$key" "listed size '$expected' is not a number"
+                continue
+              fi
+              f="$dest/$key"
+              if [ ! -f "$f" ]; then
+                fail "s3://$bucket/$key" "download failed, expected $expected bytes"
+                continue
+              fi
+              actual=$(stat -c %s "$f")
+              if [ "$actual" -ne "$expected" ]; then
+                fail "s3://$bucket/$key" "size $actual/$expected"
+              fi
+            done <<< "$listing"
+            rm -rf "$dest"
+          done
+
+          echo "=== Checked $total objects, $failed failed ==="
+          # 通知本文用 (Discord の description 上限 4096 文字)。全量はログに出す
+          if [ -s "$WORK/failures.list" ]; then
+            echo "Failed: $(cat "$WORK/failures.list")"
+            { head -c 1500 "$WORK/failures.list"; [ "$(wc -c < "$WORK/failures.list")" -gt 1500 ] && printf '... (全 %d 件、残りはログ参照) ' "$failed"; } > "$WORK/failures.txt"
+          else
+            : > "$WORK/failures.txt"
+          fi
+          [ "$failed" -eq 0 ]
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: garage-s3-credentials
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: garage-s3-credentials
+                key: AWS_SECRET_ACCESS_KEY
+          # 欠損したオブジェクトは何度読んでも同じ所で切れるので、CLI 内部のリトライで時間を食わないよう試行回数を絞る
+          - name: AWS_MAX_ATTEMPTS
+            value: "2"
+        volumeMounts:
+          - name: canary-work
+            mountPath: /tmp/canary
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      volumes:
+        # 対象は 2026-10 時点で約 510MiB。ディスクに落としてサイズ照合する
+        - name: canary-work
+          emptyDir:
+            sizeLimit: 2Gi
+
+    - name: notify-on-failure
+      steps:
+        - - name: send-failure-notification
+            templateRef:
+              name: backup-failure-notification
+              template: send-discord-notification
+              clusterScope: true
+            when: "{{workflow.status}} != Succeeded"
+            arguments:
+              parameters:
+                - name: title
+                  value: "Garage 読み出しカナリア失敗"
+                - name: workflow-kind
+                  value: "Garage 読み出しカナリア"
+                # read-all-objects が完了しなかった (deadline / Pod 起動失敗) ときは
+                # outputs が無いので、未解決で通知ステップごと落ちないよう式で既定値を与える
+                - name: details
+                  value: "失敗: {{=workflow.outputs.parameters['canary-failures'] ?? ''}} "
