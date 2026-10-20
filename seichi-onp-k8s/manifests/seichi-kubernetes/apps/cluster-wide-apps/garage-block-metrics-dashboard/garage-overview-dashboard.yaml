@@ -5,6 +5,8 @@
 #   - S3 / テーブル / ブロックの p99 レイテンシ (2026-10 の Synology → NVMe 移行で 6s → 0.2s)
 #   - cluster_* の健全性 stat (ただしネットワーク疎通ベースで、ストレージ障害には反応しない)
 #   - meta ボリューム残量 (LMDB は再同期中に 3 倍以上に膨れる)
+#   - ブロック削除数 / ブロック参照カウンタ数 (2026-10-19 に repair block-refs で block_ref が
+#     誤って消され、ブロックが GC された事故はこの 2 つにしか現れなかった)
 # JSON は scratchpad の build_dash.py 相当のスクリプトで生成したもの。手で触る場合は
 # Grafana UI で編集 → JSON model をここに貼り戻す。
 apiVersion: v1
@@ -1343,13 +1345,119 @@ data:
           }
         },
         {
+          "id": 30,
+          "type": "timeseries",
+          "title": "ブロック削除数 / h (ノード別)",
+          "description": "ローカルで削除したブロックファイル数の 1 時間増分。平常時はノードあたり数百〜1,500/h、retention の掃除で 1〜2 万/h になることがある。2026-10-19 に garage-1 切断中の repair block-refs で block_ref が誤って削除された際は garage-0 で 6.4 万/h・14.3 万/h に跳ねた。repair やレイアウト変更の直後に跳ねたらブロック参照カウンタ数と garage worker list を確認する (アラート GarageBlockDeleteBurst)",
+          "gridPos": {
+            "x": 0,
+            "y": 48,
+            "w": 12,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod) (increase(block_delete_counter{job=\"garage-metrics\", pod=~\"${pod:regex}\"}[1h]))",
+              "legendFormat": "{{pod}}",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "id": 31,
+          "type": "timeseries",
+          "title": "ブロック参照カウンタ数 (ノード別)",
+          "description": "block_rc テーブルのエントリ数。オブジェクトの削除や retention で緩やかに増減する。2026-10-19 の事故では garage-0 で 20 分のうちに 733,641 → 671,510 に急減した (アラート GarageBlockRcDrop)",
+          "gridPos": {
+            "x": 12,
+            "y": 48,
+            "w": 12,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "targets": [
+            {
+              "expr": "block_rc_size{job=\"garage-metrics\", pod=~\"${pod:regex}\"}",
+              "legendFormat": "{{pod}}",
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
           "id": 26,
           "type": "row",
           "title": "ノード間 RPC",
           "collapsed": false,
           "gridPos": {
             "x": 0,
-            "y": 48,
+            "y": 56,
             "w": 24,
             "h": 1
           },
@@ -1362,7 +1470,7 @@ data:
           "description": "",
           "gridPos": {
             "x": 0,
-            "y": 49,
+            "y": 57,
             "w": 8,
             "h": 8
           },
@@ -1414,7 +1522,7 @@ data:
           "description": "",
           "gridPos": {
             "x": 8,
-            "y": 49,
+            "y": 57,
             "w": 8,
             "h": 8
           },
@@ -1466,7 +1574,7 @@ data:
           "description": "ノード断・再起動中に跳ねる。平常時 0",
           "gridPos": {
             "x": 16,
-            "y": 49,
+            "y": 57,
             "w": 8,
             "h": 8
           },

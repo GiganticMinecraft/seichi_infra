@@ -8,6 +8,10 @@ spec:
       inputs:
         parameters:
           - name: title
+          # 本文の「〜 `<workflow 名>` が失敗しました」の主語。
+          # バックアップ以外のワークフロー (garage-read-canary など) が通知に使うときに上書きする
+          - name: workflow-kind
+            default: "バックアップワークフロー"
       container:
         image: curlimages/curl:8.23.0
         env:
@@ -26,7 +30,7 @@ spec:
                 \"allowed_mentions\": {\"roles\": [\"532704116799963168\"]},
                 \"embeds\": [{
                   \"title\": \"{{inputs.parameters.title}}\",
-                  \"description\": \"バックアップワークフロー \`{{workflow.name}}\` が失敗しました。ArgoWorkflows を確認してください。\",
+                  \"description\": \"{{inputs.parameters.workflow-kind}} \`{{workflow.name}}\` が失敗しました。ArgoWorkflows を確認してください。\",
                   \"color\": 15548997
                 }]
               }" \
