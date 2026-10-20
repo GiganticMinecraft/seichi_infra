@@ -32,6 +32,17 @@ spec:
       labels:
         app: seichi-portal-rabbitmq
     spec:
+      # 公式イメージは root で起動すると entrypoint が su-exec で rabbitmq (uid 100) に
+      # 落としてサーバーを動かすが、postStart や kubectl exec は root のまま動く。
+      # 初回起動 (cookie 未作成) では postStart の rabbitmqctl が root 所有の
+      # .erlang.cookie を先に作ってしまい、サーバーが eacces で落ちてコンテナが
+      # 1 回作り直される (検証 namespace で再現)。最初から rabbitmq ユーザーで動かし、
+      # PVC の所有権も fsGroup で合わせておく
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101
+        fsGroup: 101
+        runAsNonRoot: true
       containers:
         - name: rabbitmq
           image: rabbitmq:4.3-management-alpine
@@ -46,7 +57,7 @@ spec:
             # Erlang VM はノードの全コア数 (24) 分スケジューラを立てるため、
             # CPU limit 1 に合わせてスケジューラを 1 本にし busy-wait も無効化する
             - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
-              value: '+S 1:1 +sbwt none +sbwtdcpu none +sbwtdio none -rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"'
+              value: '+S 1:1 +sbwt none +sbwtdcpu none +sbwtdio none'
           lifecycle:
             postStart:
               exec:
@@ -54,8 +65,17 @@ spec:
                   - /bin/sh
                   - -ec
                   - |
+                    # postStart が終わるまで kubelet はこの Pod の状態更新も削除も進められない
+                    # (4.4.0 で boot が止まったとき、Pod を消しても Terminating のまま動かなかった)。
+                    # 起動を待つのは有限回にし、超えたら失敗させてコンテナを作り直させる
+                    i=0
                     until rabbitmqctl await_startup --timeout 5 >/dev/null 2>&1; do
-                      sleep 1
+                      i=$((i + 1))
+                      if [ "$i" -ge 60 ]; then
+                        echo "RabbitMQ did not finish booting in time" >&2
+                        exit 1
+                      fi
+                      sleep 2
                     done
                     if rabbitmqctl list_users --silent | awk -v user="$SEICHI_PORTAL_RABBITMQ_USER" '$1 == user { found=1 } END { exit(found ? 0 : 1) }'; then
                       rabbitmqctl change_password "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
@@ -78,6 +98,9 @@ spec:
             - name: definitions
               mountPath: /etc/rabbitmq/definitions.json
               subPath: definitions.json
+            - name: definitions
+              mountPath: /etc/rabbitmq/conf.d/20-definitions.conf
+              subPath: 20-definitions.conf
             - name: data
               mountPath: /var/lib/rabbitmq
           resources:
