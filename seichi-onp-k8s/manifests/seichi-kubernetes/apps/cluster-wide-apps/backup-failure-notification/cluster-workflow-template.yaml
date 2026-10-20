@@ -12,6 +12,10 @@ spec:
           # バックアップ以外のワークフロー (garage-read-canary など) が通知に使うときに上書きする
           - name: workflow-kind
             default: "バックアップワークフロー"
+          # 本文に追記する補足 (失敗したオブジェクトの一覧など)。呼び出し側で JSON 文字列に
+          # 入れて安全な形 (引用符・バックスラッシュ・改行を含まない) に整形してから渡す
+          - name: details
+            default: ""
       container:
         image: curlimages/curl:8.23.0
         env:
@@ -30,7 +34,7 @@ spec:
                 \"allowed_mentions\": {\"roles\": [\"532704116799963168\"]},
                 \"embeds\": [{
                   \"title\": \"{{inputs.parameters.title}}\",
-                  \"description\": \"{{inputs.parameters.workflow-kind}} \`{{workflow.name}}\` が失敗しました。ArgoWorkflows を確認してください。\",
+                  \"description\": \"{{inputs.parameters.workflow-kind}} \`{{workflow.name}}\` が失敗しました。{{inputs.parameters.details}}ArgoWorkflows を確認してください。\",
                   \"color\": 15548997
                 }]
               }" \

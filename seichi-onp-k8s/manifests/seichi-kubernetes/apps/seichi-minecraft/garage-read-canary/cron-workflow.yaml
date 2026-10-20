@@ -44,6 +44,10 @@ spec:
     requests:
       cpu: 100m
       memory: 256Mi
+  # CiliumNetworkPolicy allow--from-garage-read-canary--to-garage の selector
+  podMetadata:
+    labels:
+      app: garage-read-canary
   serviceAccountName: garage-read-canary-workflow-sa
   ttlStrategy:
     secondsAfterSuccess: 3600
@@ -64,59 +68,106 @@ spec:
         # 欠損したオブジェクトは何度読んでも同じ所で切れるので、2 回続けて失敗したら本物。
         limit: "1"
         retryPolicy: OnFailure
+      outputs:
+        parameters:
+          # 失敗したオブジェクトの一覧。onExit の通知本文に載せる (失敗時は Argo が
+          # exit code に関係なく outputs を回収する)
+          - name: failures
+            globalName: canary-failures
+            valueFrom:
+              path: /tmp/canary/failures.txt
+              default: ""
       script:
         # AWS CLI と bash が入っている既存のバックアップ用イメージを使う
         image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:0249304b6d227ac472947c895c3cba7449ccac648ecddc883e1eb7e9ceeb1cc4
         command: ["/bin/bash"]
         source: |
-          set -euo pipefail
+          set -uo pipefail
+
+          WORK=/tmp/canary
+          mkdir -p "$WORK"
+          : > "$WORK/failures.txt"
+
+          # Garage は 64MiB ブロック + メモリ上限が厳しく、並列の range GET で OOM した前歴がある。
+          # 転送は 1 本ずつ、かつ multipart_threshold を実質無効にして 1 オブジェクト = 1 GET にする
+          # (本文が途中で切れる欠損は、1 本の GET の short read としてそのまま検出できる)。
+          export AWS_CONFIG_FILE="$WORK/aws-config"
+          cat > "$AWS_CONFIG_FILE" <<'CFG'
+          [default]
+          s3 =
+              max_concurrent_requests = 1
+              multipart_threshold = 5GB
+          CFG
 
           S3_OPTS=(--endpoint-url http://garage.garage.svc.cluster.local:3900 --region seichi-cloud)
           BUCKETS="seichi-plugins seichiassist"
 
           total=0
           failed=0
-          failures=""
+
+          fail() {
+            # $1: 対象, $2: 理由。Discord の JSON に埋め込むので引用符・バックスラッシュは落とす
+            failed=$((failed + 1))
+            echo "NG   $1: $2"
+            # shellcheck disable=SC1003  # tr 自身のエスケープで \\ はバックスラッシュ 1 文字
+            printf '%s (%s) / ' "$1" "$2" | tr -d '"\\' >> "$WORK/failures.txt"
+          }
 
           for bucket in $BUCKETS; do
             echo "=== Listing s3://$bucket ==="
-            listing=$(aws "${S3_OPTS[@]}" s3api list-objects-v2 \
+            # 一覧の失敗は set -e で落とさず、そのバケットの失敗として記録して次へ進む
+            # (summary と通知本文を必ず出すため)
+            if ! listing=$(aws "${S3_OPTS[@]}" s3api list-objects-v2 \
               --bucket "$bucket" \
               --query 'Contents[].[Size,Key]' \
-              --output text)
+              --output text); then
+              fail "s3://$bucket" "list failed"
+              continue
+            fi
 
             if [ -z "$listing" ] || [ "$listing" = "None" ]; then
               # 空になっている時点で mod-downloader は何も取れないので異常として扱う
-              echo "ERROR: s3://$bucket にオブジェクトがありません"
-              failed=$((failed + 1))
-              failures="${failures}s3://$bucket (empty)\n"
+              fail "s3://$bucket" "empty"
               continue
+            fi
+
+            # 1 プロセスで全オブジェクトを取る (オブジェクトごとに CLI を起動すると起動コストが支配的になる)。
+            # 途中で切れたオブジェクトは一時ファイルごと捨てられて終了コードが 1 になるが、
+            # 残りの転送は続くので、ここでは止めずに下のサイズ照合で個別に拾う
+            dest="$WORK/$bucket"
+            rm -rf "$dest"
+            mkdir -p "$dest"
+            if ! aws "${S3_OPTS[@]}" s3 sync "s3://$bucket" "$dest" --only-show-errors; then
+              echo "WARN s3 sync reported errors for s3://$bucket (details below)"
             fi
 
             # Size を先頭に置いているので、キーにスペースが含まれても 2 列目以降に全部入る
             while IFS=$'\t' read -r expected key; do
               [ -n "$key" ] || continue
+              # ディレクトリマーカー (末尾 /, 0 byte) はファイルにならないので対象外
+              case "$key" in */) continue ;; esac
               total=$((total + 1))
-              # 欠損したオブジェクトは 200 + 正しい Content-Length のあと本文が途中で切れる。
-              # aws s3 cp はこの場合に失敗するが、念のため受信バイト数もリスト上のサイズと比べる。
-              if actual=$(aws "${S3_OPTS[@]}" s3 cp --quiet "s3://$bucket/$key" - </dev/null | wc -c); then
-                if [ "$actual" -ne "$expected" ]; then
-                  echo "NG   s3://$bucket/$key: expected $expected bytes, got $actual bytes"
-                  failed=$((failed + 1))
-                  failures="${failures}s3://$bucket/$key (size $actual/$expected)\n"
-                fi
-              else
-                echo "NG   s3://$bucket/$key: download failed (received ${actual:-?} bytes of $expected)"
-                failed=$((failed + 1))
-                failures="${failures}s3://$bucket/$key (download failed)\n"
+              # [ -ne ] は非数値だと exit 2 で「不一致ではない」扱いになるので先に弾く
+              if ! [[ "$expected" =~ ^[0-9]+$ ]]; then
+                fail "s3://$bucket/$key" "listed size '$expected' is not a number"
+                continue
+              fi
+              f="$dest/$key"
+              if [ ! -f "$f" ]; then
+                fail "s3://$bucket/$key" "download failed, expected $expected bytes"
+                continue
+              fi
+              actual=$(stat -c %s "$f")
+              if [ "$actual" -ne "$expected" ]; then
+                fail "s3://$bucket/$key" "size $actual/$expected"
               fi
             done <<< "$listing"
+            rm -rf "$dest"
           done
 
           echo "=== Checked $total objects, $failed failed ==="
           if [ "$failed" -ne 0 ]; then
-            echo "Failed objects:"
-            printf '%b' "$failures"
+            echo "Failed: $(cat "$WORK/failures.txt")"
             exit 1
           fi
         env:
@@ -133,12 +184,20 @@ spec:
           # 欠損したオブジェクトは何度読んでも同じ所で切れるので、CLI 内部のリトライで時間を食わないよう試行回数を絞る
           - name: AWS_MAX_ATTEMPTS
             value: "2"
+        volumeMounts:
+          - name: canary-work
+            mountPath: /tmp/canary
         resources:
           requests:
             cpu: 100m
             memory: 256Mi
           limits:
             memory: 512Mi
+      volumes:
+        # 対象は 2026-10 時点で約 510MiB。ディスクに落としてサイズ照合する
+        - name: canary-work
+          emptyDir:
+            sizeLimit: 2Gi
 
     - name: notify-on-failure
       steps:
@@ -154,3 +213,5 @@ spec:
                   value: "Garage 読み出しカナリア失敗"
                 - name: workflow-kind
                   value: "Garage 読み出しカナリア"
+                - name: details
+                  value: "失敗: {{workflow.outputs.parameters.canary-failures}} "

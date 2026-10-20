@@ -1,0 +1,41 @@
+# garage-read-canary (Garage の読み出しカナリア Workflow) の egress 許可。
+# 読み出しは Garage の S3 API (3900/TCP)、失敗通知は Discord の webhook (443/TCP)。
+# Workflow の Pod は WorkflowTemplate の podMetadata で app: garage-read-canary を付けている。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-garage-read-canary--to-garage
+spec:
+  endpointSelector:
+    matchLabels:
+      app: garage-read-canary
+  egress:
+    - toServices:
+        - k8sService:
+            serviceName: garage
+            namespace: garage
+      toPorts:
+        - ports:
+            - port: "3900"
+              protocol: TCP
+    - toFQDNs:
+        - matchName: discord.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Argo の wait コンテナが outputs の回収や状態報告で API server に接続する
+    - toEntities:
+        - kube-apiserver
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchName: garage.garage.svc.cluster.local
+              - matchName: discord.com
