@@ -1,3 +1,6 @@
+# Deployment 時代の PVC。StatefulSet 移行後は volumeClaimTemplates の
+# data-seichi-portal-rabbitmq-0 を使うので未使用になる。中身は旧 Pod 名ごとの
+# データディレクトリだけで、新 node の稼働を確認したら削除する
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

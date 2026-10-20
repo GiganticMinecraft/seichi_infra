@@ -1,5 +1,14 @@
+# RabbitMQ の node 名は既定で rabbit@<ホスト名>、データディレクトリは
+# /var/lib/rabbitmq/mnesia/<node 名> になる。Deployment では Pod ごとにホスト名が
+# 変わるため、再起動のたびに空の node として起動して durable queue の中身を失い、
+# PVC には旧 Pod 名のディレクトリが溜まり続けていた。StatefulSet にして
+# ホスト名を seichi-portal-rabbitmq-0 に固定し、同じディレクトリを引き継ぐ。
+#
+# データを引き継ぐようになったので、イメージ更新は既存ストアに対するアップグレードになる。
+# 複数マイナーを一度に跨ぐ更新は RabbitMQ 側が拒否することがあるため、
+# Renovate の PR はリリースノートの upgrade 条件を確認してからマージすること
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: seichi-portal-rabbitmq
   namespace: seichi-minecraft
@@ -7,8 +16,14 @@ metadata:
     app: seichi-portal-rabbitmq
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
+  # serviceName は StatefulSet の必須フィールドとして既存の ClusterIP Service を指している。
+  # headless ではないので Pod ごとの DNS (seichi-portal-rabbitmq-0.seichi-portal-rabbitmq) は
+  # 引けないが、1 node で Erlang の短い node 名を使う限り kubelet が書く /etc/hosts で
+  # 自ホスト名が解決できるので問題ない。クラスタ化や RABBITMQ_USE_LONGNAME を使う場合は
+  # headless Service を別途用意すること
+  serviceName: seichi-portal-rabbitmq
+  # replicas: 1 の RollingUpdate は旧 Pod の終了を待ってから新 Pod を作るので、
+  # Deployment の Recreate と同じく RWO の PVC を取り合わない
   selector:
     matchLabels:
       app: seichi-portal-rabbitmq
@@ -48,6 +63,10 @@ spec:
                       rabbitmqctl add_user "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
                     fi
                     rabbitmqctl set_permissions -p / "$SEICHI_PORTAL_RABBITMQ_USER" '.*' '.*' '.*'
+                    # 既存ストアを引き継ぐ node では stable な feature flag は自動では有効にならず、
+                    # 次のマイナー更新で required になった flag が無効のままだと起動を拒否される。
+                    # 公式の手順どおり、起動のたびに stable な flag をすべて有効化しておく
+                    rabbitmqctl enable_feature_flag all
           ports:
             - name: amqp
               containerPort: 5672
@@ -86,6 +105,17 @@ spec:
         - name: definitions
           configMap:
             name: seichi-portal-rabbitmq-definitions
-        - name: data
-          persistentVolumeClaim:
-            claimName: seichi-portal-rabbitmq-data
+  # volumeClaimTemplates は作成後に変更できない (サイズ変更も apply が拒否される)。
+  # 容量を増やすときは PVC data-seichi-portal-rabbitmq-0 を直接 expand すること
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: synology-iscsi-storage
+        resources:
+          requests:
+            storage: 8Gi

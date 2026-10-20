@@ -4,6 +4,10 @@ metadata:
   name: seichi-portal-rabbitmq-definitions
   namespace: seichi-minecraft
 data:
+  # 起動時に load_definitions で取り込まれるが、既に存在する exchange / queue は
+  # 引数が違っても更新されない (declare が既存を返すだけ)。StatefulSet でデータを
+  # 引き継ぐようになったため、type や arguments を変えるときは対象を手で削除するか
+  # 新しい名前で作り直すこと
   definitions.json: |
     {
       "vhosts": [
