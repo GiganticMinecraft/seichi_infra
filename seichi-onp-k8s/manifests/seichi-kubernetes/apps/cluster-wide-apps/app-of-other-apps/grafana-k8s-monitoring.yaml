@@ -65,6 +65,21 @@ spec:
         applicationObservability:
           enabled: true
           collector: alloy-receiver
+          processors:
+            resourceDetection:
+              # chart 既定の system detector (hostname_sources = ["os"], override = true) は
+              # 受け取った全 OTLP テレメトリの host.name / os.type を alloy-receiver 自身の
+              # 値 (= receiver の Pod 名) で上書きしてしまい、送信元の識別に使えない値になる。
+              # override: false だけでは、host.name を付けない SDK (Rust アプリなど) に
+              # receiver の Pod 名が補われるだけで直らないので、system detector は無効化する。
+              # 送信元の Pod / ノードは後段の k8sattributes が k8s.pod.name / k8s.node.name として付ける。
+              # env detector は receiver Pod 自身の OTEL_RESOURCE_ATTRIBUTES を読むもので、
+              # receiver には設定していないため現状は何もしない (chart の既定どおり残す)。
+              # 将来 detector や receiver 側の属性を足しても送信元の値を上書きしないよう
+              # override も false にしておく
+              override: false
+              system:
+                enabled: false
           receivers:
             otlp:
               http:
