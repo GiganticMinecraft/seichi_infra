@@ -21,7 +21,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: gachadata-server
-          image: ghcr.io/giganticminecraft/gachadata-server:sha-2f3cd4d@sha256:777dfab96121f307fe4a2e3372a2b77996d75966ba45b42d66dc28c4d99b0ddc
+          image: ghcr.io/giganticminecraft/gachadata-server:sha-80e3110@sha256:c9897f29a276420af088c38844ceb351aadc3660ff2c17273e74f5e3b1a9d80a
           ports:
             - name: http
               containerPort: 80
