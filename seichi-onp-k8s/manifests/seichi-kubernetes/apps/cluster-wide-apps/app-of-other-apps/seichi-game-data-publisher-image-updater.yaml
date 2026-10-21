@@ -11,8 +11,9 @@ spec:
       images:
         - alias: publisher
           # Track digest changes on the rolling :master tag (re-pushed by CI on
-          # every merge to default branch). Works around the ApplicationSet wiping
-          # kustomize.images overrides each reconcile cycle.
+          # every merge to default branch). Same shape as mcserver--lobby; works
+          # around the ApplicationSet wiping kustomize.images overrides each
+          # reconcile cycle.
           imageName: ghcr.io/giganticminecraft/seichi-game-data-publisher:master
           commonUpdateSettings:
             updateStrategy: digest
