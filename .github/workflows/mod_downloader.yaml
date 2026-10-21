@@ -33,6 +33,9 @@ jobs:
         with:
           version: v2.15.0
           working-directory: docker-images/mod-downloader
+      - name: go test
+        working-directory: docker-images/mod-downloader
+        run: go test ./...
 
   build-image:
     name: Build docker image (and publish on main if app changed)

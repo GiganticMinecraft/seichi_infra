@@ -78,8 +78,8 @@ spec:
               value: world-data/lobby
             - name: DOWNLOAD_TARGET_DIR_PATH
               value: /data
-            # ワールドデータは大きく、debug-s1/s2 の mc-worlds は 2026-10 時点で 6〜7 分かかっている。
-            # mod-downloader 既定の 10 分では Garage が少し遅いだけで締め切りを越えるので延ばす
+            # ワールドデータはプラグインより大きいので、他の world-downloader と同じく
+            # mod-downloader 既定の 10 分より長い締め切りにしておく
             - name: DOWNLOAD_DEADLINE
               value: 30m
           volumeMounts:
