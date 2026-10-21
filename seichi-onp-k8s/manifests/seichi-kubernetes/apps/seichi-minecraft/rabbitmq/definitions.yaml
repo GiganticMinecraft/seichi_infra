@@ -4,6 +4,16 @@ metadata:
   name: seichi-portal-rabbitmq-definitions
   namespace: seichi-minecraft
 data:
+  # 定義ファイルの取り込みは core の definitions.* 設定で行う。以前使っていた
+  # 管理プラグイン経由 (-rabbitmq_management load_definitions) は boot step の依存関係が
+  # 宣言されておらず、Erlang 28 以降 (RabbitMQ 4.4 のイメージ) で実行順が変わって
+  # boot が永久に止まる (rabbitmq/rabbitmq-server#17914、修正は 4.4.1 / 4.3.8 予定)
+  20-definitions.conf: |
+    definitions.import_backend = local_filesystem
+    definitions.local.path = /etc/rabbitmq/definitions.json
+  # 起動時に取り込まれるが、既に存在する exchange / queue は引数が違っても
+  # 更新されない (declare が既存を返すだけ)。StatefulSet でデータを引き継ぐように
+  # なったため、type や arguments を変えるときは対象を手で削除するか新しい名前で作り直すこと
   definitions.json: |
     {
       "vhosts": [

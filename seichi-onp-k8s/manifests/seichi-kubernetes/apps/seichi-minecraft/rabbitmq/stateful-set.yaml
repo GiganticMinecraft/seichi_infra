@@ -1,0 +1,161 @@
+# RabbitMQ の node 名は既定で rabbit@<ホスト名>、データディレクトリは
+# /var/lib/rabbitmq/mnesia/<node 名> になる。Deployment では Pod ごとにホスト名が
+# 変わるため、再起動のたびに空の node として起動して durable queue の中身を失い、
+# PVC には旧 Pod 名のディレクトリが溜まり続けていた。StatefulSet にして
+# ホスト名を seichi-portal-rabbitmq-0 に固定し、同じディレクトリを引き継ぐ。
+#
+# データを引き継ぐようになったので、イメージ更新は既存ストアに対するアップグレードになる。
+# 複数マイナーを一度に跨ぐ更新は RabbitMQ 側が拒否することがあるため、
+# Renovate の PR はリリースノートの upgrade 条件を確認してからマージすること
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seichi-portal-rabbitmq
+  namespace: seichi-minecraft
+  labels:
+    app: seichi-portal-rabbitmq
+  annotations:
+    # definitions.json と 20-definitions.conf は subPath マウントで起動時にしか読まれないため、
+    # ConfigMap を変えたら Reloader に Pod を作り直させる (debezium と同じ)
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  # 既定の OrderedReady だと Ready にならない Pod (boot が止まった場合など) があると
+  # テンプレートの修正 (イメージの差し戻しなど) が rollout されず、Pod を手で消すまで
+  # 止まる。1 replica なので順序制御は不要で、RabbitMQ Cluster Operator と同じ Parallel にする
+  podManagementPolicy: Parallel
+  # serviceName は StatefulSet の必須フィールドとして既存の ClusterIP Service を指している。
+  # headless ではないので Pod ごとの DNS (seichi-portal-rabbitmq-0.seichi-portal-rabbitmq) は
+  # 引けないが、1 node で Erlang の短い node 名を使う限り kubelet が書く /etc/hosts で
+  # 自ホスト名が解決できるので問題ない。クラスタ化や RABBITMQ_USE_LONGNAME を使う場合は
+  # headless Service を別途用意すること
+  serviceName: seichi-portal-rabbitmq
+  # replicas: 1 の RollingUpdate は旧 Pod の終了を待ってから新 Pod を作るので、
+  # Deployment の Recreate と同じく RWO の PVC を取り合わない
+  selector:
+    matchLabels:
+      app: seichi-portal-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: seichi-portal-rabbitmq
+    spec:
+      # 公式イメージは root で起動すると entrypoint が su-exec で rabbitmq (uid 100) に
+      # 落としてサーバーを動かすが、postStart や kubectl exec は root のまま動く。
+      # 初回起動 (cookie 未作成) では postStart の rabbitmqctl が root 所有の
+      # .erlang.cookie を先に作ってしまい、サーバーが eacces で落ちてコンテナが
+      # 1 回作り直される (検証 namespace で再現)。最初から rabbitmq ユーザーで動かし、
+      # PVC の所有権も fsGroup で合わせておく
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101
+        fsGroup: 101
+        # kubelet は fsGroup を適用するとき volume 内の全ファイルに g+rw を足す。
+        # Erlang は .erlang.cookie が 0400 でないと起動を拒否するため、既定の Always だと
+        # 2 回目以降の起動で cookie が 0460 にされて落ちる (検証 namespace で再現)。
+        # ルートディレクトリの所有権が合っていれば触らない OnRootMismatch にする
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:4.3-management-alpine
+          env:
+            - name: SEICHI_PORTAL_RABBITMQ_USER
+              value: seichi-portal
+            - name: SEICHI_PORTAL_RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seichi-portal-rabbitmq-credentials
+                  key: password
+            # Erlang VM はノードの全コア数 (24) 分スケジューラを立てるため、
+            # CPU limit 1 に合わせてスケジューラを 1 本にし busy-wait も無効化する
+            - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
+              value: '+S 1:1 +sbwt none +sbwtdcpu none +sbwtdio none'
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/bash
+                  - -ec
+                  - |
+                    # postStart が終わるまで kubelet はこの Pod の状態更新も削除も進められない
+                    # (4.4.0 で boot が止まったとき、Pod を消しても Terminating のまま動かなかった)。
+                    # 起動を待つのは有限回にし、超えたら失敗させてコンテナを作り直させる。
+                    # rabbitmqctl は 1 回ごとに Erlang VM を立てて約 1 CPU 秒使うので、起動手順の
+                    # 最後に開く AMQP ポートを bash の /dev/tcp で待ってから 1 回だけ呼ぶ
+                    i=0
+                    until (exec 3<>/dev/tcp/127.0.0.1/5672) 2>/dev/null; do
+                      i=$((i + 1))
+                      if [ "$i" -ge 90 ]; then
+                        echo "RabbitMQ did not open the AMQP listener in time" >&2
+                        exit 1
+                      fi
+                      sleep 2
+                    done
+                    rabbitmqctl await_startup --timeout 60
+                    if rabbitmqctl list_users --silent | awk -v user="$SEICHI_PORTAL_RABBITMQ_USER" '$1 == user { found=1 } END { exit(found ? 0 : 1) }'; then
+                      rabbitmqctl change_password "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
+                    else
+                      rabbitmqctl add_user "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
+                    fi
+                    rabbitmqctl set_permissions -p / "$SEICHI_PORTAL_RABBITMQ_USER" '.*' '.*' '.*'
+                    # 既存ストアを引き継ぐ node では stable な feature flag は自動では有効にならず、
+                    # 次のマイナー更新で required になった flag が無効のままだと起動を拒否される。
+                    # 公式の手順どおり、起動のたびに stable な flag をすべて有効化しておく。
+                    # 失敗しても hook ごと落として稼働中の broker を殺さないよう非致命にする
+                    rabbitmqctl enable_feature_flag all || echo "enable_feature_flag all failed; continuing" >&2
+          ports:
+            - name: amqp
+              containerPort: 5672
+            - name: management
+              containerPort: 15672
+            - name: prometheus
+              containerPort: 15692
+          volumeMounts:
+            - name: definitions
+              mountPath: /etc/rabbitmq/definitions.json
+              subPath: definitions.json
+            - name: definitions
+              mountPath: /etc/rabbitmq/conf.d/20-definitions.conf
+              subPath: 20-definitions.conf
+            - name: data
+              mountPath: /var/lib/rabbitmq
+          resources:
+            requests:
+              # 以前の 500m は probe の rabbitmq-diagnostics が食っていた分(約 0.3 core)を
+              # 実測として取り込んだ値。probe を TCP に替えた後の broker 本体は数十 m で済む
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          # 旧 probe の rabbitmq-diagnostics ping は実行ごとに Erlang VM を起動して
+          # distribution に join するため 1 回あたり約 1 CPU 秒かかり、5 秒 + 10 秒間隔の
+          # 実行だけで常時 0.3 core を消費して CFS throttling が 50% に達していた。
+          # 公式ドキュメント (monitoring#health-checks-as-readiness-probes) と RabbitMQ
+          # Cluster Operator に合わせ、readiness は AMQP ポートの TCP チェックのみにし
+          # liveness は置かない。AMQP リスナーは起動手順の最後に開くので起動完了の判定にもなる
+          readinessProbe:
+            tcpSocket:
+              port: amqp
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: definitions
+          configMap:
+            name: seichi-portal-rabbitmq-definitions
+  # volumeClaimTemplates は作成後に変更できない (サイズ変更も apply が拒否される)。
+  # 容量を増やすときは PVC data-seichi-portal-rabbitmq-0 を直接 expand すること
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: synology-iscsi-storage
+        resources:
+          requests:
+            storage: 8Gi
