@@ -39,7 +39,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: migration
-          image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-35af1fb@sha256:05139d5006e8301855007416cbdc1849d25d4366d4aae8d34ea7e70d272c35d2
+          image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:latest@sha256:1fc13b6c996184a6c75eb6ac8b944d4fe439a7a0c628f9ac29d1c2f0e8219785
           resources:
             requests:
               cpu: 50m
