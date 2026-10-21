@@ -43,7 +43,7 @@ data:
           "id": 1,
           "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_up{job=\"seichi-game-data-publisher-cache-proxy\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "min(nginx_up{job=\"seichi-game-data-publisher-cache-proxy\"})", "refId": "A" }
           ],
           "title": "Status",
           "type": "stat"
@@ -63,7 +63,7 @@ data:
           "id": 2,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_active{job=\"seichi-game-data-publisher-cache-proxy\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_active{job=\"seichi-game-data-publisher-cache-proxy\"})", "refId": "A" }
           ],
           "title": "Active Connections",
           "type": "stat"
@@ -83,7 +83,7 @@ data:
           "id": 3,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"}[5m])", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"}[5m]))", "refId": "A" }
           ],
           "title": "Requests/sec",
           "type": "stat"
@@ -103,7 +103,7 @@ data:
           "id": 4,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"})", "refId": "A" }
           ],
           "title": "Total Requests",
           "type": "stat"
@@ -123,7 +123,7 @@ data:
           "id": 5,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_accepted{job=\"seichi-game-data-publisher-cache-proxy\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_accepted{job=\"seichi-game-data-publisher-cache-proxy\"})", "refId": "A" }
           ],
           "title": "Total Accepted",
           "type": "stat"
@@ -143,7 +143,7 @@ data:
           "id": 6,
           "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_handled{job=\"seichi-game-data-publisher-cache-proxy\"}", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_handled{job=\"seichi-game-data-publisher-cache-proxy\"})", "refId": "A" }
           ],
           "title": "Total Handled",
           "type": "stat"
@@ -193,7 +193,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"}[5m])", "legendFormat": "Requests/sec", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"}[5m]))", "legendFormat": "Requests/sec", "refId": "A" }
           ],
           "title": "Request Rate",
           "type": "timeseries"
@@ -235,7 +235,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"}", "legendFormat": "Total Requests", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_http_requests_total{job=\"seichi-game-data-publisher-cache-proxy\"})", "legendFormat": "Total Requests", "refId": "A" }
           ],
           "title": "Total Requests",
           "type": "timeseries"
@@ -285,10 +285,10 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_active{job=\"seichi-game-data-publisher-cache-proxy\"}", "legendFormat": "Active", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_reading{job=\"seichi-game-data-publisher-cache-proxy\"}", "legendFormat": "Reading", "refId": "B" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_writing{job=\"seichi-game-data-publisher-cache-proxy\"}", "legendFormat": "Writing", "refId": "C" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_waiting{job=\"seichi-game-data-publisher-cache-proxy\"}", "legendFormat": "Waiting", "refId": "D" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_active{job=\"seichi-game-data-publisher-cache-proxy\"})", "legendFormat": "Active", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_reading{job=\"seichi-game-data-publisher-cache-proxy\"})", "legendFormat": "Reading", "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_writing{job=\"seichi-game-data-publisher-cache-proxy\"})", "legendFormat": "Writing", "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_waiting{job=\"seichi-game-data-publisher-cache-proxy\"})", "legendFormat": "Waiting", "refId": "D" }
           ],
           "title": "Connection States",
           "type": "timeseries"
@@ -330,8 +330,8 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(nginx_connections_accepted{job=\"seichi-game-data-publisher-cache-proxy\"}[5m])", "legendFormat": "Accepted/sec", "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "rate(nginx_connections_handled{job=\"seichi-game-data-publisher-cache-proxy\"}[5m])", "legendFormat": "Handled/sec", "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(nginx_connections_accepted{job=\"seichi-game-data-publisher-cache-proxy\"}[5m]))", "legendFormat": "Accepted/sec", "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(rate(nginx_connections_handled{job=\"seichi-game-data-publisher-cache-proxy\"}[5m]))", "legendFormat": "Handled/sec", "refId": "B" }
           ],
           "title": "Connection Rate",
           "type": "timeseries"
@@ -373,7 +373,7 @@ data:
             "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "nginx_connections_accepted{job=\"seichi-game-data-publisher-cache-proxy\"} - nginx_connections_handled{job=\"seichi-game-data-publisher-cache-proxy\"}", "legendFormat": "Dropped Connections", "refId": "A" }
+            { "datasource": { "type": "prometheus", "uid": "${datasource}" }, "expr": "sum(nginx_connections_accepted{job=\"seichi-game-data-publisher-cache-proxy\"}) - sum(nginx_connections_handled{job=\"seichi-game-data-publisher-cache-proxy\"})", "legendFormat": "Dropped Connections", "refId": "A" }
           ],
           "title": "Dropped Connections (Accepted - Handled)",
           "type": "timeseries"
