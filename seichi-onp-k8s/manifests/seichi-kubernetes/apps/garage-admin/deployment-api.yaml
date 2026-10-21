@@ -17,9 +17,9 @@ spec:
       labels:
         app: garage-admin-api
     spec:
-      # SIGTERM 後の猶予。アプリ (Go の http.ListenAndServe) はシグナルを処理せず SIGTERM で
-      # すぐ終了するため 30 秒 (既定値) で足りる。preStop は Endpoint 反映までの取りこぼしを
-      # 防ぐだけで、SIGTERM 時点で処理中のリクエストと未送信のテレメトリは失われる
+      # SIGTERM 後の猶予。アプリ (garage-admin-console#422 以降) は SIGTERM で listener を
+      # 閉じ、処理中のリクエストを最大 15 秒待ち (超過分は切断後 2 秒待つ)、OTel を最大 4 秒で
+      # flush してから終了する (合計 21 秒)。preStop 5 秒と合わせて 26 秒 < 30 秒
       terminationGracePeriodSeconds: 30
       containers:
         - name: garage-admin-api
@@ -27,7 +27,7 @@ spec:
           # main への push ごとに :latest を上書き push する。Renovate (pinDigests) が
           # :latest の digest の変化を検知して更新 PR を出す。特定コミットに固定して
           # ロールバックしたいときは sha-<commit> タグの digest を指定する
-          image: ghcr.io/giganticminecraft/garage-admin-console-backend:latest@sha256:7ee99ccb7dccfa3d12a2e7476f3b37a972fcebac96a21ecd2544c2952ce76ca6
+          image: ghcr.io/giganticminecraft/garage-admin-console-backend:latest@sha256:26859143f936a50dacc67609d89053d698469acb470abd6a34d1970ed5e08f71
           ports:
             - containerPort: 8080
           # ファイルに書き込まないため、ルートファイルシステムは読み取り専用にする
