@@ -26,7 +26,7 @@ data:
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
   OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
   OTEL_TRACES_SAMPLER: "parentbased_always_on"
-  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=production"
+  # OTEL_RESOURCE_ATTRIBUTES は Pod 名 (downward API) を埋め込むため deployment.yaml の env にある
 
   # Continuous profiler push target. Unset to disable.
   PYROSCOPE_SERVER_ADDRESS: "http://pyroscope.monitoring.svc.cluster.local:4040"
