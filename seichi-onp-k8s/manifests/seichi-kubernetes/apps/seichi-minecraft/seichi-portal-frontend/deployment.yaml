@@ -38,7 +38,7 @@ spec:
               app: seichi-portal-frontend
       containers:
         - name: seichi-portal-frontend
-          image: ghcr.io/giganticminecraft/seichi-portal-frontend:1.3.5@sha256:6b4c02836b6df54433bfb1cf8252bb93f3d409a9010a72b0f6e80ef881c6a206
+          image: ghcr.io/giganticminecraft/seichi-portal-frontend:1.3.6@sha256:74541c26848d1735be844a2011c4f4f9834904035c10b8199a4afb2a7372fcad
           ports:
             - name: http
               containerPort: 3000
