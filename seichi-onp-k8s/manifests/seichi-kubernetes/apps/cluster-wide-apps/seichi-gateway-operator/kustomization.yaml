@@ -14,11 +14,11 @@ images:
     newTag: latest@sha256:187158b68b5ede6e7b3625a23c4efb8145b74985a106c59976c7bc8e7e1ce197
 
 patches:
-  # 上流の ServiceMonitor を kube-prometheus-stack の Prometheus (serviceMonitorSelector: release=prometheus) に拾わせる
+  # 上流の ServiceMonitor を kube-prometheus-stack の Prometheus (serviceMonitorSelector: release=prometheus) に拾わせる。
+  # 上流で名前が変わっても patch が黙って外れないよう、name では絞らず全 ServiceMonitor を対象にする
   - target:
       group: monitoring.coreos.com
       kind: ServiceMonitor
-      name: seichi-gateway-operator-controller-manager-metrics-monitor
     patch: |-
       - op: add
         path: /metadata/labels/release
