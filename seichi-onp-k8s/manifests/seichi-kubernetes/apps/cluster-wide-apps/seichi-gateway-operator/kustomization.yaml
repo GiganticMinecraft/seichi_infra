@@ -2,6 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  # ?ref= (config/: CRD / RBAC / manager) と images の newTag は同じコミットに揃える。
+  # Renovate が digest 追従で更新するのは newTag (latest@sha256) だけで ?ref= は追従しないため、
+  # 上流の config/ が変わったら ?ref= を手動で上げる
   - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=a2719aeabf6c0490c29aea72d6f2e5bdf1ce4e06
 
 images:

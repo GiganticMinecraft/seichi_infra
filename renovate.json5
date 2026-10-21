@@ -147,6 +147,27 @@
       pinDigests: true,
     },
     {
+      // 同じリポジトリのコミットからビルドされる組は 1 つの PR でまとめて更新する。
+      // conifers: migration (PreSync hook) → 新 ingestor の順序を同じ sync で保つため
+      // tailscale-approval-bot: 同じ Pod の api / discord を同じコミットに揃えるため
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'ghcr.io/giganticminecraft/seichi-timed-stats-conifers-*',
+      ],
+      groupName: 'seichi-timed-stats-conifers images',
+    },
+    {
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'ghcr.io/giganticminecraft/tailscale-approval-bot/*',
+      ],
+      groupName: 'tailscale-approval-bot images',
+    },
+    {
       // ノードの containerd / runc のパッチ更新はノールックで automerge する
       // (kubelet のパッチ追従は Renovate を経由せず kured の rebootCommand で完結している)。
       // マージしてもバイナリ差し替えと sentinel 作成までで、実際の再起動は
