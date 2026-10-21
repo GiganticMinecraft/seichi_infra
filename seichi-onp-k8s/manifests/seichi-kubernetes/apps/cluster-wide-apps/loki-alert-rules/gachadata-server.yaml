@@ -36,7 +36,8 @@ data:
           # mariadb-dump の失敗 (DB 接続失敗を含む) は run_gachadata_dump が試行 1 回に
           # つき ERROR を 1 行出すだけで、失敗後 30 秒は再試行しない (handler は前回の
           # キャッシュを返すか 503 を返し、ログは debug のみ)。利用頻度が低く 10 分で
-          # 3 件を超えることはまず無いため、dump 失敗は下の GachadataDumpFailed で単発から拾う
+          # 3 件を超えることはまず無いため、dump 失敗は下の GachadataDumpFailed で単発から拾い、
+          # 同じ原因で 2 本通知しないようここでは mariadb-dump のログを除外する
           #
           # 除外: pyroscope-rs (log_module_path =~ "pyroscope::.*")
           #   backend に組み込まれたプロファイリング用ライブラリであり、アプリの
@@ -52,7 +53,7 @@ data:
           - alert: GachadataServerErrorLogs
             expr: |
               sum by (service_name) (
-                count_over_time({job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | panic!="true" | log_module_path !~ `pyroscope::.*` [10m])
+                count_over_time({job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | panic!="true" | log_module_path !~ `pyroscope::.*` | message !~ `.*mariadb-dump.*` [10m])
               ) > 3
             labels:
               severity: warning
@@ -72,11 +73,16 @@ data:
           # Prometheus の gachadata_dump_failures_total (reason 別) はダッシュボード用。
           # counter の series は初回失敗で初めて作られるため、Pod 起動後の最初の失敗は
           # increase() では 0 に見えて拾えない。通知はこのログベースのルールで行う。
-          # 15 分窓 + for: 0m なので、1 回の失敗で約 15 分間 firing になり、その後 resolve する
+          # message は完全一致ではなく mariadb-dump を含むかで判定する (文言が多少変わっても
+          # 拾えるように。成功時の "mariadb-dump finished" は INFO、"mariadb-dump wrote to stderr"
+          # は WARN なので level="ERROR" で除外される)。panic は GachadataServerPanic が拾う。
+          # 15 分窓 + for: 0m なので、1 回の失敗で約 15 分間 firing になり、その後 resolve する。
+          # Discord 通知は Sync Window (07:00-08:00 JST) の間は抑止されるので、その時間帯の
+          # 単発失敗は通知されない (DB の更新に伴う一過性の失敗を流す意図どおり)
           - alert: GachadataDumpFailed
             expr: |
-              sum(
-                count_over_time({job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | message=~".*mariadb-dump.*" [15m])
+              sum by (service_name) (
+                count_over_time({job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | panic!="true" | message=~`.*mariadb-dump.*` [15m])
               ) > 0
             for: 0m
             labels:
@@ -86,12 +92,8 @@ data:
             annotations:
               summary: gachadata-server の mariadb-dump が失敗しました
               description: >-
-                直近 15 分間に mariadb-dump の失敗ログ (level=ERROR) が記録されました。
-                失敗中は前回の正常な dump を返し続けます (起動後一度も成功していなければ 503)。
-                message は "failed to spawn mariadb-dump" (起動失敗) / "mariadb-dump timed out" (120 秒超過) /
-                "mariadb-dump exited with failure" (非 0 終了: DB 接続・認証・権限など) /
-                "mariadb-dump succeeded but produced no output" (出力が空) のいずれか。
-                exited with failure / produced no output の場合、mariadb-dump の stderr (パスワードを伏せて 4 KiB に切り詰めたもの) は
-                同じ行の stderr フィールドに入る (spawn 失敗は error、timeout は timeout_secs フィールド)。
-                Loki で {job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | message=~".*mariadb-dump.*" を実行して確認する。
+                直近 15 分間に mariadb-dump が失敗しました (前回の dump を返し続け、未成功なら 503)。
+                原因は message (spawn 失敗 / timed out / exited with failure / no output) と
+                同じ行の stderr を Loki で確認する:
+                {job="seichi-minecraft/gachadata-server"} | json | level="ERROR" | message=~`.*mariadb-dump.*`
               runbook_url: https://github.com/GiganticMinecraft/gachadata-server/pull/267
