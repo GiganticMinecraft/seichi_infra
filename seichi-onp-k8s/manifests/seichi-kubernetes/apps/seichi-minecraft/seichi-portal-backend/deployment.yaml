@@ -190,8 +190,16 @@ spec:
             # service.version はここに書くと Renovate のイメージ更新(image: 行のみ書き換え)に
             # 追従できず乖離するため含めない。アプリ側で CARGO_PKG_VERSION から
             # OTel resource に埋め込むのが正
+            # service.instance.id が無いと OTLP メトリクスに instance ラベルが付かず、
+            # 複数 replica (と rollout 中の新旧 Pod) の累積値が同じ series に交互に
+            # 書かれて resets() / increase() が壊れる。Pod 名を instance にする。
+            # $(POD_NAME) は先に定義した env しか展開されないため、この順序を保つ
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production"
+              value: "service.namespace=seichi-portal,deployment.environment=production,deployment.environment.name=production,service.instance.id=$(POD_NAME)"
             # 継続プロファイリング (seichi-portal-backend#1290)。
             # 対応前のイメージはこの env を読まないため先行供給しても無害
             - name: PYROSCOPE_SERVER_ADDRESS
