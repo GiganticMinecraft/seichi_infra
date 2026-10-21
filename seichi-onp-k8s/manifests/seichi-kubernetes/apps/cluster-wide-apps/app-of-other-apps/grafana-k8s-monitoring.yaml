@@ -61,6 +61,13 @@ spec:
         podLogsViaLoki:
           enabled: true
           collector: alloy-logs
+          # 既定 (true) だと loki.source.file "pod_logs" が tail_from_end = true になり、
+          # local.file_match (10 秒周期) が新しいログファイルを見つける前に書かれた行
+          # (全 Pod の起動直後のログ、短命 Job の全行) が Loki に入らない (2026-10-21 実測:
+          # conifers ingestor 6 行中 0 行、portal-backend 起動ログ 7 行欠落、backup Job 0 行)。
+          # false にして新しいファイルを先頭から読む。読み取り位置は host-storage preset
+          # (/var/lib/alloy) に保存されるので、Alloy 再起動でも全量再送にはならない
+          onlyGatherNewLogLines: false
 
         applicationObservability:
           enabled: true
