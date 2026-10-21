@@ -17,6 +17,8 @@ spec:
       labels:
         app: seichi-portal-frontend
     spec:
+      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
+      terminationGracePeriodSeconds: 30
       containers:
         - name: seichi-portal-frontend
           image: ghcr.io/giganticminecraft/seichi-portal-frontend:1.3.3@sha256:83854b3d5be3bc046d86fb7f2b6d0cbe3c86d44fa6140a26061dd29c1ccb4b76
@@ -24,6 +26,27 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
+          # health エンドポイントが無いため、listener の有無だけを tcpSocket で見る。
+          # (SSR が backend を呼ぶ "/" を httpGet にすると backend 障害で frontend まで
+          # 再起動するため使わない。イベントループのハングは tcpSocket では検知できない)
+          # startupProbe が通るまで liveness を止め、起動直後の再起動を防ぐ (最大 60 秒)
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 12
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           # 2026-10 時点の 7 日ピークが 230Mi で limit 256Mi に迫り、VPA の upper bound
           # (303Mi) も limit を超えていたため memory を倍に広げる。
           # CPU は平均 10m 程度 (VPA target 23m) だが、Next.js の SSR はリクエストが

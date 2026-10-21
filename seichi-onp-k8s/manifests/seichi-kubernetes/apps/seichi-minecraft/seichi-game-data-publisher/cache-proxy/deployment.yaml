@@ -17,6 +17,8 @@ spec:
       labels:
         app: seichi-game-data-publisher-cache-proxy
     spec:
+      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
+      terminationGracePeriodSeconds: 30
       containers:
         - resources:
             requests:
@@ -32,6 +34,18 @@ spec:
             # 最大30秒待つ
             failureThreshold: 6
             periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - mountPath: /etc/nginx/nginx.conf
               name: nginx-conf

@@ -17,6 +17,8 @@ spec:
       labels:
         app: seichi-game-data-publisher-server
     spec:
+      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
+      terminationGracePeriodSeconds: 30
       containers:
         - resources:
             # Bumped from 50m to 300m to absorb the OTel exporter and
