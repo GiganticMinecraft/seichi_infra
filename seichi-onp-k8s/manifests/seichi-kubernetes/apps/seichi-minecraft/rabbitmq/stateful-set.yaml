@@ -14,8 +14,16 @@ metadata:
   namespace: seichi-minecraft
   labels:
     app: seichi-portal-rabbitmq
+  annotations:
+    # definitions.json と 20-definitions.conf は subPath マウントで起動時にしか読まれないため、
+    # ConfigMap を変えたら Reloader に Pod を作り直させる (debezium と同じ)
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
+  # 既定の OrderedReady だと Ready にならない Pod (boot が止まった場合など) があると
+  # テンプレートの修正 (イメージの差し戻しなど) が rollout されず、Pod を手で消すまで
+  # 止まる。1 replica なので順序制御は不要で、RabbitMQ Cluster Operator と同じ Parallel にする
+  podManagementPolicy: Parallel
   # serviceName は StatefulSet の必須フィールドとして既存の ClusterIP Service を指している。
   # headless ではないので Pod ごとの DNS (seichi-portal-rabbitmq-0.seichi-portal-rabbitmq) は
   # 引けないが、1 node で Erlang の短い node 名を使う限り kubelet が書く /etc/hosts で
@@ -67,21 +75,24 @@ spec:
             postStart:
               exec:
                 command:
-                  - /bin/sh
+                  - /bin/bash
                   - -ec
                   - |
                     # postStart が終わるまで kubelet はこの Pod の状態更新も削除も進められない
                     # (4.4.0 で boot が止まったとき、Pod を消しても Terminating のまま動かなかった)。
-                    # 起動を待つのは有限回にし、超えたら失敗させてコンテナを作り直させる
+                    # 起動を待つのは有限回にし、超えたら失敗させてコンテナを作り直させる。
+                    # rabbitmqctl は 1 回ごとに Erlang VM を立てて約 1 CPU 秒使うので、起動手順の
+                    # 最後に開く AMQP ポートを bash の /dev/tcp で待ってから 1 回だけ呼ぶ
                     i=0
-                    until rabbitmqctl await_startup --timeout 5 >/dev/null 2>&1; do
+                    until (exec 3<>/dev/tcp/127.0.0.1/5672) 2>/dev/null; do
                       i=$((i + 1))
-                      if [ "$i" -ge 60 ]; then
-                        echo "RabbitMQ did not finish booting in time" >&2
+                      if [ "$i" -ge 90 ]; then
+                        echo "RabbitMQ did not open the AMQP listener in time" >&2
                         exit 1
                       fi
                       sleep 2
                     done
+                    rabbitmqctl await_startup --timeout 60
                     if rabbitmqctl list_users --silent | awk -v user="$SEICHI_PORTAL_RABBITMQ_USER" '$1 == user { found=1 } END { exit(found ? 0 : 1) }'; then
                       rabbitmqctl change_password "$SEICHI_PORTAL_RABBITMQ_USER" "$SEICHI_PORTAL_RABBITMQ_PASSWORD"
                     else
@@ -90,8 +101,9 @@ spec:
                     rabbitmqctl set_permissions -p / "$SEICHI_PORTAL_RABBITMQ_USER" '.*' '.*' '.*'
                     # 既存ストアを引き継ぐ node では stable な feature flag は自動では有効にならず、
                     # 次のマイナー更新で required になった flag が無効のままだと起動を拒否される。
-                    # 公式の手順どおり、起動のたびに stable な flag をすべて有効化しておく
-                    rabbitmqctl enable_feature_flag all
+                    # 公式の手順どおり、起動のたびに stable な flag をすべて有効化しておく。
+                    # 失敗しても hook ごと落として稼働中の broker を殺さないよう非致命にする
+                    rabbitmqctl enable_feature_flag all || echo "enable_feature_flag all failed; continuing" >&2
           ports:
             - name: amqp
               containerPort: 5672
