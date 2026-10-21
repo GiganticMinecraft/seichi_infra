@@ -81,11 +81,6 @@ spec:
             external-hostname: gachadata.public-gigantic-api.seichi.click
             internal-authority: "gachadata-server.seichi-minecraft:80"
 
-          # phpMyAdmin
-          - name: phpmyadmin
-            external-hostname: phpmyadmin.onp-k8s.admin.seichi.click
-            internal-authority: "phpmyadmin.seichi-minecraft:80"
-
           # Argo Workflows に対する POST リクエストのみを受け付けるためのリバースプロキシ。
           - name: argo-wf-proxy
             external-hostname: argo-wf-webhook.onp-k8s.admin.seichi.click
