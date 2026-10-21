@@ -24,8 +24,9 @@ spec:
       labels:
         app: seichi-portal-frontend
     spec:
-      # SIGTERM 後の猶予。preStop の 5 秒を含めてもアプリの終了処理は短く、
-      # 既定値の 30 秒で足りる
+      # SIGTERM 後の猶予。Next.js の standalone server は SIGTERM を受けると drain せずに
+      # すぐ終了するため 30 秒 (既定値) で足りる。preStop は Endpoint 反映までの取りこぼしを
+      # 防ぐだけで、SIGTERM 時点で処理中の SSR リクエストは切れる
       terminationGracePeriodSeconds: 30
       # 2 replica を別ノードに分散させる。空きが無いときは同じノードでも起動させる
       topologySpreadConstraints:

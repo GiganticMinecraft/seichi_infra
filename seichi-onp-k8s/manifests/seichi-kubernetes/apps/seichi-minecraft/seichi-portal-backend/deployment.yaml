@@ -27,9 +27,10 @@ spec:
         resource.opentelemetry.io/service.name: seichi-portal-backend
         resource.opentelemetry.io/service.namespace: seichi-portal
     spec:
-      # preStop 5 秒 + 処理中リクエストの drain と OTel / Pyroscope の flush に
-      # 余裕を持たせて 40 秒にする
-      terminationGracePeriodSeconds: 40
+      # preStop 5 秒 + drain 後の Pyroscope 停止 最大 10 秒 + tracer / meter provider の
+      # shutdown (順に実行、それぞれ OTLP タイムアウト 10 秒) = 35 秒に、処理中リクエストの
+      # drain (axum の graceful shutdown。上限なし) として 15 秒と余裕を足して 60 秒にする
+      terminationGracePeriodSeconds: 60
       containers:
         - name: seichi-portal-backend
           image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.3@sha256:5dd57eae9296de6d6438b1ec8a4076fd9ccf5520479dd95bda7cec6e49804cce

@@ -17,8 +17,9 @@ spec:
       labels:
         app: garage-admin-api
     spec:
-      # SIGTERM 後の猶予。preStop の 5 秒を含めてもアプリの終了処理は短く、
-      # 既定値の 30 秒で足りる
+      # SIGTERM 後の猶予。アプリ (Go の http.ListenAndServe) はシグナルを処理せず SIGTERM で
+      # すぐ終了するため 30 秒 (既定値) で足りる。preStop は Endpoint 反映までの取りこぼしを
+      # 防ぐだけで、SIGTERM 時点で処理中のリクエストと未送信のテレメトリは失われる
       terminationGracePeriodSeconds: 30
       containers:
         - name: garage-admin-api

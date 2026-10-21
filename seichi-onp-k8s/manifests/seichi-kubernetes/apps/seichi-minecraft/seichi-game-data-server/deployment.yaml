@@ -26,7 +26,8 @@ spec:
         app: seichi-game-data-server
     spec:
       # preStop 5 秒 + アプリ側の drain 最大 15 秒 + Pyroscope エージェント停止 最大 10 秒
-      # = 30 秒に余裕を足して 45 秒にする (既定の 30 秒だと drain 中に SIGKILL され得る)
+      # = 30 秒に、OTel の flush と余裕を足して 45 秒にする (既定の 30 秒だと drain 中に
+      # SIGKILL され得る)
       terminationGracePeriodSeconds: 45
       # 2 replica を別ノードに分散させる。空きが無いときは同じノードでも起動させる
       topologySpreadConstraints:

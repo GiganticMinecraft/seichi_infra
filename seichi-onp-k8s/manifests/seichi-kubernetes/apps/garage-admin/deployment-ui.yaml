@@ -15,8 +15,8 @@ spec:
       labels:
         app: garage-admin-ui
     spec:
-      # SIGTERM 後の猶予。preStop の 5 秒を含めてもアプリの終了処理は短く、
-      # 既定値の 30 秒で足りる
+      # SIGTERM 後の猶予。公式 nginx イメージの STOPSIGNAL は SIGQUIT (graceful shutdown) で、
+      # 処理中のリクエストは短いため preStop の 5 秒を含めても 30 秒 (既定値) で足りる
       terminationGracePeriodSeconds: 30
       containers:
         - name: garage-admin-ui

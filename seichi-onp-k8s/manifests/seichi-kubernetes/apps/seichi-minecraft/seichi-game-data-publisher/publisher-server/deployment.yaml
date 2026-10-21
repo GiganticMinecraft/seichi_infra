@@ -24,9 +24,10 @@ spec:
       labels:
         app: seichi-game-data-publisher-server
     spec:
-      # preStop 5 秒 + アプリ側の pre-drain 5 秒 + drain 最大 15 秒 = 25 秒に
-      # 余裕を足して 40 秒にする
-      terminationGracePeriodSeconds: 40
+      # preStop 5 秒 + アプリ側の pre-drain 5 秒 + drain 最大 15 秒 + drain 後の
+      # Pyroscope 停止 最大 10 秒 + OTel (traces / metrics / logs) の flush 約 10 秒 = 45 秒に
+      # 余裕を足して 50 秒にする
+      terminationGracePeriodSeconds: 50
       # 2 replica を別ノードに分散させる。空きが無いときは同じノードでも起動させる
       topologySpreadConstraints:
         - maxSkew: 1
