@@ -1,7 +1,7 @@
 # 観測対象アプリ (seichi-minecraft namespace の各アプリと garage-admin namespace の
 # garage-admin-api) からの ingress 許可。
 #   - alloy-receiver 4318/TCP: OTLP HTTP (gachadata-server, seichi-game-data-server,
-#     seichi-game-data-publisher-server, garage-admin-api。portal は既存の
+#     seichi-game-data-publisher-server, conifers ingestor, garage-admin-api。portal は既存の
 #     allow--from-seichi-portal--to-alloy-receiver.yaml が担う)
 #   - pyroscope 4040/TCP: 継続プロファイリングの push
 # seichi-minecraft の対象アプリを増やすときは seichi-minecraft 側 (egress) と
@@ -31,6 +31,7 @@ spec:
                 - gachadata-server
                 - seichi-game-data-server
                 - seichi-game-data-publisher-server
+                - seichi-timed-stats-conifers-ingestor
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: garage-admin
             app: garage-admin-api

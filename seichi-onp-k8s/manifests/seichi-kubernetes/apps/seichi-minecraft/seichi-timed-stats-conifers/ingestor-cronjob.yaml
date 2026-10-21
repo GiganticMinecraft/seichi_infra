@@ -22,6 +22,10 @@ spec:
           labels:
             # CiliumNetworkPolicy の endpointSelector 用
             app: seichi-timed-stats-conifers-ingestor
+          # Pod ログの Loki service_name を OTEL_SERVICE_NAME に揃え、Tempo の
+          # tracesToLogs (service.name -> service_name) でログに辿れるようにする
+          annotations:
+            resource.opentelemetry.io/service.name: seichi-timed-stats-conifers-ingestor
         spec:
           restartPolicy: OnFailure
           # イメージ (conifers#240 以降) は distroless nonroot で USER 65532:65532 を数値で
@@ -37,7 +41,7 @@ spec:
           # migration の障害が 5 分ごとの全 ingest を止めないようにするため
           containers:
             - name: ingestor
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:latest@sha256:acad126265f740e91da46b0fcdbb1ab085ac6bafc8b794783b2f12bbbb944f18
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:latest@sha256:f10a4a372c1e922543086ae9da824ecafb7b435f7e48cc03215c003ec6539513
               # 2026-10 時点で直近 24 時間の working set 最大は約 30Mi、1 回の実行は 12 秒程度。
               # CPU は実行時間が短く scrape 間隔に収まらないため実測できていない
               resources:
@@ -76,8 +80,10 @@ spec:
                       key: password
                 - name: GAME_DATA_SERVER_GRPC_ENDPOINT_URL
                   value: "http://seichi-game-data-server:80"
+                # debug だと sqlx / h2 などのログが多いため info にする。
+                # ログは stdout の JSON (trace_id / span_id 付き) を Alloy が Loki に送る
                 - name: RUST_LOG
-                  value: "debug,h2::codec::framed_read=info"
+                  value: "info"
                 - name: RUST_BACKTRACE
                   value: "1"
                 # 継続プロファイリング (conifers#196 で Sentry から移行)
@@ -85,6 +91,26 @@ spec:
                   value: "http://pyroscope.monitoring.svc.cluster.local:4040"
                 - name: PYROSCOPE_APPLICATION_NAME
                   value: "seichi-timed-stats-conifers-ingestor"
+                # OpenTelemetry (conifers#243): traces と metrics を Alloy receiver に OTLP HTTP で送る。
+                # OTLP logs は使わない (stdout → Loki と二重になるため)。
+                # OTEL_EXPORTER_OTLP_ENDPOINT を外すと OTel は無効になる。送信先に届かなくても
+                # アプリ側が flush を 25 秒で打ち切るので、ingest の成否や Job の期限には響かない
+                - name: OTEL_SERVICE_NAME
+                  value: "seichi-timed-stats-conifers-ingestor"
+                # $(POD_NAME) で参照するため OTEL_RESOURCE_ATTRIBUTES より前に定義する
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OTEL_EXPORTER_OTLP_ENDPOINT
+                  value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+                - name: OTEL_EXPORTER_OTLP_PROTOCOL
+                  value: "http/protobuf"
+                - name: OTEL_TRACES_SAMPLER
+                  value: "parentbased_always_on"
+                - name: OTEL_RESOURCE_ATTRIBUTES
+                  # k8s.pod.name: 実行 (Job / Pod) ごとの trace を kubectl logs や Job の失敗と突き合わせるため
+                  value: "deployment.environment=production,deployment.environment.name=production,k8s.pod.name=$(POD_NAME)"
           volumes:
             - name: tmp
               emptyDir:
