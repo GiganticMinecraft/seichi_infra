@@ -3,6 +3,8 @@
 #     seichi-game-data-publisher-server。portal は既存の
 #     allow--from-seichi-portal--to-alloy-receiver.yaml が担う)
 #   - pyroscope 4040/TCP: 継続プロファイリングの push
+#     (garage-admin namespace の garage-admin-api も含む。garage-admin 側は
+#     default-deny のみで egress 許可は未整備)
 # 対象アプリを増やすときは seichi-minecraft 側 (egress) と monitoring 側 (ingress) の
 # 両方のリストを揃えて更新すること。
 # 対になる seichi-minecraft 側の egress 許可は
@@ -57,6 +59,9 @@ spec:
                 - seichi-timed-stats-conifers-ingestor
                 - seichi-game-data-server
                 - seichi-game-data-publisher-server
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: garage-admin
+            app: garage-admin-api
       toPorts:
         - ports:
             - port: "4040"
