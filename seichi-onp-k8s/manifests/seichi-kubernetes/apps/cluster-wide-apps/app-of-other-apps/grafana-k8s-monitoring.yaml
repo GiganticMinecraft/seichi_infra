@@ -163,8 +163,17 @@ spec:
             # ノードの hostPath /var/lib/alloy に保存する。未指定だと storage.path が
             # コンテナ内の /tmp/alloy になり、Alloy Pod の再起動・更新のたびに位置を失って
             # 全ファイルを tail_from_end で末尾から読み直す (その間に書かれた行が欠落する)。
-            # 第 2 段で onlyGatherNewLogLines を false にする前提として、先に位置を保存させておく
-            # (位置が無いまま切り替えると既存ログファイルを全量再送してしまう)
+            # 第 2 段で podLogsViaLoki.onlyGatherNewLogLines を false にする前提として、先に位置を
+            # 保存させておく (位置が無いまま切り替えると既存ログファイルを全量再送してしまう)。
+            # onlyGatherNewLogLines が効くのは chart の pod_logs だけで、下の extraConfig の
+            # k8s_audit / mariadb_slow は tail_from_end = true を直書きしている
+            # (k8s_audit の audit*.log はローテート済みの audit-<時刻>.log にも一致するので、
+            #  false にすると過去分を全量送る点に注意)。
+            # 注意:
+            #   - /var/lib/alloy はノード全体で共有されるパスなので、他の Alloy DaemonSet
+            #     (alloy-profiles など) に host-storage を付けると positions を取り合う
+            #   - 書き込みは alloy イメージ既定の root (uid 0) で動いていることに依存する
+            #     (runAsUser は指定していない。kubelet が作る /var/lib/alloy は root 所有)
             presets: [daemonset, filesystem-log-reader, host-storage]
             # k8s-monitoring Helm chart は alloy-logs 以外の任意名 collector を
             # サポートしないため、audit log 収集を alloy-logs に同居させている。
