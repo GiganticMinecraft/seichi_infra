@@ -30,6 +30,14 @@ spec:
             limits:
               cpu: 300m
               memory: 128Mi
+          # root で port 80 に bind するため、drop ALL の後に NET_BIND_SERVICE だけ戻す
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
           env:
             - name: MYSQL_USER
               value: mcserver
@@ -62,3 +70,6 @@ spec:
               value: "http://pyroscope.monitoring.svc.cluster.local:4040"
             - name: PYROSCOPE_APPLICATION_NAME
               value: "gachadata-server"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault

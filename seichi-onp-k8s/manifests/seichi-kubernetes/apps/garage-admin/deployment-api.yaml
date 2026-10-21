@@ -22,6 +22,11 @@ spec:
           image: ghcr.io/giganticminecraft/garage-admin-console-backend:sha-a7b56f5@sha256:5d533bd1a977081e96cadd0721ad51c07bbe9a221856dea7641638aa56012738
           ports:
             - containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: GARAGE_ADMIN_ENDPOINT
               value: "http://garage-metrics.garage.svc.cluster.local:3903"
@@ -90,3 +95,8 @@ spec:
               path: /api/health
               port: 8080
             periodSeconds: 30
+      # イメージは distroless static nonroot (USER 65532)
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault

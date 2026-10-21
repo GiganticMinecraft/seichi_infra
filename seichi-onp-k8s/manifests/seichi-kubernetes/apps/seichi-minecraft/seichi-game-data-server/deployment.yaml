@@ -23,6 +23,15 @@ spec:
             requests:
               memory: 128Mi
 
+          # root で port 80 に bind するため、drop ALL の後に NET_BIND_SERVICE だけ戻す
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+
           envFrom:
             - configMapRef:
                 name: seichi-game-data-server-config
@@ -63,3 +72,6 @@ spec:
             # 最大30秒待つ
             failureThreshold: 6
             periodSeconds: 5
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
