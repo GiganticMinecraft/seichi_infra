@@ -17,7 +17,7 @@ data:
     {
       "uid": "seichi-portal-overview",
       "title": "Seichi Portal",
-      "description": "seichi-portal (frontend / backend / CDC パイプライン) の性能と健全性",
+      "description": "seichi-portal (frontend / backend / CDC パイプライン) の性能と健全性。OTLP メトリクス (seichi_portal_* / nodejs_* / v8js_* / db_client_*) は 2026-10-21 15:03 JST (seichi_infra #6464) から Pod ごとの series (instance ラベル) になった。それ以前は複数 replica が 1 本の series に交互に書いていたため、レートや分位数が実際より大きく出ている (補正不可)。Tempo span-metrics・Loki・kube-state-metrics 由来のパネルは影響を受けない",
       "tags": [
         "seichi-portal"
       ],
@@ -143,7 +143,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) / sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
+              "expr": "(sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) or vector(0)) / sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "",
               "range": true,
@@ -188,7 +188,8 @@ data:
             "colorMode": "value",
             "graphMode": "area",
             "textMode": "value"
-          }
+          },
+          "description": "エラーが 1 件も無い期間は 0% (分子の series が無くても No data にならないよう or vector(0) を付けている)"
         },
         {
           "type": "stat",
@@ -453,7 +454,7 @@ data:
             "graphMode": "area",
             "textMode": "value"
           },
-          "description": "MariaDB でコミットされてから Meilisearch に反映し終わるまで"
+          "description": "MariaDB でコミットされてから Meilisearch に反映し終わるまで\n\n※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
         },
         {
           "type": "stat",
@@ -768,6 +769,205 @@ data:
           "description": "Tempo の service graph。矢印は呼び出し元 → 呼び出し先。ノードをクリックするとそのサービスのトレースやメトリクスを開ける"
         },
         {
+          "type": "table",
+          "title": "実行中のバージョンと Pod",
+          "id": 77,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 17
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "max by (service_name, service_version, k8s_pod_name, k8s_node_name, k8s_pod_start_time) (target_info{job=~\"seichi-portal/.*\"})",
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": ""
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "Value": true
+                },
+                "indexByName": {
+                  "service_name": 0,
+                  "service_version": 1,
+                  "k8s_pod_name": 2,
+                  "k8s_node_name": 3,
+                  "k8s_pod_start_time": 4
+                },
+                "renameByName": {
+                  "service_name": "サービス",
+                  "service_version": "バージョン",
+                  "k8s_pod_name": "Pod",
+                  "k8s_node_name": "ノード",
+                  "k8s_pod_start_time": "Pod 起動 (UTC)"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "サービス",
+                "desc": false
+              }
+            ]
+          },
+          "description": "OTLP の target_info (service.version / service.instance.id) から。今動いている Pod だけが出る。debezium は OTel Java Agent が service.version を付けないのでバージョンは空欄"
+        },
+        {
+          "type": "table",
+          "title": "Pod の稼働時間と再起動回数",
+          "id": 78,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 17
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (pod) (kube_pod_container_status_restarts_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", pod!~\"seichi-portal-backup.*\"})",
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "再起動"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "max by (pod) (time() - kube_pod_start_time{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", pod!~\"seichi-portal-backup.*\"})",
+              "refId": "B",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "稼働時間"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "renameByName": {
+                  "pod": "Pod",
+                  "Value #A": "再起動回数",
+                  "Value #B": "稼働時間"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "稼働時間"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "再起動回数"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "yellow",
+                          "value": 1
+                        },
+                        {
+                          "color": "red",
+                          "value": 10
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "再起動回数",
+                "desc": true
+              }
+            ]
+          },
+          "description": "kube-state-metrics から。再起動回数は Pod 作成からの累計 (コンテナの restartCount の合計)。portal の Deployment / StatefulSet の Pod が対象で、バックアップ Job の Pod は除く"
+        },
+        {
           "type": "row",
           "title": "ユーザー起点 (user): ブラウザ → frontend → backend",
           "id": 13,
@@ -776,7 +976,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 17
+            "y": 23
           },
           "panels": []
         },
@@ -787,7 +987,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 18
+            "y": 24
           },
           "options": {
             "mode": "markdown",
@@ -807,7 +1007,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 20
+            "y": 26
           },
           "targets": [
             {
@@ -860,7 +1060,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 20
+            "y": 26
           },
           "targets": [
             {
@@ -913,7 +1113,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 20
+            "y": 26
           },
           "targets": [
             {
@@ -966,7 +1166,7 @@ data:
             "h": 9,
             "w": 24,
             "x": 0,
-            "y": 28
+            "y": 34
           },
           "targets": [
             {
@@ -1142,7 +1342,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 37
+            "y": 43
           },
           "targets": [
             {
@@ -1180,7 +1380,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 37
+            "y": 43
           },
           "targets": [
             {
@@ -1218,7 +1418,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 45
+            "y": 51
           },
           "targets": [
             {
@@ -1271,7 +1471,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 45
+            "y": 51
           },
           "targets": [
             {
@@ -1324,7 +1524,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 45
+            "y": 51
           },
           "targets": [
             {
@@ -1377,7 +1577,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 53
+            "y": 59
           },
           "targets": [
             {
@@ -1430,7 +1630,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 53
+            "y": 59
           },
           "targets": [
             {
@@ -1483,7 +1683,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 0,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1555,7 +1755,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 6,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1627,7 +1827,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 12,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1699,7 +1899,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 18,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1771,7 +1971,7 @@ data:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 68
+            "y": 74
           },
           "targets": [
             {
@@ -1820,7 +2020,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 74
+            "y": 80
           },
           "panels": []
         },
@@ -1831,7 +2031,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 75
+            "y": 81
           },
           "options": {
             "mode": "markdown",
@@ -1851,7 +2051,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 0,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -1905,7 +2105,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 6,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -1967,7 +2167,7 @@ data:
               "sort": "desc"
             }
           },
-          "description": "MariaDB でコミットされてから backend が RabbitMQ から受け取るまで"
+          "description": "MariaDB でコミットされてから backend が RabbitMQ から受け取るまで\n\n※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
         },
         {
           "type": "timeseries",
@@ -1981,7 +2181,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 12,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -2043,7 +2243,7 @@ data:
               "sort": "desc"
             }
           },
-          "description": "MariaDB でコミットされてから Meilisearch に反映し終わるまで。利用者から見た検索の鮮度"
+          "description": "MariaDB でコミットされてから Meilisearch に反映し終わるまで。利用者から見た検索の鮮度\n\n※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
         },
         {
           "type": "timeseries",
@@ -2057,7 +2257,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 18,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -2108,7 +2308,7 @@ data:
               "sort": "desc"
             }
           },
-          "description": "search_engine.sync はリトライを含めた 1 イベント分の span。点 (exemplar) からトレースを開ける"
+          "description": "search_engine.sync はリトライを含めた 1 イベント分の span。点 (exemplar) からトレースを開ける\n\n※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
         },
         {
           "type": "timeseries",
@@ -2122,7 +2322,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 0,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2175,7 +2375,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 6,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2183,7 +2383,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "min(debezium_queue_remaining_capacity{job=\"seichi-portal/seichi-portal-debezium\"})",
+              "expr": "min(debezium_queue_remaining_capacity{job=\"seichi-portal/seichi-portal-debezium\", debezium_context=\"streaming\"})",
               "refId": "A",
               "legendFormat": "remaining",
               "range": true,
@@ -2194,7 +2394,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "max(debezium_queue_limit{job=\"seichi-portal/seichi-portal-debezium\"})",
+              "expr": "max(debezium_queue_limit{job=\"seichi-portal/seichi-portal-debezium\", debezium_context=\"streaming\"})",
               "refId": "B",
               "legendFormat": "limit",
               "range": true,
@@ -2240,7 +2440,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 12,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2305,7 +2505,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 18,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2313,7 +2513,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum(rate(rabbitmq_detailed_exchange_messages_published_total{job=\"seichi-portal-rabbitmq\", exchange=\"seichi_portal\"}[$__rate_interval]))",
+              "expr": "sum(rate(rabbitmq_exchange_messages_published_total{job=\"seichi-portal-rabbitmq\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "published",
               "range": true,
@@ -2324,7 +2524,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum(rate(rabbitmq_detailed_queue_messages_delivered_ack_total{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"}[$__rate_interval]))",
+              "expr": "sum(rate(rabbitmq_queue_messages_delivered_ack_total{job=\"seichi-portal-rabbitmq\"}[$__rate_interval]))",
               "refId": "B",
               "legendFormat": "delivered",
               "range": true,
@@ -2335,7 +2535,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum(rate(rabbitmq_detailed_queue_messages_acked_total{job=\"seichi-portal-rabbitmq\", queue=\"seichi_portal\"}[$__rate_interval]))",
+              "expr": "sum(rate(rabbitmq_queue_messages_acked_total{job=\"seichi-portal-rabbitmq\"}[$__rate_interval]))",
               "refId": "C",
               "legendFormat": "acked",
               "range": true,
@@ -2366,7 +2566,8 @@ data:
               "mode": "multi",
               "sort": "desc"
             }
-          }
+          },
+          "description": "seichi-portal-rabbitmq の broker 全体の合計 (queue / exchange ラベルの無いメトリクス)。この broker は portal 専用。published に対して acked が追いつかない状態が続くと backend の消化が遅れている"
         },
         {
           "type": "timeseries",
@@ -2380,7 +2581,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 93
+            "y": 99
           },
           "targets": [
             {
@@ -2420,7 +2621,7 @@ data:
               "sort": "desc"
             }
           },
-          "description": "forwarded: 検索同期へ渡した / skipped: 検索対象外のテーブルやハートビート / failed: デコードや受け渡しに失敗"
+          "description": "forwarded: 検索同期へ渡した / skipped: 検索対象外のテーブルやハートビート / failed: デコードや受け渡しに失敗\n\n※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
         },
         {
           "type": "timeseries",
@@ -2434,7 +2635,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 93
+            "y": 99
           },
           "targets": [
             {
@@ -2473,7 +2674,8 @@ data:
               "mode": "multi",
               "sort": "desc"
             }
-          }
+          },
+          "description": "※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
         },
         {
           "type": "timeseries",
@@ -2487,7 +2689,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 93
+            "y": 99
           },
           "targets": [
             {
@@ -2541,7 +2743,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 101
+            "y": 107
           },
           "targets": [
             {
@@ -2579,7 +2781,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 101
+            "y": 107
           },
           "targets": [
             {
@@ -2614,7 +2816,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 109
+            "y": 115
           },
           "panels": []
         },
@@ -2625,7 +2827,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 110
+            "y": 116
           },
           "options": {
             "mode": "markdown",
@@ -2645,7 +2847,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 112
+            "y": 118
           },
           "targets": [
             {
@@ -2698,7 +2900,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 112
+            "y": 118
           },
           "targets": [
             {
@@ -2762,7 +2964,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 112
+            "y": 118
           },
           "targets": [
             {
@@ -2797,7 +2999,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 120
+            "y": 126
           },
           "panels": []
         },
@@ -2808,7 +3010,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 121
+            "y": 127
           },
           "options": {
             "mode": "markdown",
@@ -2828,7 +3030,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 123
+            "y": 129
           },
           "targets": [
             {
@@ -2901,7 +3103,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 123
+            "y": 129
           },
           "targets": [
             {
@@ -2954,7 +3156,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 123
+            "y": 129
           },
           "targets": [
             {
@@ -2989,7 +3191,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 131
+            "y": 137
           },
           "panels": []
         },
@@ -3000,7 +3202,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 132
+            "y": 138
           },
           "options": {
             "mode": "markdown",
@@ -3020,7 +3222,7 @@ data:
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 134
+            "y": 140
           },
           "targets": [
             {
@@ -3028,7 +3230,7 @@ data:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
-              "expr": "{service_name=\"seichi-portal-backend\"} | json | level=~\"ERROR|WARN\"",
+              "expr": "{service_name=\"seichi-portal-backend\", namespace=\"seichi-minecraft\"} | json | level=~\"ERROR|WARN\"",
               "refId": "A",
               "legendFormat": "",
               "queryType": "range"
@@ -3054,7 +3256,7 @@ data:
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 134
+            "y": 140
           },
           "targets": [
             {
@@ -3062,7 +3264,7 @@ data:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
-              "expr": "{service_name=\"seichi-portal-backend\"} |= \"entrypoint::access\" | json | status >= 500",
+              "expr": "{service_name=\"seichi-portal-backend\", namespace=\"seichi-minecraft\"} |= \"entrypoint::access\" | json | status >= 500",
               "refId": "A",
               "legendFormat": "",
               "queryType": "range"
@@ -3088,7 +3290,7 @@ data:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 144
+            "y": 150
           },
           "targets": [
             {
@@ -3096,7 +3298,7 @@ data:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
-              "expr": "{service_name=\"seichi-portal-frontend\"} |~ \"(?i)error\"",
+              "expr": "{service_name=\"seichi-portal-frontend\", namespace=\"seichi-minecraft\"} |~ \"(?i)error\"",
               "refId": "A",
               "legendFormat": "",
               "queryType": "range"
@@ -3119,7 +3321,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 152
+            "y": 158
           },
           "panels": [
             {
@@ -3134,7 +3336,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 0,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3142,9 +3344,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "max by (instance) (nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
                   "refId": "A",
-                  "legendFormat": "p99",
+                  "legendFormat": "{{instance}} p99",
                   "range": true,
                   "exemplar": false
                 },
@@ -3153,9 +3355,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "max by (instance) (nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
                   "refId": "B",
-                  "legendFormat": "p50",
+                  "legendFormat": "{{instance}} p50",
                   "range": true,
                   "exemplar": false
                 }
@@ -3185,7 +3387,7 @@ data:
                   "sort": "desc"
                 }
               },
-              "description": "伸びると全リクエストが遅くなる"
+              "description": "伸びると全リクエストが遅くなる\n\n※ 2026-10-21 15:03 JST より前は 2 つの Pod が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、その期間の値は Pod が入れ替わりながら 1 本の線になっている。"
             },
             {
               "type": "timeseries",
@@ -3199,7 +3401,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 6,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3207,9 +3409,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "max by (instance) (nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"})",
                   "refId": "A",
-                  "legendFormat": "utilization",
+                  "legendFormat": "{{instance}}",
                   "range": true,
                   "exemplar": false
                 }
@@ -3238,7 +3440,8 @@ data:
                   "mode": "multi",
                   "sort": "desc"
                 }
-              }
+              },
+              "description": "※ 2026-10-21 15:03 JST より前は 2 つの Pod が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、その期間の値は Pod が入れ替わりながら 1 本の線になっている。"
             },
             {
               "type": "timeseries",
@@ -3252,7 +3455,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 12,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3260,9 +3463,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum(v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "sum by (instance) (v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
                   "refId": "A",
-                  "legendFormat": "used",
+                  "legendFormat": "{{instance}} used",
                   "range": true,
                   "exemplar": false
                 },
@@ -3271,9 +3474,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum(v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "sum by (instance) (v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
                   "refId": "B",
-                  "legendFormat": "size",
+                  "legendFormat": "{{instance}} size",
                   "range": true,
                   "exemplar": false
                 }
@@ -3302,7 +3505,8 @@ data:
                   "mode": "multi",
                   "sort": "desc"
                 }
-              }
+              },
+              "description": "※ 2026-10-21 15:03 JST より前は 2 つの Pod が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、その期間の値は Pod が入れ替わりながら 1 本の線になっている。"
             },
             {
               "type": "timeseries",
@@ -3316,7 +3520,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 18,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3324,9 +3528,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval]))",
+                  "expr": "sum by (instance, v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval]))",
                   "refId": "A",
-                  "legendFormat": "{{v8js_gc_type}}",
+                  "legendFormat": "{{instance}} {{v8js_gc_type}}",
                   "range": true,
                   "exemplar": false
                 }
@@ -3355,7 +3559,8 @@ data:
                   "mode": "multi",
                   "sort": "desc"
                 }
-              }
+              },
+              "description": "※ 2026-10-21 15:03 JST より前は replica が同じ series に交互に書いていた (seichi_infra #6464 で Pod ごとに分離) ため、レート・分位数が実際より大きく出る。補正はできない。"
             }
           ]
         },
@@ -3368,7 +3573,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 153
+            "y": 159
           },
           "panels": [
             {
@@ -3383,7 +3588,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 0,
-                "y": 154
+                "y": 160
               },
               "targets": [
                 {
@@ -3391,9 +3596,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "max by (instance) (seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"})",
                   "refId": "A",
-                  "legendFormat": "alive tasks",
+                  "legendFormat": "{{instance}} alive tasks",
                   "range": true,
                   "exemplar": false
                 },
@@ -3402,9 +3607,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "max by (instance) (seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"})",
                   "refId": "B",
-                  "legendFormat": "global queue",
+                  "legendFormat": "{{instance}} global queue",
                   "range": true,
                   "exemplar": false
                 }
@@ -3447,7 +3652,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 8,
-                "y": 154
+                "y": 160
               },
               "targets": [
                 {
@@ -3455,9 +3660,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"})",
+                  "expr": "sum by (instance, db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"})",
                   "refId": "A",
-                  "legendFormat": "{{db_client_connection_pool_name}} used",
+                  "legendFormat": "{{instance}} {{db_client_connection_pool_name}} used",
                   "range": true,
                   "exemplar": false
                 },
@@ -3466,9 +3671,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "max by (instance, db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"})",
                   "refId": "B",
-                  "legendFormat": "{{db_client_connection_pool_name}} max",
+                  "legendFormat": "{{instance}} {{db_client_connection_pool_name}} max",
                   "range": true,
                   "exemplar": false
                 }
@@ -3512,7 +3717,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 16,
-                "y": 154
+                "y": 160
               },
               "targets": [
                 {
@@ -3565,7 +3770,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 0,
-                "y": 162
+                "y": 168
               },
               "targets": [
                 {
@@ -3618,7 +3823,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 8,
-                "y": 162
+                "y": 168
               },
               "targets": [
                 {
@@ -3671,7 +3876,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 16,
-                "y": 162
+                "y": 168
               },
               "targets": [
                 {
@@ -3723,7 +3928,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 154
+            "y": 160
           },
           "panels": [
             {
@@ -3738,7 +3943,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 0,
-                "y": 155
+                "y": 161
               },
               "targets": [
                 {
@@ -3791,7 +3996,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 8,
-                "y": 155
+                "y": 161
               },
               "targets": [
                 {
@@ -3844,7 +4049,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 16,
-                "y": 155
+                "y": 161
               },
               "targets": [
                 {
