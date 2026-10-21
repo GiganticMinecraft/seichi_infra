@@ -24,8 +24,10 @@ spec:
       labels:
         app: seichi-game-data-publisher-server
     spec:
-      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
-      terminationGracePeriodSeconds: 30
+      # preStop 5 秒 + アプリ側の pre-drain 5 秒 + drain 最大 15 秒 + drain 後の
+      # Pyroscope 停止 最大 10 秒 + OTel (traces / metrics / logs) の flush 約 10 秒 = 45 秒に
+      # 余裕を足して 50 秒にする
+      terminationGracePeriodSeconds: 50
       # 2 replica を別ノードに分散させる。空きが無いときは同じノードでも起動させる
       topologySpreadConstraints:
         - maxSkew: 1
@@ -74,6 +76,17 @@ spec:
           name: seichi-game-data-publisher-server
           ports:
             - containerPort: 80
+          # Pod の削除が始まっても、Service の Endpoint から外れたことが各ノードの
+          # ロードバランサ (Cilium) に反映されるまでは新しいリクエストが届き得る。
+          # その間に SIGTERM でプロセスが止まって接続を落とさないよう、SIGTERM の前に 5 秒待つ。
+          # distroless などシェルの無いイメージでも使えるよう exec ではなく sleep アクションを使う
+          # (preStop の時間は terminationGracePeriodSeconds に含まれる)
+          # アプリ側にも SIGTERM 後に 5 秒待つ pre-drain があり待ち時間は重複するが、
+          # アプリの値を将来変えても k8s 側で猶予を担保できるよう preStop も付ける
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
           livenessProbe:
             tcpSocket:
               port: 80

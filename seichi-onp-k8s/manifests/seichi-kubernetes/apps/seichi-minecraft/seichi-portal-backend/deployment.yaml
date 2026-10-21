@@ -27,8 +27,10 @@ spec:
         resource.opentelemetry.io/service.name: seichi-portal-backend
         resource.opentelemetry.io/service.namespace: seichi-portal
     spec:
-      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
-      terminationGracePeriodSeconds: 30
+      # preStop 5 秒 + drain 後の Pyroscope 停止 最大 10 秒 + tracer / meter provider の
+      # shutdown (順に実行、それぞれ OTLP タイムアウト 10 秒) = 35 秒に、処理中リクエストの
+      # drain (axum の graceful shutdown。上限なし) として 15 秒と余裕を足して 60 秒にする
+      terminationGracePeriodSeconds: 60
       containers:
         - name: seichi-portal-backend
           image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.3@sha256:5dd57eae9296de6d6438b1ec8a4076fd9ccf5520479dd95bda7cec6e49804cce
@@ -36,6 +38,15 @@ spec:
             - name: http
               containerPort: 9000
               protocol: TCP
+          # Pod の削除が始まっても、Service の Endpoint から外れたことが各ノードの
+          # ロードバランサ (Cilium) に反映されるまでは新しいリクエストが届き得る。
+          # その間に SIGTERM でプロセスが止まって接続を落とさないよう、SIGTERM の前に 5 秒待つ。
+          # distroless などシェルの無いイメージでも使えるよう exec ではなく sleep アクションを使う
+          # (preStop の時間は terminationGracePeriodSeconds に含まれる)
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
           # /health は MariaDB と Valkey を必須依存として確認する。
           # Meilisearch、RabbitMQ、Discord Bot の障害は degraded として報告されるが、
           # 主要機能を提供できる Pod は Service から外さない。
