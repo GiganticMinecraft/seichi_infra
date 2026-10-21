@@ -17,7 +17,7 @@ data:
     {
       "uid": "seichi-portal-overview",
       "title": "Seichi Portal",
-      "description": "seichi-portal (frontend / backend / CDC パイプライン) の性能と健全性",
+      "description": "seichi-portal (frontend / backend / CDC パイプライン) の性能と健全性。OTLP メトリクス (seichi_portal_* / nodejs_* / v8js_* / db_client_*) は 2026-10-21 15:03 JST (06:03 UTC、seichi_infra #6464) から service.instance.id (Pod 名) ごとの series になった。それ以前は複数 replica が同じ series に交互に書いていたため、その期間のレート・分位数・Pod 別の値は歪んでいて信頼できない (補正不可。グラフ上の注釈で切り替わりを示している)。Tempo span-metrics・Loki・kube-state-metrics 由来のパネルは影響を受けない。debezium の instance は Pod 名ではなく JVM 起動ごとのランダムな UUID (OTel Java Agent が付ける)。検証用の scratch namespace の Pod が同じ job で現れることがある",
       "tags": [
         "seichi-portal"
       ],
@@ -31,7 +31,21 @@ data:
         "to": "now"
       },
       "annotations": {
-        "list": []
+        "list": [
+          {
+            "name": "OTLP メトリクスの instance 分離 (#6464)",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "enable": true,
+            "iconColor": "orange",
+            "expr": "vector(1) and on() (vector(time()) >= 1792562580 and vector(time()) < 1792562880)",
+            "step": "60s",
+            "titleFormat": "instance 分離 (#6464)",
+            "textFormat": "2026-10-21 15:03 JST 以前の OTLP メトリクス (レート・分位数・Pod 別) は歪んでいて信頼できない"
+          }
+        ]
       },
       "templating": {
         "list": []
@@ -143,7 +157,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) / sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
+              "expr": "(sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) or vector(0)) / sum(rate(traces_spanmetrics_calls_total{service=\"seichi-portal-backend\", span_kind=\"SPAN_KIND_SERVER\"}[$__rate_interval]))",
               "refId": "A",
               "legendFormat": "",
               "range": true,
@@ -188,7 +202,8 @@ data:
             "colorMode": "value",
             "graphMode": "area",
             "textMode": "value"
-          }
+          },
+          "description": "エラーが 1 件も無い期間は 0% (分子の series が無くても No data にならないよう or vector(0) を付けている)"
         },
         {
           "type": "stat",
@@ -768,6 +783,238 @@ data:
           "description": "Tempo の service graph。矢印は呼び出し元 → 呼び出し先。ノードをクリックするとそのサービスのトレースやメトリクスを開ける"
         },
         {
+          "type": "table",
+          "title": "実行中のバージョンと Pod",
+          "id": 77,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 17
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "max by (service_name, service_version, k8s_pod_name, k8s_node_name, k8s_pod_start_time) (target_info{job=~\"seichi-portal/.*\", k8s_namespace_name=\"seichi-minecraft\"})",
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": ""
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "Value": true
+                },
+                "indexByName": {
+                  "service_name": 0,
+                  "service_version": 1,
+                  "k8s_pod_name": 2,
+                  "k8s_node_name": 3,
+                  "k8s_pod_start_time": 4
+                },
+                "renameByName": {
+                  "service_name": "サービス",
+                  "service_version": "バージョン",
+                  "k8s_pod_name": "Pod",
+                  "k8s_node_name": "ノード",
+                  "k8s_pod_start_time": "Pod 起動 (UTC)"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "サービス",
+                "desc": false
+              }
+            ]
+          },
+          "description": "OTLP の target_info (service.version / service.instance.id) から。OTLP の series には staleness marker が無いため、削除された Pod も約 5 分は残り、ローリング更新の直後は新旧 ReplicaSet の Pod が並ぶことがある。debezium の instance は Pod 名ではなく JVM 起動ごとのランダムな UUID で、OTel Java Agent は service.version を付けないのでバージョンは空欄。seichi-minecraft namespace のみ (scratch 検証 Pod は除外)"
+        },
+        {
+          "type": "table",
+          "title": "Pod の稼働時間と再起動回数",
+          "id": 78,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 17
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (pod) (kube_pod_container_status_restarts_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", pod!~\"seichi-portal-backup.*\"})",
+              "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "再起動"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "max by (pod) (time() - kube_pod_start_time{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", pod!~\"seichi-portal-backup.*\"})",
+              "refId": "B",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "稼働時間"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "PBFA97CFB590B2093"
+              },
+              "expr": "sum by (pod) (increase(kube_pod_container_status_restarts_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", pod!~\"seichi-portal-backup.*\"}[6h]) and on(pod, container) kube_pod_container_status_restarts_total{namespace=\"seichi-minecraft\", pod=~\"seichi-portal-.*\", pod!~\"seichi-portal-backup.*\"})",
+              "refId": "C",
+              "instant": true,
+              "range": false,
+              "format": "table",
+              "legendFormat": "直近 6h の再起動"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "renameByName": {
+                  "pod": "Pod",
+                  "Value #A": "再起動回数",
+                  "Value #B": "稼働時間",
+                  "Value #C": "直近 6h の再起動"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "稼働時間"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "再起動回数"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "直近 6h の再起動"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "yellow",
+                          "value": 1
+                        },
+                        {
+                          "color": "red",
+                          "value": 3
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "直近 6h の再起動",
+                "desc": true
+              }
+            ]
+          },
+          "description": "kube-state-metrics から。再起動回数は Pod 作成からの累計 (コンテナの restartCount の合計) で参考値。色は直近 6h の増加分 (1 以上で黄、3 以上で赤) で付ける。窓を 6h にしたのは、数日分の過去の再起動で色が付いたままにならず、かつ Thanos に長い範囲を読ませないため。portal の Deployment / StatefulSet の Pod が対象で、バックアップ Job の Pod は除く"
+        },
+        {
           "type": "row",
           "title": "ユーザー起点 (user): ブラウザ → frontend → backend",
           "id": 13,
@@ -776,7 +1023,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 17
+            "y": 23
           },
           "panels": []
         },
@@ -787,7 +1034,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 18
+            "y": 24
           },
           "options": {
             "mode": "markdown",
@@ -807,7 +1054,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 20
+            "y": 26
           },
           "targets": [
             {
@@ -860,7 +1107,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 20
+            "y": 26
           },
           "targets": [
             {
@@ -913,7 +1160,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 20
+            "y": 26
           },
           "targets": [
             {
@@ -966,7 +1213,7 @@ data:
             "h": 9,
             "w": 24,
             "x": 0,
-            "y": 28
+            "y": 34
           },
           "targets": [
             {
@@ -1142,7 +1389,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 37
+            "y": 43
           },
           "targets": [
             {
@@ -1180,7 +1427,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 37
+            "y": 43
           },
           "targets": [
             {
@@ -1218,7 +1465,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 45
+            "y": 51
           },
           "targets": [
             {
@@ -1271,7 +1518,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 45
+            "y": 51
           },
           "targets": [
             {
@@ -1324,7 +1571,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 45
+            "y": 51
           },
           "targets": [
             {
@@ -1377,7 +1624,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 53
+            "y": 59
           },
           "targets": [
             {
@@ -1430,7 +1677,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 53
+            "y": 59
           },
           "targets": [
             {
@@ -1483,7 +1730,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 0,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1555,7 +1802,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 6,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1627,7 +1874,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 12,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1699,7 +1946,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 18,
-            "y": 61
+            "y": 67
           },
           "targets": [
             {
@@ -1771,7 +2018,7 @@ data:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 68
+            "y": 74
           },
           "targets": [
             {
@@ -1820,7 +2067,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 74
+            "y": 80
           },
           "panels": []
         },
@@ -1831,7 +2078,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 75
+            "y": 81
           },
           "options": {
             "mode": "markdown",
@@ -1851,7 +2098,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 0,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -1905,7 +2152,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 6,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -1981,7 +2228,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 12,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -2057,7 +2304,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 18,
-            "y": 77
+            "y": 83
           },
           "targets": [
             {
@@ -2122,7 +2369,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 0,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2175,7 +2422,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 6,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2183,7 +2430,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "min(debezium_queue_remaining_capacity{job=\"seichi-portal/seichi-portal-debezium\"})",
+              "expr": "min(debezium_queue_remaining_capacity{job=\"seichi-portal/seichi-portal-debezium\", debezium_context=\"streaming\"})",
               "refId": "A",
               "legendFormat": "remaining",
               "range": true,
@@ -2194,7 +2441,7 @@ data:
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "max(debezium_queue_limit{job=\"seichi-portal/seichi-portal-debezium\"})",
+              "expr": "max(debezium_queue_limit{job=\"seichi-portal/seichi-portal-debezium\", debezium_context=\"streaming\"})",
               "refId": "B",
               "legendFormat": "limit",
               "range": true,
@@ -2240,7 +2487,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 12,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2305,7 +2552,7 @@ data:
             "h": 8,
             "w": 6,
             "x": 18,
-            "y": 85
+            "y": 91
           },
           "targets": [
             {
@@ -2366,7 +2613,8 @@ data:
               "mode": "multi",
               "sort": "desc"
             }
-          }
+          },
+          "description": "queue / exchange 単位の行は RabbitMQ が最初のメッセージを処理してから作られるため、broker の再起動後は次の CDC メッセージが流れるまで No data になる (異常ではない)"
         },
         {
           "type": "timeseries",
@@ -2380,7 +2628,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 93
+            "y": 99
           },
           "targets": [
             {
@@ -2434,7 +2682,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 93
+            "y": 99
           },
           "targets": [
             {
@@ -2487,7 +2735,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 93
+            "y": 99
           },
           "targets": [
             {
@@ -2541,7 +2789,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 101
+            "y": 107
           },
           "targets": [
             {
@@ -2579,7 +2827,7 @@ data:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 101
+            "y": 107
           },
           "targets": [
             {
@@ -2614,7 +2862,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 109
+            "y": 115
           },
           "panels": []
         },
@@ -2625,7 +2873,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 110
+            "y": 116
           },
           "options": {
             "mode": "markdown",
@@ -2645,7 +2893,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 112
+            "y": 118
           },
           "targets": [
             {
@@ -2698,7 +2946,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 112
+            "y": 118
           },
           "targets": [
             {
@@ -2762,7 +3010,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 112
+            "y": 118
           },
           "targets": [
             {
@@ -2797,7 +3045,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 120
+            "y": 126
           },
           "panels": []
         },
@@ -2808,7 +3056,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 121
+            "y": 127
           },
           "options": {
             "mode": "markdown",
@@ -2828,7 +3076,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 123
+            "y": 129
           },
           "targets": [
             {
@@ -2901,7 +3149,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 123
+            "y": 129
           },
           "targets": [
             {
@@ -2954,7 +3202,7 @@ data:
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 123
+            "y": 129
           },
           "targets": [
             {
@@ -2989,7 +3237,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 131
+            "y": 137
           },
           "panels": []
         },
@@ -3000,7 +3248,7 @@ data:
             "h": 2,
             "w": 24,
             "x": 0,
-            "y": 132
+            "y": 138
           },
           "options": {
             "mode": "markdown",
@@ -3020,7 +3268,7 @@ data:
             "h": 10,
             "w": 12,
             "x": 0,
-            "y": 134
+            "y": 140
           },
           "targets": [
             {
@@ -3028,7 +3276,7 @@ data:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
-              "expr": "{service_name=\"seichi-portal-backend\"} | json | level=~\"ERROR|WARN\"",
+              "expr": "{service_name=\"seichi-portal-backend\", namespace=\"seichi-minecraft\"} | json | level=~\"ERROR|WARN\"",
               "refId": "A",
               "legendFormat": "",
               "queryType": "range"
@@ -3054,7 +3302,7 @@ data:
             "h": 10,
             "w": 12,
             "x": 12,
-            "y": 134
+            "y": 140
           },
           "targets": [
             {
@@ -3062,7 +3310,7 @@ data:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
-              "expr": "{service_name=\"seichi-portal-backend\"} |= \"entrypoint::access\" | json | status >= 500",
+              "expr": "{service_name=\"seichi-portal-backend\", namespace=\"seichi-minecraft\"} |= \"entrypoint::access\" | json | status >= 500",
               "refId": "A",
               "legendFormat": "",
               "queryType": "range"
@@ -3088,7 +3336,7 @@ data:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 144
+            "y": 150
           },
           "targets": [
             {
@@ -3096,7 +3344,7 @@ data:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
-              "expr": "{service_name=\"seichi-portal-frontend\"} |~ \"(?i)error\"",
+              "expr": "{service_name=\"seichi-portal-frontend\", namespace=\"seichi-minecraft\"} |~ \"(?i)error\"",
               "refId": "A",
               "legendFormat": "",
               "queryType": "range"
@@ -3119,7 +3367,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 152
+            "y": 158
           },
           "panels": [
             {
@@ -3134,7 +3382,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 0,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3142,9 +3390,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "label_replace(max by (instance) (nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "A",
-                  "legendFormat": "p99",
+                  "legendFormat": "{{instance}} p99",
                   "range": true,
                   "exemplar": false
                 },
@@ -3153,9 +3401,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "label_replace(max by (instance) (nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "B",
-                  "legendFormat": "p50",
+                  "legendFormat": "{{instance}} p50",
                   "range": true,
                   "exemplar": false
                 }
@@ -3199,7 +3447,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 6,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3207,9 +3455,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "label_replace(max by (instance) (nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "A",
-                  "legendFormat": "utilization",
+                  "legendFormat": "{{instance}}",
                   "range": true,
                   "exemplar": false
                 }
@@ -3252,7 +3500,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 12,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3260,9 +3508,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum(v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "label_replace(sum by (instance) (v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "A",
-                  "legendFormat": "used",
+                  "legendFormat": "{{instance}} used",
                   "range": true,
                   "exemplar": false
                 },
@@ -3271,9 +3519,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum(v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "label_replace(sum by (instance) (v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "B",
-                  "legendFormat": "size",
+                  "legendFormat": "{{instance}} size",
                   "range": true,
                   "exemplar": false
                 }
@@ -3316,7 +3564,7 @@ data:
                 "h": 8,
                 "w": 6,
                 "x": 18,
-                "y": 153
+                "y": 159
               },
               "targets": [
                 {
@@ -3324,9 +3572,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval]))",
+                  "expr": "label_replace(sum by (instance, v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval])), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "A",
-                  "legendFormat": "{{v8js_gc_type}}",
+                  "legendFormat": "{{instance}} {{v8js_gc_type}}",
                   "range": true,
                   "exemplar": false
                 }
@@ -3368,7 +3616,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 153
+            "y": 159
           },
           "panels": [
             {
@@ -3383,7 +3631,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 0,
-                "y": 154
+                "y": 160
               },
               "targets": [
                 {
@@ -3391,9 +3639,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "label_replace(max by (instance) (seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "A",
-                  "legendFormat": "alive tasks",
+                  "legendFormat": "{{instance}} alive tasks",
                   "range": true,
                   "exemplar": false
                 },
@@ -3402,9 +3650,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max(seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "label_replace(max by (instance) (seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "B",
-                  "legendFormat": "global queue",
+                  "legendFormat": "{{instance}} global queue",
                   "range": true,
                   "exemplar": false
                 }
@@ -3447,7 +3695,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 8,
-                "y": 154
+                "y": 160
               },
               "targets": [
                 {
@@ -3455,9 +3703,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"})",
+                  "expr": "label_replace(sum by (instance, db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "A",
-                  "legendFormat": "{{db_client_connection_pool_name}} used",
+                  "legendFormat": "{{instance}} {{db_client_connection_pool_name}} used",
                   "range": true,
                   "exemplar": false
                 },
@@ -3466,9 +3714,9 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "label_replace(max by (instance, db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"}), \"instance\", \"分割前\", \"instance\", \"\")",
                   "refId": "B",
-                  "legendFormat": "{{db_client_connection_pool_name}} max",
+                  "legendFormat": "{{instance}} {{db_client_connection_pool_name}} max",
                   "range": true,
                   "exemplar": false
                 }
@@ -3512,7 +3760,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 16,
-                "y": 154
+                "y": 160
               },
               "targets": [
                 {
@@ -3565,7 +3813,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 0,
-                "y": 162
+                "y": 168
               },
               "targets": [
                 {
@@ -3618,7 +3866,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 8,
-                "y": 162
+                "y": 168
               },
               "targets": [
                 {
@@ -3671,7 +3919,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 16,
-                "y": 162
+                "y": 168
               },
               "targets": [
                 {
@@ -3723,7 +3971,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 154
+            "y": 160
           },
           "panels": [
             {
@@ -3738,7 +3986,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 0,
-                "y": 155
+                "y": 161
               },
               "targets": [
                 {
@@ -3791,7 +4039,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 8,
-                "y": 155
+                "y": 161
               },
               "targets": [
                 {
@@ -3844,7 +4092,7 @@ data:
                 "h": 8,
                 "w": 8,
                 "x": 16,
-                "y": 155
+                "y": 161
               },
               "targets": [
                 {
