@@ -3,13 +3,6 @@ kind: Application
 metadata:
   name: garage-admin
   namespace: argocd
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: frontend=ghcr.io/giganticminecraft/garage-admin-console-frontend, backend=ghcr.io/giganticminecraft/garage-admin-console-backend
-    argocd-image-updater.argoproj.io/frontend.update-strategy: latest
-    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^sha-
-    argocd-image-updater.argoproj.io/backend.update-strategy: latest
-    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^sha-
-    argocd-image-updater.argoproj.io/write-back-method: argocd
 spec:
   project: garage-admin
   source:

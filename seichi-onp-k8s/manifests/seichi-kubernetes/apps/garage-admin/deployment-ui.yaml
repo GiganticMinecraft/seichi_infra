@@ -20,7 +20,11 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: garage-admin-ui
-          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:sha-af22c9a@sha256:460978c72409b3127ac912af5ad81fed33eff5b5e0153c62383b7a245fb23bb8
+          # GiganticMinecraft/garage-admin-console の CI (.github/workflows/frontend.yaml) が
+          # main への push ごとに :latest を上書き push する。Renovate (pinDigests) が
+          # :latest の digest の変化を検知して更新 PR を出す。特定コミットに固定して
+          # ロールバックしたいときは sha-<commit> タグの digest を指定する
+          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:latest@sha256:eaa58bddbd751df428754832de25080727db567a74915106d680383a3ee71574
           ports:
             - containerPort: 80
           resources:
