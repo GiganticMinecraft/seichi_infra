@@ -27,6 +27,8 @@ spec:
         resource.opentelemetry.io/service.name: seichi-portal-backend
         resource.opentelemetry.io/service.namespace: seichi-portal
     spec:
+      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
+      terminationGracePeriodSeconds: 30
       containers:
         - name: seichi-portal-backend
           image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.2@sha256:23d9e2bfcef06531b9118402184ea78f75d2e232eebde4f7015d310c2499c947

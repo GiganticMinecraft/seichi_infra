@@ -17,9 +17,35 @@ spec:
       annotations:
         resource.opentelemetry.io/service.name: gachadata-server
     spec:
+      # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
+      terminationGracePeriodSeconds: 30
       containers:
         - name: gachadata-server
           image: ghcr.io/giganticminecraft/gachadata-server:sha-2f3cd4d@sha256:777dfab96121f307fe4a2e3372a2b77996d75966ba45b42d66dc28c4d99b0ddc
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          # health エンドポイントが無いため、listener (HTTP_PORT=80) の有無だけを
+          # tcpSocket で見る。listen 開始までの時間を実測できていないため、
+          # startupProbe で最大 5 分待ってから liveness を有効にする
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             requests:
               cpu: 15m
