@@ -42,6 +42,11 @@ spec:
         runAsUser: 100
         runAsGroup: 101
         fsGroup: 101
+        # kubelet は fsGroup を適用するとき volume 内の全ファイルに g+rw を足す。
+        # Erlang は .erlang.cookie が 0400 でないと起動を拒否するため、既定の Always だと
+        # 2 回目以降の起動で cookie が 0460 にされて落ちる (検証 namespace で再現)。
+        # ルートディレクトリの所有権が合っていれば触らない OnRootMismatch にする
+        fsGroupChangePolicy: OnRootMismatch
         runAsNonRoot: true
       containers:
         - name: rabbitmq
