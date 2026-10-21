@@ -40,14 +40,20 @@ spec:
             requests:
               memory: 128Mi
 
-          # root で port 80 に bind するため、drop ALL の後に NET_BIND_SERVICE だけ戻す
+          # root で port 80 に bind するため、drop ALL の後に NET_BIND_SERVICE だけ戻す。
+          # ルートファイルシステムは読み取り専用にし、書き込みが要る /tmp だけ emptyDir を使う
           securityContext:
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
               add:
                 - NET_BIND_SERVICE
+
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
 
           envFrom:
             - configMapRef:
@@ -92,3 +98,13 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+      volumes:
+        # pyroscope-rs のプロファイラが /tmp に一時ファイルを作る。/tmp が書けないと
+        # 起動時に "create profiler error" で終了するため、読み取り専用の
+        # ルートファイルシステムの代わりに書き込める /tmp を与える。
+        # medium: Memory (tmpfs) はコンテナのメモリ使用量に計上される。一時ファイルは小さいが、
+        # sizeLimit (64Mi) を超えると kubelet が Pod を evict する
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi

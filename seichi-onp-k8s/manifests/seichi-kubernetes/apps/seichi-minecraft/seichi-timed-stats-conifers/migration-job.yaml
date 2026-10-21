@@ -46,7 +46,9 @@ spec:
               memory: 64Mi
             limits:
               memory: 256Mi
+          # ファイルに書き込まないため、ルートファイルシステムは読み取り専用にする
           securityContext:
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:

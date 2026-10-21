@@ -63,14 +63,22 @@ spec:
             limits:
               cpu: "2"
               memory: 3Gi
-          # イメージの USER が ubuntu (名前指定) のため runAsNonRoot は付けない。
-          # 付ける場合は runAsUser: 1000 (イメージ内の ubuntu の uid) を併記しないと
-          # kubelet が非 root を検証できず CreateContainerConfigError になる
+          # イメージの USER は ubuntu (名前指定) で、kubelet は名前から uid を解決できず
+          # runAsNonRoot だけでは CreateContainerConfigError になる。このため ubuntu の
+          # uid/gid (1000) を数値で明示する (migration と /health が uid 1000 で通ることを確認済み)。
+          # ルートファイルシステムは読み取り専用にし、書き込みが要る /tmp だけ emptyDir を使う
           securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           env:
             - name: MYSQL_DATABASE
               value: seichi-portal
@@ -181,3 +189,13 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+      volumes:
+        # pyroscope-rs のプロファイラが /tmp に一時ファイルを作る。/tmp が書けないと
+        # 起動はするがプロファイラが黙って無効になるため、読み取り専用の
+        # ルートファイルシステムの代わりに書き込める /tmp を与える。
+        # medium: Memory (tmpfs) はコンテナのメモリ使用量に計上される。一時ファイルは小さいが、
+        # sizeLimit (64Mi) を超えると kubelet が Pod を evict する
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi

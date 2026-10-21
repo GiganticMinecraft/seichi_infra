@@ -33,8 +33,10 @@ spec:
           # setuid/setgid する。master は temp/cache ディレクトリを mkdir して worker に chown する。
           # このため drop ALL の後に NET_BIND_SERVICE (port 80)、SETUID/SETGID (worker の降格)、
           # CHOWN (temp/cache の chown) を戻す。ローカルの container ランタイムで、
-          # どれか 1 つでも欠けると起動に失敗することを確認済み
+          # どれか 1 つでも欠けると起動に失敗することを確認済み。
+          # ルートファイルシステムは読み取り専用にし、書き込み先は emptyDir にする (volumes 参照)
           securityContext:
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
@@ -49,6 +51,10 @@ spec:
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
               readOnly: true
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /run
           startupProbe:
             tcpSocket:
               port: 80
@@ -66,6 +72,19 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       volumes:
+        # 読み取り専用のルートファイルシステムで nginx が書き込む先。
+        # /var/cache/nginx は client_temp などの一時ディレクトリ (proxy_cache は使っていない)、
+        # /run は nginx.pid (/var/run は /run への symlink)。
+        # sizeLimit を超えると kubelet が Pod を evict する。/api/ は client_max_body_size 100m で
+        # アップロード本体を client_temp に、大きなダウンロードを proxy_temp (既定で最大 1024m) に
+        # 書き出すため、ノードのディスクを使い 2Gi まで許す
+        - name: nginx-cache
+          emptyDir:
+            sizeLimit: 2Gi
+        - name: nginx-run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Mi
         - name: nginx-conf
           configMap:
             name: garage-admin-ui-nginx-conf
