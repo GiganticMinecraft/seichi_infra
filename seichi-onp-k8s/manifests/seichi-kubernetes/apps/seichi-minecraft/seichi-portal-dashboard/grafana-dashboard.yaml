@@ -812,7 +812,6 @@ data:
                   "k8s_node_name": 3
                 },
                 "renameByName": {
-                  "service_name": "サービス",
                   "service_version": "バージョン",
                   "k8s_pod_name": "Pod",
                   "k8s_node_name": "ノード",
@@ -1004,7 +1003,7 @@ data:
               }
             ]
           },
-          "description": "kube-state-metrics から。再起動回数は Pod 作成からの累計 (コンテナの restartCount の合計) で参考値。色は直近 6h の増加分 (1 以上で黄、3 以上で赤) で付ける。窓を 6h にしたのは、数日分の過去の再起動で色が付いたままにならず、かつ Thanos に長い範囲を読ませないため。portal の Deployment / StatefulSet の Pod が対象で、バックアップ Job の Pod は除く"
+          "description": "kube-state-metrics から。「累計の再起動」は Pod 作成からの累計 (コンテナの restartCount の合計) で参考値。色は「直近 6h の再起動」 (1 以上で黄、3 以上で赤) で付ける。窓を 6h にしたのは、数日分の過去の再起動で色が付いたままにならず、かつ Thanos に長い範囲を読ませないため。portal の Deployment / StatefulSet の Pod が対象で、バックアップ Job の Pod は除く"
         },
         {
           "type": "row",
@@ -3382,7 +3381,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (instance) (nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "max by (instance) (nodejs_eventloop_delay_p99_seconds{job=\"seichi-portal/seichi-portal-frontend\", instance!=\"\"})",
                   "refId": "A",
                   "legendFormat": "{{instance}} p99",
                   "range": true,
@@ -3393,7 +3392,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (instance) (nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "max by (instance) (nodejs_eventloop_delay_p50_seconds{job=\"seichi-portal/seichi-portal-frontend\", instance!=\"\"})",
                   "refId": "B",
                   "legendFormat": "{{instance}} p50",
                   "range": true,
@@ -3447,7 +3446,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (instance) (nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "max by (instance) (nodejs_eventloop_utilization_ratio{job=\"seichi-portal/seichi-portal-frontend\", instance!=\"\"})",
                   "refId": "A",
                   "legendFormat": "{{instance}}",
                   "range": true,
@@ -3500,7 +3499,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (instance) (v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "sum by (instance) (v8js_memory_heap_used_bytes{job=\"seichi-portal/seichi-portal-frontend\", instance!=\"\"})",
                   "refId": "A",
                   "legendFormat": "{{instance}} used",
                   "range": true,
@@ -3511,7 +3510,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (instance) (v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\"})",
+                  "expr": "sum by (instance) (v8js_memory_heap_space_size_bytes{job=\"seichi-portal/seichi-portal-frontend\", instance!=\"\"})",
                   "refId": "B",
                   "legendFormat": "{{instance}} size",
                   "range": true,
@@ -3564,7 +3563,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (instance, v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\"}[$__rate_interval]))",
+                  "expr": "sum by (instance, v8js_gc_type) (rate(v8js_gc_duration_seconds_sum{job=\"seichi-portal/seichi-portal-frontend\", instance!=\"\"}[$__rate_interval]))",
                   "refId": "A",
                   "legendFormat": "{{instance}} {{v8js_gc_type}}",
                   "range": true,
@@ -3631,7 +3630,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (instance) (seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "max by (instance) (seichi_portal_runtime_alive_tasks{job=\"seichi-portal/seichi-portal-backend\", instance!=\"\"})",
                   "refId": "A",
                   "legendFormat": "{{instance}} alive tasks",
                   "range": true,
@@ -3642,7 +3641,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (instance) (seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "max by (instance) (seichi_portal_runtime_global_queue_depth{job=\"seichi-portal/seichi-portal-backend\", instance!=\"\"})",
                   "refId": "B",
                   "legendFormat": "{{instance}} global queue",
                   "range": true,
@@ -3695,7 +3694,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "sum by (instance, db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", db_client_connection_state=\"used\"})",
+                  "expr": "sum by (instance, db_client_connection_pool_name) (db_client_connection_count{job=\"seichi-portal/seichi-portal-backend\", instance!=\"\", db_client_connection_state=\"used\"})",
                   "refId": "A",
                   "legendFormat": "{{instance}} {{db_client_connection_pool_name}} used",
                   "range": true,
@@ -3706,7 +3705,7 @@ data:
                     "type": "prometheus",
                     "uid": "PBFA97CFB590B2093"
                   },
-                  "expr": "max by (instance, db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\"})",
+                  "expr": "max by (instance, db_client_connection_pool_name) (db_client_connection_max{job=\"seichi-portal/seichi-portal-backend\", instance!=\"\"})",
                   "refId": "B",
                   "legendFormat": "{{instance}} {{db_client_connection_pool_name}} max",
                   "range": true,
