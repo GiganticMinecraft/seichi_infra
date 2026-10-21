@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.2@sha256:23d9e2bfcef06531b9118402184ea78f75d2e232eebde4f7015d310c2499c947
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.3@sha256:5dd57eae9296de6d6438b1ec8a4076fd9ccf5520479dd95bda7cec6e49804cce
           ports:
             - name: http
               containerPort: 9000
