@@ -61,6 +61,21 @@ spec:
         podLogsViaLoki:
           enabled: true
           collector: alloy-logs
+          # 既定 (true) だと loki.source.file "pod_logs" が tail_from_end = true になり、
+          # local.file_match (10 秒周期) が新しいログファイルを見つける前に書かれた行
+          # (全 Pod の起動直後のログ、短命 Job の全行) が Loki に入らない (2026-10-21 実測:
+          # conifers ingestor 6 行中 0 行、portal-backend 起動ログ 7 行欠落、backup Job 0 行)。
+          # false にして新しいファイルを先頭から読む。
+          #
+          # 再送についての注意 (Alloy v1.20.0 loki/source/file のソースで確認):
+          # - positions は行を送った直後にしか更新されない (10 秒間引き)。正常停止時は全ファイルの
+          #   offset を書くので、定常的な再起動では再送しない。
+          # - ただし true の時代に 1 行も読まれなかったファイルは offset 0 で記録されているため、
+          #   false にした後の「最初の」alloy-logs 再起動で先頭から再送される (1 回限り)。
+          #   1 時間より古い行は Loki が out-of-order で捨てる。再起動は 1 ノードずつ行うこと。
+          # - 非正常終了 (OOMKill 等) や relabel 変更 (positions の key = path + labels) でも
+          #   該当ファイルを先頭から再送する。chart 更新時は再送量を意識すること。
+          onlyGatherNewLogLines: false
 
         applicationObservability:
           enabled: true
