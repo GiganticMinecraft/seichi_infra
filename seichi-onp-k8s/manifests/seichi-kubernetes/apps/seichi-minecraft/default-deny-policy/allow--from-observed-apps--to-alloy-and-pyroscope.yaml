@@ -1,6 +1,6 @@
 # 観測対象アプリが monitoring namespace の受け口へテレメトリを送るための egress 許可。
 #   - alloy-receiver 4318/TCP: OTLP HTTP (gachadata-server, seichi-game-data-server,
-#     seichi-game-data-publisher-server。portal は既存の
+#     seichi-game-data-publisher-server, conifers ingestor。portal は既存の
 #     allow--from-seichi-portal--to-alloy-receiver.yaml が担う)
 #   - pyroscope 4040/TCP: 継続プロファイリングの push
 #     (portal backend/frontend, gachadata-server, conifers ingestor,
@@ -25,6 +25,7 @@ spec:
           - gachadata-server
           - seichi-game-data-server
           - seichi-game-data-publisher-server
+          - seichi-timed-stats-conifers-ingestor
   egress:
     - toEndpoints:
         - matchLabels:
