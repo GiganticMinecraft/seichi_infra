@@ -89,6 +89,10 @@ spec:
               value: s1
             - name: DOWNLOAD_TARGET_DIR_PATH
               value: /downloaded-worlds
+            # ワールドデータは大きく、debug-s1/s2 の mc-worlds は 2026-10 時点で 6〜7 分かかっている。
+            # mod-downloader 既定の 10 分では Garage が少し遅いだけで締め切りを越えるので延ばす
+            - name: DOWNLOAD_DEADLINE
+              value: 30m
           volumeMounts:
             - name: world-download-volume
               mountPath: /downloaded-worlds

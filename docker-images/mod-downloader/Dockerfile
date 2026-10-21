@@ -28,4 +28,8 @@ ENV S3_REGION="seichi-cloud"
 ENV BUCKET_NAME=""
 ENV BUCKET_PREFIX_NAME=""
 ENV DOWNLOAD_TARGET_DIR_PATH=""
+# 全体の締め切り (Go の time.ParseDuration 形式)。過ぎたら exit 1
+ENV DOWNLOAD_DEADLINE="10m"
+# ダウンロードしたオブジェクト数の下限。下回ったら exit 1 (0 で無効)
+ENV MIN_OBJECTS="1"
 CMD ["/bin/mod-downloader"]
