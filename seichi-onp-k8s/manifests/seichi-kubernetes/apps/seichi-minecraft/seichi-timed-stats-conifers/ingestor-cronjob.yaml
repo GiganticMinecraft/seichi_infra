@@ -24,12 +24,12 @@ spec:
             app: seichi-timed-stats-conifers-ingestor
         spec:
           restartPolicy: OnFailure
-          # イメージ (conifers#240 以降) は distroless nonroot で USER 65532 を明示している。
-          # 非 root を Pod 側でも強制する。listen はしないので port の制約は無い
+          # イメージ (conifers#240 以降) は distroless nonroot で USER 65532:65532 を数値で
+          # 明示しているので、migration-job.yaml と同じく runAsNonRoot だけで非 root を強制する
+          # (runAsUser の固定はイメージ側の uid 変更を黙って上書きするため付けない)。
+          # listen はしないので port の制約は無い
           securityContext:
             runAsNonRoot: true
-            runAsUser: 65532
-            runAsGroup: 65532
             seccompProfile:
               type: RuntimeDefault
           # migration は initContainer ではなく ArgoCD の PreSync hook
@@ -47,8 +47,10 @@ spec:
                 limits:
                   memory: 512Mi
               # rootfs は読み取り専用。書き込みが必要なのは pyroscope-rs (pprof) が
-              # 起動時に作る一時ファイル用の /tmp だけ (ローカル実機で確認)。
-              # /tmp が無いと ingest 自体は成功するがプロファイルが黙って取れなくなる
+              # 起動時に作る一時ファイル用の /tmp だけ (conifers#240 でローカル実機確認)。
+              # /tmp に書けないと ingest 自体は成功するが、起動時に
+              # "Error in creating profiler: Read-only file system (os error 30)" を
+              # ログに出してプロファイルだけ取れなくなる (アラートは無いのでログで気付く)
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -87,5 +89,7 @@ spec:
             - name: tmp
               emptyDir:
                 medium: Memory
-                # pprof の一時ファイルは小さい。超過すると Pod が evict される
-                sizeLimit: 16Mi
+                # 他の Rust サービス (game-data-server 等) と同じ値。medium: Memory では
+                # sizeLimit が tmpfs の size になるため、超過しても evict ではなく
+                # プロセス内の書き込みが ENOSPC で失敗し、プロファイルが欠ける
+                sizeLimit: 64Mi
