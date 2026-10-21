@@ -23,6 +23,10 @@ spec:
     metadata:
       labels:
         app: seichi-game-data-publisher-server
+      # Pod ログの Loki service_name を OTEL_SERVICE_NAME に揃え、Tempo の
+      # tracesToLogs (service.name -> service_name) でログに辿れるようにする
+      annotations:
+        resource.opentelemetry.io/service.name: seichi-game-data-publisher
     spec:
       # preStop 5 秒 + アプリ側の pre-drain 5 秒 + drain 最大 15 秒 + drain 後の
       # Pyroscope 停止 最大 10 秒 + OTel (traces / metrics) の flush 約 10 秒 = 45 秒に

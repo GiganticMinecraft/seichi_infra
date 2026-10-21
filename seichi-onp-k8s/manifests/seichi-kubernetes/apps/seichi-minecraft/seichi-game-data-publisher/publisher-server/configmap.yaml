@@ -5,6 +5,7 @@ metadata:
 data:
   # Expect game-data-server service to be in the same namespace
   GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server:80"
+  # sqlx::query=debug は外した (publisher は DB に触らない)
   RUST_LOG: "info"
   RUST_BACKTRACE: "1"
 
