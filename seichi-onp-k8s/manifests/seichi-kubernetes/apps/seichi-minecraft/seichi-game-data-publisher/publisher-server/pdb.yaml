@@ -1,12 +1,16 @@
 # replicas 2 と組み合わせ、drain (kured のノード再起動など) で同時に 2 台とも
-# 退避されないようにする。replicas を 1 に戻すときはこの PDB も消すこと
-# (minAvailable 1 + replicas 1 だと drain が永久にブロックされる)
+# 退避されないようにする。
+# - minAvailable: 1 ではなく maxUnavailable: 1 にしている。replicas 2 では同じ意味だが、
+#   replicas を 1 に戻したときも drain をブロックしない
+# - unhealthyPodEvictionPolicy: AlwaysAllow で、CrashLoop や NotReady の Pod は
+#   budget に関係なく退避させる (壊れたイメージで kured の drain が止まらないように)
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: seichi-game-data-publisher-server
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
       app: seichi-game-data-publisher-server
