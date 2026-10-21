@@ -1,14 +1,15 @@
-# seichi-minecraft namespace の観測対象アプリからの ingress 許可。
+# 観測対象アプリ (seichi-minecraft namespace の各アプリと garage-admin namespace の
+# garage-admin-api) からの ingress 許可。
 #   - alloy-receiver 4318/TCP: OTLP HTTP (gachadata-server, seichi-game-data-server,
-#     seichi-game-data-publisher-server。portal は既存の
+#     seichi-game-data-publisher-server, garage-admin-api。portal は既存の
 #     allow--from-seichi-portal--to-alloy-receiver.yaml が担う)
 #   - pyroscope 4040/TCP: 継続プロファイリングの push
-#     (garage-admin namespace の garage-admin-api も含む。garage-admin 側は
-#     default-deny のみで egress 許可は未整備)
-# 対象アプリを増やすときは seichi-minecraft 側 (egress) と monitoring 側 (ingress) の
-# 両方のリストを揃えて更新すること。
+# seichi-minecraft の対象アプリを増やすときは seichi-minecraft 側 (egress) と
+# monitoring 側 (ingress) の両方のリストを揃えて更新すること。
 # 対になる seichi-minecraft 側の egress 許可は
 # apps/seichi-minecraft/default-deny-policy/ にある。
+# garage-admin 側は apps/garage-admin/default-deny-policy/ がまだ kustomization に
+# 含まれておらず (CiliumNetworkPolicy 無し)、対になる egress 許可も無い。
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -30,6 +31,9 @@ spec:
                 - gachadata-server
                 - seichi-game-data-server
                 - seichi-game-data-publisher-server
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: garage-admin
+            app: garage-admin-api
       toPorts:
         - ports:
             - port: "4318"
