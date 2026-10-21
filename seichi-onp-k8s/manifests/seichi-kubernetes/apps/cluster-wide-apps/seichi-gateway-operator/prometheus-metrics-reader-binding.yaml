@@ -1,0 +1,15 @@
+# operator の metrics (:8443) は controller-runtime の authn/authz (TokenReview + SubjectAccessReview) で保護されている。
+# scrape する Prometheus の ServiceAccount に上流の metrics-reader (nonResourceURL /metrics の get) を明示的に付与する。
+# kube-prometheus-stack の ClusterRole にも /metrics の get は含まれるが、chart の権限構成に依存しないようにする。
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: seichi-gateway-operator-metrics-reader-prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: seichi-gateway-operator-metrics-reader
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-kube-prometheus-prometheus
+    namespace: monitoring

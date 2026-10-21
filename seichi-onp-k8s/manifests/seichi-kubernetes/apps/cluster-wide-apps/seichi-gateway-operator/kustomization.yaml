@@ -2,12 +2,24 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # ?ref= (config/: CRD / RBAC / manager) と images の newTag は同じコミットに揃える。
+  # ?ref= (config/: CRD / RBAC / manager / ServiceMonitor) と images の newTag は同じコミットに揃える。
   # Renovate が digest 追従で更新するのは newTag (latest@sha256) だけで ?ref= は追従しないため、
   # 上流の config/ が変わったら ?ref= を手動で上げる
-  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=8d077e320437deea757a78bfa45edf2dd02eee12
+  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=f9c44e61c8dc1b112bd1acac7209aa48eb111eb4
+  - prometheus-metrics-reader-binding.yaml
 
 images:
   - name: controller
     newName: ghcr.io/giganticminecraft/seichi-gateway-operator
-    newTag: latest@sha256:c17349c5552cf000912c7f79f5179b0b37350f095aa4cb8e409b74be7c10fcd4
+    newTag: latest@sha256:187158b68b5ede6e7b3625a23c4efb8145b74985a106c59976c7bc8e7e1ce197
+
+patches:
+  # 上流の ServiceMonitor を kube-prometheus-stack の Prometheus (serviceMonitorSelector: release=prometheus) に拾わせる。
+  # 上流で名前が変わっても patch が黙って外れないよう、name では絞らず全 ServiceMonitor を対象にする
+  - target:
+      group: monitoring.coreos.com
+      kind: ServiceMonitor
+    patch: |-
+      - op: add
+        path: /metadata/labels/release
+        value: prometheus
