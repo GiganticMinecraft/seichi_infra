@@ -110,9 +110,9 @@ spec:
         # pyroscope-rs のプロファイラが /tmp に一時ファイルを作る。/tmp が書けないと
         # 起動はするがプロファイラが黙って無効になるため、読み取り専用の
         # ルートファイルシステムの代わりに書き込める /tmp を与える。
-        # medium: Memory (tmpfs) はコンテナのメモリ使用量に計上される。一時ファイルは小さいが、
-        # sizeLimit (64Mi) を超えると kubelet が Pod を evict する
+        # 他の Rust サービスと違い memory limit が 128Mi と小さく、tmpfs (medium: Memory) だと
+        # /tmp の使用量がメモリ limit に計上されて OOM kill を招き得るため、ノードのディスクを使う。
+        # 一時ファイルは小さいが、sizeLimit (64Mi) を超えると kubelet が Pod を evict する
         - name: tmp
           emptyDir:
-            medium: Memory
             sizeLimit: 64Mi

@@ -75,10 +75,12 @@ spec:
         # 読み取り専用のルートファイルシステムで nginx が書き込む先。
         # /var/cache/nginx は client_temp などの一時ディレクトリ (proxy_cache は使っていない)、
         # /run は nginx.pid (/var/run は /run への symlink)。
-        # sizeLimit を超えると kubelet が Pod を evict する
+        # sizeLimit を超えると kubelet が Pod を evict する。/api/ は client_max_body_size 100m で
+        # アップロード本体を client_temp に、大きなダウンロードを proxy_temp (既定で最大 1024m) に
+        # 書き出すため、ノードのディスクを使い 2Gi まで許す
         - name: nginx-cache
           emptyDir:
-            sizeLimit: 16Mi
+            sizeLimit: 2Gi
         - name: nginx-run
           emptyDir:
             medium: Memory
