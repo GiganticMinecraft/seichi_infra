@@ -17,15 +17,16 @@ spec:
       annotations:
         resource.opentelemetry.io/service.name: gachadata-server
     spec:
-      # preStop 5 秒 + Pyroscope エージェント停止 最大 10 秒に、処理中リクエストの drain
-      # (axum の graceful shutdown。上限なし) として 25 秒を足して 40 秒にする
-      # (preStop を入れる前と同じく SIGTERM 後に 30 秒以上残す)。
+      # preStop 5 秒 + 処理中リクエストの drain (axum の graceful shutdown。アプリ側で
+      # 20 秒で打ち切る: gachadata-server#268 の DRAIN_TIMEOUT) + Pyroscope 停止・OTel flush
+      # (合計 15 秒を見込む) で 40 秒にする。DRAIN_TIMEOUT はこの値から逆算しているので、
+      # 変えるときはアプリ側も揃える。
       # キャッシュミス時の mariadb-dump (最大 120 秒) を待ち切る長さにはしない。
       # その場合は SIGKILL でリクエストが切れ、クライアント側の再試行に任せる
       terminationGracePeriodSeconds: 40
       containers:
         - name: gachadata-server
-          image: ghcr.io/giganticminecraft/gachadata-server:sha-80e3110@sha256:c9897f29a276420af088c38844ceb351aadc3660ff2c17273e74f5e3b1a9d80a
+          image: ghcr.io/giganticminecraft/gachadata-server:latest@sha256:7e272645eca2ced771a768c946e8ab35f4f3922479c379616340799f20b4c46c
           ports:
             - name: http
               containerPort: 80

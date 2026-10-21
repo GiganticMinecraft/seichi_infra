@@ -2,9 +2,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=5281f03968e7f429b0a65477c9a739773d952f05
+  # ?ref= (config/: CRD / RBAC / manager) と images の newTag は同じコミットに揃える。
+  # Renovate が digest 追従で更新するのは newTag (latest@sha256) だけで ?ref= は追従しないため、
+  # 上流の config/ が変わったら ?ref= を手動で上げる
+  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=8d077e320437deea757a78bfa45edf2dd02eee12
 
 images:
   - name: controller
     newName: ghcr.io/giganticminecraft/seichi-gateway-operator
-    newTag: sha-5281f03@sha256:2d356bc6db9e11efa83b902d9a57c4c73628b47475d61ee545e844bc01d6ed0f
+    newTag: latest@sha256:c17349c5552cf000912c7f79f5179b0b37350f095aa4cb8e409b74be7c10fcd4
