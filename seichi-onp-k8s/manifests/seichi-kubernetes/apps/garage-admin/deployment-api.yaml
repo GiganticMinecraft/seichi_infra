@@ -18,8 +18,8 @@ spec:
         app: garage-admin-api
     spec:
       # SIGTERM 後の猶予。アプリ (garage-admin-console#422 以降) は SIGTERM で listener を
-      # 閉じ、処理中のリクエストを最大 15 秒待ち (超過分は切断後 2 秒待つ)、OTel を最大 4 秒で
-      # flush してから終了する (合計 21 秒)。preStop 5 秒と合わせて 26 秒 < 30 秒
+      # 閉じ、処理中のリクエストを最大 15 秒待ち (超過分は切断後 2 秒待つ)、OTel と Pyroscope を
+      # 並行して最大 4 秒で flush してから終了する (合計 21 秒)。preStop 5 秒と合わせて 26 秒 < 30 秒
       terminationGracePeriodSeconds: 30
       containers:
         - name: garage-admin-api
@@ -27,7 +27,7 @@ spec:
           # main への push ごとに :latest を上書き push する。Renovate (pinDigests) が
           # :latest の digest の変化を検知して更新 PR を出す。特定コミットに固定して
           # ロールバックしたいときは sha-<commit> タグの digest を指定する
-          image: ghcr.io/giganticminecraft/garage-admin-console-backend:latest@sha256:26859143f936a50dacc67609d89053d698469acb470abd6a34d1970ed5e08f71
+          image: ghcr.io/giganticminecraft/garage-admin-console-backend:latest@sha256:eb6efe8bbaea0344cb688882ce738d6b4d9332ceac2c6a876ec8453002f35368
           ports:
             - containerPort: 8080
           # ファイルに書き込まないため、ルートファイルシステムは読み取り専用にする
@@ -52,6 +52,24 @@ spec:
               value: "onp-admin-grafana"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
+            # $(POD_NAME) で参照するため OTEL_RESOURCE_ATTRIBUTES より前に定義する
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            # PYROSCOPE_APPLICATION_NAME と揃えて traces と profiles を突き合わせられるようにする
+            - name: OTEL_SERVICE_NAME
+              value: "garage-admin-console"
+            # service.version はアプリ側 (garage-admin-console#423 以降) がイメージビルド時の
+            # コミット SHA を埋め込む
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment=production,deployment.environment.name=production,k8s.pod.name=$(POD_NAME)"
+            # 継続プロファイリングの push 先 (garage-admin-console#423)。未設定なら無効。
+            # アプリ名は OTEL_SERVICE_NAME に揃える
+            - name: PYROSCOPE_SERVER_ADDRESS
+              value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+            - name: PYROSCOPE_APPLICATION_NAME
+              value: "garage-admin-console"
             - name: GARAGE_ADMIN_TOKEN
               valueFrom:
                 secretKeyRef:
