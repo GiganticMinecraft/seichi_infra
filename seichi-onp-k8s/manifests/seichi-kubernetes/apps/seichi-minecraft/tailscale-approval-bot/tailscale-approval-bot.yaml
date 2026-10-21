@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: tailscale-approval-api
-          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/api:latest@sha256:a688ec6a172c83346d4f4ce8f597aabb8986f27ca2d4b68dd27c02cd3e09d2df"
+          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/api:latest@sha256:513df1ffc67f6eee7cb67e9c86bf4d647825db855bcf5eac95183fa96f2a98f5"
           ports:
             - containerPort: 8080
           env:
@@ -52,7 +52,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
         - name: tailscale-approval-discord
-          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/discord:latest@sha256:ee12be5c89ca5250789e54f7d51f050d49459ec51e9dbafd9ca9bb1fa9e53308"
+          image: "ghcr.io/giganticminecraft/tailscale-approval-bot/discord:latest@sha256:67bd24c7f60ee96559b7ba76381ab639f8e220565f85e207e87ab37036340a87"
           env:
             - name: DISCORD_BOT_TOKEN
               valueFrom:

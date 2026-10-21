@@ -5,9 +5,9 @@ resources:
   # ?ref= (config/: CRD / RBAC / manager) と images の newTag は同じコミットに揃える。
   # Renovate が digest 追従で更新するのは newTag (latest@sha256) だけで ?ref= は追従しないため、
   # 上流の config/ が変わったら ?ref= を手動で上げる
-  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=a2719aeabf6c0490c29aea72d6f2e5bdf1ce4e06
+  - github.com/GiganticMinecraft/seichi-gateway-operator/config/default?ref=8d077e320437deea757a78bfa45edf2dd02eee12
 
 images:
   - name: controller
     newName: ghcr.io/giganticminecraft/seichi-gateway-operator
-    newTag: latest@sha256:dfb9d46eb7fb3bc441f24c7ddb670a489d3f50f69052aef0a418e59d90443745
+    newTag: latest@sha256:c17349c5552cf000912c7f79f5179b0b37350f095aa4cb8e409b74be7c10fcd4
