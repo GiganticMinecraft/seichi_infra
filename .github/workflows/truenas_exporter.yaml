@@ -66,6 +66,8 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=sha,prefix=sha-,suffix=,format=short
+            # マニフェストは latest@sha256:... で参照し、Renovate が digest の変化を追従する
+            type=raw,value=latest,enable={{is_default_branch}}
             type=schedule,pattern={{date 'YYYYMMDD'}}
 
       - name: Build (and push if on main)

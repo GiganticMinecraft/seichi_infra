@@ -68,10 +68,9 @@ spec:
                   name: mariadb
                   key: mcserver-password
 
-          # Track the rolling :master tag so Argo Image Updater can swap
-          # digests in. Per-commit pinning happens by setting a sha- tag here
-          # if you ever need to roll back (and disabling Image Updater for
-          # this image temporarily).
+          # CI が default branch への merge ごとに :master を上書き push する。
+          # Renovate (pinDigests) が :master の digest の変化を検知して更新 PR を出す。
+          # 特定コミットに固定してロールバックしたいときは sha-<commit> タグの digest を指定する
           image: ghcr.io/giganticminecraft/seichi-game-data-server:master@sha256:b9a009a0155ab0c5434f36b012bdfb282bb2439bed011822d6472c89a98f86ed
           imagePullPolicy: Always
           name: seichi-game-data-server

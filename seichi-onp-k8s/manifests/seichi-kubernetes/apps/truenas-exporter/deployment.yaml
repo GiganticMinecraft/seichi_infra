@@ -19,7 +19,10 @@ spec:
     spec:
       containers:
         - name: truenas-exporter
-          image: ghcr.io/giganticminecraft/truenas-exporter:sha-0cfd4e4@sha256:bf1e7d18df8789c4d1801004b656f4b29b619eeea553b9cc33b581792f8ebaec
+          # CI (.github/workflows/truenas_exporter.yaml) が main への push ごとに :latest を
+          # 上書き push する。Renovate (pinDigests) が :latest の digest の変化を検知して更新 PR を出す。
+          # 特定コミットに固定してロールバックしたいときは sha-<commit> タグの digest を指定する
+          image: ghcr.io/giganticminecraft/truenas-exporter:latest@sha256:bf1e7d18df8789c4d1801004b656f4b29b619eeea553b9cc33b581792f8ebaec
           ports:
             - containerPort: 9814
               name: metrics
