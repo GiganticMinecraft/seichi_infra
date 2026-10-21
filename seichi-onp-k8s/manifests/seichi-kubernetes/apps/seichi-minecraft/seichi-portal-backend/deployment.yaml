@@ -27,13 +27,14 @@ spec:
         resource.opentelemetry.io/service.name: seichi-portal-backend
         resource.opentelemetry.io/service.namespace: seichi-portal
     spec:
-      # preStop 5 秒 + drain 後の Pyroscope 停止 最大 10 秒 + tracer / meter provider の
-      # shutdown (順に実行、それぞれ OTLP タイムアウト 10 秒) = 35 秒に、処理中リクエストの
-      # drain (axum の graceful shutdown。上限なし) として 15 秒と余裕を足して 60 秒にする
+      # preStop 5 秒 + drain (v1.2.4 以降: シグナル受信から 15 秒で打ち切り。axum と
+      # search sync / Discord / MQ の停止をまとめて待つ) + Pyroscope 停止 最大 10 秒 +
+      # tracer / meter provider の shutdown (順に実行、それぞれ OTLP タイムアウト 10 秒)
+      # = 50 秒に余裕を足して 60 秒にする
       terminationGracePeriodSeconds: 60
       containers:
         - name: seichi-portal-backend
-          image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.3@sha256:5dd57eae9296de6d6438b1ec8a4076fd9ccf5520479dd95bda7cec6e49804cce
+          image: ghcr.io/giganticminecraft/seichi-portal-backend:1.2.4@sha256:d51b8e37b54978751392a939700820e402a824c25d785159c8e492fef151d132
           ports:
             - name: http
               containerPort: 9000
