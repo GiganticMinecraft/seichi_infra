@@ -27,12 +27,13 @@ spec:
               containerPort: 80
               protocol: TCP
           # health エンドポイントが無いため、listener (HTTP_PORT=80) の有無だけを
-          # tcpSocket で見る。listen 開始までの時間を実測できていないため、
-          # startupProbe で最大 5 分待ってから liveness を有効にする
+          # tcpSocket で見る。DB 接続より前に bind するので、DB 障害では落ちない。
+          # tcpSocket はプロセスのハング (accept しない状態) までは検知できない。
+          # startupProbe は seichi-game-data-* と同じ最大 30 秒
           startupProbe:
             tcpSocket:
               port: http
-            failureThreshold: 60
+            failureThreshold: 6
             periodSeconds: 5
           readinessProbe:
             tcpSocket:

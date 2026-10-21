@@ -27,6 +27,8 @@ spec:
               containerPort: 3000
               protocol: TCP
           # health エンドポイントが無いため、listener の有無だけを tcpSocket で見る。
+          # (SSR が backend を呼ぶ "/" を httpGet にすると backend 障害で frontend まで
+          # 再起動するため使わない。イベントループのハングは tcpSocket では検知できない)
           # startupProbe が通るまで liveness を止め、起動直後の再起動を防ぐ (最大 60 秒)
           startupProbe:
             tcpSocket:

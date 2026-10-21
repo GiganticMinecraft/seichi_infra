@@ -5,8 +5,8 @@
 #   - pyroscope 4040/TCP: 継続プロファイリングの push
 #     (portal backend/frontend, gachadata-server, conifers ingestor,
 #     seichi-game-data-server, seichi-game-data-publisher-server)
-# 1 本目のポリシー名は gachadata のみだった頃の名残。リネームすると削除と再作成に
-# なるため名前は据え置く
+# 対象アプリを増やすときは seichi-minecraft 側 (egress) と monitoring 側 (ingress) の
+# 両方のリストを揃えて更新すること。
 # 対になる monitoring 側の ingress 許可は
 # apps/cluster-wide-apps/monitoring-default-deny-policy/ にある。
 # 注意: 現状の default-deny は明示 Deny (ingressDeny/egressDeny) 方式のため、
@@ -15,7 +15,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: allow--from-gachadata--to-alloy-receiver
+  name: allow--from-observed-apps--to-alloy-receiver
 spec:
   endpointSelector:
     matchExpressions:
