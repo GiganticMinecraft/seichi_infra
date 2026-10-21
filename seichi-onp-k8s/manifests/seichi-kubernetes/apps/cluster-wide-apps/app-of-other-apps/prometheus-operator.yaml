@@ -142,7 +142,7 @@ spec:
                     # ログ行の trace ID から Tempo のトレースへ飛べるようにする。
                     # seichi-portal-backend の JSON ログは "openTelemetry":{..,"traceId":"<id>"}、
                     # Faro (seichi-portal-browser) の logfmt は traceID=<id>、
-                    # Rust の tracing-subscriber JSON (seichi-game-data-publisher) は "trace_id":"<id>" で出る。
+                    # Rust の tracing-subscriber JSON (seichi-game-data-publisher / seichi-game-data-server) は "trace_id":"<id>" で出る。
                     derivedFields:
                       - name: TraceID
                         matcherRegex: '(?:"traceId":"|"trace_id":"|traceID=)(\w+)'
