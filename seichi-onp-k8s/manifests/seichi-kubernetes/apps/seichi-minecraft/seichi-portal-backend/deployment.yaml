@@ -63,6 +63,14 @@ spec:
             limits:
               cpu: "2"
               memory: 3Gi
+          # イメージの USER が ubuntu (名前指定) のため runAsNonRoot は付けない。
+          # 付ける場合は runAsUser: 1000 (イメージ内の ubuntu の uid) を併記しないと
+          # kubelet が非 root を検証できず CreateContainerConfigError になる
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: MYSQL_DATABASE
               value: seichi-portal
@@ -170,3 +178,6 @@ spec:
               value: "http://pyroscope.monitoring.svc.cluster.local:4040"
             - name: PYROSCOPE_APPLICATION_NAME
               value: "seichi-portal-backend"
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault

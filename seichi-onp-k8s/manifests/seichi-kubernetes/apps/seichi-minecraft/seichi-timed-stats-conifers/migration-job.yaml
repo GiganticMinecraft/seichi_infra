@@ -32,9 +32,25 @@ spec:
         app: seichi-timed-stats-conifers-ingestor
     spec:
       restartPolicy: Never
+      # イメージは USER 65532
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: migration
           image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-database-migration:sha-35af1fb@sha256:05139d5006e8301855007416cbdc1849d25d4366d4aae8d34ea7e70d272c35d2
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: DB_HOST_AND_PORT
               value: "mariadb:3306"

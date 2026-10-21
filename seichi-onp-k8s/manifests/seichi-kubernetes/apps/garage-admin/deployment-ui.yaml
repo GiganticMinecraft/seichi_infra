@@ -29,6 +29,21 @@ spec:
             limits:
               cpu: 100m
               memory: 64Mi
+          # 公式 nginx イメージは master が root で起動し、worker を nginx (101) に
+          # setuid/setgid する。master は temp/cache ディレクトリを mkdir して worker に chown する。
+          # このため drop ALL の後に NET_BIND_SERVICE (port 80)、SETUID/SETGID (worker の降格)、
+          # CHOWN (temp/cache の chown) を戻す。ローカルの container ランタイムで、
+          # どれか 1 つでも欠けると起動に失敗することを確認済み
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+                - CHOWN
+                - SETUID
+                - SETGID
           volumeMounts:
             - name: nginx-conf
               mountPath: /etc/nginx/nginx.conf
@@ -47,6 +62,9 @@ spec:
             tcpSocket:
               port: 80
             periodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: nginx-conf
           configMap:

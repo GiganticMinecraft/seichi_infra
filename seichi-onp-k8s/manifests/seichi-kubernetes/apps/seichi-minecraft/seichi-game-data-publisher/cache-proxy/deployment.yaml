@@ -24,6 +24,25 @@ spec:
             requests:
               memory: 32Mi
 
+          # 公式 nginx イメージは master が root で起動し、worker を nginx (101) に
+          # setuid/setgid する。master は temp/cache ディレクトリを mkdir して worker に chown する。
+          # このため drop ALL の後に NET_BIND_SERVICE (port 80)、SETUID/SETGID (worker の降格)、
+          # CHOWN (temp/cache の chown) を戻す。ローカルの container ランタイムで、
+          # どれか 1 つでも欠けると起動に失敗することを確認済み
+          # proxy_cache_path は /var/cache/nginx 直下だと master がその親ディレクトリごと
+          # nginx に chown し、続く client_temp などの mkdir に DAC_OVERRIDE が必要になるため、
+          # nginx.conf 側でサブディレクトリにしている
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+                - CHOWN
+                - SETUID
+                - SETGID
+
           image: nginx:1.31.7
           name: seichi-game-data-publisher-cache-proxy
           ports:
@@ -58,6 +77,13 @@ spec:
           ports:
             - containerPort: 9113
               name: metrics
+          # nginx-prometheus-exporter のイメージは USER 1001:1001
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               memory: 16Mi
@@ -66,6 +92,9 @@ spec:
               memory: 32Mi
               cpu: 50m
 
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: nginx-conf
           configMap:
