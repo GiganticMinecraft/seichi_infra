@@ -24,7 +24,12 @@ spec:
             app: seichi-timed-stats-conifers-ingestor
         spec:
           restartPolicy: OnFailure
+          # イメージ (conifers#240 以降) は distroless nonroot で USER 65532:65532 を数値で
+          # 明示しているので、migration-job.yaml と同じく runAsNonRoot だけで非 root を強制する
+          # (runAsUser の固定はイメージ側の uid 変更を黙って上書きするため付けない)。
+          # listen はしないので port の制約は無い
           securityContext:
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           # migration は initContainer ではなく ArgoCD の PreSync hook
@@ -32,7 +37,7 @@ spec:
           # migration の障害が 5 分ごとの全 ingest を止めないようにするため
           containers:
             - name: ingestor
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-2327a0e@sha256:fcc4302c0528edad9c033e6887f4bcf2d4c0d9c66c5b068926b9605326b88ded
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:sha-b817258@sha256:6ad9fba8effdb7e05c2a8f3f7c01e09a1da613e9b9a92ca7253302e26f11cfda
               # 2026-10 時点で直近 24 時間の working set 最大は約 30Mi、1 回の実行は 12 秒程度。
               # CPU は実行時間が短く scrape 間隔に収まらないため実測できていない
               resources:
@@ -41,12 +46,20 @@ spec:
                   memory: 128Mi
                 limits:
                   memory: 512Mi
-              # イメージは USER 0 (root) のため runAsNonRoot は付けない。listen はしない
+              # rootfs は読み取り専用。書き込みが必要なのは pyroscope-rs (pprof) が
+              # 起動時に作る一時ファイル用の /tmp だけ (conifers#240 でローカル実機確認)。
+              # /tmp に書けないと ingest 自体は成功するが、起動時に
+              # "Error in creating profiler: Read-only file system (os error 30)" を
+              # ログに出してプロファイルだけ取れなくなる (アラートは無いのでログで気付く)
               securityContext:
                 allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
                 capabilities:
                   drop:
                     - ALL
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
               env:
                 - name: DB_CONNECTION_HOST_AND_PORT
                   value: "mariadb:3306"
@@ -72,3 +85,11 @@ spec:
                   value: "http://pyroscope.monitoring.svc.cluster.local:4040"
                 - name: PYROSCOPE_APPLICATION_NAME
                   value: "seichi-timed-stats-conifers-ingestor"
+          volumes:
+            - name: tmp
+              emptyDir:
+                medium: Memory
+                # 他の Rust サービス (game-data-server 等) と同じ値。medium: Memory では
+                # sizeLimit が tmpfs の size になるため、超過しても evict ではなく
+                # プロセス内の書き込みが ENOSPC で失敗し、プロファイルが欠ける
+                sizeLimit: 64Mi
