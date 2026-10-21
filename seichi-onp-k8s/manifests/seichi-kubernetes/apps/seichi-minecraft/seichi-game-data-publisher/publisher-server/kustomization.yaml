@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - "configmap.yaml"
   - "deployment.yaml"
+  - "pdb.yaml"
   - "service.yaml"
 

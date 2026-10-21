@@ -1,0 +1,12 @@
+# replicas 2 と組み合わせ、drain (kured のノード再起動など) で同時に 2 台とも
+# 退避されないようにする。replicas を 1 に戻すときはこの PDB も消すこと
+# (minAvailable 1 + replicas 1 だと drain が永久にブロックされる)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: seichi-game-data-publisher-server
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: seichi-game-data-publisher-server

@@ -7,7 +7,14 @@ metadata:
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
-  replicas: 1
+  # ステートレスなので 2 replica にし、ノード再起動 (kured) やロールアウト中も 1 台は残す。
+  # PDB (pdb.yaml) と組み合わせて drain 時も最低 1 台を維持する
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -19,6 +26,14 @@ spec:
     spec:
       # 既定値と同じ 30 秒を明示する (SIGTERM 後の猶予。挙動は変わらない)
       terminationGracePeriodSeconds: 30
+      # 2 replica を別ノードに分散させる。空きが無いときは同じノードでも起動させる
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: seichi-game-data-publisher-cache-proxy
       containers:
         - resources:
             requests:

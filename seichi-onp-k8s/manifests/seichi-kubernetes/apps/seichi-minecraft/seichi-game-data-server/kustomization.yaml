@@ -4,4 +4,5 @@ namespace: seichi-minecraft
 resources:
   - "configmap.yaml"
   - "deployment.yaml"
+  - "pdb.yaml"
   - "service.yaml"
