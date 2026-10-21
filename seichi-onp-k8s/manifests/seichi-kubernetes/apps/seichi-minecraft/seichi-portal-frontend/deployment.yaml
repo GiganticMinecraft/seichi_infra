@@ -76,11 +76,17 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+          # ルートファイルシステムは読み取り専用にし、Next.js の画像最適化キャッシュ
+          # (/app/.next/cache) だけ emptyDir を使う
           securityContext:
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: next-cache
+              mountPath: /app/.next/cache
           env:
             - name: TURNSTILE_SITE_KEY
               valueFrom:
@@ -139,3 +145,10 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      volumes:
+        # /_next/image の最適化結果を書き込むキャッシュ。書けないと毎回 MISS (再変換) になり、
+        # ENOENT の unhandledRejection がログに出る。Pod ごとのキャッシュで再起動時に消えてよい。
+        # ノードのディスクを使い、sizeLimit (256Mi) を超えると kubelet が Pod を evict する
+        - name: next-cache
+          emptyDir:
+            sizeLimit: 256Mi

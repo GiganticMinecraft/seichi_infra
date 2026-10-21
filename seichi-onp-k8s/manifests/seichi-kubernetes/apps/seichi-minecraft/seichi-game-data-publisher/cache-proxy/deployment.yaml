@@ -46,8 +46,10 @@ spec:
           # どれか 1 つでも欠けると起動に失敗することを確認済み
           # proxy_cache_path は /var/cache/nginx 直下だと master がその親ディレクトリごと
           # nginx に chown し、続く client_temp などの mkdir に DAC_OVERRIDE が必要になるため、
-          # nginx.conf 側でサブディレクトリにしている
+          # nginx.conf 側でサブディレクトリにしている。
+          # ルートファイルシステムは読み取り専用にし、書き込み先は emptyDir にする (volumes 参照)
           securityContext:
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
@@ -84,6 +86,10 @@ spec:
             - mountPath: /etc/nginx/nginx.conf
               name: nginx-conf
               subPath: nginx.conf
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /run
 
         - name: nginx-exporter
           image: nginx/nginx-prometheus-exporter:1.5.3
@@ -92,9 +98,11 @@ spec:
           ports:
             - containerPort: 9113
               name: metrics
-          # nginx-prometheus-exporter のイメージは USER 1001:1001
+          # nginx-prometheus-exporter のイメージは USER 1001:1001。
+          # 単一の Go バイナリでファイルに書き込まないため、ルートファイルシステムは読み取り専用にする
           securityContext:
             runAsNonRoot: true
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop:
@@ -111,6 +119,17 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       volumes:
+        # 読み取り専用のルートファイルシステムで nginx が書き込む先。
+        # /var/cache/nginx は client_temp などの一時ディレクトリと proxy_cache、
+        # /run は nginx.pid (/var/run は /run への symlink)。
+        # sizeLimit を超えると kubelet が Pod を evict する
+        - name: nginx-cache
+          emptyDir:
+            sizeLimit: 64Mi
+        - name: nginx-run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Mi
         - name: nginx-conf
           configMap:
             name: seichi-game-data-publisher-cache-proxy-nginx-conf
