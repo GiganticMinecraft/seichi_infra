@@ -22,6 +22,10 @@ spec:
           labels:
             # CiliumNetworkPolicy の endpointSelector 用
             app: seichi-timed-stats-conifers-ingestor
+          # Pod ログの Loki service_name を OTEL_SERVICE_NAME に揃え、Tempo の
+          # tracesToLogs (service.name -> service_name) でログに辿れるようにする
+          annotations:
+            resource.opentelemetry.io/service.name: seichi-timed-stats-conifers-ingestor
         spec:
           restartPolicy: OnFailure
           # イメージ (conifers#240 以降) は distroless nonroot で USER 65532:65532 を数値で
@@ -89,9 +93,15 @@ spec:
                   value: "seichi-timed-stats-conifers-ingestor"
                 # OpenTelemetry (conifers#243): traces と metrics を Alloy receiver に OTLP HTTP で送る。
                 # OTLP logs は使わない (stdout → Loki と二重になるため)。
-                # OTEL_EXPORTER_OTLP_ENDPOINT を外すと OTel は無効になる
+                # OTEL_EXPORTER_OTLP_ENDPOINT を外すと OTel は無効になる。送信先に届かなくても
+                # アプリ側が flush を 25 秒で打ち切るので、ingest の成否や Job の期限には響かない
                 - name: OTEL_SERVICE_NAME
                   value: "seichi-timed-stats-conifers-ingestor"
+                # $(POD_NAME) で参照するため OTEL_RESOURCE_ATTRIBUTES より前に定義する
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
                 - name: OTEL_EXPORTER_OTLP_ENDPOINT
                   value: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
                 - name: OTEL_EXPORTER_OTLP_PROTOCOL
@@ -99,7 +109,8 @@ spec:
                 - name: OTEL_TRACES_SAMPLER
                   value: "parentbased_always_on"
                 - name: OTEL_RESOURCE_ATTRIBUTES
-                  value: "deployment.environment=production"
+                  # k8s.pod.name: 実行 (Job / Pod) ごとの trace を kubectl logs や Job の失敗と突き合わせるため
+                  value: "deployment.environment=production,deployment.environment.name=production,k8s.pod.name=$(POD_NAME)"
           volumes:
             - name: tmp
               emptyDir:
