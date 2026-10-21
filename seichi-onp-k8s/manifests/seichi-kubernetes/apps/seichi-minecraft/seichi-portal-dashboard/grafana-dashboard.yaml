@@ -17,7 +17,7 @@ data:
     {
       "uid": "seichi-portal-overview",
       "title": "Seichi Portal",
-      "description": "seichi-portal (frontend / backend / CDC パイプライン) の性能と健全性。OTLP メトリクス (seichi_portal_* / nodejs_* / v8js_* / db_client_*) は 2026-10-21 15:03 JST (06:03 UTC、seichi_infra #6464) から service.instance.id (Pod 名) ごとの series になった。それ以前は複数 replica が同じ series に交互に書いていたため、その期間のレート・分位数・Pod 別の値は歪んでいて信頼できない (補正不可。グラフ上の注釈で切り替わりを示している)。Tempo span-metrics・Loki・kube-state-metrics 由来のパネルは影響を受けない。debezium の instance は Pod 名ではなく JVM 起動ごとのランダムな UUID (OTel Java Agent が付ける)。検証用の scratch namespace の Pod が同じ job で現れることがある",
+      "description": "seichi-portal (frontend / backend / CDC パイプライン) の性能と健全性。OTLP メトリクス (seichi_portal_* / nodejs_* / v8js_* / db_client_*) は 2026-10-21 15:03 JST (06:03 UTC) から service.instance.id (Pod 名) ごとの series になった。それ以前は複数 replica が同じ series に交互に書いていたため、その期間のレート・分位数・Pod 別の値は歪んでいて信頼できない (補正不可。グラフ上の注釈で切り替わりを示している)。Tempo span-metrics・Loki・kube-state-metrics 由来のパネルは影響を受けない。debezium の instance は Pod 名ではなく JVM 起動ごとのランダムな UUID (OTel Java Agent が付ける)。検証用の scratch namespace の Pod が同じ job で現れることがある",
       "tags": [
         "seichi-portal"
       ],
@@ -33,7 +33,7 @@ data:
       "annotations": {
         "list": [
           {
-            "name": "OTLP メトリクスの instance 分離 (#6464)",
+            "name": "メトリクスを Pod 別に記録し始めた時刻",
             "datasource": {
               "type": "prometheus",
               "uid": "PBFA97CFB590B2093"
@@ -42,8 +42,8 @@ data:
             "iconColor": "orange",
             "expr": "vector(1) and on() (vector(time()) >= 1792562580 and vector(time()) < 1792562880)",
             "step": "60s",
-            "titleFormat": "instance 分離 (#6464)",
-            "textFormat": "2026-10-21 15:03 JST 以前の OTLP メトリクス (レート・分位数・Pod 別) は歪んでいて信頼できない"
+            "titleFormat": "メトリクスを Pod 別に記録し始めた",
+            "textFormat": "これより前の portal のメトリクス (レート・分位数・Pod 別の値) は複数 Pod の値が 1 本に混ざっていて信頼できない"
           }
         ]
       },
@@ -816,14 +816,14 @@ data:
               "options": {
                 "excludeByName": {
                   "Time": true,
-                  "Value": true
+                  "Value": true,
+                  "service_name": true
                 },
                 "indexByName": {
-                  "service_name": 0,
+                  "k8s_pod_name": 0,
                   "service_version": 1,
-                  "k8s_pod_name": 2,
-                  "k8s_node_name": 3,
-                  "k8s_pod_start_time": 4
+                  "k8s_pod_start_time": 2,
+                  "k8s_node_name": 3
                 },
                 "renameByName": {
                   "service_name": "サービス",
@@ -844,7 +844,7 @@ data:
             "cellHeight": "sm",
             "sortBy": [
               {
-                "displayName": "サービス",
+                "displayName": "Pod",
                 "desc": false
               }
             ]
@@ -914,9 +914,15 @@ data:
                 "excludeByName": {
                   "Time": true
                 },
+                "indexByName": {
+                  "pod": 0,
+                  "Value #C": 1,
+                  "Value #A": 2,
+                  "Value #B": 3
+                },
                 "renameByName": {
                   "pod": "Pod",
-                  "Value #A": "再起動回数",
+                  "Value #A": "累計の再起動",
                   "Value #B": "稼働時間",
                   "Value #C": "直近 6h の再起動"
                 }
@@ -945,7 +951,7 @@ data:
               {
                 "matcher": {
                   "id": "byName",
-                  "options": "再起動回数"
+                  "options": "累計の再起動"
                 },
                 "properties": [
                   {
