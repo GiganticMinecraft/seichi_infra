@@ -3,10 +3,10 @@ kind: ConfigMap
 metadata:
   name: seichi-game-data-server-config
 data:
-  # `debug` is enabled to surface sqlx::query events (db.statement,
-  # rows_returned, elapsed_secs) which are emitted at Debug level and become
-  # logs attached to each gRPC span via OTLP.
-  RUST_LOG: "info,sqlx::query=debug"
+  # Each DB query has its own client span (SQL text, returned rows and
+  # duration), so the per-query `sqlx::query` events at Debug level are no
+  # longer needed. Slow statements (over 1s) are still logged by sqlx at WARN.
+  RUST_LOG: "info"
   HTTP_HOST: "0.0.0.0"
   HTTP_PORT: "80"
 
@@ -17,9 +17,11 @@ data:
 
   # Db password will be read from mcserver--common--config-secrets secret
 
-  # OpenTelemetry: traces, metrics, logs are pushed to the cluster's Alloy
-  # receiver, which fans out to Tempo / Mimir / Loki. Disabling the exporter
-  # is as simple as removing OTEL_EXPORTER_OTLP_ENDPOINT.
+  # OpenTelemetry: traces and metrics are pushed to the cluster's Alloy
+  # receiver, which fans out to Tempo / Mimir. Logs are not sent over OTLP;
+  # the JSON lines on stdout (with trace_id / span_id) reach Loki through the
+  # Pod log collection. Disabling the exporter is as simple as removing
+  # OTEL_EXPORTER_OTLP_ENDPOINT.
   OTEL_SERVICE_NAME: "seichi-game-data-server"
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
   OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
