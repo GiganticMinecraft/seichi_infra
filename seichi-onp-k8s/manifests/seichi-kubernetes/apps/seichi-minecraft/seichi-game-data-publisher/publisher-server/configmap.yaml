@@ -5,14 +5,15 @@ metadata:
 data:
   # Expect game-data-server service to be in the same namespace
   GAME_DATA_SERVER_GRPC_ENDPOINT_URL: "http://seichi-game-data-server:80"
-  # Base level info; keep sqlx::query at debug to match the game-data stack's
-  # query tracing policy without enabling noisy crate-wide DEBUG logs.
-  RUST_LOG: "info,sqlx::query=debug"
+  RUST_LOG: "info"
   RUST_BACKTRACE: "1"
 
-  # OpenTelemetry: traces, metrics, logs are pushed to the cluster's Alloy
-  # receiver, which fans out to Tempo / Mimir / Loki. Disabling the exporter
-  # is as simple as removing OTEL_EXPORTER_OTLP_ENDPOINT.
+  # OpenTelemetry: traces and metrics are pushed to the cluster's Alloy
+  # receiver, which fans out to Tempo / Mimir. Logs are not exported over OTLP;
+  # the JSON lines on stdout (with trace_id / span_id) are collected as pod
+  # logs. Disabling the exporter is as simple as removing
+  # OTEL_EXPORTER_OTLP_ENDPOINT. service.version defaults to the git commit
+  # compiled into the binary; set SERVICE_VERSION to override it.
   OTEL_SERVICE_NAME: "seichi-game-data-publisher"
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://k8s-monitoring-alloy-receiver.monitoring.svc.cluster.local:4318"
   OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
