@@ -98,7 +98,7 @@ data:
           "id": 2,
           "type": "stat",
           "title": "対応が必要な脆弱性",
-          "description": "稼働中のカーネルとそれ以外のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。0 以外ならパッケージ更新 (と稼働中カーネルなら再起動) が必要。",
+          "description": "稼働中カーネル・再起動待ちの新しいカーネル・通常のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。動いていない旧カーネルの残骸 (stale-kernel) は含まない。0 以外ならパッケージ更新か再起動が必要。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -346,7 +346,7 @@ data:
           "id": 6,
           "type": "table",
           "title": "ノード別",
-          "description": "ノードごとの修正版ありの脆弱性件数を kind (package / running-kernel / stale-kernel) と重大度で集計したもの。稼働中カーネルは node_uname_info の release。",
+          "description": "ノードごとの修正版ありの脆弱性件数を kind と重大度で集計したもの。kind は package (通常のパッケージ) / running-kernel (稼働中カーネル) / newer-kernel (インストール済みで再起動待ちのカーネル) / stale-kernel (動いていない旧カーネルの残骸)。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -412,14 +412,19 @@ data:
           },
           "transformations": [
             {
-              "id": "merge",
-              "options": {}
+              "id": "joinByField",
+              "options": {
+                "byField": "nodename",
+                "mode": "outerTabular"
+              }
             },
             {
               "id": "organize",
               "options": {
                 "excludeByName": {
-                  "Time": true
+                  "Time": true,
+                  "Time 1": true,
+                  "Time 2": true
                 },
                 "renameByName": {
                   "nodename": "ノード",
@@ -437,7 +442,7 @@ data:
           "id": 7,
           "type": "table",
           "title": "パッケージ別",
-          "description": "パッケージ (インストール済みバージョン) ごとの件数。stale-kernel は動いていない旧カーネルの残骸。",
+          "description": "パッケージ (インストール済みバージョン) ごとの件数。stale-kernel は動いていない旧カーネルの残骸、newer-kernel は再起動すると稼働中になるカーネル。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -533,7 +538,7 @@ data:
                 "uid": "${loki_datasource}"
               },
               "queryType": "range",
-              "expr": "{job=\"trivy-operator/kbom\"} | json | event=\"trivy_kbom_scan\"",
+              "expr": "{job=\"trivy-operator/kbom\"} |= \"trivy_kbom_scan\" | json | event=\"trivy_kbom_scan\"",
               "maxLines": 5
             }
           ],
@@ -581,7 +586,9 @@ data:
                 }
               }
             }
-          ]
+          ],
+          "timeFrom": "26h",
+          "hideTimeOverride": false
         },
         {
           "id": 10,
@@ -606,7 +613,7 @@ data:
                 "uid": "${loki_datasource}"
               },
               "queryType": "range",
-              "expr": "{job=\"trivy-operator/kbom\"} | json | event=\"trivy_kbom_vulnerability\"",
+              "expr": "{job=\"trivy-operator/kbom\"} |= \"trivy_kbom_vulnerability\" | json | event=\"trivy_kbom_vulnerability\"",
               "maxLines": 500
             }
           ],
@@ -708,7 +715,9 @@ data:
                 }
               }
             }
-          ]
+          ],
+          "timeFrom": "26h",
+          "hideTimeOverride": false
         }
       ],
       "annotations": {

@@ -38,3 +38,22 @@ spec:
           annotations:
             summary: "{{ $labels.nodename }} の OS パッケージスキャン結果が更新されていません"
             description: "trivy-node-scanner の Pod が {{ $labels.nodename }} で動いているか、node-exporter が --collector.textfile.directory=/host/root/var/lib/node-exporter/textfile で起動しているかを確認してください。"
+        - alert: TrivyKbomScanMissing
+          # Kubernetes コンポーネントの KBOM スキャン (CronJob trivy-kbom、毎日 05:30 JST) が
+          # 2 日成功していない。kbom.sh は失敗時に exit 1 するので Job の成否 = スキャンの成否。
+          # 一度も成功していない CronJob は作成から 2 日経つまで鳴らさない (導入直後の誤検知を避ける)。
+          expr: |
+            (time() - kube_cronjob_status_last_successful_time{job="kube-state-metrics", namespace="trivy-operator", cronjob="trivy-kbom"} > 2 * 86400)
+            or
+            (
+              (time() - kube_cronjob_created{job="kube-state-metrics", namespace="trivy-operator", cronjob="trivy-kbom"} > 2 * 86400)
+              unless on (namespace, cronjob)
+              kube_cronjob_status_last_successful_time{job="kube-state-metrics", namespace="trivy-operator", cronjob="trivy-kbom"}
+            )
+          for: 1h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: Kubernetes コンポーネントの脆弱性スキャン (KBOM) が 2 日間成功していません
+            description: kubectl -n trivy-operator get cronjob trivy-kbom と直近の Job / Pod の状態、Loki の {job="trivy-operator/kbom"} | json | event="trivy_kbom_scan" を確認してください。

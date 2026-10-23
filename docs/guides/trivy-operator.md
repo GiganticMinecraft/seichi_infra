@@ -122,9 +122,11 @@ Trivy Operator が見るのはコンテナイメージとクラスタの設定�
 |---|---|---|
 | `package` | 通常のパッケージ | パッケージを更新する |
 | `running-kernel` | 稼働中カーネルのパッケージ | 更新してノードを再起動する (kured) |
+| `newer-kernel` | 稼働中より新しいカーネル (インストール済みで再起動待ち) | 再起動すると `running-kernel` になる。修正版が出ていれば更新する |
 | `stale-kernel` | 動いていない旧カーネルの残骸 | `apt autoremove --purge` で消す。実害は無いが件数が大きく見える |
 
 - 見方: ダッシュボードの「対応が必要な脆弱性」(`stale-kernel` を除いた件数) が 0 かどうかを見る
+- スキャンが失敗したときは前回成功時の件数を残し、`trivy_node_scan_success` だけを 0 にする (0 件 = 問題なしに見えないように)
 
 ### Kubernetes コンポーネント (KBOM)
 
@@ -145,8 +147,8 @@ Trivy Operator が見るのはコンテナイメージとクラスタの設定�
 |---|---|
 | `TrivyNodeScanFailing` | ノードの最終スキャンが失敗のまま 1 時間 |
 | `TrivyNodeScanStale` | 最終スキャンから 2 日以上経った、またはスキャン結果が無いノードがある状態が 3 時間 |
-| `TrivyKbomScanFailing` (Loki) | 直近 1 日に KBOM スキャンの失敗がある |
-| `TrivyKbomScanMissing` (Loki) | 2 日間 KBOM スキャンの成功が無い |
+| `TrivyKbomScanFailing` (Loki) | 直近 1 日に KBOM スキャンの失敗があり、同じ期間に成功が無い (再試行で成功していれば鳴らない) |
+| `TrivyKbomScanMissing` | CronJob `trivy-kbom` の最終成功から 2 日以上 (kube-state-metrics。一度も成功していない場合は作成から 2 日経つまで鳴らさない) |
 
 ## 既知の制約
 
