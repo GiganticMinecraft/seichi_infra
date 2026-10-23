@@ -489,7 +489,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -533,7 +533,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -567,7 +567,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -601,7 +601,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -635,7 +635,43 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 160
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "イメージ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 220
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
                   }
                 ]
               }
@@ -1018,7 +1054,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -1062,7 +1098,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -1096,7 +1132,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -1130,7 +1166,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -1164,7 +1200,79 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 160
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "種別"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 110
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "リソース名"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 200
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "コンテナ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 120
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "イメージ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 220
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
                   }
                 ]
               }
@@ -1383,7 +1491,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -1396,7 +1504,68 @@ data:
                 ]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 160
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "イメージ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 220
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "OS"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 90
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "OS バージョン"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 140
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 8,
@@ -2314,7 +2483,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
