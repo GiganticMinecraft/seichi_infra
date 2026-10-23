@@ -71,6 +71,19 @@
       ],
     },
     {
+      // synology-csi のサイドカーは上流マニフェストの ClusterRole を kustomize で補っているので、
+      // 新しいサイドカーが要求する権限が足りないと provisioning やスナップショットが止まる。
+      matchManagers: [
+        'kustomize',
+      ],
+      matchPackageNames: [
+        'registry.k8s.io/sig-storage/*',
+      ],
+      prBodyNotes: [
+        ':warning: synology-csi-storageclass/kustomization.yaml の ClusterRole patch が、新しいサイドカーの deploy/kubernetes/rbac.yaml の権限を満たしているか確認してください。',
+      ],
+    },
+    {
       matchManagers: [
         'dockerfile',
         'kubernetes',
