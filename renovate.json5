@@ -79,8 +79,10 @@
       matchPackageNames: [
         'registry.k8s.io/sig-storage/*',
       ],
+      groupName: 'synology-csi sidecars',
       prBodyNotes: [
         ':warning: synology-csi-storageclass/kustomization.yaml の ClusterRole patch が、新しいサイドカーの deploy/kubernetes/rbac.yaml の権限を満たしているか確認してください。',
+        ':warning: 各サイドカーのリリースノートで、上流マニフェストが使う引数 (--timeout / --csi-address / --extra-create-metadata / --kubelet-registration-path) と、csi-snapshotter に付けている --feature-gates=CSIVolumeGroupSnapshot=false が引き続き使えるか確認してください。',
       ],
     },
     {

@@ -55,11 +55,20 @@ patches:
           resources: ["volumesnapshotcontents", "volumesnapshotcontents/status"]
           verbs: ["patch"]
   # csi-snapshotter v8 は VolumeGroupSnapshot (GA) が既定で有効だが、synology-csi v1.3.1 は
-  # GroupController を実装していないので、起動のたびにエラーを出すだけ。明示的に無効にする。
+  # GroupController を実装していないので明示的に無効にする。csi-snapshotter-crd が group snapshot の
+  # CRD を入れているので、このフラグを外すと informer が起動し、上の ClusterRole には
+  # groupsnapshot.storage.k8s.io の権限が無いので watch が forbidden で失敗する。
+  # 外すなら upstream の rbac-csi-snapshotter.yaml にある groupsnapshot の権限も足すこと。
+  # 将来の csi-snapshotter でこの gate が LockToDefault になったり削除されたりすると、
+  # フラグの解析で起動に失敗するので、更新時はリリースノートを確認する。
   - target:
       kind: StatefulSet
       name: synology-csi-snapshotter
     patch: |-
+      # 上流でコンテナの順番が変わったら別のコンテナにフラグが付かないよう、名前を確かめてから足す
+      - op: test
+        path: /spec/template/spec/containers/0/name
+        value: csi-snapshotter
       - op: add
         path: /spec/template/spec/containers/0/args/-
         value: --feature-gates=CSIVolumeGroupSnapshot=false
