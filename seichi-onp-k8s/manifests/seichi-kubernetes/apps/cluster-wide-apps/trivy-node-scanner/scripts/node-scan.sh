@@ -28,13 +28,20 @@ pause "${jitter}"
 
 while true; do
   start=$(date +%s)
+  # 試行の開始時点で success=0 にしておく。trivy ごとコンテナが OOMKilled / evict されると
+  # 結果を書き直す機会が無いため、前回の success=1 が残って失敗に気付けなくなる。
+  if [ -f "${OUT}" ]; then
+    sed 's/^trivy_node_scan_success 1$/trivy_node_scan_success 0/' "${OUT}" > "${OUT}.tmp" && mv "${OUT}.tmp" "${OUT}"
+  fi
+  # trivy をバックグラウンドで動かして wait する (フォアグラウンドだと SIGTERM の trap が終わるまで動かない)
   trivy rootfs /host \
     --scanners vuln --pkg-types os --ignore-unfixed \
     --cache-dir /tmp/trivy \
     --format template --template @/scripts/node-scan.tpl \
     --skip-version-check --no-progress \
     --timeout 10m \
-    --output /tmp/vulns.tsv
+    --output /tmp/vulns.tsv &
+  wait $!
   rc=$?
   # DB は数時間おきに更新されるので次回 (24h 後) には使えない。ノードの ephemeral storage を
   # 1.55GiB 占有し続けないよう毎回消す。

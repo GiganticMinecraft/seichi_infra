@@ -98,7 +98,7 @@ data:
           "id": 2,
           "type": "stat",
           "title": "対応が必要な脆弱性",
-          "description": "稼働中カーネル・再起動待ちの新しいカーネル・通常のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。動いていない旧カーネルの残骸 (stale-kernel) は含まない。0 以外ならパッケージ更新か再起動が必要。 スキャン結果がまだ無いときは「データなし」になる (0 ではない)。",
+          "description": "稼働中カーネル・再起動待ちの新しいカーネル・通常のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。動いていない旧カーネルの残骸 (stale-kernel) は含まない。0 以外ならパッケージ更新か再起動が必要。 どのノードもまだスキャンに成功していないときは 0 ではなく「データなし」になる。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -116,7 +116,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind!=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
+              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind!=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or (0 * count(trivy_node_last_success_timestamp_seconds * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}))",
               "instant": true
             }
           ],
@@ -160,7 +160,7 @@ data:
           "id": 3,
           "type": "stat",
           "title": "うち稼働中カーネル",
-          "description": "稼働中カーネルのパッケージの件数。更新してもノードを再起動するまで直らない (kured の再起動待ち)。",
+          "description": "稼働中カーネルのパッケージの件数。更新してもノードを再起動するまで直らない (kured の再起動待ち)。 どのノードもまだスキャンに成功していないときは 0 ではなく「データなし」になる。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -178,7 +178,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind=\"running-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
+              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind=\"running-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or (0 * count(trivy_node_last_success_timestamp_seconds * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}))",
               "instant": true
             }
           ],
@@ -222,7 +222,7 @@ data:
           "id": 4,
           "type": "stat",
           "title": "旧カーネルの残骸パッケージ",
-          "description": "稼働していない古いカーネル (linux-headers / modules / tools 等) のパッケージ数。脆弱性件数が大きく見えるが実害は無く、apt autoremove --purge で消せる。",
+          "description": "稼働していない古いカーネル (linux-headers / modules / tools 等) のパッケージ数。脆弱性件数が大きく見えるが実害は無く、apt autoremove --purge で消せる。 どのノードもまだスキャンに成功していないときは 0 ではなく「データなし」になる。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -240,7 +240,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "count((count by (instance, pkg_name) (trivy_node_vulnerabilities{kind=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
+              "expr": "count((count by (instance, pkg_name) (trivy_node_vulnerabilities{kind=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or (0 * count(trivy_node_last_success_timestamp_seconds * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}))",
               "instant": true
             }
           ],
@@ -284,7 +284,7 @@ data:
           "id": 5,
           "type": "stat",
           "title": "最も古い成功スキャン",
-          "description": "各ノードの最終成功スキャンからの経過時間の最大値 (表示中の件数がどれだけ古いか)。スキャンは 1 日 1 回なので 1 日を大きく超えていれば失敗が続いているか止まっている。",
+          "description": "各ノードの最終成功スキャンからの経過時間の最大値 (表示中の件数がどれだけ古いか)。一度も成功していないノードがあると Infinity になる。スキャンは 1 日 1 回なので 1 日を大きく超えていれば失敗が続いているか止まっている。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -302,7 +302,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "max((time() - trivy_node_last_success_timestamp_seconds) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
+              "expr": "max((time() - trivy_node_last_success_timestamp_seconds) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"} or ((node_uname_info{nodename=~\"$node\"} unless on (instance) trivy_node_last_success_timestamp_seconds) * +Inf))",
               "instant": true
             }
           ],
