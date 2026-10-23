@@ -533,7 +533,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 80
+                    "value": 100
                   }
                 ]
               },
@@ -567,7 +567,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 80
+                    "value": 100
                   }
                 ]
               },
@@ -601,7 +601,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 80
+                    "value": 100
                   }
                 ]
               },
@@ -647,7 +647,23 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 150
+                    "value": 140
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "イメージ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 220
+                  },
+                  {
+                    "id": "custom.inspect",
+                    "value": true
                   }
                 ]
               },
@@ -1086,7 +1102,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 80
+                    "value": 100
                   }
                 ]
               },
@@ -1120,7 +1136,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 80
+                    "value": 100
                   }
                 ]
               },
@@ -1154,7 +1170,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 80
+                    "value": 100
                   }
                 ]
               },
@@ -1200,7 +1216,7 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 150
+                    "value": 140
                   }
                 ]
               },
@@ -1219,12 +1235,48 @@ data:
               {
                 "matcher": {
                   "id": "byName",
+                  "options": "リソース名"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 200
+                  },
+                  {
+                    "id": "custom.inspect",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
                   "options": "コンテナ"
                 },
                 "properties": [
                   {
-                    "id": "custom.width",
-                    "value": 170
+                    "id": "custom.minWidth",
+                    "value": 120
+                  },
+                  {
+                    "id": "custom.inspect",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "イメージ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 220
+                  },
+                  {
+                    "id": "custom.inspect",
+                    "value": true
                   }
                 ]
               },
@@ -1477,7 +1529,23 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 150
+                    "value": 140
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "イメージ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.minWidth",
+                    "value": 220
+                  },
+                  {
+                    "id": "custom.inspect",
+                    "value": true
                   }
                 ]
               },
@@ -2448,56 +2516,7 @@ data:
                 ]
               }
             },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "namespace"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 150
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "digest"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 130
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "重大度"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 90
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "件数"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 80
-                  }
-                ]
-              }
-            ]
+            "overrides": []
           },
           "gridPos": {
             "h": 9,
