@@ -1,0 +1,24 @@
+# Trivy Operator を補うノード側のスキャン。
+#   - node-scanner (DaemonSet): 各ノードの OS パッケージ (dpkg) を 1 日 1 回スキャンし、
+#     node-exporter の textfile collector 経由で Prometheus に出す
+#   - kbom (CronJob): Kubernetes コンポーネント (kubelet / apiserver / etcd / containerd 等) の
+#     SBOM (KBOM) を作って脆弱性を照合し、結果を JSON ログで Loki に出す
+# Trivy Operator 本体の KBOM 機能は sbomGenerationEnabled が必須で、全イメージの SbomReport
+# (Minecraft イメージで約 860KB、debezium で約 1.9MB = etcd の 1 リクエスト上限超え) が
+# etcd に載るため使わない。詳細は docs/guides/trivy-operator.md。
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: trivy-operator
+resources:
+  - rbac.yaml
+  - daemonset.yaml
+  - cronjob.yaml
+  - prometheusrule.yaml
+configMapGenerator:
+  # 名前に内容のハッシュが付くので、スクリプトを変えると DaemonSet / CronJob が追従する
+  - name: trivy-node-scanner-scripts
+    files:
+      - scripts/node-scan.sh
+      - scripts/node-scan.tpl
+      - scripts/kbom.sh
+      - scripts/kbom.tpl

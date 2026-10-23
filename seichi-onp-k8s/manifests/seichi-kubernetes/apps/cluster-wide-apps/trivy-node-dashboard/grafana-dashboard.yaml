@@ -1,0 +1,717 @@
+# Trivy - Nodes: ノードの OS パッケージと Kubernetes コンポーネントの脆弱性。
+#
+# - ノードの OS パッケージ: trivy-node-scanner (DaemonSet) が node-exporter の textfile collector に
+#   書く trivy_node_* を表示する。インストール済みのカーネルパッケージは全部数えられるので、
+#   動いていない旧カーネルの残骸 (kind="stale-kernel") を分けて出す。残骸を除いた
+#   「対応が必要な脆弱性」が 0 かどうかを最初に見る。
+# - Kubernetes コンポーネント: CronJob trivy-kbom が Loki に出す JSON ログを表示する。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trivy-node-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Trivy"
+data:
+  trivy-nodes.json: |
+    {
+      "uid": "trivy-nodes",
+      "title": "Trivy - Nodes",
+      "tags": [
+        "trivy",
+        "security"
+      ],
+      "timezone": "browser",
+      "schemaVersion": 41,
+      "refresh": "5m",
+      "time": {
+        "from": "now-2d",
+        "to": "now"
+      },
+      "editable": true,
+      "graphTooltip": 0,
+      "templating": {
+        "list": [
+          {
+            "name": "datasource",
+            "label": "Prometheus",
+            "type": "datasource",
+            "query": "prometheus",
+            "current": {},
+            "hide": 0
+          },
+          {
+            "name": "loki_datasource",
+            "label": "Loki",
+            "type": "datasource",
+            "query": "loki",
+            "current": {},
+            "hide": 0
+          },
+          {
+            "name": "node",
+            "label": "ノード",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "query": {
+              "query": "label_values(node_uname_info, nodename)",
+              "refId": "node"
+            },
+            "definition": "label_values(node_uname_info, nodename)",
+            "includeAll": true,
+            "multi": true,
+            "allValue": ".*",
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "refresh": 2,
+            "sort": 1,
+            "hide": 0
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "row",
+          "title": "ノードの OS パッケージ",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "panels": []
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "対応が必要な脆弱性",
+          "description": "稼働中のカーネルとそれ以外のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。0 以外ならパッケージ更新 (と稼働中カーネルなら再起動) が必要。",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind!=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or vector(0)",
+              "instant": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "colorMode": "value",
+            "graphMode": "none",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "うち稼働中カーネル",
+          "description": "稼働中カーネルのパッケージの件数。更新してもノードを再起動するまで直らない (kured の再起動待ち)。",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind=\"running-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or vector(0)",
+              "instant": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "colorMode": "value",
+            "graphMode": "none",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "旧カーネルの残骸パッケージ",
+          "description": "稼働していない古いカーネル (linux-headers / modules / tools 等) のパッケージ数。脆弱性件数が大きく見えるが実害は無く、apt autoremove --purge で消せる。",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "count((count by (instance, pkg_name) (trivy_node_vulnerabilities{kind=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or vector(0)",
+              "instant": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "colorMode": "value",
+            "graphMode": "none",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 5,
+          "type": "stat",
+          "title": "最も古いスキャン",
+          "description": "各ノードの最終スキャンからの経過時間の最大値。スキャンは 1 日 1 回なので 1 日を大きく超えていれば止まっている。",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "max((time() - trivy_node_scan_timestamp_seconds) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
+              "instant": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 129600
+                  },
+                  {
+                    "color": "red",
+                    "value": 172800
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "colorMode": "value",
+            "graphMode": "none",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 6,
+          "type": "table",
+          "title": "ノード別",
+          "description": "ノードごとの修正版ありの脆弱性件数を kind (package / running-kernel / stale-kernel) と重大度で集計したもの。稼働中カーネルは node_uname_info の release。",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "instant": true,
+              "format": "table",
+              "expr": "sum by (nodename, kind, severity) ((sum by (instance, kind, severity) (trivy_node_vulnerabilities)) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})"
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "instant": true,
+              "format": "table",
+              "expr": "max by (nodename, release) ((time() - trivy_node_scan_timestamp_seconds) * on (instance) group_left (nodename, release) node_uname_info{nodename=~\"$node\"})"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto"
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "最終スキャンからの経過"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "件数",
+                "desc": true
+              }
+            ]
+          },
+          "transformations": [
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "renameByName": {
+                  "nodename": "ノード",
+                  "kind": "種別",
+                  "severity": "重大度",
+                  "Value #A": "件数",
+                  "Value #B": "最終スキャンからの経過",
+                  "release": "稼働中カーネル"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "type": "table",
+          "title": "パッケージ別",
+          "description": "パッケージ (インストール済みバージョン) ごとの件数。stale-kernel は動いていない旧カーネルの残骸。",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 13
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "instant": true,
+              "format": "table",
+              "expr": "sum by (nodename, kind, pkg_name, installed_version, severity) (trivy_node_vulnerabilities * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "sortBy": [
+              {
+                "displayName": "件数",
+                "desc": true
+              }
+            ]
+          },
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "renameByName": {
+                  "nodename": "ノード",
+                  "kind": "種別",
+                  "pkg_name": "パッケージ",
+                  "installed_version": "バージョン",
+                  "severity": "重大度",
+                  "Value": "件数"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "type": "row",
+          "title": "Kubernetes コンポーネント (KBOM)",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 22
+          },
+          "panels": []
+        },
+        {
+          "id": 9,
+          "type": "table",
+          "title": "最新の KBOM スキャン",
+          "description": "CronJob trivy-kbom (毎日 05:30 JST) の実行結果の要約。components はクラスタの KBOM に含まれるコンポーネント数。",
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_datasource}"
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 23
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "loki",
+                "uid": "${loki_datasource}"
+              },
+              "queryType": "range",
+              "expr": "{job=\"trivy-operator/kbom\"} | json | event=\"trivy_kbom_scan\"",
+              "maxLines": 5
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto"
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "transformations": [
+            {
+              "id": "extractFields",
+              "options": {
+                "source": "labels"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "includeByName": {
+                  "Time": true,
+                  "success": true,
+                  "components": true,
+                  "vulnerabilities": true,
+                  "fixable": true,
+                  "duration_seconds": true,
+                  "stage": true,
+                  "error": true
+                },
+                "renameByName": {
+                  "Time": "時刻",
+                  "success": "成功",
+                  "components": "コンポーネント数",
+                  "vulnerabilities": "脆弱性",
+                  "fixable": "修正版あり",
+                  "duration_seconds": "所要秒",
+                  "stage": "失敗段階",
+                  "error": "エラー"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "type": "table",
+          "title": "Kubernetes コンポーネントの脆弱性",
+          "description": "直近 2 日の KBOM スキャンで見つかった MEDIUM 以上の脆弱性 (kubelet / apiserver / controller-manager / etcd / containerd 等)。修正版が空のものは全バージョンが影響を受ける既知の問題で、設定 (例: gitRepo ボリュームを使わない) で回避する類のもの。",
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki_datasource}"
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 28
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "loki",
+                "uid": "${loki_datasource}"
+              },
+              "queryType": "range",
+              "expr": "{job=\"trivy-operator/kbom\"} | json | event=\"trivy_kbom_vulnerability\"",
+              "maxLines": 500
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto"
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CVE"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "NVD",
+                        "url": "https://nvd.nist.gov/vuln/detail/${__value.text}",
+                        "targetBlank": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          },
+          "transformations": [
+            {
+              "id": "extractFields",
+              "options": {
+                "source": "labels"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "includeByName": {
+                  "Time": true,
+                  "vuln_id": true,
+                  "pkg_name": true,
+                  "installed_version": true,
+                  "fixed_version": true,
+                  "severity": true,
+                  "title": true
+                },
+                "renameByName": {
+                  "Time": "時刻",
+                  "vuln_id": "CVE",
+                  "pkg_name": "コンポーネント",
+                  "installed_version": "バージョン",
+                  "fixed_version": "修正版",
+                  "severity": "重大度",
+                  "title": "概要"
+                }
+              }
+            },
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "CVE": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "コンポーネント": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "バージョン": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "修正版": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "重大度": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "概要": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "時刻": {
+                    "aggregations": [
+                      "max"
+                    ],
+                    "operation": "aggregate"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "annotations": {
+        "list": []
+      }
+    }

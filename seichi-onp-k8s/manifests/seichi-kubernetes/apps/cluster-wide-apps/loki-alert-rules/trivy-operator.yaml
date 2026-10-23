@@ -7,6 +7,9 @@
 # status.message にスキャンコンテナのログ末尾が入る) を数える。
 # 実証実験 (2026-10-23) では、取得できないイメージ 2 件に対してこのログが
 # 1 時間に 4 件記録されるのを Loki で確認した。
+#
+# 同じファイルに、Kubernetes コンポーネントの KBOM スキャン (cluster-wide-apps/trivy-node-scanner の
+# CronJob trivy-kbom) の失敗・停止を通知するルールも置く。
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -37,3 +40,27 @@ data:
             annotations:
               summary: Trivy のスキャンジョブが繰り返し失敗しています
               description: 直近 2 時間に {{ $value }} 件のスキャンコンテナ失敗が記録されました。Loki で {job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" を実行し、status_message の末尾 (Trivy の FATAL 行) で原因を確認してください。取得できないイメージなら Application の trivyOperator.excludeImages に追加するか、元の Job / namespace を削除してください。
+          # Kubernetes コンポーネントの KBOM スキャン (CronJob trivy-kbom、毎日 05:30 JST)。
+          # 実行ごとに event="trivy_kbom_scan" の要約行を 1 行出す。失敗したら翌日まで直らないので単発で通知する。
+          - alert: TrivyKbomScanFailing
+            expr: |
+              sum(
+                count_over_time({job="trivy-operator/kbom"} | json | event="trivy_kbom_scan" | success="false" [1d])
+              ) > 0
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: Kubernetes コンポーネントの脆弱性スキャン (KBOM) が失敗しました
+              description: Loki で {job="trivy-operator/kbom"} | json | event="trivy_kbom_scan" を実行し、stage (kbom / sbom) と error を確認してください。kbom なら RBAC (ClusterRole trivy-kbom) や API サーバーへの到達性、sbom なら脆弱性 DB の取得 (mirror.gcr.io) を疑ってください。
+          # 成功の要約行が 2 日出ていない = CronJob が動いていない (suspend、スケジュール不能、ログ欠落)。
+          - alert: TrivyKbomScanMissing
+            expr: |
+              absent_over_time({job="trivy-operator/kbom"} | json | event="trivy_kbom_scan" | success="true" [2d])
+            for: 1h
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: Kubernetes コンポーネントの脆弱性スキャン (KBOM) が 2 日間成功していません
+              description: kubectl -n trivy-operator get cronjob trivy-kbom と直近の Job / Pod の状態を確認してください。

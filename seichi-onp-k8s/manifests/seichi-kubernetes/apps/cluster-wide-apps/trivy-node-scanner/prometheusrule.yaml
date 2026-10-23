@@ -1,0 +1,40 @@
+# ノードスキャン (trivy-node-scanner) そのものの故障を Discord に通知する。
+# 脆弱性の件数ではアラートしない (トリアージは Grafana の「Trivy - Nodes」で行う)。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: trivy-node-scanner-alerts
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: trivy-node-scanner-alerts
+      rules:
+        - alert: TrivyNodeScanFailing
+          # 値は次のスキャン (24h 後) まで残るので、失敗が 1 時間続いたら通知する。
+          # よくある原因は脆弱性 DB の取得失敗 (mirror.gcr.io) と OOMKilled。
+          expr: |
+            (trivy_node_scan_success == 0)
+            * on (instance) group_left (nodename) node_uname_info
+          for: 1h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "{{ $labels.nodename }} の OS パッケージスキャンが失敗しています"
+            description: "kubectl -n trivy-operator logs -l app.kubernetes.io/name=trivy-node-scanner --prefix で {{ $labels.nodename }} の Pod のログを確認してください。"
+        - alert: TrivyNodeScanStale
+          # スキャン間隔は 24h (+ 初回のみ最大 1h のずらし)。2 日更新が無ければ止まっている。
+          # textfile が無いノード (DaemonSet が載っていない / node-exporter が読めていない) も拾う。
+          expr: |
+            (time() - trivy_node_scan_timestamp_seconds > 2 * 86400)
+            * on (instance) group_left (nodename) node_uname_info
+            or
+            (node_uname_info unless on (instance) trivy_node_scan_timestamp_seconds)
+          for: 3h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "{{ $labels.nodename }} の OS パッケージスキャン結果が更新されていません"
+            description: "trivy-node-scanner の Pod が {{ $labels.nodename }} で動いているか、node-exporter が --collector.textfile.directory=/host/root/var/lib/node-exporter/textfile で起動しているかを確認してください。"
