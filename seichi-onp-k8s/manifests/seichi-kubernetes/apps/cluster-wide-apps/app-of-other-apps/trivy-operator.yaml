@@ -10,15 +10,21 @@
 # 2025-03〜2025-09 に同名の Application (chart 0.30.0) で導入されていたため、
 # クラスタスコープの CRD 6 種 (cluster*reports。namespaced の 6 種は削除済み) と
 # ClusterRole/ClusterRoleBinding `trivy-operator` がクラスタに残っている。
-# chart 0.37.0 の CRD 12 種のうち、この 6 種はスキーマが同一なのでそのまま引き取り
-# (差分は controller-gen の annotation のみ)、残り 6 種は新規に作られる。
+# chart 0.37.0 の CRD 12 種のうち、この 6 種はスキーマが同一なのでそのまま引き取る
+# (差分は controller-gen の annotation のみ)。残り 6 種 (namespaced) は 2026-10-23 の
+# 実証実験で kubectl (field manager trivy-poc) から作成済みで、各 namespace のレポートが
+# 載っているので、Argo CD はこれも引き取る (削除して作り直してはいけない)。
 # Application 名と releaseName を当時と同じ `trivy-operator` にしておくことで、
 # argocd.argoproj.io/instance=trivy-operator ラベル付きの残骸をそのまま引き取る。
+# 2025 年に残骸ができたのは Application に finalizer が無く非カスケード削除になったためなので、
+# 今回は resources-finalizer を付けて、Application を消したときにチャートのリソースも消えるようにする。
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: trivy-operator
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: cluster-wide-apps
   source:
@@ -34,8 +40,8 @@ spec:
         excludeNamespaces: "seichi-debug-minecraft-on-seichiassist-pr-*"
 
         trivyOperator:
-          # 取得できないイメージを除外する (glob はパス区切りごとに一致させる)。
-          # 完了済みの古い Job が残っていると、その中の既に取得できないイメージを 30 秒ごとに
+          # 取得できないイメージを除外する (glob。ここでは完全一致で、該当イメージだけを外す)。
+          # 完了済みの古い Job が残っていると、その中の既に取得できないイメージを繰り返し
           # pull しに行って失敗し続ける。実証実験で該当したのは次の 2 つ:
           #   - docker-registry1.mariadb.com/library/mariadb:11.8
           #     seichi-minecraft の mariadb-restore--* (mariadb-operator の Restore が残した完了 Job 12 件)。
@@ -45,8 +51,9 @@ spec:
           #     削除済みで MANIFEST_UNKNOWN になる
           # Job 全体を対象外にする手もあるが、mariadb-operator の Backup が作る Job
           # (coreprotect-*-backup--* 等、CronJob 所有ではない) のイメージも見えなくなるので
-          # イメージ単位で除外する。該当の Job / namespace を掃除したらこの除外は消してよい。
-          excludeImages: "docker-registry1.mariadb.com/*/*,docker.io/bitnami/*"
+          # イメージ単位で除外する。レジストリや org 単位の glob にすると将来の同系イメージまで
+          # 見えなくなるので完全一致にする。該当の Job / namespace を掃除したらこの除外は消す。
+          excludeImages: "docker-registry1.mariadb.com/library/mariadb:11.8,docker.io/bitnami/kafka:3.7.1-debian-12-r4"
 
         # ---- チューニング値 ----
         operator:
@@ -108,7 +115,7 @@ spec:
           timeout: 13m0s
           # スキャンジョブのコンテナ (既定 requests 100m/100M, limits 500m/500M)。
           # 実測ピークは 380Mi (topolvm-with-sidecar)、Minecraft 本番イメージ (約 450MiB、JAR 多数) で
-          # 85〜106Mi、CPU ピーク約 1.2 コア、1 スキャン 15〜30 秒。memory limit は実測ピークの約 2.7 倍の 1Gi。
+          # 85〜106Mi、CPU ピーク約 1.2 コア。memory limit は実測ピークの約 2.7 倍の 1Gi。
           # CPU limit を下げてもスキャンが遅くなるだけなので 2 コアのままにする。
           # Java DB (942MiB 圧縮) をジョブ内の emptyDir に展開するため
           # ephemeral-storage は request 2Gi / limit 8Gi を明示する。
@@ -136,7 +143,7 @@ spec:
 
         # operator 本体 (チャート既定は未設定)。
         # 約 130 イメージ分のレポートを informer キャッシュに持つため memory に余裕を持たせる。
-        # 実測ピーク 440Mi (全クラスタスキャン中)。
+        # 実測ピーク 459Mi (全クラスタスキャン中)。
         resources:
           requests:
             cpu: 50m

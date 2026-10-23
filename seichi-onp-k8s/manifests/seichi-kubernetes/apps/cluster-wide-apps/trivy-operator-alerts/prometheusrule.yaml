@@ -12,7 +12,10 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: trivy-operator-alerts
-  namespace: trivy-operator
+  # trivy-operator namespace は Application 側の CreateNamespace で作られるため、
+  # 同時に sync されるこの Application が namespace 未作成でエラーにならないよう monitoring に置く
+  # (Loki ルールの ConfigMap と同じ置き場所)。
+  namespace: monitoring
   labels:
     release: prometheus
 spec:

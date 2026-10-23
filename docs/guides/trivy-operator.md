@@ -28,7 +28,7 @@
 
 スキャン対象は全 namespace から `excludeNamespaces` に一致するもの (SeichiAssist の PR ごとの使い捨て環境 `seichi-debug-minecraft-on-seichiassist-pr-*`) を除いたもの。イメージはすべて公開イメージなので imagePullSecret の設定は無い。Docker Hub の匿名 pull には egress IP 単位の制限がある (2026-10-23 にクラスタ内から `ratelimit-limit` ヘッダを取得したところ 100 回 / 3600 秒。Docker 側の方針変更で変わり得る) ので、同時実行数や再スキャン周期を大きく変えるときは意識すること。
 
-完了済みの Job も対象 (mariadb-operator の Backup が作る Job など) だが、既に取得できないイメージを持つ古い Job が残っていると 30 秒ごとに pull しに行って失敗し続けるため、該当イメージを `trivyOperator.excludeImages` で除外している (Application のコメントを参照)。
+完了済みの Job も対象 (mariadb-operator の Backup が作る Job など) だが、既に取得できないイメージを持つ古い Job が残っていると 30 秒ごとに pull しに行って失敗し続けるため、該当イメージを `trivyOperator.excludeImages` で完全一致で除外している (Application のコメントを参照)。
 
 レポートは operator が作るカスタムリソースで、Argo CD の管理対象ではない。
 
@@ -79,7 +79,7 @@ Grafana の **Kubernetes** フォルダにある「**Trivy Operator - Vulnerabil
 | アラート | 条件 | 対応 |
 |---|---|---|
 | `TrivyOperatorDown` | operator が 15 分以上 scrape できない | `kubectl -n trivy-operator get pods` で CrashLoopBackOff / OOMKilled / Pending を確認。OOMKilled なら Application の `resources.limits.memory` を上げる |
-| `TrivyScanJobsFailing` (Loki ルール) | operator のエラーログ (`msg="Scan job container"`) が直近 1 時間に 4 件以上の状態が 30 分続く | Loki で `{job="trivy-operator/trivy-operator"} \| json \| level="error" \| msg="Scan job container"` を実行し、`status_message` 末尾の FATAL 行で原因を見る。取得できないイメージ (タグ削除、レジストリの rate limit)、DB / Java DB の取得失敗、Kyverno の webhook 停止、OOMKilled、タイムアウトが典型。失敗した Job は operator がすぐ消すので `kubectl get jobs` では見えない |
+| `TrivyScanJobsFailing` (Loki ルール) | operator のエラーログ (`msg="Scan job container"`) が直近 2 時間に 3 件以上の状態が 30 分続く (取得できないイメージ 1 つで約 2 件/時) | Loki で `{job="trivy-operator/trivy-operator"} \| json \| level="error" \| msg="Scan job container"` を実行し、`status_message` 末尾の FATAL 行で原因を見る。取得できないイメージ (タグ削除、レジストリの rate limit)、DB / Java DB の取得失敗、Kyverno の webhook 停止、OOMKilled、タイムアウトが典型。失敗した Job は operator がすぐ消すので `kubectl get jobs` では見えない |
 | `TrivyVulnerabilityReportsMissing` | operator は up なのに `trivy_image_vulnerabilities` が 2 時間以上無い | スキャンが 1 件も成功していない。`kubectl -n trivy-operator get jobs`、operator と `trivy-server` のログを確認 |
 
 ## チューニング
@@ -105,7 +105,7 @@ trivy:
 ## 既知の制約
 
 - **レポートの severity が UNKNOWN になるものがある**: operator はレポートの severity を Trivy JSON の `VendorSeverity[SeveritySource]` から取る (`pkg/vulnerabilityreport/io.go`)。SeveritySource が無い脆弱性 (Go 標準ライブラリや GHSA 由来の JAR の CVE など、Trivy 自身は CVSS から MEDIUM / HIGH と表示するもの) は UNKNOWN になる。実証実験では debug lobby イメージの 92 件のうち 48 件 (Trivy 表示では MEDIUM 27 / HIGH 21) が UNKNOWN だった。`trivy.severity` のフィルタ自体は Trivy 側で効いている (LOW は入ってこない) ので、ダッシュボードやレポートの UNKNOWN は「未評価」ではなく「MEDIUM 以上だがベンダー severity が無い」と読むこと。upstream に修正 (VendorSeverity に無ければ Severity を使う) を出すのが本筋
-- **古い Job のイメージは取得できないことがある**: 完了済みの Job が残っていると、そのイメージ (タグが upstream から消えたもの、レジストリの rate limit に当たるもの) を 30 秒ごとに pull しに行って失敗し続ける。実証実験では mariadb-operator の Restore が残した `mariadb-restore--*` と `sentry` namespace の `sentry-kafka-provisioning` がこれに当たったため、該当イメージを `trivyOperator.excludeImages` で除外している。元の Job / namespace を掃除したら除外は外せる
+- **古い Job のイメージは取得できないことがある**: 完了済みの Job が残っていると、そのイメージ (タグが upstream から消えたもの、レジストリの rate limit に当たるもの) を 30 秒ごとに pull しに行って失敗し続ける。実証実験では mariadb-operator の Restore が残した `mariadb-restore--*` と `sentry` namespace の `sentry-kafka-provisioning` がこれに当たったため、該当イメージを `trivyOperator.excludeImages` で (完全一致で) 除外している。元の Job / namespace を掃除したら除外は外せる
 - **Java DB はスキャンジョブごとに取得される**: trivy-server が配信するのは本体の脆弱性 DB だけで、JAR を含むイメージをスキャンするたびにジョブ側で Java index DB (942MiB 圧縮、mirror.gcr.io から約 8 秒) をダウンロードする。本番 Minecraft イメージ 1 件のスキャンはこれを含めて約 25 秒。Minecraft 系の Java イメージが約 45 個あるので、再スキャン周期を短くするとそのぶん通信量が増える。Java DB の共有キャッシュ (RWX PVC + 定期更新) を作れば無くせるが、未実装
 - **scanJobTTL は設定しない**: 理由は「チューニング」の項と Application のコメントを参照
 - **Kyverno の webhook に依存する**: Kyverno の webhook は failurePolicy=Fail なので、Kyverno が落ちている間はスキャンジョブを作れない (`TrivyScanJobsFailing` / `TrivyVulnerabilityReportsMissing` の原因になり得る)
@@ -115,7 +115,7 @@ trivy:
 
 ## 実証実験 (2026-10-23)
 
-本番クラスタの一時 namespace `trivy-operator-poc` に chart 0.37.0 を同じ values で展開して計測した (CRD 12 種は適用、残骸の ClusterRole と ClusterComplianceReport は SSA で上書き)。
+本番クラスタの一時 namespace `trivy-operator-poc` に chart 0.37.0 を同じ values で展開して計測した (CRD 12 種は適用、残骸の ClusterRole と ClusterComplianceReport は SSA で上書き)。計測後に namespace `trivy-operator-poc` と ClusterRoleBinding `trivy-operator-poc` は削除済み。CRD 12 種、ClusterRole `trivy-operator`、ClusterComplianceReport 4 件、各 namespace のレポートは残してあり、本番の Application が引き取る。
 
 | 項目 | 結果 |
 |---|---|
@@ -139,4 +139,4 @@ trivy:
 
 - 2025-03〜2025-09 に Argo CD Application `trivy-operator` (chart 0.30.0) として導入されていたが、PR #3633 で理由の記載なく削除された
 - 削除後もクラスタスコープのリソースが残っていた: cluster*reports の CRD 6 種 (namespaced の 6 種は削除されていた)、`argocd.argoproj.io/instance=trivy-operator` ラベル付きの ClusterRole / ClusterRoleBinding `trivy-operator`、owner の無い ClusterComplianceReport 4 件、ClusterRbacAssessmentReport 約 218 件
-- 2026-10 に chart 0.37.0 で再導入した。Application 名と releaseName を当時と同じ `trivy-operator` にしたので、残っていた CRD 6 種と ClusterRole / ClusterRoleBinding はそのまま Argo CD の管理下に戻り (CRD のスキーマは 0.37.0 と同一)、namespaced の CRD 6 種は新規に作られる。ClusterComplianceReport 4 件はチャートが同名で作るので引き継がれる。更新されないまま残っていたクラスタスコープのレポート (ClusterRbacAssessmentReport など) は 2026-10-23 に削除した
+- 2026-10 に chart 0.37.0 で再導入した。Application 名と releaseName を当時と同じ `trivy-operator` にしたので、残っていた CRD 6 種と ClusterRole / ClusterRoleBinding はそのまま Argo CD の管理下に戻る (CRD のスキーマは 0.37.0 と同一)。namespaced の CRD 6 種は実証実験で作成済みで、これも Argo CD が引き取る。再発防止として Application に `resources-finalizer.argocd.argoproj.io` を付け、Application を消したときにチャートのリソースも消えるようにした。ClusterComplianceReport 4 件はチャートが同名で作るので引き継がれる。更新されないまま残っていたクラスタスコープのレポート (ClusterRbacAssessmentReport など) は 2026-10-23 に削除した

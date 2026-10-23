@@ -20,19 +20,20 @@ data:
       - name: trivy-operator-logs
         interval: 1m
         rules:
-          # 単発の失敗は operator が再試行するので、1 時間に 4 件以上の状態が 30 分続いた
-          # 場合 (= 同じ原因で失敗が繰り返されている) に鳴らす。
+          # 取得できないイメージが 1 つ詰まると、このログは 1 時間に約 2 件のペースで出続ける
+          # (実証実験: 2 イメージで 4 件/時)。1 イメージでも鳴るように 2 時間窓で 3 件以上、
+          # それが 30 分続いたら通知する。単発の失敗 (コンテナ 2 つの Pod で 2 件) では鳴らない。
           # よくある原因: イメージの pull 失敗 (タグ削除、レジストリの rate limit)、
           # 脆弱性 DB / Java DB の取得失敗 (mirror.gcr.io への到達性)、OOMKilled、タイムアウト。
           - alert: TrivyScanJobsFailing
             expr: |
               sum(
-                count_over_time({job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" [1h])
-              ) > 3
+                count_over_time({job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" [2h])
+              ) > 2
             for: 30m
             labels:
               severity: warning
               notify: discord
             annotations:
               summary: Trivy のスキャンジョブが繰り返し失敗しています
-              description: 直近 1 時間に {{ $value }} 件のスキャンコンテナ失敗が記録されました。Loki で {job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" を実行し、status_message の末尾 (Trivy の FATAL 行) で原因を確認してください。取得できないイメージなら Application の trivyOperator.excludeImages に追加するか、元の Job / namespace を削除してください。
+              description: 直近 2 時間に {{ $value }} 件のスキャンコンテナ失敗が記録されました。Loki で {job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" を実行し、status_message の末尾 (Trivy の FATAL 行) で原因を確認してください。取得できないイメージなら Application の trivyOperator.excludeImages に追加するか、元の Job / namespace を削除してください。
