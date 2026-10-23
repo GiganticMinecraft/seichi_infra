@@ -15,7 +15,7 @@
 #     数十件の Job に出る。イメージ単位の数字はすべてイメージ (registry/repository:tag@digest) で
 #     重複排除し、
 #     CVE の表は影響イメージ数 (重複排除済み) を数える。ワークロード別の表だけは
-#     ワークロード単位なので、`リソース種別` 変数で Job を外せるようにする。
+#     ワークロード単位なので、`Job` 変数 (既定は除外) で kind=Job のレポートをワークロード別・設定監査から外す。
 #   - 同じイメージが複数 namespace にあると namespace ごとに数えられる。クラスタ全体の
 #     合計 (概要の stat) はイメージ (digest 単位) だけで重複排除し、`namespace` 変数で絞れるようにする。
 #
@@ -87,7 +87,8 @@ data:
                   }
                 ]
               },
-              "unit": "none"
+              "unit": "none",
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -121,7 +122,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\"}))",
+              "expr": "count(count by (image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\"})) or (vector(0) and on () group(trivy_image_vulnerabilities{job=\"trivy-operator\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -152,7 +153,8 @@ data:
                   }
                 ]
               },
-              "unit": "none"
+              "unit": "none",
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -186,7 +188,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (vuln_id) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
+              "expr": "count(count by (vuln_id) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"})) or (vector(0) and on () group(trivy_vulnerability_id{job=\"trivy-operator\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -606,7 +608,7 @@ data:
               {
                 "matcher": {
                   "id": "byName",
-                  "options": "Unknown"
+                  "options": "Unknown (≥Medium)"
                 },
                 "properties": [
                   {
@@ -701,7 +703,8 @@ data:
                   "Unknown": 4
                 },
                 "renameByName": {
-                  "key\\severity": "namespace | イメージ | digest"
+                  "key\\severity": "namespace | イメージ | digest",
+                  "Unknown": "Unknown (≥Medium)"
                 }
               }
             }
@@ -726,7 +729,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "脆弱性 ID × パッケージごとに 1 行で、影響を受けるイメージ (digest 単位) の数を出す。同じイメージを使うワークロードや完了 Job がいくつあっても 1 と数えるので、「どのパッケージを上げると何イメージ分が片付くか」の目安になる。重大度はベースイメージのディストリビューションごとにベンダー評価が違うことがあるので、影響イメージの中で最も高いものを出す。順位は Critical > High > Unknown (≥Medium) > Medium とする (Unknown は MEDIUM 以上であることしか分からないので、Medium より上・High より下に置く)。インストール済み・修正版のバージョンはイメージごとに違うので表には出さない (NVD / OSV のリンク先か、ワークロード別の表のイメージで確認する)。「除外するパッケージ」変数で Go 標準ライブラリ・golang.org/x を外せる (Go バイナリを含むイメージが多く、同じ stdlib の CVE が数十イメージに出るため)。重大度 Unknown は MEDIUM 以上でベンダー評価が無いもの。 同じ CVE でもスキャン時期 (脆弱性 DB の版) によって概要が違うことがあるので、概要は 1 つだけ代表を出す。",
+          "description": "脆弱性 ID × パッケージごとに 1 行で、影響を受けるイメージ (digest 単位) の数を出す。同じイメージを使うワークロードや完了 Job がいくつあっても 1 と数えるので、「どのパッケージを上げると何イメージ分が片付くか」の目安になる。重大度はベースイメージのディストリビューションごとにベンダー評価が違うことがあるので、影響イメージの中で最も高いものを出す。順位は Critical > High > Unknown (≥Medium) > Medium とする (Unknown は MEDIUM 以上であることしか分からないので、Medium より上・High より下に置く)。インストール済み・修正済みのバージョンは kubectl get vulnerabilityreports -n <namespace> <name> -o yaml で確認する。「除外するパッケージ」変数で Go 標準ライブラリ・golang.org/x を外せる (Go バイナリを含むイメージが多く、同じ stdlib の CVE が数十イメージに出るため)。重大度 Unknown は MEDIUM 以上でベンダー評価が無いもの。 同じ CVE でもスキャン時期 (脆弱性 DB の版) によって概要が違うことがあるので、概要は 1 つだけ代表を出す。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -965,7 +968,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ワークロード (ReplicaSet / StatefulSet / DaemonSet / Job など) × コンテナごとの件数。対応時に「どのマニフェストのイメージを上げるか」を探すための表。完了 Job (mariadb-operator の Backup / Restore 履歴など) もレポートを持つので、「完了 Job」変数 (既定は除外) で外している。含めると履歴の Job も行に出る。件数はワークロード単位なので、同じイメージは使っているワークロードの数だけ行が出る。 同じコンテナでも digest が違うレポート (古い digest のものが残っている場合) は別の行になる。",
+          "description": "ワークロード (ReplicaSet / StatefulSet / DaemonSet / Job など) × コンテナごとの件数。対応時に「どのマニフェストのイメージを上げるか」を探すための表。完了 Job (mariadb-operator の Backup / Restore 履歴など) もレポートを持つので、「Job」変数 (既定は除外) で外している。含めると履歴の Job も行に出る。件数はワークロード単位なので、同じイメージは使っているワークロードの数だけ行が出る。 同じコンテナでも digest が違うレポート (古い digest のものが残っている場合) は別の行になる。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1096,7 +1099,7 @@ data:
               {
                 "matcher": {
                   "id": "byName",
-                  "options": "Unknown"
+                  "options": "Unknown (≥Medium)"
                 },
                 "properties": [
                   {
@@ -1191,7 +1194,8 @@ data:
                   "Unknown": 4
                 },
                 "renameByName": {
-                  "key\\severity": "namespace | 種別 | リソース名 | コンテナ | イメージ | digest"
+                  "key\\severity": "namespace | 種別 | リソース名 | コンテナ | イメージ | digest",
+                  "Unknown": "Unknown (≥Medium)"
                 }
               }
             }
@@ -1397,7 +1401,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ConfigAuditReport (Pod の securityContext・リソース指定など、ワークロード定義の設定ミス) の失敗件数を重大度別に合計したもの。namespace・「リソース種別」・「完了 Job」変数が効く。",
+          "description": "ConfigAuditReport (Pod の securityContext・リソース指定など、ワークロード定義の設定ミス) の失敗件数を重大度別に合計したもの。namespace・「リソース種別」・「Job」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1890,7 +1894,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ConfigAuditReport の失敗件数をリソースごとに出したもの (失敗が 1 件以上のリソースだけ)。High 以上が多いリソースから securityContext などを見直す。namespace・「リソース種別」・「完了 Job」変数が効く。",
+          "description": "ConfigAuditReport の失敗件数をリソースごとに出したもの (失敗が 1 件以上のリソースだけ)。High 以上が多いリソースから securityContext などを見直す。namespace・「リソース種別」・「Job」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2531,7 +2535,7 @@ data:
               "uid": "${datasource}"
             },
             "definition": "label_values({job=\"trivy-operator\", __name__=~\"trivy_image_vulnerabilities|trivy_resource_configaudits\"}, resource_kind)",
-            "description": "ワークロード別の表と設定監査 (重大度別・リソース別) に効く。Job を外すと完了 Job の履歴を除ける。",
+            "description": "ワークロード別・設定監査の表を絞り込むリソース種別。Job は「Job」変数で切り替える。",
             "hide": 0,
             "includeAll": true,
             "label": "リソース種別 (ワークロード・設定監査)",
@@ -2544,16 +2548,16 @@ data:
               "refId": "PrometheusVariableQueryEditor-VariableQuery"
             },
             "refresh": 2,
-            "regex": "",
+            "regex": "/^(?!Job$).*$/",
             "skipUrlSync": false,
             "sort": 1,
             "type": "query"
           },
           {
             "name": "exclude_kind",
-            "label": "完了 Job",
+            "label": "Job",
             "type": "custom",
-            "description": "mariadb-operator の Backup / Restore などが残した完了 Job のレポートを、ワークロード別・設定監査の表から外す。",
+            "description": "kind が Job のレポート (mariadb-operator の Backup / Restore が残した完了 Job の履歴が大半。実行中の Job も含む) を、ワークロード別・設定監査の表から外すかどうか。既定は外す。CronJob はリソース種別の方で選ぶ。",
             "query": "含める : __none__,除外する : Job",
             "options": [
               {
