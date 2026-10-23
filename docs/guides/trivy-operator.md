@@ -74,7 +74,7 @@ Grafana の **Trivy** フォルダにある「**Trivy Operator - Overview**」(u
 
 - **Unknown の意味**: Operator はレポートの重大度を Trivy の `VendorSeverity[SeveritySource]` から取るので、ベンダー severity の無い CVE (Go の `stdlib` / `golang.org/x/*`、一部の GHSA 由来 JAR) は `Unknown` になり、全体の約 7 割を占める。`trivy.severity` で LOW は除外済みなので、Unknown は「MEDIUM 以上でベンダー評価なし」と読む。隠さずに独立した列・パネルとして表示する。
 - **Go 標準ライブラリの増幅**: Go バイナリを含むイメージが多く、同じ stdlib の CVE が数百コンテナに出る。概要の行 (ユニーク CVE 数と重大度別の検出数) と CVE の表には「除外するパッケージ」変数が効き、既定で `stdlib` と `golang.org/x/*` を除外する。概要の重大度別の検出数は `trivy_vulnerability_id` から「CVE × パッケージ × イメージ」の組を数えるので、このトグルに追従する。イメージ別・ワークロード別の表はレポート上の件数 (`trivy_image_vulnerabilities`、パッケージ名なし) なのでトグルは効かない。
-- **完了 Job の履歴**: mariadb-operator の Backup / Restore が残した完了 Job もレポートを持ち、同じイメージが数十件の Job に出る。イメージ単位の数字は registry/repository:tag@digest で重複排除し (同じタグでも digest が違えば別イメージ)、CVE の表は脆弱性 ID × パッケージごとの影響イメージ数を数える。ワークロード別の表と設定監査 (重大度別・リソース別) は「リソース種別」変数で Job を外せる。CVE の表の重大度は、ディストリビューションごとに評価が分かれる場合に影響イメージ内の最大を Critical > High > Unknown (≥Medium) > Medium の順で出す。
+- **完了 Job の履歴**: mariadb-operator の Backup / Restore が残した完了 Job もレポートを持ち、同じイメージが数十件の Job に出る。イメージ単位の数字は registry/repository:tag@digest で重複排除し (同じタグでも digest が違えば別イメージ)、CVE の表は脆弱性 ID × パッケージごとの影響イメージ数を数える。ワークロード別の表と設定監査 (重大度別・リソース別) は「完了 Job」変数 (既定は除外) で Job を外している。CVE の表の重大度は、ディストリビューションごとに評価が分かれる場合に影響イメージ内の最大を Critical > High > Unknown (≥Medium) > Medium の順で出す。
 - **同じイメージを複数 namespace で使う場合**: 概要の合計はイメージだけで重複排除し、`namespace` 変数で絞れる。
 
 EOL ベース OS のパネルは `trivy_image_info` (`operator.metricsImageInfo: true` で出力) を使う。
