@@ -41,7 +41,7 @@ spec:
           # migration の障害が 5 分ごとの全 ingest を止めないようにするため
           containers:
             - name: ingestor
-              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:latest@sha256:99b92416d4b56c0b5a898d9a0703fa3f4e972b73b05bfb3be98d8601c7801f74
+              image: ghcr.io/giganticminecraft/seichi-timed-stats-conifers-ingestor:latest@sha256:a1cb4f48847be0ef17c64c4440d1e621eccb4a5db65f324fd603413ba947a2a0
               # 2026-10 時点で直近 24 時間の working set 最大は約 30Mi、1 回の実行は 12 秒程度。
               # CPU は実行時間が短く scrape 間隔に収まらないため実測できていない
               resources:
