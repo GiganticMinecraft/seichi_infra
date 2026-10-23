@@ -533,7 +533,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 80
                   }
                 ]
               },
@@ -567,7 +567,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 80
                   }
                 ]
               },
@@ -601,7 +601,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 80
                   }
                 ]
               },
@@ -635,7 +635,31 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
                   }
                 ]
               }
@@ -1062,7 +1086,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 80
                   }
                 ]
               },
@@ -1096,7 +1120,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 80
                   }
                 ]
               },
@@ -1130,7 +1154,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 80
                   }
                 ]
               },
@@ -1164,7 +1188,55 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "種別"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 110
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "コンテナ"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 170
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
                   }
                 ]
               }
@@ -1396,7 +1468,56 @@ data:
                 ]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "OS"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 90
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "OS バージョン"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 120
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 8,
@@ -2327,7 +2448,56 @@ data:
                 ]
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "namespace"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "重大度"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 90
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "件数"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 80
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 9,
