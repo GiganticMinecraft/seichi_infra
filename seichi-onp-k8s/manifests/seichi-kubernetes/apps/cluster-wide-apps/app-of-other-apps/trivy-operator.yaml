@@ -87,12 +87,19 @@ spec:
           sbomGenerationEnabled: false
           clusterComplianceEnabled: true
           infraAssessmentScannerEnabled: true
-          # CVE ID 単位のメトリクス (trivy_vulnerability_id)。既存の dotdc ダッシュボード
-          # (Trivy Operator - Vulnerabilities) の CVE 一覧に必要。
+          # CVE ID 単位のメトリクス (trivy_vulnerability_id)。自前ダッシュボード
+          # (Trivy Operator - Overview) と dotdc ダッシュボード (Trivy Operator - Vulnerabilities) の
+          # CVE 一覧に必要。
           # 下の trivy.severity で MEDIUM 以上に絞っている。実証実験では全クラスタ (117 イメージ) で
           # trivy_vulnerability_id が約 30,800 系列。Prometheus のメモリが問題になったら
           # ここを false にする (ダッシュボードの CVE 一覧パネルだけが空になる)。
           metricsVulnIdEnabled: true
+          # イメージ情報のメトリクス (trivy_image_info。ベース OS 名と EOL かどうかを含む)。
+          # スキャン対象のコンテナ 1 つにつき 1 系列なので系列数は小さい。
+          # 自前ダッシュボード (Trivy Operator - Overview) の EOL ベース OS パネルに必要。
+          # 実証実験では本番 Minecraft サーバー全台の ubuntu 20.04 や synology-csi の
+          # サイドカーの debian 10 など、24 イメージが EOL の OS の上に載っていた。
+          metricsImageInfo: true
 
         serviceMonitor:
           enabled: true

@@ -68,9 +68,20 @@ kubectl get clusterrbacassessmentreports
 
 ## Grafana ダッシュボード
 
-Grafana の **Kubernetes** フォルダにある「**Trivy Operator - Vulnerabilities**」(uid `security_trivy_operator`) を使う。`grafana-dashboards-kubernetes` Application が配布しているもので、`trivy_image_vulnerabilities` (イメージ × 重大度の件数) と `trivy_vulnerability_id` (CVE ID 単位、`metricsVulnIdEnabled: true` で出力) を表示する。
+Grafana の **Trivy** フォルダにある「**Trivy Operator - Overview**」(uid `trivy-overview`) を使う。定義は `seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/trivy-operator-dashboard/grafana-dashboard.yaml`。概要 (重大度別件数・ユニーク CVE 数・EOL ベース OS のイメージ数)、イメージ別、CVE 別 (影響イメージ数)、ワークロード別、EOL ベース OS、設定監査 / RBAC / インフラ / コンプライアンス / 公開シークレット、Operator のエラーログの順に並ぶ。
 
-脆弱性の対応 (どのイメージを上げるか、どの CVE を無視するか) はこのダッシュボードを見て判断する。脆弱性の件数ではアラートを出さない。MEDIUM 以上の脆弱性はサードパーティイメージのどこかに常に存在するので、件数アラートは鳴りっぱなしで Discord に 4 時間ごとに再通知されるだけになるため。
+生のメトリクスをそのまま合計すると件数が実態より大きく見えるため、次の補正をしている。
+
+- **Unknown の意味**: Operator はレポートの重大度を Trivy の `VendorSeverity[SeveritySource]` から取るので、ベンダー severity の無い CVE (Go の `stdlib` / `golang.org/x/*`、一部の GHSA 由来 JAR) は `Unknown` になり、全体の約 7 割を占める。`trivy.severity` で LOW は除外済みなので、Unknown は「MEDIUM 以上でベンダー評価なし」と読む。隠さずに独立した列・パネルとして表示する。
+- **Go 標準ライブラリの増幅**: Go バイナリを含むイメージが多く、同じ stdlib の CVE が数百コンテナに出る。CVE の表とユニーク CVE 数には「除外するパッケージ」変数があり、既定で `stdlib` と `golang.org/x/*` を除外する。
+- **完了 Job の履歴**: mariadb-operator の Backup / Restore が残した完了 Job もレポートを持ち、同じイメージが数十件の Job に出る。イメージ単位の数字は `max by (イメージ)` で重複排除し、CVE の表は影響イメージ数 (重複排除済み) を数える。ワークロード別の表は「リソース種別」変数で Job を外せる。
+- **同じイメージを複数 namespace で使う場合**: 概要の合計はイメージだけで重複排除し、namespace ごとの表は `namespace` 変数で絞る。
+
+EOL ベース OS のパネルは `trivy_image_info` (`operator.metricsImageInfo: true` で出力) を使うので、Operator が設定を読み込んで各イメージを再スキャンした後に値が入る。
+
+dotdc の「Trivy Operator - Vulnerabilities」(uid `security_trivy_operator`、`grafana-dashboards-kubernetes` Application が配布) も Kubernetes フォルダに残っているが、上の補正をしていない生の件数なので参考程度にする。
+
+脆弱性の対応 (どのイメージを上げるか、どの CVE を無視するか) は「Trivy Operator - Overview」を見て判断する。脆弱性の件数ではアラートを出さない。MEDIUM 以上の脆弱性はサードパーティイメージのどこかに常に存在するので、件数アラートは鳴りっぱなしで Discord に 4 時間ごとに再通知されるだけになるため。
 
 ## アラート
 
