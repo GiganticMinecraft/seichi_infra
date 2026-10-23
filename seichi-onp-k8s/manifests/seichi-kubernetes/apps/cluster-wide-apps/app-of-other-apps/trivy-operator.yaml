@@ -30,14 +30,25 @@ spec:
         # 寿命が短くイメージも CI でスキャン済みのため、スキャンジョブを浪費するだけになる。
         excludeNamespaces: "seichi-debug-minecraft-on-seichiassist-pr-*"
 
-        # ---- チューニング値 (実証実験の結果に応じてここを調整する) ----
+        # Job は対象から外す (チャート既定は pod,replicaset,replicationcontroller,statefulset,daemonset,cronjob,job)。
+        # 完了済みの古い Job が残っていると、その中の既に取得できないイメージを毎回 pull しに行って失敗し続ける。
+        # 実証実験では seichi-minecraft の mariadb-restore--* (mariadb-operator の Restore が残した Job、
+        # docker-registry1.mariadb.com/library/mariadb:11.8 が TOOMANYREQUESTS) と sentry namespace の
+        # sentry-kafka-provisioning (docker.io/bitnami/kafka:3.7.1-debian-12-r4、タグが upstream から削除済みで
+        # MANIFEST_UNKNOWN) がこれに該当し、外したところ失敗ジョブは 0 になった。
+        # CronJob は引き続き対象なので、定期実行される Job のイメージはそちらで拾う。
+        targetWorkloads: "pod,replicaset,replicationcontroller,statefulset,daemonset,cronjob"
+
+        # ---- チューニング値 ----
         operator:
           # 同時に走らせるスキャンジョブ数 (既定 10)。
           # wk-2/wk-3 はメモリ requests が 83〜84% まで埋まっており、
-          # 1 ジョブ最大 2Gi (下の trivy.resources) を 10 並列で積む余裕がない。
+          # 1 ジョブ最大 1Gi (下の trivy.resources) を 10 並列で積む余裕がない。
+          # 実証実験では 2 並列で全クラスタ (61 イメージ) を約 7 分でスキャンできた。
           scanJobsConcurrentLimit: 2
-          # スキャンジョブのタイムアウト (既定 5m)。JAR を含むイメージでは
-          # Java DB (~1GB) の取得に加えて 340〜450MiB 級の Minecraft イメージを解析するため延ばす。
+          # スキャンジョブのタイムアウト (既定 5m)。実測では Java DB 取得
+          # (約 8 秒、mirror.gcr.io から 120MiB/s) を含めて本番 Minecraft イメージ 1 件 25 秒。
+          # 15m はミラーが遅いときの余裕。
           scanJobTimeout: 15m
           # scanJobTTL は設定しないこと (チャート既定の未設定のままにする)。
           # 未設定なら完了 Job は operator が即時削除する。scanJobTTL を設定すると
@@ -45,7 +56,10 @@ spec:
           # namespace 内の Job を状態に関係なく数えるため、完了 Job が同時実行枠を TTL 分占有して
           # スキャンが止まる (実証実験で limit 2 / TTL 10m にしたところ 10 分間停止した)。
           # レポートの有効期限 = 全ワークロードの再スキャン周期 (既定 24h)。
-          # Java イメージが約 45 個あり、1 件ごとに ~1GB の Java DB 取得が走るため 24h 周期では重い。
+          # JAR を含むイメージのスキャンではジョブごとに Java DB (942MiB) を取得することを
+          # 実証実験で確認した (trivy-server は本体 DB しか配信しない)。Java イメージ約 45 件 × 1GB を
+          # 24h ごとに引き直すのは無駄なので 72h。全クラスタの初回スキャンは並列 2 で約 7 分
+          # (122 レポート / 61 イメージ) だったので、周期を短くしても処理時間の問題は無い。
           scannerReportTTL: 72h
           # クラスタ内に trivy-server (StatefulSet + PVC) を立て、脆弱性 DB (~135MB) は
           # サーバーが 1 回だけ取得する。スキャンジョブごとの DB ダウンロードを避ける。
@@ -57,7 +71,8 @@ spec:
           infraAssessmentScannerEnabled: true
           # CVE ID 単位のメトリクス (trivy_vulnerability_id)。既存の dotdc ダッシュボード
           # (Trivy Operator - Vulnerabilities) の CVE 一覧に必要。
-          # 下の trivy.severity で MEDIUM 以上に絞っているためカーディナリティは限定的。
+          # 下の trivy.severity で MEDIUM 以上に絞っているためカーディナリティは限定的
+          # (実証実験では trivy_vulnerability_id が約 11,600 系列 / 61 イメージ)。
           metricsVulnIdEnabled: true
 
         serviceMonitor:
@@ -70,13 +85,19 @@ spec:
         trivy:
           # 修正版の無い脆弱性は報告しない。CI の trivy-action と同じ方針。
           ignoreUnfixed: true
-          # LOW / UNKNOWN は対応しないのでレポート・メトリクスから除外する
+          # LOW は対応しないのでレポート・メトリクスから除外する。
+          # (レポート上の UNKNOWN は Trivy が MEDIUM 以上と判定したがベンダー severity が無いもの。
+          #  docs/guides/trivy-operator.md の既知の制約を参照)
           severity: MEDIUM,HIGH,CRITICAL
           # Trivy 自体のタイムアウト (既定 5m0s)。operator.scanJobTimeout と揃える。
+          # 実測は Java DB 取得 (約 8 秒) を含めて本番 Minecraft イメージ 1 件 25 秒で、15m はミラーが遅いときの余裕。
           timeout: 15m0s
           # スキャンジョブのコンテナ (既定 requests 100m/100M, limits 500m/500M)。
-          # 既定の 500M では JAR を大量に含む Minecraft イメージの解析で OOM になるため広げる。
-          # イメージの展開と Java DB を ephemeral storage に置くので明示的に確保・上限を設ける。
+          # 実測ピークは 380Mi (topolvm-with-sidecar)、Minecraft 本番イメージ (約 450MiB、JAR 多数) で
+          # 85〜106Mi、CPU ピーク約 1.2 コア、1 スキャン 15〜30 秒。memory limit は実測ピークの約 2.7 倍の 1Gi。
+          # CPU limit を下げてもスキャンが遅くなるだけなので 2 コアのままにする。
+          # Java DB (942MiB 圧縮) をジョブ内の emptyDir に展開するため
+          # ephemeral-storage は request 2Gi / limit 8Gi を明示する。
           resources:
             requests:
               cpu: 100m
@@ -84,12 +105,13 @@ spec:
               ephemeralStorage: 2Gi
             limits:
               cpu: "2"
-              memory: 2Gi
+              memory: 1Gi
               ephemeralStorage: 8Gi
           # trivy-server の DB 用 PVC (既定 StorageClass の synology-iscsi-storage に作られる)
           storageSize: 5Gi
           server:
             # trivy-server (既定 requests 200m/512Mi)。DB の配信だけなので requests を下げる。
+            # 実測 44〜90Mi。
             resources:
               requests:
                 cpu: 50m
@@ -100,6 +122,7 @@ spec:
 
         # operator 本体 (チャート既定は未設定)。
         # 約 130 イメージ分のレポートを informer キャッシュに持つため memory に余裕を持たせる。
+        # 実測ピーク 440Mi (全クラスタスキャン中)。
         resources:
           requests:
             cpu: 50m
