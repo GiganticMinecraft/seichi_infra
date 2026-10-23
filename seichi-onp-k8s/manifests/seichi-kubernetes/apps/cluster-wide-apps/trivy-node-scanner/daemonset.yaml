@@ -44,7 +44,7 @@ spec:
         - name: scanner
           # Renovate (kubernetes manager) がタグを追従する。Trivy Operator 側の Trivy はチャートの
           # 既定値 (trivy.image.tag) に従うので一時的にずれることはあるが、どちらも同じ trivy-db:2 を読む
-          image: mirror.gcr.io/aquasec/trivy:0.75.0
+          image: mirror.gcr.io/aquasec/trivy:0.76.1
           # textfile は停止時に消さない。消すと再起動・ロールアウト直後 (初回スキャンまで最大 1h) に
           # 0 件 = 問題なしに見える。古さは trivy_node_last_success_timestamp_seconds で判別する。
           # この DaemonSet を撤去するときは各ノードの /var/lib/node-exporter/textfile/trivy_node.prom を消すこと。

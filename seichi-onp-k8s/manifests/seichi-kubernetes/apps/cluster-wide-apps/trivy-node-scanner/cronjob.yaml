@@ -35,7 +35,7 @@ spec:
             - name: kbom
               # Renovate (kubernetes manager) がタグを追従する。Trivy Operator 側の Trivy はチャートの
               # 既定値 (trivy.image.tag) に従うので一時的にずれることはあるが、どちらも同じ trivy-db:2 を読む
-              image: mirror.gcr.io/aquasec/trivy:0.75.0
+              image: mirror.gcr.io/aquasec/trivy:0.76.1
               command: ["/bin/sh", "/scripts/kbom.sh"]
               env:
                 # 脆弱性の照合は Trivy Operator の trivy-server (builtInTrivyServer) に任せる。
