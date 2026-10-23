@@ -489,7 +489,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -533,7 +533,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -567,7 +567,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -601,7 +601,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -647,7 +647,7 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 140
+                    "value": 160
                   }
                 ]
               },
@@ -660,10 +660,6 @@ data:
                   {
                     "id": "custom.minWidth",
                     "value": 220
-                  },
-                  {
-                    "id": "custom.inspect",
-                    "value": true
                   }
                 ]
               },
@@ -1058,7 +1054,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -1102,7 +1098,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -1136,7 +1132,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -1170,7 +1166,7 @@ data:
                   },
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 110
                   }
                 ]
               },
@@ -1216,7 +1212,7 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 140
+                    "value": 160
                   }
                 ]
               },
@@ -1241,10 +1237,6 @@ data:
                   {
                     "id": "custom.minWidth",
                     "value": 200
-                  },
-                  {
-                    "id": "custom.inspect",
-                    "value": true
                   }
                 ]
               },
@@ -1257,10 +1249,6 @@ data:
                   {
                     "id": "custom.minWidth",
                     "value": 120
-                  },
-                  {
-                    "id": "custom.inspect",
-                    "value": true
                   }
                 ]
               },
@@ -1273,10 +1261,6 @@ data:
                   {
                     "id": "custom.minWidth",
                     "value": 220
-                  },
-                  {
-                    "id": "custom.inspect",
-                    "value": true
                   }
                 ]
               },
@@ -1507,7 +1491,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
@@ -1529,7 +1513,7 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 140
+                    "value": 160
                   }
                 ]
               },
@@ -1542,10 +1526,6 @@ data:
                   {
                     "id": "custom.minWidth",
                     "value": 220
-                  },
-                  {
-                    "id": "custom.inspect",
-                    "value": true
                   }
                 ]
               },
@@ -1581,7 +1561,7 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 120
+                    "value": 140
                   }
                 ]
               }
@@ -2503,7 +2483,7 @@ data:
                   "type": "auto"
                 },
                 "filterable": true,
-                "inspect": false
+                "inspect": true
               },
               "mappings": [],
               "thresholds": {
