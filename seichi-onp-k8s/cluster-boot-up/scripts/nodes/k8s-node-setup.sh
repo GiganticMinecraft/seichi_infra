@@ -160,7 +160,16 @@ server = "https://registry-1.docker.io"
   capabilities = ["pull", "resolve"]
 EOF
 
-sudo sed -i '/^\s*\[plugins\."io.containerd.grpc.v1.cri"\.registry\]/,/\[/{s|config_path = ""|config_path = "/etc/containerd/certs.d"|}' /etc/containerd/config.toml
+# containerd 2.x の `config default` (version 3 / 4 形式) は、registry のセクション名とクォートが 1.x と異なる
+#   1.x: [plugins."io.containerd.grpc.v1.cri".registry] / config_path = ""
+#   2.x: [plugins.'io.containerd.cri.v1.images'.registry] / config_path = ''
+# 1.x 形式だけを置換していた頃は、2.x のノードでミラーが無効のままになっていた
+sudo sed -i -E "/^\s*\[plugins\.(\"io\.containerd\.grpc\.v1\.cri\"|'io\.containerd\.cri\.v1\.images')\.registry\]/,/^\s*\[/{s#config_path = (\"\"|'')#config_path = '/etc/containerd/certs.d'#}" /etc/containerd/config.toml
+# ファイルではなく containerd が解釈した実効値を、registry セクションに限定して確認する
+sudo containerd config dump 2>/dev/null \
+    | sed -n -E "/^\s*\[plugins\.(\"io\.containerd\.grpc\.v1\.cri\"|'io\.containerd\.cri\.v1\.images')\.registry\]/,/^\s*\[/p" \
+    | grep -qE "^\s*config_path = ['\"]/etc/containerd/certs\.d(:[^'\"]*)?['\"]$" \
+    || { echo "containerd の registry config_path が /etc/containerd/certs.d になっていません (docker.io ミラーが無効)" >&2; exit 1; }
 
 # Restart containerd to apply changes
 sudo systemctl restart containerd
