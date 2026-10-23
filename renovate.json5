@@ -72,7 +72,7 @@
       ],
     },
     {
-      // hubble-observer のイメージ (quay.io/cilium/cilium) は Cilium と同じバージョンにそろえる
+      // hubble-observer のイメージ (quay.io/cilium/cilium) を Cilium の chart と同じ PR で上げる
       matchPackageNames: [
         'cilium',
         'quay.io/cilium/cilium',
@@ -247,7 +247,7 @@
         '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/app-of-other-apps/hubble-observer[.]yaml$/',
       ],
       matchStrings: [
-        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s+tag: (?<currentValue>v[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s+tag: \"?(?<currentValue>v[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)\"?',
       ],
       versioningTemplate: 'semver',
     },

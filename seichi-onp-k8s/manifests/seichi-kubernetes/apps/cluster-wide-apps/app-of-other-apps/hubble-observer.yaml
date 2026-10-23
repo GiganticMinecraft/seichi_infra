@@ -35,9 +35,11 @@ spec:
         # v1.16.4 (Alpine 3.20、EOL) で配布が止まっている。上流は Cilium Agent の
         # イメージに同梱の hubble を使う方針 (cilium/hubble#1631) なので、それに
         # 差し替える。チャートは `/bin/sh -c "hubble observe ..."` で起動するので
-        # そのまま動く。cilium.yaml の Cilium と同じタグ・digest にする (ノードには
-        # digest で入っているので、digest まで合わせると pull が起きない)。
-        # Renovate は Cilium の chart と同じグループで上げる。
+        # そのまま動く。Cilium の DaemonSet が使うイメージ (cilium.yaml の chart の既定値。
+        # `kubectl -n kube-system get ds cilium` で見られる) と同じタグ・digest にする。
+        # ノードには digest で入っているので、そろっていれば pull が起きない。
+        # Renovate は Cilium の chart と同じグループで上げるが、公開時期の差で別々の PR に
+        # なることもあるので、Cilium を上げたらここも合っているか確かめる。
         image:
           repository: quay.io/cilium/cilium
           # renovate: datasource=docker depName=quay.io/cilium/cilium
