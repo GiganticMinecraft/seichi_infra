@@ -1,0 +1,174 @@
+# Trivy Operator: クラスタ内で実際に動いているワークロードを継続的にスキャンする。
+#
+# CI (aquasecurity/trivy-action) はビルド時点の内製イメージしか見ないため、
+# ここでは次を補う:
+#   - 内製以外の約 100 イメージ (Helm チャート由来のミドルウェア等) の脆弱性
+#   - 稼働中イメージを最新の脆弱性 DB で定期的に再スキャン (ビルド後に公開された CVE の検知)
+#   - ConfigAudit / RBAC / Infra (ノードの CIS 項目) / Compliance レポート
+# 詳細は docs/guides/trivy-operator.md を参照。
+#
+# 2025-03〜2025-09 に同名の Application (chart 0.30.0) で導入されていたため、
+# クラスタスコープの CRD 6 種 (cluster*reports。namespaced の 6 種は削除済み) と
+# ClusterRole/ClusterRoleBinding `trivy-operator` がクラスタに残っている。
+# chart 0.37.0 の CRD 12 種のうち、この 6 種はスキーマが同一なのでそのまま引き取る
+# (差分は controller-gen の annotation のみ)。残り 6 種 (namespaced) は 2026-10-23 の
+# 実証実験で kubectl (field manager trivy-poc) から作成済みで、各 namespace のレポートが
+# 載っているので、Argo CD はこれも引き取る (削除して作り直してはいけない)。
+# Application 名と releaseName を当時と同じ `trivy-operator` にしておくことで、
+# argocd.argoproj.io/instance=trivy-operator ラベル付きの残骸をそのまま引き取る。
+# 2025 年に残骸ができたのは Application に finalizer が無く非カスケード削除になったためなので、
+# 今回は resources-finalizer を付けて、Application を消したときにチャートのリソースも消えるようにする。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: trivy-operator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: cluster-wide-apps
+  source:
+    chart: trivy-operator
+    # ghcr の OCI ミラーは 0.32.1 で更新が止まっているため HTTPS リポジトリを使う
+    repoURL: https://aquasecurity.github.io/helm-charts/
+    targetRevision: 0.37.0
+    helm:
+      releaseName: trivy-operator
+      values: |
+        # SeichiAssist の PR ごとに作られる使い捨てデバッグ環境はスキャン対象外にする。
+        # 寿命が短くイメージも CI でスキャン済みのため、スキャンジョブを浪費するだけになる。
+        excludeNamespaces: "seichi-debug-minecraft-on-seichiassist-pr-*"
+
+        trivyOperator:
+          # 取得できないイメージを除外する (glob。ここでは完全一致で、該当イメージだけを外す)。
+          # 完了済みの古い Job が残っていると、その中の既に取得できないイメージを繰り返し
+          # pull しに行って失敗し続ける。実証実験で該当したのは次の 2 つ:
+          #   - docker-registry1.mariadb.com/library/mariadb:11.8
+          #     seichi-minecraft の mariadb-restore--* (mariadb-operator の Restore が残した完了 Job 12 件)。
+          #     このレジストリは Docker Hub の匿名 rate limit を代理で食っていて TOOMANYREQUESTS になる
+          #   - docker.io/bitnami/kafka:3.7.1-debian-12-r4
+          #     sentry namespace の sentry-kafka-provisioning (2025-06 の完了 Job)。タグが upstream から
+          #     削除済みで MANIFEST_UNKNOWN になる
+          # Job 全体を対象外にする手もあるが、mariadb-operator の Backup が作る Job
+          # (coreprotect-*-backup--* 等、CronJob 所有ではない) のイメージも見えなくなるので
+          # イメージ単位で除外する。レジストリや org 単位の glob にすると将来の同系イメージまで
+          # 見えなくなるので完全一致にする。該当の Job / namespace を掃除したらこの除外は消す。
+          excludeImages: "docker-registry1.mariadb.com/library/mariadb:11.8,docker.io/bitnami/kafka:3.7.1-debian-12-r4"
+
+        # ---- チューニング値 ----
+        operator:
+          # 同時に走らせるスキャンジョブ数 (既定 10)。
+          # wk-2/wk-3 はメモリ requests が 83〜84% まで埋まっており、
+          # 1 ジョブ最大 1Gi (下の trivy.resources) を 10 並列で積む余裕がない。
+          # 実証実験では 2 並列で全クラスタ (117 イメージ / VulnerabilityReport 255 件) を
+          # 約 27 分 (operator の再起動 2 回を含む) でスキャンできた。
+          scanJobsConcurrentLimit: 2
+          # スキャンジョブのタイムアウト (既定 5m)。実測では Java DB 取得
+          # (約 8 秒、mirror.gcr.io から 120MiB/s) を含めて本番 Minecraft イメージ 1 件 25 秒。
+          # 15m はミラーが遅いときの余裕。
+          scanJobTimeout: 15m
+          # scanJobTTL は設定しないこと (チャート既定の未設定のままにする)。
+          # 未設定なら完了 Job は operator が即時削除する。scanJobTTL を設定すると
+          # operator は Job の削除を ttlSecondsAfterFinished に任せる一方、同時実行数の判定は
+          # namespace 内の Job を状態に関係なく数えるため、完了 Job が同時実行枠を TTL 分占有して
+          # スキャンが止まる (実証実験で limit 2 / TTL 10m にしたところ 10 分間停止した)。
+          # レポートの有効期限 = 全ワークロードの再スキャン周期 (既定 24h)。
+          # JAR を含むイメージのスキャンではジョブごとに Java DB (942MiB) を取得することを
+          # 実証実験で確認した (trivy-server は本体 DB しか配信しない)。Java イメージ約 45 件 × 1GB を
+          # 24h ごとに引き直すのは無駄なので 72h (検知が最大 3 日遅れるのと引き換え。
+          # Java DB の共有キャッシュを作れば 24h に戻せる)。全クラスタの初回スキャンは並列 2 で
+          # 約 27 分だったので、周期を短くしても処理時間の問題は無い。
+          scannerReportTTL: 72h
+          # クラスタ内に trivy-server (StatefulSet + PVC) を立て、脆弱性 DB (~135MB) は
+          # サーバーが 1 回だけ取得する。スキャンジョブごとの DB ダウンロードを避ける。
+          builtInTrivyServer: true
+          # SBOM は CI の BuildKit attestation で作成済み。SbomReport を作らないことで
+          # etcd に載るレポートのサイズも抑える。
+          sbomGenerationEnabled: false
+          clusterComplianceEnabled: true
+          infraAssessmentScannerEnabled: true
+          # CVE ID 単位のメトリクス (trivy_vulnerability_id)。既存の dotdc ダッシュボード
+          # (Trivy Operator - Vulnerabilities) の CVE 一覧に必要。
+          # 下の trivy.severity で MEDIUM 以上に絞っている。実証実験では全クラスタ (117 イメージ) で
+          # trivy_vulnerability_id が約 30,800 系列。Prometheus のメモリが問題になったら
+          # ここを false にする (ダッシュボードの CVE 一覧パネルだけが空になる)。
+          metricsVulnIdEnabled: true
+
+        serviceMonitor:
+          enabled: true
+          interval: 60s
+          # kube-prometheus-stack の Prometheus は release=prometheus のラベルで選択する
+          labels:
+            release: prometheus
+
+        trivy:
+          # 修正版の無い脆弱性は報告しない。CI の trivy-action と同じ方針。
+          ignoreUnfixed: true
+          # LOW は対応しないのでレポート・メトリクスから除外する。
+          # (レポート上の UNKNOWN は Trivy が MEDIUM 以上と判定したがベンダー severity が無いもの。
+          #  docs/guides/trivy-operator.md の既知の制約を参照)
+          severity: MEDIUM,HIGH,CRITICAL
+          # Trivy 自体のタイムアウト (既定 5m0s)。operator.scanJobTimeout (= Job の
+          # activeDeadlineSeconds、スケジューリングや trivy イメージの pull も含む) より短くして、
+          # 遅いときは Job が kill されるより先に Trivy が自分のタイムアウトエラーをログに残すようにする。
+          # 実測は Java DB 取得 (約 8 秒) を含めて本番 Minecraft イメージ 1 件 25 秒。
+          timeout: 13m0s
+          # スキャンジョブのコンテナ (既定 requests 100m/100M, limits 500m/500M)。
+          # 実測ピークは 380Mi (topolvm-with-sidecar)、Minecraft 本番イメージ (約 450MiB、JAR 多数) で
+          # 85〜106Mi、CPU ピーク約 1.2 コア。memory limit は実測ピークの約 2.7 倍の 1Gi。
+          # CPU limit を下げてもスキャンが遅くなるだけなので 2 コアのままにする。
+          # Java DB (942MiB 圧縮) をジョブ内の emptyDir に展開するため
+          # ephemeral-storage は request 2Gi / limit 8Gi を明示する。
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+              ephemeralStorage: 2Gi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+              ephemeralStorage: 8Gi
+          # trivy-server の DB 用 PVC (既定 StorageClass の synology-iscsi-storage に作られる)
+          storageSize: 5Gi
+          server:
+            # trivy-server (既定 requests 200m/512Mi)。DB の配信だけなので requests を下げる。
+            # 実測 44〜90Mi。
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                cpu: "1"
+                memory: 1Gi
+
+        # operator 本体 (チャート既定は未設定)。
+        # 約 130 イメージ分のレポートを informer キャッシュに持つため memory に余裕を持たせる。
+        # 実測ピーク 459Mi (全クラスタスキャン中)。
+        resources:
+          requests:
+            cpu: 50m
+            memory: 300Mi
+          limits:
+            memory: 768Mi
+
+        # node-collector (CIS 項目の収集ジョブ) を control-plane ノードでも動かす。
+        # kube-apiserver / etcd などの設定ファイルは control-plane にしか無い。
+        nodeCollector:
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+        # ---- チューニング値ここまで ----
+
+        # 注意: trivyOperator.scanJobPodTemplatePodSecurityContext は設定しないこと。
+        # node-collector の Pod にも適用され、root (hostPID) が必要な node-collector が動かなくなる。
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: trivy-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

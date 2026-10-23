@@ -23,6 +23,7 @@ https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 - [開発者向けデプロイガイド](./guides/deployment.md)
 - [Kubernetesクラスタ構築](./guides/cluster-setup.md)
 - [Terraform運用](./guides/terraform.md)
+- [Trivy Operator運用](./guides/trivy-operator.md)
 
 ## 編集方法
 

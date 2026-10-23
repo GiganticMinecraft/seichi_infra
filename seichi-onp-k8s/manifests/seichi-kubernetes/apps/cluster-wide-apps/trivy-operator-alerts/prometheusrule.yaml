@@ -1,0 +1,50 @@
+# Trivy Operator のスキャン基盤そのものの異常を既存の Alertmanager -> Discord 経路へ通知する。
+#
+# スキャンジョブの失敗は operator が失敗 Job を観測した直後に削除してしまい
+# kube-state-metrics では捕まえられないため、operator のログを見る Loki ルール
+# (cluster-wide-apps/loki-alert-rules/trivy-operator.yaml の TrivyScanJobsFailing) で通知する。
+#
+# 脆弱性の件数ではアラートしない。サードパーティイメージを含めると MEDIUM 以上の
+# 脆弱性は常にどこかに存在するため、件数アラートは鳴りっぱなしになり 4 時間ごとに
+# Discord へ再通知されるだけになる。脆弱性のトリアージは Grafana の
+# 「Trivy Operator - Vulnerabilities」ダッシュボードで行う (docs/guides/trivy-operator.md)。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: trivy-operator-alerts
+  # trivy-operator namespace は Application 側の CreateNamespace で作られるため、
+  # 同時に sync されるこの Application が namespace 未作成でエラーにならないよう monitoring に置く
+  # (Loki ルールの ConfigMap と同じ置き場所)。
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: trivy-operator-alerts
+      rules:
+        - alert: TrivyOperatorDown
+          # ServiceMonitor 経由の job ラベルは Service 名 (= releaseName の trivy-operator)。
+          # operator が落ちるとレポートの更新もメトリクスも止まる。再スケジュールや
+          # イメージ取得の待ちで数分止まるのは問題ないので 15 分継続で鳴らす。
+          expr: absent(up{job="trivy-operator", namespace="trivy-operator"} == 1)
+          for: 15m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Trivy Operator のメトリクスが取得できません"
+            description: "trivy-operator namespace の operator が 15 分以上 scrape できていません。kubectl -n trivy-operator get pods で Pod の状態 (CrashLoopBackOff / OOMKilled / Pending) を確認してください。"
+
+        - alert: TrivyVulnerabilityReportsMissing
+          # operator は動いているのに脆弱性メトリクスが 1 系列も無い = スキャンが 1 件も
+          # 成功していない (scan pipeline が壊れている)。初回は全イメージのスキャンに
+          # 時間がかかるので 2 時間の猶予を取る。operator 自体の停止は TrivyOperatorDown が
+          # 拾うので、ここでは operator が up のときだけ評価して二重通知を避ける。
+          expr: absent(trivy_image_vulnerabilities{job="trivy-operator"}) and on() (up{job="trivy-operator", namespace="trivy-operator"} == 1)
+          for: 2h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "Trivy Operator が脆弱性レポートを生成していません"
+            description: "operator は稼働していますが trivy_image_vulnerabilities が 2 時間以上存在しません。kubectl get vulnerabilityreports -A でレポートの有無を、kubectl -n trivy-operator get jobs と operator のログでスキャンジョブの状態を確認してください。trivy-server (kubectl -n trivy-operator logs sts/trivy-server) の DB 取得失敗も疑ってください。"
