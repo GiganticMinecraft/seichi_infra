@@ -36,11 +36,10 @@ spec:
         runAsGroup: 0
         seccompProfile:
           type: RuntimeDefault
-      # node-exporter と同じく NoSchedule の taint を全部許容する (control-plane も対象)。
+      # node-exporter と同じく taint を全部許容する (control-plane も対象)。
       # node-exporter だけが載るノードがあると TrivyNodeScanStale が鳴り続けるため。
       tolerations:
         - operator: Exists
-          effect: NoSchedule
       containers:
         - name: scanner
           # Renovate (kubernetes manager) がタグを追従する。Trivy Operator 側の Trivy はチャートの

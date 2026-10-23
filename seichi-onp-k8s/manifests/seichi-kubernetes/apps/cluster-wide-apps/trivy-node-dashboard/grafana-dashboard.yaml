@@ -669,7 +669,8 @@ data:
                   "installed_version": true,
                   "fixed_version": true,
                   "severity": true,
-                  "title": true
+                  "title": true,
+                  "target": true
                 },
                 "renameByName": {
                   "Time": "時刻",
@@ -678,7 +679,8 @@ data:
                   "installed_version": "バージョン",
                   "fixed_version": "修正版",
                   "severity": "重大度",
-                  "title": "概要"
+                  "title": "概要",
+                  "target": "対象"
                 }
               }
             },
@@ -715,6 +717,10 @@ data:
                       "max"
                     ],
                     "operation": "aggregate"
+                  },
+                  "対象": {
+                    "aggregations": [],
+                    "operation": "groupby"
                   }
                 }
               }

@@ -16,7 +16,7 @@ spec:
     spec:
       backoffLimit: 1
       activeDeadlineSeconds: 1800
-      ttlSecondsAfterFinished: 86400
+      # 終わった Job は failedJobsHistoryLimit / successfulJobsHistoryLimit で消える。結果は Loki に残る
       template:
         metadata:
           labels:
@@ -38,12 +38,12 @@ spec:
               image: mirror.gcr.io/aquasec/trivy:0.75.0
               command: ["/bin/sh", "/scripts/kbom.sh"]
               env:
-                # 脆弱性の照合は Trivy Operator の trivy-server (builtInTrivyServer) に任せる
-                - name: TRIVY_SERVER
+                # 脆弱性の照合は Trivy Operator の trivy-server (builtInTrivyServer) に任せる。
+                # TRIVY_SERVER にすると Trivy が全サブコマンド (trivy k8s も) のフラグとして読むので別名にする
+                - name: KBOM_TRIVY_SERVER
                   value: http://trivy-service.trivy-operator:4954
                 - name: TRIVY_SEVERITY
                   value: MEDIUM,HIGH,CRITICAL
-              # memory.peak は DB を書く emptyDir のページキャッシュ込みで 1Gi に張り付いた
               resources:
                 # DB は trivy-server 側にあるので、/tmp には KBOM (約 60KB) と k8s 用のキャッシュだけ
                 requests:

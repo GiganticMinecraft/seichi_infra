@@ -24,7 +24,7 @@ trivy k8s \
 # 照合はクラスタ内の trivy-server に任せる (KBOM の結果は数件なのでサーバーの負荷にならない)。
 # DB を Pod ごとに取得すると展開後 1.55GiB の ephemeral storage が要る。
 trivy sbom /tmp/kbom.json \
-  --scanners vuln --server "${TRIVY_SERVER}" \
+  --scanners vuln --server "${KBOM_TRIVY_SERVER}" \
   --cache-dir /tmp/trivy --skip-version-check --no-progress --timeout 10m \
   --format template --template @/scripts/kbom.tpl \
   --output /tmp/vulns.jsonl 2>/tmp/sbom.err || fail sbom /tmp/sbom.err

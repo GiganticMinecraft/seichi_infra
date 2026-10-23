@@ -27,12 +27,17 @@ spec:
         - alert: TrivyNodeScanStale
           # スキャン間隔は 24h (+ 初回のみ最大 1h のずらし)。最終「成功」から 2 日経っていれば、
           # 表示中の件数は古い (失敗が続いている場合も含む)。
-          # 一度も成功していないノード (DaemonSet が載っていない / node-exporter が読めていない) も拾う。
+          # textfile が無いノード (DaemonSet が載っていない / node-exporter が読めていない) も拾う。
+          # 一度は試行して失敗し続けているノードは TrivyNodeScanFailing が拾うので、ここでは除く。
           expr: |
             (time() - trivy_node_last_success_timestamp_seconds > 2 * 86400)
             * on (instance) group_left (nodename) node_uname_info
             or
-            (node_uname_info unless on (instance) trivy_node_last_success_timestamp_seconds)
+            (
+              node_uname_info
+              unless on (instance) trivy_node_last_success_timestamp_seconds
+              unless on (instance) trivy_node_scan_success
+            )
           for: 3h
           labels:
             severity: warning
