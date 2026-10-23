@@ -118,9 +118,7 @@ controller:
         release: prometheus
 
 dex:
-  # イメージは chart の既定値に任せる。以前 v2.42.1 で GitHub SSO が失敗したため v2.41.1 に
-  # 固定していたが (argoproj/argo-cd#23415)、v2.41.1 は Alpine 3.20 (EOL) ベースで、
-  # Argo CD 本体も v2.45 / v2.46 を同梱するようになっている。
+  # イメージは chart の既定値に任せる (固定すると更新が止まり、ベース OS が EOL のまま残る)。
   env:
     - name: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
       valueFrom:

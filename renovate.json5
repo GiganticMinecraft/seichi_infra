@@ -68,6 +68,7 @@
       groupName: 'Argo CD',
       prBodyNotes: [
         ':warning: Helm chart のバージョンだけでなく、Chart.yaml の appVersion と Argo CD の upgrade notes を確認してください。',
+        ':warning: dex のイメージは chart の既定値 (values.yaml の dex.image.tag) に従うので、dex の版が変わる場合は反映後に GitHub SSO でログインできることを確認してください。',
       ],
     },
     {
