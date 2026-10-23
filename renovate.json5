@@ -247,7 +247,7 @@
         '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/app-of-other-apps/hubble-observer[.]yaml$/',
       ],
       matchStrings: [
-        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s+tag: (?<currentValue>v[\\d.]+)',
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s+tag: (?<currentValue>v[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]+)',
       ],
       versioningTemplate: 'semver',
     },

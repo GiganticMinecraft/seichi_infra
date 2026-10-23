@@ -35,12 +35,27 @@ spec:
         # v1.16.4 (Alpine 3.20、EOL) で配布が止まっている。上流は Cilium Agent の
         # イメージに同梱の hubble を使う方針 (cilium/hubble#1631) なので、それに
         # 差し替える。チャートは `/bin/sh -c "hubble observe ..."` で起動するので
-        # そのまま動く。タグは cilium.yaml の Cilium と同じにする (各ノードに既に
-        # あるイメージなので pull も起きない)。Renovate は Cilium の chart と同じ PR で上げる。
+        # そのまま動く。cilium.yaml の Cilium と同じタグ・digest にする (ノードには
+        # digest で入っているので、digest まで合わせると pull が起きない)。
+        # Renovate は Cilium の chart と同じグループで上げる。
         image:
           repository: quay.io/cilium/cilium
           # renovate: datasource=docker depName=quay.io/cilium/cilium
-          tag: v1.20.3
+          tag: v1.20.3@sha256:95cfa5c2427cc6b452c00908778d0566311f572589284af949d06a013db1a849
+        # Cilium Agent のイメージは root 実行・ネットワーク系ツール入りなので、
+        # hubble observe に要らない権限を落とす (/tmp はチャートが emptyDir を付ける)。
+        podSecurityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          seccompProfile:
+            type: RuntimeDefault
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
         hubbleRelay:
           serviceName: hubble-relay
           port: "80"
