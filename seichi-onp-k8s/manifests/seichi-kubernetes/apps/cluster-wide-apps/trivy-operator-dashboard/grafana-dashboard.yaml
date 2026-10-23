@@ -201,7 +201,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "重大度ごとの検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。Unknown は「未評価」ではない。trivy.severity: MEDIUM,HIGH,CRITICAL で LOW は既に除外済みで、Unknown は Trivy 自身は MEDIUM 以上と判定しているが、Operator がレポートの重大度に使うベンダー severity (VendorSeverity[SeveritySource]) が無い CVE。Go の stdlib / golang.org/x/* や一部の GHSA 由来 JAR の CVE が主で、全体の 7 割近くを占める。MEDIUM〜HIGH 相当として扱い、隠さずに見ること。",
+          "description": "重大度ごとの検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。Unknown は「未評価」ではない。trivy.severity: MEDIUM,HIGH,CRITICAL で LOW は既に除外済みで、Unknown は Trivy 自身は MEDIUM 以上と判定しているが、Operator がレポートの重大度に使うベンダー severity (VendorSeverity[SeveritySource]) が無い CVE。Go の stdlib / golang.org/x/* や一部の GHSA 由来 JAR の CVE が主で、全体の 7 割近くを占める。MEDIUM〜HIGH 相当として扱い、隠さずに見ること。 Operator が止まっているなど trivy_vulnerability_id 自体が無いときは 0 ではなく「データなし」になる。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -218,7 +218,7 @@ data:
                 ]
               },
               "unit": "none",
-              "noValue": "0"
+              "noValue": "データなし"
             },
             "overrides": [
               {
@@ -296,30 +296,6 @@ data:
               {
                 "matcher": {
                   "id": "byName",
-                  "options": "Unknown"
-                },
-                "properties": [
-                  {
-                    "id": "thresholds",
-                    "value": {
-                      "mode": "absolute",
-                      "steps": [
-                        {
-                          "color": "green",
-                          "value": null
-                        },
-                        {
-                          "color": "blue",
-                          "value": 1
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
                   "options": "Unknown (≥Medium)"
                 },
                 "properties": [
@@ -373,7 +349,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (severity) (count by (severity, vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity!=\"Low\"})) or label_replace(vector(0), \"severity\", \"Critical\", \"\", \"\") or label_replace(vector(0), \"severity\", \"High\", \"\", \"\") or label_replace(vector(0), \"severity\", \"Medium\", \"\", \"\") or label_replace(vector(0), \"severity\", \"Unknown\", \"\", \"\")",
+              "expr": "count by (severity) (count by (severity, vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity!=\"Low\"})) or (label_replace(vector(0), \"severity\", \"Critical\", \"\", \"\") and on () (count(trivy_vulnerability_id{job=\"trivy-operator\"}) > 0)) or (label_replace(vector(0), \"severity\", \"High\", \"\", \"\") and on () (count(trivy_vulnerability_id{job=\"trivy-operator\"}) > 0)) or (label_replace(vector(0), \"severity\", \"Medium\", \"\", \"\") and on () (count(trivy_vulnerability_id{job=\"trivy-operator\"}) > 0)) or (label_replace(vector(0), \"severity\", \"Unknown\", \"\", \"\") and on () (count(trivy_vulnerability_id{job=\"trivy-operator\"}) > 0))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -416,7 +392,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ベース OS がサポート終了 (EOSL) になっているイメージ (digest 単位) の数。OS パッケージの修正が出なくなるため、CVE 件数とは別にベースイメージの更新対象として見る。namespace 変数が効く。",
+          "description": "ベース OS がサポート終了 (EOSL) になっているイメージ (digest 単位) の数。OS パッケージの修正が出なくなるため、CVE 件数とは別にベースイメージの更新対象として見る。namespace 変数が効く。 trivy_image_info 自体が無いときは 0 ではなく「データなし」になる。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -437,7 +413,7 @@ data:
                 ]
               },
               "unit": "none",
-              "noValue": "0"
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -471,7 +447,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (image_registry, image_repository, image_tag, image_digest) (trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}))",
+              "expr": "count(count by (image_registry, image_repository, image_tag, image_digest) (trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"})) or (vector(0) and on () (count(trivy_image_info{job=\"trivy-operator\"}) > 0))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -499,7 +475,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の Unknown パネルの説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。",
+          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の「重大度別の検出数」の説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -790,14 +766,14 @@ data:
                     "id": "links",
                     "value": [
                       {
-                        "title": "NVD で開く",
-                        "targetBlank": true,
-                        "url": "https://nvd.nist.gov/vuln/detail/${__value.text}"
-                      },
-                      {
-                        "title": "OSV で開く",
+                        "title": "OSV で開く (CVE / GHSA / GO いずれも)",
                         "targetBlank": true,
                         "url": "https://osv.dev/vulnerability/${__value.text}"
+                      },
+                      {
+                        "title": "NVD で開く (CVE のみ)",
+                        "targetBlank": true,
+                        "url": "https://nvd.nist.gov/vuln/detail/${__value.text}"
                       }
                     ]
                   }
@@ -977,7 +953,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ワークロード (ReplicaSet / StatefulSet / DaemonSet / Job など) × コンテナごとの件数。対応時に「どのマニフェストのイメージを上げるか」を探すための表。完了 Job (mariadb-operator の Backup / Restore 履歴など) もレポートを持つので、「リソース種別」変数で Job を外すと稼働中のワークロードだけになる。件数はワークロード単位なので、同じイメージは使っているワークロードの数だけ行が出る。",
+          "description": "ワークロード (ReplicaSet / StatefulSet / DaemonSet / Job など) × コンテナごとの件数。対応時に「どのマニフェストのイメージを上げるか」を探すための表。完了 Job (mariadb-operator の Backup / Restore 履歴など) もレポートを持つので、「リソース種別」変数で Job を外すと稼働中のワークロードだけになる。件数はワークロード単位なので、同じイメージは使っているワークロードの数だけ行が出る。 同じコンテナでも digest が違うレポート (古い digest のものが残っている場合) は別の行になる。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1173,7 +1149,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (key, severity) (label_join(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"key\", \" | \", \"namespace\", \"resource_kind\", \"resource_name\", \"container_name\", \"image\"))",
+              "expr": "max by (key, severity) (label_join(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest_short\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"), \"key\", \" | \", \"namespace\", \"resource_kind\", \"resource_name\", \"container_name\", \"image\", \"digest_short\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1484,21 +1460,6 @@ data:
                     "value": {
                       "mode": "fixed",
                       "fixedColor": "blue"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Low"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "mode": "fixed",
-                      "fixedColor": "green"
                     }
                   }
                 ]
@@ -2353,7 +2314,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "trivy-operator の /metrics を Prometheus が取得できているか。ターゲットが 1 つでも取得できないか、ターゲット自体が見つからないと DOWN になる。DOWN の間はこのダッシュボードの値が古いまま (または空) になる。",
+          "description": "trivy-operator の /metrics を Prometheus が取得できているか。ターゲットが 1 つでも取得できないか、ターゲット自体が見つからないと DOWN になる。DOWN が 5 分を超えると Trivy のメトリクスは消えるので、このダッシュボードの他のパネルは「データなし」や空の表になる (古い値は残らない)。",
           "fieldConfig": {
             "defaults": {
               "color": {
