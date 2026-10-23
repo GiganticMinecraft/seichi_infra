@@ -160,7 +160,12 @@ server = "https://registry-1.docker.io"
   capabilities = ["pull", "resolve"]
 EOF
 
-sudo sed -i '/^\s*\[plugins\."io.containerd.grpc.v1.cri"\.registry\]/,/\[/{s|config_path = ""|config_path = "/etc/containerd/certs.d"|}' /etc/containerd/config.toml
+# containerd 2.x の `config default` は version 3 形式で、registry のセクション名とクォートが 1.x と異なる
+#   1.x: [plugins."io.containerd.grpc.v1.cri".registry] / config_path = ""
+#   2.x: [plugins.'io.containerd.cri.v1.images'.registry] / config_path = ''
+# 1.x 形式だけを置換していた頃は、2.x のノードでミラーが無効のままになっていた
+sudo sed -i -E "/^\s*\[plugins\.(\"io\.containerd\.grpc\.v1\.cri\"|'io\.containerd\.cri\.v1\.images')\.registry\]/,/\[/{s#config_path = (\"\"|'')#config_path = '/etc/containerd/certs.d'#}" /etc/containerd/config.toml
+grep -qE "^\s*config_path = ['\"]/etc/containerd/certs\.d['\"]$" /etc/containerd/config.toml
 
 # Restart containerd to apply changes
 sudo systemctl restart containerd
