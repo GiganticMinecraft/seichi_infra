@@ -54,22 +54,12 @@ patches:
           apiGroups: ["snapshot.storage.k8s.io"]
           resources: ["volumesnapshotcontents", "volumesnapshotcontents/status"]
           verbs: ["patch"]
-      # csi-snapshotter v8: VolumeGroupSnapshot (GA、既定で有効) の informer
+  # csi-snapshotter v8 は VolumeGroupSnapshot (GA) が既定で有効だが、synology-csi v1.3.1 は
+  # GroupController を実装していないので、起動のたびにエラーを出すだけ。明示的に無効にする。
+  - target:
+      kind: StatefulSet
+      name: synology-csi-snapshotter
+    patch: |-
       - op: add
-        path: /rules/-
-        value:
-          apiGroups: ["groupsnapshot.storage.k8s.io"]
-          resources: ["volumegroupsnapshotclasses"]
-          verbs: ["get", "list", "watch"]
-      - op: add
-        path: /rules/-
-        value:
-          apiGroups: ["groupsnapshot.storage.k8s.io"]
-          resources: ["volumegroupsnapshotcontents"]
-          verbs: ["get", "list", "watch", "update", "patch"]
-      - op: add
-        path: /rules/-
-        value:
-          apiGroups: ["groupsnapshot.storage.k8s.io"]
-          resources: ["volumegroupsnapshotcontents/status"]
-          verbs: ["update", "patch"]
+        path: /spec/template/spec/containers/0/args/-
+        value: --feature-gates=CSIVolumeGroupSnapshot=false
