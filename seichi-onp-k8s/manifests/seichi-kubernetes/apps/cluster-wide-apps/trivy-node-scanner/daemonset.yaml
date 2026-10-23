@@ -1,0 +1,141 @@
+# 各ノードの OS パッケージを trivy rootfs でスキャンする。
+#
+# ホストのルート全体はマウントしない。OS とパッケージの判定に必要な
+# os-release / lsb-release / dpkg データベースだけを読み取り専用でマウントする
+# (ルート全体だと containerd のイメージ層まで走査して 512Mi で即 OOMKilled した)。
+#
+# 脆弱性 DB はクラスタ内の trivy-server を使わず、Pod ごとに取得する (Standalone)。
+# 旧カーネルのパッケージが残っているノードでは結果が 6 万件規模になり、
+# trivy-server (limit 1Gi) に 2 ノード同時に問い合わせたところ OOMKilled したため。
+# DB はダウンロード約 135MB・展開後約 1.55GiB で、/tmp の emptyDir に置き、スキャンごとに消す
+# (数時間おきに更新されるので 24h 後には再取得になり、残しておく意味が無い)。
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: trivy-node-scanner
+  labels:
+    app.kubernetes.io/name: trivy-node-scanner
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: trivy-node-scanner
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: trivy-node-scanner
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      # dpkg データベースの読み取りと、root 所有の textfile ディレクトリへの書き込みのため root。
+      # capability は全部落とし、ルートファイルシステムは読み取り専用にする。
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        seccompProfile:
+          type: RuntimeDefault
+      # node-exporter と同じく taint を全部許容する (control-plane も対象)。
+      # node-exporter だけが載るノードがあると TrivyNodeScanStale が鳴り続けるため。
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: scanner
+          # Renovate (kubernetes manager) がタグを追従する。Trivy Operator 側の Trivy はチャートの
+          # 既定値 (trivy.image.tag) に従うので一時的にずれることはあるが、どちらも同じ trivy-db:2 を読む
+          image: mirror.gcr.io/aquasec/trivy:0.75.0
+          # textfile は停止時に消さない。消すと再起動・ロールアウト直後 (初回スキャンまで最大 1h) に
+          # 0 件 = 問題なしに見える。古さは trivy_node_last_success_timestamp_seconds で判別する。
+          # この DaemonSet を撤去するときは各ノードの /var/lib/node-exporter/textfile/trivy_node.prom を消すこと。
+          command: ["/bin/sh", "/scripts/node-scan.sh"]
+          env:
+            - name: TRIVY_DB_REPOSITORY
+              value: mirror.gcr.io/aquasec/trivy-db:2
+            # Trivy Operator と同じく MEDIUM 以上・修正版ありのみ
+            - name: TRIVY_SEVERITY
+              value: MEDIUM,HIGH,CRITICAL
+            - name: SCAN_INTERVAL_SECONDS
+              value: "86400"
+            # 全ノードが同時に DB を取りに行かないよう、初回の開始を最大 1 時間ずらす
+            - name: SCAN_JITTER_SECONDS
+              value: "3600"
+            # 失敗時の再試行間隔
+            - name: SCAN_RETRY_SECONDS
+              value: "3600"
+          # 実測 (2026-10-23): 1 ノード 6〜9 秒 / 日。memory.peak は DB を書く emptyDir の
+          # ページキャッシュ込みで上限まで張り付くが、匿名メモリは 650〜850Mi 程度
+          # (旧カーネル残骸の 6 万件規模の結果を含む。残骸を消せば小さくなる)。
+          # スキャン中以外は sleep しているだけなので、実使用に合わせて requests を積むと
+          # 6 ノードで常時 3〜5Gi を確保することになる (wk-2/wk-3 は requests が 8 割超)。
+          # requests を超えて使う Pod はノードのメモリ逼迫時に kubelet が先に evict するので、
+          # 逼迫時に犠牲になるのはこの Pod の方 (スキャンは 1 時間後に再試行される)。
+          resources:
+            # 脆弱性 DB は展開後 1.55GiB (2026-10-23 実測) あり、/tmp の emptyDir に置く。
+            # 1Gi の sizeLimit では kubelet に evict された。
+            requests:
+              cpu: 10m
+              memory: 256Mi
+              ephemeral-storage: 2Gi
+            limits:
+              cpu: "1"
+              memory: 1536Mi
+              ephemeral-storage: 4Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: usr-lib-os-release
+              mountPath: /host/usr/lib/os-release
+              readOnly: true
+            - name: etc-os-release
+              mountPath: /host/etc/os-release
+              readOnly: true
+            # Trivy の Ubuntu 判定は etc/lsb-release を見る (無いと OS が none になり 0 件になる)。
+            # ファイル単位の bind mount なので、置き換えられると古い inode を見続ける。ただし
+            # リリースアップグレードは再起動を伴い、そのときコンテナが作り直されてマウントし直される。
+            # ポイントリリースの更新 (26.04.1 → 26.04.2) では VERSION_ID が変わらず判定に影響しない。
+            - name: etc-lsb-release
+              mountPath: /host/etc/lsb-release
+              readOnly: true
+            - name: dpkg
+              mountPath: /host/var/lib/dpkg
+              readOnly: true
+            - name: textfile
+              mountPath: /textfile
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: usr-lib-os-release
+          hostPath:
+            path: /usr/lib/os-release
+            type: File
+        - name: etc-os-release
+          hostPath:
+            path: /etc/os-release
+            type: File
+        - name: etc-lsb-release
+          hostPath:
+            path: /etc/lsb-release
+            type: File
+        - name: dpkg
+          hostPath:
+            path: /var/lib/dpkg
+            type: Directory
+        # node-exporter は --collector.textfile.directory=/host/root/var/lib/node-exporter/textfile
+        # (ホストの / を /host/root にマウント済み) でこのディレクトリを読む
+        - name: textfile
+          hostPath:
+            path: /var/lib/node-exporter/textfile
+            type: DirectoryOrCreate
+        - name: scripts
+          configMap:
+            name: trivy-node-scanner-scripts
+        - name: tmp
+          emptyDir:
+            sizeLimit: 3Gi

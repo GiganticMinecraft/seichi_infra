@@ -1,0 +1,9 @@
+# trivy-operator namespace は Trivy Operator の Application (CreateNamespace=true) が作るが、
+# この Application が先に sync されても namespace-not-found にならないよう、ここでも宣言する。
+# どちらかの Application を消したときに namespace ごと消えないよう Prune / Delete を禁止する。
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trivy-operator
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false

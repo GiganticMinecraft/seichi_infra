@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trivy-kbom
+---
+# trivy k8s --format cyclonedx が KBOM を作るのに必要な最小権限
+# (実証実験で view ではなくこの 3 リソースの get/list だけで同じ KBOM が得られることを確認)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: trivy-kbom
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "pods", "namespaces"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: trivy-kbom
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: trivy-kbom
+subjects:
+  - kind: ServiceAccount
+    name: trivy-kbom
+    namespace: trivy-operator

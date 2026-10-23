@@ -113,6 +113,58 @@ trivy:
     - CVE-2026-12345  # 理由と見直し期限をコメントで残す
 ```
 
+## ノードと Kubernetes コンポーネントのスキャン
+
+Trivy Operator が見るのはコンテナイメージとクラスタの設定までで、ノード自体の OS パッケージは見ない。これを補うものを `cluster-wide-apps/trivy-node-scanner` に置いている。ダッシュボードは Grafana の **Trivy** フォルダの「**Trivy - Nodes**」(uid `trivy-nodes`)。
+
+| 対象 | 仕組み | 出力先 |
+|---|---|---|
+| ノードの OS パッケージ (dpkg) | DaemonSet `trivy-node-scanner` が 1 日 1 回 `trivy rootfs` を実行 | node-exporter の textfile collector → Prometheus (`trivy_node_*`) |
+| Kubernetes コンポーネント (kubelet / apiserver / controller-manager / etcd / containerd 等) | CronJob `trivy-kbom` が毎日 05:30 JST に `trivy k8s --format cyclonedx` で KBOM を作り `trivy sbom` で照合 | 1 件 1 行の JSON ログ → Loki (`{job="trivy-operator/kbom"}`) |
+
+### ノードの OS パッケージ
+
+- ホストのルートはマウントせず、`/usr/lib/os-release`、`/etc/os-release`、`/etc/lsb-release`、`/var/lib/dpkg` だけを読み取り専用でマウントする。ルート全体を走査すると containerd のイメージ層まで読んで 512Mi で即 OOMKilled した。`/etc/lsb-release` が無いと Trivy は OS を判定できず 0 件になる
+- 脆弱性 DB は Pod ごとに取得する (Standalone)。クラスタ内の trivy-server を使うと、旧カーネルの残骸があるノードの結果 (6 万件規模) をサーバーが処理しきれず、2 ノード同時で trivy-server が OOMKilled した
+- 結果は「パッケージ × 重大度の件数」に集約して出す。CVE 単位だと 1 ノード 1 万系列を超える
+- `kind` ラベルで 4 つに分ける。スクリプトが `uname -r` (コンテナはホストのカーネルを共有する) と比べて判定する
+
+| `kind` | 意味 | 対応 |
+|---|---|---|
+| `package` | 通常のパッケージ | パッケージを更新する |
+| `running-kernel` | 稼働中カーネルのパッケージ | 更新してノードを再起動する (kured) |
+| `newer-kernel` | 稼働中より新しいカーネル (インストール済みで再起動待ち) | 再起動すると `running-kernel` になる。修正版が出ていれば更新する |
+| `stale-kernel` | 動いていない旧カーネルの残骸 | `apt autoremove --purge` で消す。実害は無いが件数が大きく見える |
+
+- 見方: ダッシュボードの「対応が必要な脆弱性」(`stale-kernel` を除いた件数) が 0 かどうかを見る
+- スキャンが失敗したときは前回成功時の件数を残し、`trivy_node_scan_success` だけを 0 にする (0 件 = 問題なしに見えないように)。表示中の件数の古さは `trivy_node_last_success_timestamp_seconds` で分かる。失敗時は 1 時間後に再試行する
+- Trivy は OS を判定できないと 0 件のまま正常終了するので、OS パッケージの結果が無いスキャンは失敗扱いにする
+- 脆弱性 DB (展開後約 1.55GiB) はスキャンごとに消す。数時間おきに更新されるので、24h 後には再取得になるため
+- textfile は Pod の停止時に消さない (再起動直後に 0 件に見えないように)。DaemonSet を撤去するときは各ノードの `/var/lib/node-exporter/textfile/trivy_node.prom` を手で消す
+
+### Kubernetes コンポーネント (KBOM)
+
+- Trivy Operator 本体にも KBOM 機能 (`ClusterVulnerabilityReport` の `k8s-cluster`) があるが、`operator.sbomGenerationEnabled: true` が必須で、全イメージの SbomReport も作られる。CycloneDX での実測は Minecraft イメージで約 860KB、debezium で約 1.9MB (etcd の 1 リクエスト上限 1.5MiB を超えて保存できない) で、全イメージ分を etcd に載せるのは重いので使わない
+- `trivy-kbom` の権限は nodes / pods / namespaces の get / list だけ (ClusterRole `trivy-kbom`)。`--disable-node-collector` を付けているので Job は作らない
+- KBOM の照合は Trivy Operator の trivy-server に任せる (結果は数件なのでサーバーの負荷にならず、Pod ごとの DB 取得も不要)
+- Loki で直接見るとき:
+
+```logql
+{job="trivy-operator/kbom"} | json | event="trivy_kbom_vulnerability"
+{job="trivy-operator/kbom"} | json | event="trivy_kbom_scan"
+```
+
+- 修正版が空のものは全バージョンが影響を受ける既知の問題で、Kubernetes を上げても消えない (例: CVE-2025-1767 は gitRepo ボリュームを使わなければ影響しない)
+
+### アラート
+
+| アラート | 条件 |
+|---|---|
+| `TrivyNodeScanFailing` | ノードのスキャンが失敗のまま 2 時間 (1 時間後の再試行でも直らない) |
+| `TrivyNodeScanStale` | 最終成功から 2 日以上経った、または一度も成功していないノードがある状態が 3 時間 |
+| `TrivyKbomScanFailing` (Loki) | 直近 1 日に KBOM スキャンの失敗があり、同じ期間に成功が無い状態が 15 分 (再試行で成功していれば鳴らない) |
+| `TrivyKbomScanMissing` | CronJob `trivy-kbom` の最終成功から 2 日以上 (kube-state-metrics。一度も成功していない場合は作成から 2 日経つまで鳴らさない) |
+
 ## 既知の制約
 
 - **レポートの severity が UNKNOWN になるものがある**: operator はレポートの severity を Trivy JSON の `VendorSeverity[SeveritySource]` から取る (`pkg/vulnerabilityreport/io.go`)。SeveritySource が無い脆弱性 (Go 標準ライブラリや GHSA 由来の JAR の CVE など、Trivy 自身は CVSS から MEDIUM / HIGH と表示するもの) は UNKNOWN になる。実証実験では debug lobby イメージの 92 件のうち 48 件 (Trivy 表示では MEDIUM 27 / HIGH 21) が UNKNOWN だった。`trivy.severity` のフィルタ自体は Trivy 側で効いている (LOW は入ってこない) ので、ダッシュボードやレポートの UNKNOWN は「未評価」ではなく「MEDIUM 以上だがベンダー severity が無い」と読むこと。upstream に修正 (VendorSeverity に無ければ Severity を使う) を出すのが本筋

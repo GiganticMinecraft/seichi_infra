@@ -33,6 +33,15 @@ spec:
           operatingSystems:
             darwin:
               enabled: false
+        prometheus-node-exporter:
+          # textfile collector を有効にする。node-exporter はホストの / を /host/root に
+          # マウントしているので、trivy-node-scanner (cluster-wide-apps/trivy-node-scanner) が
+          # ホストの /var/lib/node-exporter/textfile に書いた *.prom をそのままメトリクスにする。
+          # extraArgs はリストごと置き換わるので、チャート既定の 2 つ (filesystem の除外) も残す。
+          extraArgs:
+            - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/containerd/.+|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+            - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|erofs)$
+            - --collector.textfile.directory=/host/root/var/lib/node-exporter/textfile
         loki:
           isDefault: false
         grafana:

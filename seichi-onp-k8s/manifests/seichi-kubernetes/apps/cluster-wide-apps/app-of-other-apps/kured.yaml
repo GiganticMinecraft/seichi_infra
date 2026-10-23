@@ -52,7 +52,12 @@ spec:
           # drain による Pod 再作成で heap は一旦初期化されるが根本原因は解消しない
           # アプリ固有アラートであり、賑わい時間帯に warning が長時間 firing し続けて
           # クラスタ全体のノード保守を止めうるため除外する
-          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled|ConifersMigrationJobFailed|ArgoCDAppDegraded|ArgoCDAppSyncFailed|ArgoCDAppOutOfSyncTooLong|McserverOldGenHighAfterCollection|McserverFullGcStorm|McserverMemoryNearLimit)$"
+          # Trivy*: Trivy Operator / ノードスキャン / KBOM スキャンの基盤故障アラート (trivy-operator-alerts,
+          # trivy-node-scanner-alerts)。スキャンが止まっていてもノードの再起動 (むしろ脆弱性の解消手段) を
+          # 止める理由は無く、mirror.gcr.io の障害などで長時間 firing しうるので除外する。
+          # NodeTextFileCollectorScrapeError: textfile collector を使っているのは trivy-node-scanner だけで、
+          # ディレクトリ作成前などの一時的なエラーで全ノードの保守を止めないよう除外する
+          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled|ConifersMigrationJobFailed|ArgoCDAppDegraded|ArgoCDAppSyncFailed|ArgoCDAppOutOfSyncTooLong|McserverOldGenHighAfterCollection|McserverFullGcStorm|McserverMemoryNearLimit|Trivy[A-Za-z]+|NodeTextFileCollectorScrapeError)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、
