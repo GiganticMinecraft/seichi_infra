@@ -10,8 +10,11 @@ OUT="${OUT_DIR}/trivy_node.prom"
 RUNNING_KERNEL="$(uname -r)"
 RUNNING_KERNEL_BASE="$(echo "${RUNNING_KERNEL}" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+-[0-9]+).*/\1/')"
 
-# 全ノードが同時に DB を取りに行かないよう、初回だけ開始時刻をずらす
-jitter=$(( $(od -An -N2 -tu2 /dev/urandom | tr -d ' ') % ${SCAN_JITTER_SECONDS} ))
+# 全ノードが同時に DB を取りに行かないよう、初回だけ開始時刻をずらす (0 ならずらさない)
+jitter=0
+if [ "${SCAN_JITTER_SECONDS:-0}" -gt 0 ] 2>/dev/null; then
+  jitter=$(( $(od -An -N2 -tu2 /dev/urandom | tr -d ' ') % SCAN_JITTER_SECONDS ))
+fi
 echo "first scan in ${jitter}s (running kernel ${RUNNING_KERNEL})"
 sleep "${jitter}"
 
@@ -74,5 +77,6 @@ while true; do
   } > "${OUT}.tmp" && mv "${OUT}.tmp" "${OUT}"
   echo "scan finished rc=${rc} duration=$((end - start))s series=$(wc -l < /tmp/vulns.prom | tr -d ' ')"
   rm -f /tmp/vulns.tsv /tmp/vulns.prom
-  sleep "${SCAN_INTERVAL_SECONDS}"
+  # 失敗 (DB 取得の一時的な失敗など) は 24h 待たずに再試行する
+  if [ "${rc}" -eq 0 ]; then sleep "${SCAN_INTERVAL_SECONDS}"; else sleep "${SCAN_RETRY_SECONDS:-3600}"; fi
 done

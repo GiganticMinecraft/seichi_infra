@@ -116,7 +116,7 @@ Trivy Operator が見るのはコンテナイメージとクラスタの設定�
 - ホストのルートはマウントせず、`/usr/lib/os-release`、`/etc/os-release`、`/etc/lsb-release`、`/var/lib/dpkg` だけを読み取り専用でマウントする。ルート全体を走査すると containerd のイメージ層まで読んで 512Mi で即 OOMKilled した。`/etc/lsb-release` が無いと Trivy は OS を判定できず 0 件になる
 - 脆弱性 DB は Pod ごとに取得する (Standalone)。クラスタ内の trivy-server を使うと、旧カーネルの残骸があるノードの結果 (6 万件規模) をサーバーが処理しきれず、2 ノード同時で trivy-server が OOMKilled した
 - 結果は「パッケージ × 重大度の件数」に集約して出す。CVE 単位だと 1 ノード 1 万系列を超える
-- `kind` ラベルで 3 つに分ける。スクリプトが `uname -r` (コンテナはホストのカーネルを共有する) と比べて判定する
+- `kind` ラベルで 4 つに分ける。スクリプトが `uname -r` (コンテナはホストのカーネルを共有する) と比べて判定する
 
 | `kind` | 意味 | 対応 |
 |---|---|---|
@@ -126,7 +126,8 @@ Trivy Operator が見るのはコンテナイメージとクラスタの設定�
 | `stale-kernel` | 動いていない旧カーネルの残骸 | `apt autoremove --purge` で消す。実害は無いが件数が大きく見える |
 
 - 見方: ダッシュボードの「対応が必要な脆弱性」(`stale-kernel` を除いた件数) が 0 かどうかを見る
-- スキャンが失敗したときは前回成功時の件数を残し、`trivy_node_scan_success` だけを 0 にする (0 件 = 問題なしに見えないように)
+- スキャンが失敗したときは前回成功時の件数を残し、`trivy_node_scan_success` だけを 0 にする (0 件 = 問題なしに見えないように)。失敗時は 1 時間後に再試行する
+- Pod の停止時 (preStop) に textfile を消す。DaemonSet を消したあとも node-exporter が古い値を出し続けないように
 
 ### Kubernetes コンポーネント (KBOM)
 

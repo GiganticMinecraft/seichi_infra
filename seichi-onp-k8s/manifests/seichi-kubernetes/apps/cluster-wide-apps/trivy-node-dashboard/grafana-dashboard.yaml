@@ -519,7 +519,7 @@ data:
           "id": 9,
           "type": "table",
           "title": "最新の KBOM スキャン",
-          "description": "CronJob trivy-kbom (毎日 05:30 JST) の実行結果の要約。components はクラスタの KBOM に含まれるコンポーネント数。",
+          "description": "CronJob trivy-kbom (毎日 05:30 JST) の直近 26 時間の実行結果。bom_refs は KBOM に含まれる要素数 (クラスタ自身を含む)。行が無ければ実行されていない。",
           "datasource": {
             "type": "loki",
             "uid": "${loki_datasource}"
@@ -567,22 +567,22 @@ data:
                 "includeByName": {
                   "Time": true,
                   "success": true,
-                  "components": true,
                   "vulnerabilities": true,
                   "fixable": true,
                   "duration_seconds": true,
                   "stage": true,
-                  "error": true
+                  "error": true,
+                  "bom_refs": true
                 },
                 "renameByName": {
                   "Time": "時刻",
                   "success": "成功",
-                  "components": "コンポーネント数",
                   "vulnerabilities": "脆弱性",
                   "fixable": "修正版あり",
                   "duration_seconds": "所要秒",
                   "stage": "失敗段階",
-                  "error": "エラー"
+                  "error": "エラー",
+                  "bom_refs": "要素数"
                 }
               }
             }
@@ -594,7 +594,7 @@ data:
           "id": 10,
           "type": "table",
           "title": "Kubernetes コンポーネントの脆弱性",
-          "description": "直近 2 日の KBOM スキャンで見つかった MEDIUM 以上の脆弱性 (kubelet / apiserver / controller-manager / etcd / containerd 等)。修正版が空のものは全バージョンが影響を受ける既知の問題で、設定 (例: gitRepo ボリュームを使わない) で回避する類のもの。",
+          "description": "直近 26 時間 (= 直近 1 回) の KBOM スキャンで見つかった MEDIUM 以上の脆弱性 (kubelet / apiserver / controller-manager / etcd / containerd 等)。修正版が空のものは全バージョンが影響を受ける既知の問題で、設定 (例: gitRepo ボリュームを使わない) で回避する類のもの。行が無いときは「最新の KBOM スキャン」で実行されたかを確認する。",
           "datasource": {
             "type": "loki",
             "uid": "${loki_datasource}"

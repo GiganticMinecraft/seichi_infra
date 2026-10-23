@@ -28,5 +28,6 @@ trivy sbom /tmp/kbom.json \
 grep -v '^[[:space:]]*$' /tmp/vulns.jsonl
 total=$(grep -c '"event":"trivy_kbom_vulnerability"' /tmp/vulns.jsonl)
 fixable=$(grep '"event":"trivy_kbom_vulnerability"' /tmp/vulns.jsonl | grep -vc '"fixed_version":""')
-components=$(grep -o '"bom-ref"' /tmp/kbom.json | wc -l | tr -d ' ')
-echo "{\"event\":\"trivy_kbom_scan\",\"success\":true,\"components\":${components},\"vulnerabilities\":${total},\"fixable\":${fixable},\"duration_seconds\":$(( $(date +%s) - start ))}"
+# KBOM 内の bom-ref の数 (ルートの metadata.component を含むので、厳密なコンポーネント数より 1 つ多い)
+bom_refs=$(grep -o '"bom-ref"' /tmp/kbom.json | wc -l | tr -d ' ')
+echo "{\"event\":\"trivy_kbom_scan\",\"success\":true,\"bom_refs\":${bom_refs},\"vulnerabilities\":${total},\"fixable\":${fixable},\"duration_seconds\":$(( $(date +%s) - start ))}"

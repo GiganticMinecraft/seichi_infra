@@ -33,6 +33,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: kbom
+              # Renovate (kubernetes manager) がタグを追従する。Trivy Operator チャートの trivy.image.tag と揃える
               image: mirror.gcr.io/aquasec/trivy:0.75.0
               command: ["/bin/sh", "/scripts/kbom.sh"]
               env:
@@ -42,12 +43,15 @@ spec:
                   value: MEDIUM,HIGH,CRITICAL
               # memory.peak は DB を書く emptyDir のページキャッシュ込みで 1Gi に張り付いた
               resources:
+                # 脆弱性 DB (展開後 1.55GiB) を /tmp の emptyDir に置く
                 requests:
                   cpu: 50m
                   memory: 128Mi
+                  ephemeral-storage: 2Gi
                 limits:
                   cpu: "1"
                   memory: 1Gi
+                  ephemeral-storage: 4Gi
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -65,4 +69,4 @@ spec:
                 name: trivy-node-scanner-scripts
             - name: tmp
               emptyDir:
-                sizeLimit: 1Gi
+                sizeLimit: 3Gi

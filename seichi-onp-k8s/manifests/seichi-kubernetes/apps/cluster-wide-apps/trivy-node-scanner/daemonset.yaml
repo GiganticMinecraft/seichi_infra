@@ -42,8 +42,15 @@ spec:
           effect: NoSchedule
       containers:
         - name: scanner
+          # Renovate (kubernetes manager) がタグを追従する。Trivy Operator チャートの trivy.image.tag と揃える
           image: mirror.gcr.io/aquasec/trivy:0.75.0
           command: ["/bin/sh", "/scripts/node-scan.sh"]
+          lifecycle:
+            # 停止時 (DaemonSet の削除・ノードからの退去) に textfile を消す。残すと node-exporter が
+            # 最後の値を出し続け、止まったスキャンが「最新」に見える。更新時に消えた分は次のスキャンで戻る。
+            preStop:
+              exec:
+                command: ["/bin/rm", "-f", "/textfile/trivy_node.prom"]
           env:
             - name: TRIVY_DB_REPOSITORY
               value: mirror.gcr.io/aquasec/trivy-db:2
@@ -55,17 +62,27 @@ spec:
             # 全ノードが同時に DB を取りに行かないよう、初回の開始を最大 1 時間ずらす
             - name: SCAN_JITTER_SECONDS
               value: "3600"
-          # 実測 (2026-10-23): 1 ノード 6〜9 秒。memory.peak は DB を書く emptyDir の
-          # ページキャッシュ込みで上限まで張り付くが、匿名メモリは 650〜850Mi 程度。
-          # スキャン中だけとはいえ requests を大きく下回ると逼迫したノードで他の Pod が
-          # evict されうるので、旧カーネルの残骸を消した後の想定 (~500Mi) に合わせる。
+            # 失敗時の再試行間隔
+            - name: SCAN_RETRY_SECONDS
+              value: "3600"
+          # 実測 (2026-10-23): 1 ノード 6〜9 秒 / 日。memory.peak は DB を書く emptyDir の
+          # ページキャッシュ込みで上限まで張り付くが、匿名メモリは 650〜850Mi 程度
+          # (旧カーネル残骸の 6 万件規模の結果を含む。残骸を消せば小さくなる)。
+          # スキャン中以外は sleep しているだけなので、実使用に合わせて requests を積むと
+          # 6 ノードで常時 3〜5Gi を確保することになる (wk-2/wk-3 は requests が 8 割超)。
+          # requests を超えて使う Pod はノードのメモリ逼迫時に kubelet が先に evict するので、
+          # 逼迫時に犠牲になるのはこの Pod の方 (スキャンは 1 時間後に再試行される)。
           resources:
+            # 脆弱性 DB は展開後 1.55GiB (2026-10-23 実測) あり、/tmp の emptyDir に置く。
+            # 1Gi の sizeLimit では kubelet に evict された。
             requests:
               cpu: 10m
-              memory: 512Mi
+              memory: 256Mi
+              ephemeral-storage: 2Gi
             limits:
               cpu: "1"
               memory: 1536Mi
+              ephemeral-storage: 4Gi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -78,7 +95,10 @@ spec:
             - name: etc-os-release
               mountPath: /host/etc/os-release
               readOnly: true
-            # Trivy の Ubuntu 判定は etc/lsb-release を見る (無いと OS が none になり 0 件になる)
+            # Trivy の Ubuntu 判定は etc/lsb-release を見る (無いと OS が none になり 0 件になる)。
+            # ファイル単位の bind mount なので、置き換えられると古い inode を見続ける。ただし
+            # リリースアップグレードは再起動を伴い、そのときコンテナが作り直されてマウントし直される。
+            # ポイントリリースの更新 (26.04.1 → 26.04.2) では VERSION_ID が変わらず判定に影響しない。
             - name: etc-lsb-release
               mountPath: /host/etc/lsb-release
               readOnly: true
@@ -120,4 +140,4 @@ spec:
             name: trivy-node-scanner-scripts
         - name: tmp
           emptyDir:
-            sizeLimit: 1Gi
+            sizeLimit: 3Gi
