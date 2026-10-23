@@ -7,3 +7,69 @@ resources:
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.3.1/deploy/kubernetes/v1.20/node.yml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.3.1/deploy/kubernetes/v1.20/snapshotter/snapshotter.yaml
   - https://raw.githubusercontent.com/SynologyOpenSource/synology-csi/v1.3.1/deploy/kubernetes/v1.20/snapshotter/volume-snapshot-class.yml
+
+# 上流のマニフェスト (v1.3.1、最新の v1.4.0 も同じ) はサイドカーが 2021 年版のままで、
+# ベース OS が Debian 10 (EOL) になっている。ドライバ本体は v1.3.1 のまま、サイドカーだけ
+# distroless の最新版に差し替える。上流が deploy のサイドカーを上げたらこの上書きは外す。
+images:
+  - name: registry.k8s.io/sig-storage/csi-attacher
+    newTag: v4.13.0
+  - name: registry.k8s.io/sig-storage/csi-provisioner
+    newTag: v6.4.0
+  - name: registry.k8s.io/sig-storage/csi-resizer
+    newTag: v2.3.0
+  - name: registry.k8s.io/sig-storage/csi-snapshotter
+    newTag: v8.7.0
+  - name: registry.k8s.io/sig-storage/csi-node-driver-registrar
+    newTag: v2.18.0
+
+# 新しいサイドカーが必要とする権限を足す (各サイドカーの deploy/kubernetes/rbac.yaml との差分)。
+patches:
+  - target:
+      kind: ClusterRole
+      name: synology-csi-controller-role
+    patch: |-
+      # csi-provisioner v6: スナップショットからの復元で VolumeSnapshot を watch / update する
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: ["snapshot.storage.k8s.io"]
+          resources: ["volumesnapshots"]
+          verbs: ["watch", "update"]
+      # csi-resizer v2: VolumeAttributesClass (GA) を参照する
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: ["storage.k8s.io"]
+          resources: ["volumeattributesclasses"]
+          verbs: ["get", "list", "watch"]
+  - target:
+      kind: ClusterRole
+      name: synology-csi-snapshotter-role
+    patch: |-
+      # csi-snapshotter v8: VolumeSnapshotContent を patch で更新する
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: ["snapshot.storage.k8s.io"]
+          resources: ["volumesnapshotcontents", "volumesnapshotcontents/status"]
+          verbs: ["patch"]
+      # csi-snapshotter v8: VolumeGroupSnapshot (GA、既定で有効) の informer
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: ["groupsnapshot.storage.k8s.io"]
+          resources: ["volumegroupsnapshotclasses"]
+          verbs: ["get", "list", "watch"]
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: ["groupsnapshot.storage.k8s.io"]
+          resources: ["volumegroupsnapshotcontents"]
+          verbs: ["get", "list", "watch", "update", "patch"]
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups: ["groupsnapshot.storage.k8s.io"]
+          resources: ["volumegroupsnapshotcontents/status"]
+          verbs: ["update", "patch"]
