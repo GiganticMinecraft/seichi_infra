@@ -72,6 +72,14 @@
       ],
     },
     {
+      // hubble-observer のイメージ (quay.io/cilium/cilium) は Cilium と同じバージョンにそろえる
+      matchPackageNames: [
+        'cilium',
+        'quay.io/cilium/cilium',
+      ],
+      groupName: 'Cilium',
+    },
+    {
       // synology-csi のサイドカーは上流マニフェストの ClusterRole を kustomize で補っているので、
       // 新しいサイドカーが要求する権限が足りないと provisioning やスナップショットが止まる。
       matchManagers: [
@@ -230,6 +238,18 @@
         '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)[\\s\\S]*?tag: "(?<currentValue>[^"]+)"',
       ],
       versioningTemplate: 'semver-coerced',
+    },
+    {
+      // hubble-observer は Cilium Agent のイメージ同梱の hubble を使うので、
+      // Application の values (YAML block scalar 内) のタグを追従する。
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/cluster-wide-apps/app-of-other-apps/hubble-observer[.]yaml$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s+tag: (?<currentValue>v[\\d.]+)',
+      ],
+      versioningTemplate: 'semver',
     },
     {
       customType: 'regex',

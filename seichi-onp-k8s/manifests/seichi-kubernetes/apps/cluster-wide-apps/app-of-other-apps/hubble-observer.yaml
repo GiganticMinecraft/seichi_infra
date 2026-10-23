@@ -31,6 +31,16 @@ spec:
         # `--verdict <値>` にそのまま埋め込むが、hubble CLI はカンマ区切りを
         # 受け付けない (実測: invalid argument "DROPPED,AUDIT")。
         verdictFilter: "AUDIT"
+        # hubble CLI 単体のイメージ (quay.io/cilium/hubble、チャートの既定値) は
+        # v1.16.4 (Alpine 3.20、EOL) で配布が止まっている。上流は Cilium Agent の
+        # イメージに同梱の hubble を使う方針 (cilium/hubble#1631) なので、それに
+        # 差し替える。チャートは `/bin/sh -c "hubble observe ..."` で起動するので
+        # そのまま動く。タグは cilium.yaml の Cilium と同じにする (各ノードに既に
+        # あるイメージなので pull も起きない)。Renovate は Cilium の chart と同じ PR で上げる。
+        image:
+          repository: quay.io/cilium/cilium
+          # renovate: datasource=docker depName=quay.io/cilium/cilium
+          tag: v1.20.3
         hubbleRelay:
           serviceName: hubble-relay
           port: "80"
