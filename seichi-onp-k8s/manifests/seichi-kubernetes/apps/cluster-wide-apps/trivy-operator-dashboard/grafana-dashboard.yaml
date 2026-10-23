@@ -201,7 +201,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "重大度 Critical の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。",
+          "description": "重大度ごとの検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。Unknown は「未評価」ではない。trivy.severity: MEDIUM,HIGH,CRITICAL で LOW は既に除外済みで、Unknown は Trivy 自身は MEDIUM 以上と判定しているが、Operator がレポートの重大度に使うベンダー severity (VendorSeverity[SeveritySource]) が無い CVE。Go の stdlib / golang.org/x/* や一部の GHSA 由来 JAR の CVE が主で、全体の 7 割近くを占める。MEDIUM〜HIGH 相当として扱い、隠さずに見ること。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -212,7 +212,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "green",
                     "value": null
                   }
                 ]
@@ -220,11 +220,132 @@ data:
               "unit": "none",
               "noValue": "0"
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Critical"
+                },
+                "properties": [
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "red",
+                          "value": 1
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "High"
+                },
+                "properties": [
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "orange",
+                          "value": 1
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Medium"
+                },
+                "properties": [
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "yellow",
+                          "value": 1
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Unknown"
+                },
+                "properties": [
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "blue",
+                          "value": 1
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Unknown (≥Medium)"
+                },
+                "properties": [
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "green",
+                          "value": null
+                        },
+                        {
+                          "color": "blue",
+                          "value": 1
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "gridPos": {
             "h": 4,
-            "w": 3,
+            "w": 12,
             "x": 8,
             "y": 1
           },
@@ -233,7 +354,7 @@ data:
             "colorMode": "value",
             "graphMode": "none",
             "justifyMode": "auto",
-            "orientation": "auto",
+            "orientation": "vertical",
             "reduceOptions": {
               "calcs": [
                 "lastNotNull"
@@ -242,7 +363,7 @@ data:
               "values": false
             },
             "showPercentChange": false,
-            "textMode": "auto",
+            "textMode": "value_and_name",
             "wideLayout": true
           },
           "targets": [
@@ -252,213 +373,43 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"Critical\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
+              "expr": "count by (severity) (count by (severity, vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity!=\"Low\"})) or label_replace(vector(0), \"severity\", \"Critical\", \"\", \"\") or label_replace(vector(0), \"severity\", \"High\", \"\", \"\") or label_replace(vector(0), \"severity\", \"Medium\", \"\", \"\") or label_replace(vector(0), \"severity\", \"Unknown\", \"\", \"\")",
               "refId": "A",
               "instant": true,
               "range": false,
-              "format": "time_series"
+              "format": "time_series",
+              "legendFormat": "{{severity}}"
             }
           ],
-          "title": "Critical",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "description": "重大度 High の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "orange",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none",
-              "noValue": "0"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 11,
-            "y": 1
-          },
-          "id": 5,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "targets": [
+          "title": "重大度別の検出数",
+          "type": "stat",
+          "transformations": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"High\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
-              "refId": "A",
-              "instant": true,
-              "range": false,
-              "format": "time_series"
-            }
-          ],
-          "title": "High",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "description": "重大度 Medium の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "yellow",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none",
-              "noValue": "0"
+              "id": "joinByField",
+              "options": {
+                "byField": "Time",
+                "mode": "outer"
+              }
             },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 14,
-            "y": 1
-          },
-          "id": 6,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"Medium\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
-              "refId": "A",
-              "instant": true,
-              "range": false,
-              "format": "time_series"
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "indexByName": {
+                  "Time": 0,
+                  "Critical": 1,
+                  "High": 2,
+                  "Medium": 3,
+                  "Unknown": 4
+                },
+                "renameByName": {
+                  "Unknown": "Unknown (≥Medium)"
+                }
+              }
             }
-          ],
-          "title": "Medium",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "description": "重大度 Unknown の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。 Unknown は「未評価」ではない。trivy.severity: MEDIUM,HIGH,CRITICAL で LOW は既に除外済みで、Unknown は Trivy 自身は MEDIUM 以上と判定しているが、Operator がレポートの重大度に使うベンダー severity (VendorSeverity[SeveritySource]) が無い CVE。Go の stdlib / golang.org/x/* や一部の GHSA 由来 JAR の CVE が主で、全体の 7 割近くを占める。MEDIUM〜HIGH 相当として扱い、隠さずに見ること。",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "blue",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "none",
-              "noValue": "0"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 17,
-            "y": 1
-          },
-          "id": 7,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"Unknown\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
-              "refId": "A",
-              "instant": true,
-              "range": false,
-              "format": "time_series"
-            }
-          ],
-          "title": "Unknown (MEDIUM 以上)",
-          "type": "stat"
+          ]
         },
         {
           "datasource": {
@@ -496,7 +447,7 @@ data:
             "x": 20,
             "y": 1
           },
-          "id": 8,
+          "id": 5,
           "options": {
             "colorMode": "value",
             "graphMode": "none",
@@ -538,7 +489,7 @@ data:
             "x": 0,
             "y": 5
           },
-          "id": 9,
+          "id": 6,
           "panels": [],
           "title": "イメージ別",
           "type": "row"
@@ -709,30 +660,6 @@ data:
                     "value": 100
                   }
                 ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "namespace"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 200
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "digest"
-                },
-                "properties": [
-                  {
-                    "id": "custom.width",
-                    "value": 130
-                  }
-                ]
               }
             ]
           },
@@ -742,7 +669,7 @@ data:
             "x": 0,
             "y": 6
           },
-          "id": 10,
+          "id": 7,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -768,44 +695,8 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (key, severity) (label_join(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest_short\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"), \"key\", \" | \", \"namespace\", \"image\", \"digest_short\"))",
               "refId": "A",
-              "instant": true,
-              "range": false,
-              "format": "table"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
-              "refId": "B",
-              "instant": true,
-              "range": false,
-              "format": "table"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
-              "refId": "C",
-              "instant": true,
-              "range": false,
-              "format": "table"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
-              "refId": "D",
               "instant": true,
               "range": false,
               "format": "table"
@@ -814,31 +705,27 @@ data:
           "title": "イメージ別の脆弱性件数",
           "transformations": [
             {
-              "id": "merge",
-              "options": {}
+              "id": "groupingToMatrix",
+              "options": {
+                "columnField": "severity",
+                "rowField": "key",
+                "valueField": "Value",
+                "emptyValue": "zero"
+              }
             },
             {
               "id": "organize",
               "options": {
-                "excludeByName": {
-                  "Time": true
-                },
+                "excludeByName": {},
                 "indexByName": {
-                  "namespace": 0,
-                  "image": 1,
-                  "image_digest": 2,
-                  "Value #A": 3,
-                  "Value #B": 4,
-                  "Value #C": 5,
-                  "Value #D": 6
+                  "key\\severity": 0,
+                  "Critical": 1,
+                  "High": 2,
+                  "Medium": 3,
+                  "Unknown": 4
                 },
                 "renameByName": {
-                  "Value #A": "Critical",
-                  "Value #B": "High",
-                  "Value #C": "Medium",
-                  "Value #D": "Unknown",
-                  "image": "イメージ",
-                  "image_digest": "digest"
+                  "key\\severity": "namespace | イメージ | digest"
                 }
               }
             }
@@ -853,7 +740,7 @@ data:
             "x": 0,
             "y": 18
           },
-          "id": 11,
+          "id": 8,
           "panels": [],
           "title": "CVE 別",
           "type": "row"
@@ -863,7 +750,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "脆弱性 ID × パッケージごとに 1 行で、影響を受けるイメージ (digest 単位) の数を出す。同じイメージを使うワークロードや完了 Job がいくつあっても 1 と数えるので、「どのパッケージを上げると何イメージ分が片付くか」の目安になる。重大度はベースイメージのディストリビューションごとにベンダー評価が違うことがあるので、影響イメージの中で最も高いものを出す。インストール済み・修正版のバージョンはイメージごとに違うので表には出さない (NVD / OSV のリンク先か、ワークロード別の表のイメージで確認する)。「除外するパッケージ」変数で Go 標準ライブラリ・golang.org/x を外せる (Go バイナリを含むイメージが多く、同じ stdlib の CVE が数十イメージに出るため)。「重大度」変数で絞り込める。重大度 Unknown は MEDIUM 以上でベンダー評価が無いもの。",
+          "description": "脆弱性 ID × パッケージごとに 1 行で、影響を受けるイメージ (digest 単位) の数を出す。同じイメージを使うワークロードや完了 Job がいくつあっても 1 と数えるので、「どのパッケージを上げると何イメージ分が片付くか」の目安になる。重大度はベースイメージのディストリビューションごとにベンダー評価が違うことがあるので、影響イメージの中で最も高いものを出す。順位は Critical > High > Unknown (≥Medium) > Medium とする (Unknown は MEDIUM 以上であることしか分からないので、Medium より上・High より下に置く)。インストール済み・修正版のバージョンはイメージごとに違うので表には出さない (NVD / OSV のリンク先か、ワークロード別の表のイメージで確認する)。「除外するパッケージ」変数で Go 標準ライブラリ・golang.org/x を外せる (Go バイナリを含むイメージが多く、同じ stdlib の CVE が数十イメージに出るため)。「重大度」変数で絞り込める。重大度 Unknown は MEDIUM 以上でベンダー評価が無いもの。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -924,7 +811,7 @@ data:
                 "properties": [
                   {
                     "id": "custom.width",
-                    "value": 100
+                    "value": 150
                   },
                   {
                     "id": "custom.cellOptions",
@@ -938,12 +825,12 @@ data:
                       {
                         "type": "value",
                         "options": {
-                          "4": {
+                          "5": {
                             "text": "Critical",
                             "color": "red",
                             "index": 0
                           },
-                          "3": {
+                          "4": {
                             "text": "High",
                             "color": "orange",
                             "index": 1
@@ -953,8 +840,8 @@ data:
                             "color": "yellow",
                             "index": 2
                           },
-                          "1": {
-                            "text": "Unknown",
+                          "3": {
+                            "text": "Unknown (≥Medium)",
                             "color": "blue",
                             "index": 3
                           }
@@ -996,7 +883,7 @@ data:
             "x": 0,
             "y": 19
           },
-          "id": 12,
+          "id": 9,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -1034,7 +921,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (vuln_id, resource, vuln_title) ((trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Critical\"} * 0 + 4) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"High\"} * 0 + 3) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Medium\"} * 0 + 2) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Unknown\"} * 0 + 1))",
+              "expr": "max by (vuln_id, resource, vuln_title) ((trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Critical\"} * 0 + 5) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"High\"} * 0 + 4) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Unknown\"} * 0 + 3) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Medium\"} * 0 + 2))",
               "refId": "B",
               "instant": true,
               "range": false,
@@ -1080,7 +967,7 @@ data:
             "x": 0,
             "y": 33
           },
-          "id": 13,
+          "id": 10,
           "panels": [],
           "title": "ワークロード別",
           "type": "row"
@@ -1260,7 +1147,7 @@ data:
             "x": 0,
             "y": 34
           },
-          "id": 14,
+          "id": 11,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -1286,44 +1173,8 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (key, severity) (label_join(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"key\", \" | \", \"namespace\", \"resource_kind\", \"resource_name\", \"container_name\", \"image\"))",
               "refId": "A",
-              "instant": true,
-              "range": false,
-              "format": "table"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
-              "refId": "B",
-              "instant": true,
-              "range": false,
-              "format": "table"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
-              "refId": "C",
-              "instant": true,
-              "range": false,
-              "format": "table"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${datasource}"
-              },
-              "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
-              "refId": "D",
               "instant": true,
               "range": false,
               "format": "table"
@@ -1332,35 +1183,27 @@ data:
           "title": "ワークロード別の脆弱性件数",
           "transformations": [
             {
-              "id": "merge",
-              "options": {}
+              "id": "groupingToMatrix",
+              "options": {
+                "columnField": "severity",
+                "rowField": "key",
+                "valueField": "Value",
+                "emptyValue": "zero"
+              }
             },
             {
               "id": "organize",
               "options": {
-                "excludeByName": {
-                  "Time": true
-                },
+                "excludeByName": {},
                 "indexByName": {
-                  "namespace": 0,
-                  "resource_kind": 1,
-                  "resource_name": 2,
-                  "container_name": 3,
-                  "image": 4,
-                  "Value #A": 5,
-                  "Value #B": 6,
-                  "Value #C": 7,
-                  "Value #D": 8
+                  "key\\severity": 0,
+                  "Critical": 1,
+                  "High": 2,
+                  "Medium": 3,
+                  "Unknown": 4
                 },
                 "renameByName": {
-                  "Value #A": "Critical",
-                  "Value #B": "High",
-                  "Value #C": "Medium",
-                  "Value #D": "Unknown",
-                  "resource_kind": "種別",
-                  "resource_name": "リソース名",
-                  "container_name": "コンテナ",
-                  "image": "イメージ"
+                  "key\\severity": "namespace | 種別 | リソース名 | コンテナ | イメージ"
                 }
               }
             }
@@ -1375,7 +1218,7 @@ data:
             "x": 0,
             "y": 46
           },
-          "id": 15,
+          "id": 12,
           "panels": [],
           "title": "EOL ベース OS",
           "type": "row"
@@ -1413,7 +1256,7 @@ data:
             "x": 0,
             "y": 47
           },
-          "id": 16,
+          "id": 13,
           "options": {
             "displayMode": "basic",
             "minVizHeight": 16,
@@ -1487,7 +1330,7 @@ data:
             "x": 8,
             "y": 47
           },
-          "id": 17,
+          "id": 14,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -1555,7 +1398,7 @@ data:
             "x": 0,
             "y": 55
           },
-          "id": 18,
+          "id": 15,
           "panels": [],
           "title": "設定監査・RBAC・インフラ・コンプライアンス",
           "type": "row"
@@ -1565,7 +1408,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ConfigAuditReport (Pod の securityContext・リソース指定など、ワークロード定義の設定ミス) の失敗件数を重大度別に合計したもの。namespace 変数が効く。",
+          "description": "ConfigAuditReport (Pod の securityContext・リソース指定など、ワークロード定義の設定ミス) の失敗件数を重大度別に合計したもの。namespace 変数と「リソース種別」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1668,7 +1511,7 @@ data:
             "x": 0,
             "y": 56
           },
-          "id": 19,
+          "id": 16,
           "options": {
             "displayMode": "basic",
             "minVizHeight": 16,
@@ -1693,7 +1536,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum by (severity) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"})",
+              "expr": "sum by (severity) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity!=\"Low\"})",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1797,7 +1640,7 @@ data:
             "x": 6,
             "y": 56
           },
-          "id": 20,
+          "id": 17,
           "options": {
             "displayMode": "basic",
             "minVizHeight": 16,
@@ -1881,7 +1724,7 @@ data:
             "x": 12,
             "y": 56
           },
-          "id": 21,
+          "id": 18,
           "options": {
             "colorMode": "value",
             "graphMode": "none",
@@ -2000,7 +1843,7 @@ data:
             "x": 16,
             "y": 56
           },
-          "id": 22,
+          "id": 19,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -2073,7 +1916,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ConfigAuditReport の失敗件数をリソースごとに出したもの (失敗が 1 件以上のリソースだけ)。High 以上が多いリソースから securityContext などを見直す。",
+          "description": "ConfigAuditReport の失敗件数をリソースごとに出したもの (失敗が 1 件以上のリソースだけ)。High 以上が多いリソースから securityContext などを見直す。namespace 変数と「リソース種別」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2209,7 +2052,7 @@ data:
             "x": 0,
             "y": 62
           },
-          "id": 23,
+          "id": 20,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -2235,7 +2078,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=~\"Critical|High|Medium\"}) > 0)",
+              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"Critical\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=~\"Critical|High|Medium\"}) > 0)",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2247,7 +2090,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=~\"Critical|High|Medium\"}) > 0)",
+              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"High\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=~\"Critical|High|Medium\"}) > 0)",
               "refId": "B",
               "instant": true,
               "range": false,
@@ -2259,7 +2102,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=~\"Critical|High|Medium\"}) > 0)",
+              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=\"Medium\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", severity=~\"Critical|High|Medium\"}) > 0)",
               "refId": "C",
               "instant": true,
               "range": false,
@@ -2336,7 +2179,7 @@ data:
             "x": 12,
             "y": 62
           },
-          "id": 24,
+          "id": 21,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -2433,7 +2276,7 @@ data:
             "x": 18,
             "y": 62
           },
-          "id": 25,
+          "id": 22,
           "options": {
             "cellHeight": "sm",
             "footer": {
@@ -2500,7 +2343,7 @@ data:
             "x": 0,
             "y": 71
           },
-          "id": 26,
+          "id": 23,
           "panels": [],
           "title": "運用",
           "type": "row"
@@ -2510,7 +2353,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "trivy-operator の /metrics を Prometheus が取得できているか。0 / No data の間はこのダッシュボードの値が古いまま (または空) になる。",
+          "description": "trivy-operator の /metrics を Prometheus が取得できているか。ターゲットが 1 つでも取得できないか、ターゲット自体が見つからないと DOWN になる。DOWN の間はこのダッシュボードの値が古いまま (または空) になる。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2522,10 +2365,12 @@ data:
                   "options": {
                     "0": {
                       "text": "DOWN",
+                      "color": "red",
                       "index": 0
                     },
                     "1": {
                       "text": "UP",
+                      "color": "green",
                       "index": 1
                     }
                   }
@@ -2555,7 +2400,7 @@ data:
             "x": 0,
             "y": 72
           },
-          "id": 27,
+          "id": 24,
           "options": {
             "colorMode": "background",
             "graphMode": "none",
@@ -2579,7 +2424,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max(up{job=\"trivy-operator\"})",
+              "expr": "min(up{job=\"trivy-operator\"}) or vector(0)",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2594,14 +2439,14 @@ data:
             "type": "loki",
             "uid": "${loki_datasource}"
           },
-          "description": "trivy-operator のエラーログ (スキャンジョブの失敗・レポート作成の失敗など)。TrivyScanJobsFailing アラートと同じストリームを見ている。",
+          "description": "trivy-operator のエラーログ (スキャンジョブの失敗・レポート作成の失敗など)。TrivyScanJobsFailing アラートと同じストリームを見ている。スキャンジョブの失敗 (msg が Scan job container) は status_message に Trivy の FATAL の原因が入るので、その末尾 400 文字を出す。それ以外は error を出す。",
           "gridPos": {
             "h": 8,
             "w": 20,
             "x": 4,
             "y": 72
           },
-          "id": 28,
+          "id": 25,
           "options": {
             "dedupStrategy": "none",
             "enableLogDetails": true,
@@ -2621,7 +2466,7 @@ data:
               "editorMode": "code",
               "queryType": "range",
               "refId": "A",
-              "expr": "{job=\"trivy-operator/trivy-operator\"} | json | level=\"error\" | line_format \"{{.namespace_extracted}}/{{.name}} {{.msg}}: {{.error}}\""
+              "expr": "{job=\"trivy-operator/trivy-operator\"} | json | level=\"error\" | line_format \"{{.namespace_extracted}}/{{.name}} {{.msg}} {{.container_extracted}}: {{ if .status_message }}{{ .status_message | trunc -400 }}{{ else }}{{ .error }}{{ end }}\""
             }
           ],
           "title": "Operator のエラーログ",
@@ -2679,7 +2524,7 @@ data:
               "type": "prometheus",
               "uid": "${datasource}"
             },
-            "definition": "label_values(trivy_image_vulnerabilities{job=\"trivy-operator\"}, namespace)",
+            "definition": "label_values({job=\"trivy-operator\", __name__=~\"trivy_image_vulnerabilities|trivy_resource_configaudits|trivy_role_rbacassessments\"}, namespace)",
             "hide": 0,
             "includeAll": true,
             "label": "namespace",
@@ -2688,7 +2533,7 @@ data:
             "options": [],
             "query": {
               "qryType": 1,
-              "query": "label_values(trivy_image_vulnerabilities{job=\"trivy-operator\"}, namespace)",
+              "query": "label_values({job=\"trivy-operator\", __name__=~\"trivy_image_vulnerabilities|trivy_resource_configaudits|trivy_role_rbacassessments\"}, namespace)",
               "refId": "PrometheusVariableQueryEditor-VariableQuery"
             },
             "refresh": 2,
@@ -2712,17 +2557,17 @@ data:
               "type": "prometheus",
               "uid": "${datasource}"
             },
-            "definition": "label_values(trivy_image_vulnerabilities{job=\"trivy-operator\"}, resource_kind)",
-            "description": "ワークロード別の表だけに効く。Job を外すと完了 Job の履歴を除ける。",
+            "definition": "label_values({job=\"trivy-operator\", __name__=~\"trivy_image_vulnerabilities|trivy_resource_configaudits\"}, resource_kind)",
+            "description": "ワークロード別の表と設定監査 (重大度別・リソース別) に効く。Job を外すと完了 Job の履歴を除ける。",
             "hide": 0,
             "includeAll": true,
-            "label": "リソース種別",
+            "label": "リソース種別 (ワークロード・設定監査)",
             "multi": true,
             "name": "resource_kind",
             "options": [],
             "query": {
               "qryType": 1,
-              "query": "label_values(trivy_image_vulnerabilities{job=\"trivy-operator\"}, resource_kind)",
+              "query": "label_values({job=\"trivy-operator\", __name__=~\"trivy_image_vulnerabilities|trivy_resource_configaudits\"}, resource_kind)",
               "refId": "PrometheusVariableQueryEditor-VariableQuery"
             },
             "refresh": 2,
