@@ -98,7 +98,7 @@ data:
           "id": 2,
           "type": "stat",
           "title": "対応が必要な脆弱性",
-          "description": "稼働中カーネル・再起動待ちの新しいカーネル・通常のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。動いていない旧カーネルの残骸 (stale-kernel) は含まない。0 以外ならパッケージ更新か再起動が必要。",
+          "description": "稼働中カーネル・再起動待ちの新しいカーネル・通常のパッケージで、修正版がある MEDIUM 以上の脆弱性の件数 (ノード合計)。動いていない旧カーネルの残骸 (stale-kernel) は含まない。0 以外ならパッケージ更新か再起動が必要。 スキャン結果がまだ無いときは「データなし」になる (0 ではない)。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -116,7 +116,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind!=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or vector(0)",
+              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind!=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
               "instant": true
             }
           ],
@@ -138,7 +138,8 @@ data:
                     "value": 1
                   }
                 ]
-              }
+              },
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -177,7 +178,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind=\"running-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or vector(0)",
+              "expr": "sum((sum by (instance) (trivy_node_vulnerabilities{kind=\"running-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
               "instant": true
             }
           ],
@@ -199,7 +200,8 @@ data:
                     "value": 1
                   }
                 ]
-              }
+              },
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -238,7 +240,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "count((count by (instance, pkg_name) (trivy_node_vulnerabilities{kind=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"}) or vector(0)",
+              "expr": "count((count by (instance, pkg_name) (trivy_node_vulnerabilities{kind=\"stale-kernel\"})) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
               "instant": true
             }
           ],
@@ -260,7 +262,8 @@ data:
                     "value": 1
                   }
                 ]
-              }
+              },
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -280,8 +283,8 @@ data:
         {
           "id": 5,
           "type": "stat",
-          "title": "最も古いスキャン",
-          "description": "各ノードの最終スキャンからの経過時間の最大値。スキャンは 1 日 1 回なので 1 日を大きく超えていれば止まっている。",
+          "title": "最も古い成功スキャン",
+          "description": "各ノードの最終成功スキャンからの経過時間の最大値 (表示中の件数がどれだけ古いか)。スキャンは 1 日 1 回なので 1 日を大きく超えていれば失敗が続いているか止まっている。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -299,7 +302,7 @@ data:
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "max((time() - trivy_node_scan_timestamp_seconds) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
+              "expr": "max((time() - trivy_node_last_success_timestamp_seconds) * on (instance) group_left (nodename) node_uname_info{nodename=~\"$node\"})",
               "instant": true
             }
           ],
@@ -325,7 +328,8 @@ data:
                     "value": 172800
                   }
                 ]
-              }
+              },
+              "noValue": "データなし"
             },
             "overrides": []
           },
@@ -376,7 +380,7 @@ data:
               },
               "instant": true,
               "format": "table",
-              "expr": "max by (nodename, release) ((time() - trivy_node_scan_timestamp_seconds) * on (instance) group_left (nodename, release) node_uname_info{nodename=~\"$node\"})"
+              "expr": "max by (nodename, release) ((time() - trivy_node_last_success_timestamp_seconds) * on (instance) group_left (nodename, release) node_uname_info{nodename=~\"$node\"})"
             }
           ],
           "fieldConfig": {
@@ -389,7 +393,7 @@ data:
               {
                 "matcher": {
                   "id": "byName",
-                  "options": "最終スキャンからの経過"
+                  "options": "最終成功からの経過"
                 },
                 "properties": [
                   {
@@ -431,7 +435,7 @@ data:
                   "kind": "種別",
                   "severity": "重大度",
                   "Value #A": "件数",
-                  "Value #B": "最終スキャンからの経過",
+                  "Value #B": "最終成功からの経過",
                   "release": "稼働中カーネル"
                 }
               }
@@ -519,7 +523,7 @@ data:
           "id": 9,
           "type": "table",
           "title": "最新の KBOM スキャン",
-          "description": "CronJob trivy-kbom (毎日 05:30 JST) の直近 26 時間の実行結果。bom_refs は KBOM に含まれる要素数 (クラスタ自身を含む)。行が無ければ実行されていない。",
+          "description": "CronJob trivy-kbom (毎日 05:30 JST) の直近 24 時間の実行結果 (= 直近 1 回。再試行があれば 2 行)。bom_refs は KBOM に含まれる要素数 (クラスタ自身を含む)。行が無ければ実行されていない。",
           "datasource": {
             "type": "loki",
             "uid": "${loki_datasource}"
@@ -587,14 +591,14 @@ data:
               }
             }
           ],
-          "timeFrom": "26h",
+          "timeFrom": "24h",
           "hideTimeOverride": false
         },
         {
           "id": 10,
           "type": "table",
           "title": "Kubernetes コンポーネントの脆弱性",
-          "description": "直近 26 時間 (= 直近 1 回) の KBOM スキャンで見つかった MEDIUM 以上の脆弱性 (kubelet / apiserver / controller-manager / etcd / containerd 等)。修正版が空のものは全バージョンが影響を受ける既知の問題で、設定 (例: gitRepo ボリュームを使わない) で回避する類のもの。行が無いときは「最新の KBOM スキャン」で実行されたかを確認する。",
+          "description": "直近 24 時間 (= 直近 1 回) の KBOM スキャンで見つかった MEDIUM 以上の脆弱性 (kubelet / apiserver / controller-manager / etcd / containerd 等)。修正版が空のものは全バージョンが影響を受ける既知の問題で、設定 (例: gitRepo ボリュームを使わない) で回避する類のもの。行が無いときは「最新の KBOM スキャン」で実行されたかを確認する。",
           "datasource": {
             "type": "loki",
             "uid": "${loki_datasource}"
@@ -716,7 +720,7 @@ data:
               }
             }
           ],
-          "timeFrom": "26h",
+          "timeFrom": "24h",
           "hideTimeOverride": false
         }
       ],

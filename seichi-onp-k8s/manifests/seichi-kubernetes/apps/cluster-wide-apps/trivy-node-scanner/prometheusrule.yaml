@@ -11,12 +11,13 @@ spec:
     - name: trivy-node-scanner-alerts
       rules:
         - alert: TrivyNodeScanFailing
-          # 値は次のスキャン (24h 後) まで残るので、失敗が 1 時間続いたら通知する。
-          # よくある原因は脆弱性 DB の取得失敗 (mirror.gcr.io) と OOMKilled。
+          # 失敗すると 1 時間後に再試行する。単発の失敗は再試行で解消するので、
+          # 再試行 1 回分より長い 2 時間続いたら通知する。
+          # よくある原因は脆弱性 DB の取得失敗 (mirror.gcr.io)、OOMKilled、OS を判定できない (マウント不備)。
           expr: |
             (trivy_node_scan_success == 0)
             * on (instance) group_left (nodename) node_uname_info
-          for: 1h
+          for: 2h
           labels:
             severity: warning
             notify: discord
@@ -24,13 +25,14 @@ spec:
             summary: "{{ $labels.nodename }} の OS パッケージスキャンが失敗しています"
             description: "kubectl -n trivy-operator logs -l app.kubernetes.io/name=trivy-node-scanner --prefix で {{ $labels.nodename }} の Pod のログを確認してください。"
         - alert: TrivyNodeScanStale
-          # スキャン間隔は 24h (+ 初回のみ最大 1h のずらし)。2 日更新が無ければ止まっている。
-          # textfile が無いノード (DaemonSet が載っていない / node-exporter が読めていない) も拾う。
+          # スキャン間隔は 24h (+ 初回のみ最大 1h のずらし)。最終「成功」から 2 日経っていれば、
+          # 表示中の件数は古い (失敗が続いている場合も含む)。
+          # 一度も成功していないノード (DaemonSet が載っていない / node-exporter が読めていない) も拾う。
           expr: |
-            (time() - trivy_node_scan_timestamp_seconds > 2 * 86400)
+            (time() - trivy_node_last_success_timestamp_seconds > 2 * 86400)
             * on (instance) group_left (nodename) node_uname_info
             or
-            (node_uname_info unless on (instance) trivy_node_scan_timestamp_seconds)
+            (node_uname_info unless on (instance) trivy_node_last_success_timestamp_seconds)
           for: 3h
           labels:
             severity: warning

@@ -126,13 +126,16 @@ Trivy Operator が見るのはコンテナイメージとクラスタの設定�
 | `stale-kernel` | 動いていない旧カーネルの残骸 | `apt autoremove --purge` で消す。実害は無いが件数が大きく見える |
 
 - 見方: ダッシュボードの「対応が必要な脆弱性」(`stale-kernel` を除いた件数) が 0 かどうかを見る
-- スキャンが失敗したときは前回成功時の件数を残し、`trivy_node_scan_success` だけを 0 にする (0 件 = 問題なしに見えないように)。失敗時は 1 時間後に再試行する
-- Pod の停止時 (preStop) に textfile を消す。DaemonSet を消したあとも node-exporter が古い値を出し続けないように
+- スキャンが失敗したときは前回成功時の件数を残し、`trivy_node_scan_success` だけを 0 にする (0 件 = 問題なしに見えないように)。表示中の件数の古さは `trivy_node_last_success_timestamp_seconds` で分かる。失敗時は 1 時間後に再試行する
+- Trivy は OS を判定できないと 0 件のまま正常終了するので、OS パッケージの結果が無いスキャンは失敗扱いにする
+- 脆弱性 DB (展開後約 1.55GiB) はスキャンごとに消す。数時間おきに更新されるので、24h 後には再取得になるため
+- textfile は Pod の停止時に消さない (再起動直後に 0 件に見えないように)。DaemonSet を撤去するときは各ノードの `/var/lib/node-exporter/textfile/trivy_node.prom` を手で消す
 
 ### Kubernetes コンポーネント (KBOM)
 
 - Trivy Operator 本体にも KBOM 機能 (`ClusterVulnerabilityReport` の `k8s-cluster`) があるが、`operator.sbomGenerationEnabled: true` が必須で、全イメージの SbomReport も作られる。CycloneDX での実測は Minecraft イメージで約 860KB、debezium で約 1.9MB (etcd の 1 リクエスト上限 1.5MiB を超えて保存できない) で、全イメージ分を etcd に載せるのは重いので使わない
 - `trivy-kbom` の権限は nodes / pods / namespaces の get / list だけ (ClusterRole `trivy-kbom`)。`--disable-node-collector` を付けているので Job は作らない
+- KBOM の照合は Trivy Operator の trivy-server に任せる (結果は数件なのでサーバーの負荷にならず、Pod ごとの DB 取得も不要)
 - Loki で直接見るとき:
 
 ```logql
@@ -146,9 +149,9 @@ Trivy Operator が見るのはコンテナイメージとクラスタの設定�
 
 | アラート | 条件 |
 |---|---|
-| `TrivyNodeScanFailing` | ノードの最終スキャンが失敗のまま 1 時間 |
-| `TrivyNodeScanStale` | 最終スキャンから 2 日以上経った、またはスキャン結果が無いノードがある状態が 3 時間 |
-| `TrivyKbomScanFailing` (Loki) | 直近 1 日に KBOM スキャンの失敗があり、同じ期間に成功が無い (再試行で成功していれば鳴らない) |
+| `TrivyNodeScanFailing` | ノードのスキャンが失敗のまま 2 時間 (1 時間後の再試行でも直らない) |
+| `TrivyNodeScanStale` | 最終成功から 2 日以上経った、または一度も成功していないノードがある状態が 3 時間 |
+| `TrivyKbomScanFailing` (Loki) | 直近 1 日に KBOM スキャンの失敗があり、同じ期間に成功が無い状態が 15 分 (再試行で成功していれば鳴らない) |
 | `TrivyKbomScanMissing` | CronJob `trivy-kbom` の最終成功から 2 日以上 (kube-state-metrics。一度も成功していない場合は作成から 2 日経つまで鳴らさない) |
 
 ## 既知の制約

@@ -7,7 +7,8 @@
 # 脆弱性 DB はクラスタ内の trivy-server を使わず、Pod ごとに取得する (Standalone)。
 # 旧カーネルのパッケージが残っているノードでは結果が 6 万件規模になり、
 # trivy-server (limit 1Gi) に 2 ノード同時に問い合わせたところ OOMKilled したため。
-# DB (約 135MB) は /tmp の emptyDir に置くので、Pod が生きている間は再利用される。
+# DB はダウンロード約 135MB・展開後約 1.55GiB で、/tmp の emptyDir に置き、スキャンごとに消す
+# (数時間おきに更新されるので 24h 後には再取得になり、残しておく意味が無い)。
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -35,22 +36,20 @@ spec:
         runAsGroup: 0
         seccompProfile:
           type: RuntimeDefault
-      # control-plane ノードもスキャン対象
+      # node-exporter と同じく NoSchedule の taint を全部許容する (control-plane も対象)。
+      # node-exporter だけが載るノードがあると TrivyNodeScanStale が鳴り続けるため。
       tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
+        - operator: Exists
           effect: NoSchedule
       containers:
         - name: scanner
-          # Renovate (kubernetes manager) がタグを追従する。Trivy Operator チャートの trivy.image.tag と揃える
+          # Renovate (kubernetes manager) がタグを追従する。Trivy Operator 側の Trivy はチャートの
+          # 既定値 (trivy.image.tag) に従うので一時的にずれることはあるが、どちらも同じ trivy-db:2 を読む
           image: mirror.gcr.io/aquasec/trivy:0.75.0
+          # textfile は停止時に消さない。消すと再起動・ロールアウト直後 (初回スキャンまで最大 1h) に
+          # 0 件 = 問題なしに見える。古さは trivy_node_last_success_timestamp_seconds で判別する。
+          # この DaemonSet を撤去するときは各ノードの /var/lib/node-exporter/textfile/trivy_node.prom を消すこと。
           command: ["/bin/sh", "/scripts/node-scan.sh"]
-          lifecycle:
-            # 停止時 (DaemonSet の削除・ノードからの退去) に textfile を消す。残すと node-exporter が
-            # 最後の値を出し続け、止まったスキャンが「最新」に見える。更新時に消えた分は次のスキャンで戻る。
-            preStop:
-              exec:
-                command: ["/bin/rm", "-f", "/textfile/trivy_node.prom"]
           env:
             - name: TRIVY_DB_REPOSITORY
               value: mirror.gcr.io/aquasec/trivy-db:2

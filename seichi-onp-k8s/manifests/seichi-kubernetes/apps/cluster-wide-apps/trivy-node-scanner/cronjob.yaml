@@ -33,25 +33,27 @@ spec:
               type: RuntimeDefault
           containers:
             - name: kbom
-              # Renovate (kubernetes manager) がタグを追従する。Trivy Operator チャートの trivy.image.tag と揃える
+              # Renovate (kubernetes manager) がタグを追従する。Trivy Operator 側の Trivy はチャートの
+              # 既定値 (trivy.image.tag) に従うので一時的にずれることはあるが、どちらも同じ trivy-db:2 を読む
               image: mirror.gcr.io/aquasec/trivy:0.75.0
               command: ["/bin/sh", "/scripts/kbom.sh"]
               env:
-                - name: TRIVY_DB_REPOSITORY
-                  value: mirror.gcr.io/aquasec/trivy-db:2
+                # 脆弱性の照合は Trivy Operator の trivy-server (builtInTrivyServer) に任せる
+                - name: TRIVY_SERVER
+                  value: http://trivy-service.trivy-operator:4954
                 - name: TRIVY_SEVERITY
                   value: MEDIUM,HIGH,CRITICAL
               # memory.peak は DB を書く emptyDir のページキャッシュ込みで 1Gi に張り付いた
               resources:
-                # 脆弱性 DB (展開後 1.55GiB) を /tmp の emptyDir に置く
+                # DB は trivy-server 側にあるので、/tmp には KBOM (約 60KB) と k8s 用のキャッシュだけ
                 requests:
                   cpu: 50m
                   memory: 128Mi
-                  ephemeral-storage: 2Gi
+                  ephemeral-storage: 256Mi
                 limits:
                   cpu: "1"
-                  memory: 1Gi
-                  ephemeral-storage: 4Gi
+                  memory: 512Mi
+                  ephemeral-storage: 1Gi
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -69,4 +71,4 @@ spec:
                 name: trivy-node-scanner-scripts
             - name: tmp
               emptyDir:
-                sizeLimit: 3Gi
+                sizeLimit: 1Gi

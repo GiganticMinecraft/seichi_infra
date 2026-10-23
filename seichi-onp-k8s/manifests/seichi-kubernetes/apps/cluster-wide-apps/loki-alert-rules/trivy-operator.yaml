@@ -43,6 +43,7 @@ data:
           # Kubernetes コンポーネントの KBOM スキャン (CronJob trivy-kbom、毎日 05:30 JST)。
           # 実行ごとに event="trivy_kbom_scan" の要約行を 1 行出す。Job は 1 回まで再試行するので、
           # 失敗があっても同じ日に成功していれば鳴らさない (翌日の成功で解消する)。
+          # 再試行の Pod が成功を書くまで待つため for を 15 分取る。
           # 停止 (成功が出ない) の検知は PrometheusRule の TrivyKbomScanMissing (kube-state-metrics)。
           # line filter を先に置いて、| json の対象を要約行だけに絞る。
           - alert: TrivyKbomScanFailing
@@ -54,9 +55,10 @@ data:
               (
                 sum(count_over_time({job="trivy-operator/kbom"} |= "trivy_kbom_scan" |= `"success":true` | json [1d])) > 0
               )
+            for: 15m
             labels:
               severity: warning
               notify: discord
             annotations:
               summary: Kubernetes コンポーネントの脆弱性スキャン (KBOM) が失敗しています
-              description: Loki で {job="trivy-operator/kbom"} | json | event="trivy_kbom_scan" を実行し、stage (kbom / sbom) と error を確認してください。kbom なら RBAC (ClusterRole trivy-kbom) や API サーバーへの到達性、sbom なら脆弱性 DB の取得 (mirror.gcr.io) を疑ってください。
+              description: Loki で {job="trivy-operator/kbom"} | json | event="trivy_kbom_scan" を実行し、stage (kbom / sbom) と error を確認してください。kbom なら RBAC (ClusterRole trivy-kbom) や API サーバーへの到達性、sbom なら trivy-server (kubectl -n trivy-operator logs sts/trivy-server) を疑ってください。
