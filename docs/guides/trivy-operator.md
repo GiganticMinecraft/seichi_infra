@@ -77,7 +77,7 @@ Grafana の **Trivy** フォルダにある「**Trivy Operator - Overview**」(u
 - **完了 Job の履歴**: mariadb-operator の Backup / Restore が残した完了 Job もレポートを持ち、同じイメージが数十件の Job に出る。イメージ単位の数字は `max by (イメージ)` で重複排除し、CVE の表は影響イメージ数 (重複排除済み) を数える。ワークロード別の表は「リソース種別」変数で Job を外せる。
 - **同じイメージを複数 namespace で使う場合**: 概要の合計はイメージだけで重複排除し、namespace ごとの表は `namespace` 変数で絞る。
 
-EOL ベース OS のパネルは `trivy_image_info` (`operator.metricsImageInfo: true` で出力) を使うので、Operator が設定を読み込んで各イメージを再スキャンした後に値が入る。
+EOL ベース OS のパネルは `trivy_image_info` (`operator.metricsImageInfo: true` で出力) を使う。既存の VulnerabilityReport に OS 情報 (`report.os.eosl`) が入っているので、再スキャンを待たずに Operator がこの設定で再起動した時点で値が入る。
 
 dotdc の「Trivy Operator - Vulnerabilities」(uid `security_trivy_operator`、`grafana-dashboards-kubernetes` Application が配布) も Kubernetes フォルダに残っているが、上の補正をしていない生の件数なので参考程度にする。
 

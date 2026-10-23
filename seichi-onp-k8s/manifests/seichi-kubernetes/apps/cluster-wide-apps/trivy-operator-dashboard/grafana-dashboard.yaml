@@ -459,7 +459,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの数。OS パッケージの修正が出なくなるため、CVE 件数とは別にベースイメージの更新対象として見る。trivy_image_info (operator.metricsImageInfo) から集計し、Operator が設定を読み込んで各イメージを再スキャンした後に値が入る。",
+          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの数。OS パッケージの修正が出なくなるため、CVE 件数とは別にベースイメージの更新対象として見る。trivy_image_info (operator.metricsImageInfo) から集計し、既存のレポートに OS 情報が入っているので、Operator がこの設定で再起動した後に値が入る。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1361,7 +1361,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "サポート終了したベース OS ごとのイメージ数 (重複排除済み)。trivy_image_info (operator.metricsImageInfo) から集計し、Operator が設定を読み込んで各イメージを再スキャンした後に値が入る。",
+          "description": "サポート終了したベース OS ごとのイメージ数 (重複排除済み)。trivy_image_info (operator.metricsImageInfo) から集計し、既存のレポートに OS 情報が入っているので、Operator がこの設定で再起動した後に値が入る。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1430,7 +1430,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの一覧。OS パッケージの修正が出ないため、CVE を個別に追うよりベースイメージ (FROM) の更新を優先する。namespace ごとに 1 行。Operator が operator.metricsImageInfo を読み込んで各イメージを再スキャンした後に値が入る。",
+          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの一覧。OS パッケージの修正が出ないため、CVE を個別に追うよりベースイメージ (FROM) の更新を優先する。namespace ごとに 1 行。既存のレポートに OS 情報が入っているので、Operator が operator.metricsImageInfo の設定で再起動した後に値が入る。",
           "fieldConfig": {
             "defaults": {
               "color": {
