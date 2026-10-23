@@ -477,7 +477,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の「重大度別の検出数」の説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。 Critical / High / Medium / Unknown のいずれかが 1 件以上あるイメージだけを出す (Low だけ・検出なしのイメージは出ないので、行数は「対象イメージ数」より少ない)。",
+          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の「重大度別の検出数」の説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。 Critical / High / Medium / Unknown のいずれかが 1 件以上あるイメージだけを出す。Low だけ・検出なしのイメージは出ない。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1430,7 +1430,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest, image_os_family, image_os_name) (label_replace(label_join(label_join(trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"))",
+              "expr": "max by (namespace, image, digest, image_os_family, image_os_name) (label_replace(label_replace(label_join(label_join(trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1449,13 +1449,12 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "image_digest": 2,
+                  "digest": 2,
                   "image_os_family": 3,
                   "image_os_name": 4
                 },
                 "renameByName": {
                   "image": "イメージ",
-                  "image_digest": "digest",
                   "image_os_family": "OS",
                   "image_os_name": "OS バージョン"
                 }
@@ -2362,7 +2361,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest, severity) (label_replace(label_join(label_join(trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\")) > 0",
+              "expr": "max by (namespace, image, digest, severity) (label_replace(label_replace(label_join(label_join(trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) > 0",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2380,13 +2379,12 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "image_digest": 2,
+                  "digest": 2,
                   "severity": 3,
                   "Value": 4
                 },
                 "renameByName": {
                   "image": "イメージ",
-                  "image_digest": "digest",
                   "severity": "重大度",
                   "Value": "件数"
                 }
