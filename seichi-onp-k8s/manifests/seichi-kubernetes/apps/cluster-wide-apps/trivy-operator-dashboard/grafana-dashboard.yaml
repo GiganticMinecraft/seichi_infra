@@ -673,7 +673,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -685,7 +685,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "B",
               "instant": true,
               "range": false,
@@ -697,7 +697,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "C",
               "instant": true,
               "range": false,
@@ -709,7 +709,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "D",
               "instant": true,
               "range": false,
@@ -744,6 +744,51 @@ data:
                   "Value #D": "Unknown (≥Medium)",
                   "image": "イメージ"
                 }
+              }
+            },
+            {
+              "id": "filterByValue",
+              "options": {
+                "type": "exclude",
+                "match": "all",
+                "filters": [
+                  {
+                    "fieldName": "Critical",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "High",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Medium",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Unknown (≥Medium)",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  }
+                ]
               }
             }
           ],
@@ -1202,7 +1247,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1214,7 +1259,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "B",
               "instant": true,
               "range": false,
@@ -1226,7 +1271,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "C",
               "instant": true,
               "range": false,
@@ -1238,7 +1283,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) or 0 * max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "D",
               "instant": true,
               "range": false,
@@ -1279,6 +1324,51 @@ data:
                   "container_name": "コンテナ",
                   "image": "イメージ"
                 }
+              }
+            },
+            {
+              "id": "filterByValue",
+              "options": {
+                "type": "exclude",
+                "match": "all",
+                "filters": [
+                  {
+                    "fieldName": "Critical",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "High",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Medium",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  },
+                  {
+                    "fieldName": "Unknown (≥Medium)",
+                    "config": {
+                      "id": "equal",
+                      "options": {
+                        "value": 0
+                      }
+                    }
+                  }
+                ]
               }
             }
           ],
