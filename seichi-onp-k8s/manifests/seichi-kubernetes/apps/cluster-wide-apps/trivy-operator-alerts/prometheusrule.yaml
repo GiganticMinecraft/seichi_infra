@@ -1,5 +1,9 @@
 # Trivy Operator のスキャン基盤そのものの異常を既存の Alertmanager -> Discord 経路へ通知する。
 #
+# スキャンジョブの失敗は operator が失敗 Job を観測した直後に削除してしまい
+# kube-state-metrics では捕まえられないため、operator のログを見る Loki ルール
+# (cluster-wide-apps/loki-alert-rules/trivy-operator.yaml の TrivyScanJobsFailing) で通知する。
+#
 # 脆弱性の件数ではアラートしない。サードパーティイメージを含めると MEDIUM 以上の
 # 脆弱性は常にどこかに存在するため、件数アラートは鳴りっぱなしになり 4 時間ごとに
 # Discord へ再通知されるだけになる。脆弱性のトリアージは Grafana の
@@ -27,22 +31,6 @@ spec:
           annotations:
             summary: "Trivy Operator のメトリクスが取得できません"
             description: "trivy-operator namespace の operator が 15 分以上 scrape できていません。kubectl -n trivy-operator get pods で Pod の状態 (CrashLoopBackOff / OOMKilled / Pending) を確認してください。"
-
-        - alert: TrivyScanJobsFailing
-          # スキャンジョブは backoffLimit 0 で、終わった Job は operator がすぐ削除するため
-          # kube_job_status_failed は短時間しか見えない。Job 名ごとに別系列になるので、
-          # 直近 1 時間に失敗が観測された Job の数を max_over_time で数える。
-          # 単発の失敗は operator が 30s 後に再試行するので、1 時間に 4 件以上の状態が
-          # 30 分続いた場合 (= DB 取得やレジストリの問題で失敗が繰り返されている) に鳴らす。
-          # kube_job_status_failed は opencost も同名で出しているため job="kube-state-metrics" に絞る。
-          expr: sum(max_over_time(kube_job_status_failed{job="kube-state-metrics", namespace="trivy-operator"}[1h])) > 3
-          for: 30m
-          labels:
-            severity: warning
-            notify: discord
-          annotations:
-            summary: "Trivy のスキャンジョブが繰り返し失敗しています"
-            description: "直近 1 時間に失敗したスキャンジョブが {{ $value }} 件あります。operator のログ (kubectl -n trivy-operator logs deploy/trivy-operator) で失敗理由を確認してください。よくある原因は脆弱性 DB / Java DB の取得失敗 (mirror.gcr.io への到達性)、イメージの pull 失敗、Kyverno の webhook 停止による Job 作成拒否、メモリ上限 (OOMKilled) やタイムアウトです。"
 
         - alert: TrivyVulnerabilityReportsMissing
           # operator は動いているのに脆弱性メトリクスが 1 系列も無い = スキャンが 1 件も

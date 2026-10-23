@@ -1,0 +1,38 @@
+# Trivy Operator のスキャンジョブ失敗をログから通知する。
+#
+# operator は失敗した Job を、コンテナのログを読んでエラーを記録した直後に削除し、
+# 30 秒後に新しい名前の Job で再試行する。そのため kube_job_status_failed は
+# 数秒しか観測できず、Prometheus 側 (kube-state-metrics) では失敗を拾えない。
+# 代わりに operator 自身が出す構造化ログ (level=error, msg="Scan job container"、
+# status.message にスキャンコンテナのログ末尾が入る) を数える。
+# 実証実験 (2026-10-23) では、取得できないイメージ 2 件に対してこのログが
+# 1 時間に 4 件記録されるのを Loki で確認した。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-alert-rules-trivy-operator
+  namespace: monitoring
+  labels:
+    loki_rule: "1"
+data:
+  trivy-operator.yaml: |
+    groups:
+      - name: trivy-operator-logs
+        interval: 1m
+        rules:
+          # 単発の失敗は operator が再試行するので、1 時間に 4 件以上の状態が 30 分続いた
+          # 場合 (= 同じ原因で失敗が繰り返されている) に鳴らす。
+          # よくある原因: イメージの pull 失敗 (タグ削除、レジストリの rate limit)、
+          # 脆弱性 DB / Java DB の取得失敗 (mirror.gcr.io への到達性)、OOMKilled、タイムアウト。
+          - alert: TrivyScanJobsFailing
+            expr: |
+              sum(
+                count_over_time({job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" [1h])
+              ) > 3
+            for: 30m
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: Trivy のスキャンジョブが繰り返し失敗しています
+              description: 直近 1 時間に {{ $value }} 件のスキャンコンテナ失敗が記録されました。Loki で {job="trivy-operator/trivy-operator"} | json | level="error" | msg="Scan job container" を実行し、status_message の末尾 (Trivy の FATAL 行) で原因を確認してください。取得できないイメージなら Application の trivyOperator.excludeImages に追加するか、元の Job / namespace を削除してください。
