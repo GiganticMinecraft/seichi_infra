@@ -477,7 +477,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の「重大度別の検出数」の説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。",
+          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の「重大度別の検出数」の説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。 Critical / High / Medium / Unknown のいずれかが 1 件以上あるイメージだけを出す。Low だけ・検出なしのイメージは出ない。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -673,8 +673,44 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (key, severity) (label_join(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest_short\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"), \"key\", \" | \", \"namespace\", \"image\", \"digest_short\"))",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"} and on (namespace, image_registry, image_repository, image_tag, image_digest) (sum by (namespace, image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"} and on (namespace, image_registry, image_repository, image_tag, image_digest) (sum by (namespace, image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "refId": "B",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"} and on (namespace, image_registry, image_repository, image_tag, image_digest) (sum by (namespace, image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "refId": "C",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (namespace, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Unknown\"} and on (namespace, image_registry, image_repository, image_tag, image_digest) (sum by (namespace, image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "refId": "D",
               "instant": true,
               "range": false,
               "format": "table"
@@ -683,28 +719,30 @@ data:
           "title": "イメージ別の脆弱性件数",
           "transformations": [
             {
-              "id": "groupingToMatrix",
-              "options": {
-                "columnField": "severity",
-                "rowField": "key",
-                "valueField": "Value",
-                "emptyValue": "zero"
-              }
+              "id": "merge",
+              "options": {}
             },
             {
               "id": "organize",
               "options": {
-                "excludeByName": {},
+                "excludeByName": {
+                  "Time": true
+                },
                 "indexByName": {
-                  "key\\severity": 0,
-                  "Critical": 1,
-                  "High": 2,
-                  "Medium": 3,
-                  "Unknown": 4
+                  "namespace": 0,
+                  "image": 1,
+                  "digest": 2,
+                  "Value #A": 3,
+                  "Value #B": 4,
+                  "Value #C": 5,
+                  "Value #D": 6
                 },
                 "renameByName": {
-                  "key\\severity": "namespace | イメージ | digest",
-                  "Unknown": "Unknown (≥Medium)"
+                  "Value #A": "Critical",
+                  "Value #B": "High",
+                  "Value #C": "Medium",
+                  "Value #D": "Unknown (≥Medium)",
+                  "image": "イメージ"
                 }
               }
             }
@@ -968,7 +1006,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ワークロード (ReplicaSet / StatefulSet / DaemonSet / Job など) × コンテナごとの件数。対応時に「どのマニフェストのイメージを上げるか」を探すための表。完了 Job (mariadb-operator の Backup / Restore 履歴など) もレポートを持つので、「Job」変数 (既定は除外) で外している。含めると履歴の Job も行に出る。件数はワークロード単位なので、同じイメージは使っているワークロードの数だけ行が出る。 同じコンテナでも digest が違うレポート (古い digest のものが残っている場合) は別の行になる。",
+          "description": "ワークロード (ReplicaSet / StatefulSet / DaemonSet / Job など) × コンテナごとの件数。対応時に「どのマニフェストのイメージを上げるか」を探すための表。完了 Job (mariadb-operator の Backup / Restore 履歴など) もレポートを持つので、「Job」変数 (既定は除外) で外している。含めると履歴の Job も行に出る。件数はワークロード単位なので、同じイメージは使っているワークロードの数だけ行が出る。 同じコンテナでも digest が違うレポート (古い digest のものが残っている場合) は別の行になる。 Critical / High / Medium / Unknown のいずれかが 1 件以上あるものだけを出す。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1164,8 +1202,44 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (key, severity) (label_join(label_replace(label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"digest_short\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"), \"key\", \" | \", \"namespace\", \"resource_kind\", \"resource_name\", \"container_name\", \"image\", \"digest_short\"))",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Critical\"} and on (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (sum by (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"High\"} and on (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (sum by (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "refId": "B",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Medium\"} and on (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (sum by (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "refId": "C",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (namespace, resource_kind, resource_name, container_name, image, digest) (label_replace(label_replace(label_join(label_join((trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity=\"Unknown\"} and on (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (sum by (namespace, image_registry, image_repository, image_tag, image_digest, resource_kind, resource_name, container_name) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", resource_kind=~\"$resource_kind\", resource_kind!~\"$exclude_kind\", severity!=\"Low\"}) > 0)), \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
+              "refId": "D",
               "instant": true,
               "range": false,
               "format": "table"
@@ -1174,28 +1248,36 @@ data:
           "title": "ワークロード別の脆弱性件数",
           "transformations": [
             {
-              "id": "groupingToMatrix",
-              "options": {
-                "columnField": "severity",
-                "rowField": "key",
-                "valueField": "Value",
-                "emptyValue": "zero"
-              }
+              "id": "merge",
+              "options": {}
             },
             {
               "id": "organize",
               "options": {
-                "excludeByName": {},
+                "excludeByName": {
+                  "Time": true
+                },
                 "indexByName": {
-                  "key\\severity": 0,
-                  "Critical": 1,
-                  "High": 2,
-                  "Medium": 3,
-                  "Unknown": 4
+                  "namespace": 0,
+                  "resource_kind": 1,
+                  "resource_name": 2,
+                  "container_name": 3,
+                  "image": 4,
+                  "digest": 5,
+                  "Value #A": 6,
+                  "Value #B": 7,
+                  "Value #C": 8,
+                  "Value #D": 9
                 },
                 "renameByName": {
-                  "key\\severity": "namespace | 種別 | リソース名 | コンテナ | イメージ | digest",
-                  "Unknown": "Unknown (≥Medium)"
+                  "Value #A": "Critical",
+                  "Value #B": "High",
+                  "Value #C": "Medium",
+                  "Value #D": "Unknown (≥Medium)",
+                  "resource_kind": "種別",
+                  "resource_name": "リソース名",
+                  "container_name": "コンテナ",
+                  "image": "イメージ"
                 }
               }
             }
@@ -1348,7 +1430,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest, image_os_family, image_os_name) (label_join(label_join(trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (namespace, image, digest, image_os_family, image_os_name) (label_replace(label_replace(label_join(label_join(trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1367,13 +1449,12 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "image_digest": 2,
+                  "digest": 2,
                   "image_os_family": 3,
                   "image_os_name": 4
                 },
                 "renameByName": {
                   "image": "イメージ",
-                  "image_digest": "digest",
                   "image_os_family": "OS",
                   "image_os_name": "OS バージョン"
                 }
@@ -2280,7 +2361,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, image_digest, severity) (label_join(label_join(trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\")) > 0",
+              "expr": "max by (namespace, image, digest, severity) (label_replace(label_replace(label_join(label_join(trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\", severity!=\"Low\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"), \"image\", \"$1\", \"image\", \"(.*):\"), \"digest\", \"$1\", \"image_digest\", \"sha256:(.{12}).*\")) > 0",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2298,13 +2379,12 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "image_digest": 2,
+                  "digest": 2,
                   "severity": 3,
                   "Value": 4
                 },
                 "renameByName": {
                   "image": "イメージ",
-                  "image_digest": "digest",
                   "severity": "重大度",
                   "Value": "件数"
                 }
