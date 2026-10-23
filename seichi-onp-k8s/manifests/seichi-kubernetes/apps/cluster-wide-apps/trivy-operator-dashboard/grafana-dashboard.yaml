@@ -9,16 +9,18 @@
 #     trivy.severity で LOW は除外済みなので、Unknown は「MEDIUM 以上でベンダー評価なし」。
 #     隠さずに独立した列・パネルとして出し、説明文で意味を明記する。
 #   - Go バイナリを含むイメージが多く、同じ stdlib の CVE が数百コンテナに出る。
-#     CVE の表には `除外するパッケージ` 変数 (既定: stdlib と golang.org/x を除外) を付ける。
+#     概要の CVE 数・重大度別の検出数と CVE の表には `除外するパッケージ` 変数
+#     (既定: stdlib と golang.org/x を除外) を付ける。
 #   - mariadb-operator の Backup / Restore が残した完了 Job もレポートを持ち、同じイメージが
-#     数十件の Job に出る。イメージ単位の数字はすべて max by (イメージ) で重複排除し、
+#     数十件の Job に出る。イメージ単位の数字はすべてイメージ (registry/repository:tag@digest) で
+#     重複排除し、
 #     CVE の表は影響イメージ数 (重複排除済み) を数える。ワークロード別の表だけは
 #     ワークロード単位なので、`リソース種別` 変数で Job を外せるようにする。
 #   - 同じイメージが複数 namespace にあると namespace ごとに数えられる。クラスタ全体の
-#     合計 (概要の stat) はイメージだけで重複排除し、namespace ごとの表は `namespace` 変数で絞る。
+#     合計 (概要の stat) はイメージ (digest 単位) だけで重複排除し、`namespace` 変数で絞れるようにする。
 #
 # パネルの意図:
-#   - 概要: 対象イメージ数・ユニーク CVE 数・重大度別件数 (イメージ単位)・EOL ベース OS の
+#   - 概要: 対象イメージ数・ユニーク CVE 数・重大度別の検出数 (CVE × パッケージ × イメージ)・EOL ベース OS の
 #     イメージ数。全体の増減を一目で見るため。
 #   - イメージ別: どのイメージを更新すると件数が大きく減るかを探すため。
 #   - CVE 別: どのパッケージを上げると何イメージ分が片付くかを見るため。
@@ -69,7 +71,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "VulnerabilityReport があるイメージ (registry/repository:tag) の数。同じイメージを複数のnamespace・ワークロード・完了 Job が使っていても 1 と数える。",
+          "description": "VulnerabilityReport があるイメージ (registry/repository:tag@digest) の数。同じイメージを複数のnamespace・ワークロード・完了 Job が使っていても 1 と数え、同じタグでも digest が違えば別に数える。namespace 変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -119,7 +121,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (image_registry, image_repository, image_tag) (trivy_image_vulnerabilities{job=\"trivy-operator\"}))",
+              "expr": "count(count by (image_registry, image_repository, image_tag, image_digest) (trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -134,7 +136,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "クラスタ内のどこかに残っている脆弱性 ID (CVE / GHSA) の種類数。「除外するパッケージ」変数が効く (既定では Go 標準ライブラリと golang.org/x を除外)。",
+          "description": "残っている脆弱性 ID (CVE / GHSA) の種類数。namespace 変数と「除外するパッケージ」変数 (既定では Go 標準ライブラリと golang.org/x を除外) が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -184,7 +186,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (vuln_id) (trivy_vulnerability_id{job=\"trivy-operator\", resource!~\"$exclude_pkg\"}))",
+              "expr": "count(count by (vuln_id) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -199,7 +201,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "Critical の脆弱性件数をイメージ単位で重複排除した合計 (クラスタ全体)。同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。このメトリクスにはパッケージ名が無いため「除外するパッケージ」変数は効かない。",
+          "description": "重大度 Critical の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -215,7 +217,8 @@ data:
                   }
                 ]
               },
-              "unit": "none"
+              "unit": "none",
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -249,14 +252,14 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(max by (image_registry, image_repository, image_tag) (trivy_image_vulnerabilities{job=\"trivy-operator\", severity=\"Critical\"}))",
+              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"Critical\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
               "format": "time_series"
             }
           ],
-          "title": "Critical (イメージ単位)",
+          "title": "Critical",
           "type": "stat"
         },
         {
@@ -264,7 +267,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "High の脆弱性件数をイメージ単位で重複排除した合計 (クラスタ全体)。同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。このメトリクスにはパッケージ名が無いため「除外するパッケージ」変数は効かない。",
+          "description": "重大度 High の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -280,7 +283,8 @@ data:
                   }
                 ]
               },
-              "unit": "none"
+              "unit": "none",
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -314,14 +318,14 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(max by (image_registry, image_repository, image_tag) (trivy_image_vulnerabilities{job=\"trivy-operator\", severity=\"High\"}))",
+              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"High\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
               "format": "time_series"
             }
           ],
-          "title": "High (イメージ単位)",
+          "title": "High",
           "type": "stat"
         },
         {
@@ -329,7 +333,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "Medium の脆弱性件数をイメージ単位で重複排除した合計 (クラスタ全体)。同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。このメトリクスにはパッケージ名が無いため「除外するパッケージ」変数は効かない。",
+          "description": "重大度 Medium の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -345,7 +349,8 @@ data:
                   }
                 ]
               },
-              "unit": "none"
+              "unit": "none",
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -379,14 +384,14 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(max by (image_registry, image_repository, image_tag) (trivy_image_vulnerabilities{job=\"trivy-operator\", severity=\"Medium\"}))",
+              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"Medium\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
               "format": "time_series"
             }
           ],
-          "title": "Medium (イメージ単位)",
+          "title": "Medium",
           "type": "stat"
         },
         {
@@ -394,7 +399,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "Unknown の脆弱性件数をイメージ単位で重複排除した合計 (クラスタ全体)。同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。このメトリクスにはパッケージ名が無いため「除外するパッケージ」変数は効かない。 Unknown は「未評価」ではない。trivy.severity: MEDIUM,HIGH,CRITICAL で LOW は既に除外済みで、Unknown は Trivy 自身は MEDIUM 以上と判定しているが、Operator がレポートの重大度に使うベンダー severity (VendorSeverity[SeveritySource]) が無い CVE。Go の stdlib / golang.org/x/* や一部の GHSA 由来 JAR の CVE が主で、全体の 7 割近くを占める。MEDIUM〜HIGH 相当として扱い、隠さずに見ること。",
+          "description": "重大度 Unknown の検出数。脆弱性 ID × パッケージ × イメージ (digest 単位) の組を 1 件と数えるので、同じイメージが複数の namespace・ワークロード・完了 Job にあっても 1 回だけ数える。ユニーク CVE 数と同じく namespace 変数と「除外するパッケージ」変数が効く。 Unknown は「未評価」ではない。trivy.severity: MEDIUM,HIGH,CRITICAL で LOW は既に除外済みで、Unknown は Trivy 自身は MEDIUM 以上と判定しているが、Operator がレポートの重大度に使うベンダー severity (VendorSeverity[SeveritySource]) が無い CVE。Go の stdlib / golang.org/x/* や一部の GHSA 由来 JAR の CVE が主で、全体の 7 割近くを占める。MEDIUM〜HIGH 相当として扱い、隠さずに見ること。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -410,7 +415,8 @@ data:
                   }
                 ]
               },
-              "unit": "none"
+              "unit": "none",
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -444,7 +450,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(max by (image_registry, image_repository, image_tag) (trivy_image_vulnerabilities{job=\"trivy-operator\", severity=\"Unknown\"}))",
+              "expr": "count(count by (vuln_id, resource, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", severity=\"Unknown\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -459,7 +465,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの数。OS パッケージの修正が出なくなるため、CVE 件数とは別にベースイメージの更新対象として見る。trivy_image_info (operator.metricsImageInfo) から集計し、既存のレポートに OS 情報が入っているので、Operator がこの設定で再起動した後に値が入る。",
+          "description": "ベース OS がサポート終了 (EOSL) になっているイメージ (digest 単位) の数。OS パッケージの修正が出なくなるため、CVE 件数とは別にベースイメージの更新対象として見る。namespace 変数が効く。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -480,7 +486,7 @@ data:
                 ]
               },
               "unit": "none",
-              "noValue": "-"
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -514,7 +520,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(count by (image_registry, image_repository, image_tag) (trivy_image_info{job=\"trivy-operator\", image_os_eosl=\"true\"}))",
+              "expr": "count(count by (image_registry, image_repository, image_tag, image_digest) (trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -542,7 +548,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "namespace × イメージごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。Unknown 列の意味は概要の Unknown パネルの説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。",
+          "description": "namespace × イメージ (digest 単位) ごとの件数。同じイメージを使うワークロードや完了 Job (mariadb-operator の Backup / Restore 履歴など) が複数あっても max で 1 つにまとめるので、ワークロード数で膨らまない。同じタグでも digest が違えば別の行になる (古い digest のレポートが残っている場合など)。同じイメージが別の namespace にあれば namespace ごとに 1 行になる。件数は Trivy のレポート上の件数で、パッケージ名を持たないため「除外するパッケージ」変数は効かない。Unknown 列の意味は概要の Unknown パネルの説明を参照 (MEDIUM 以上でベンダー評価が無いもの)。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -715,6 +721,18 @@ data:
                     "value": 200
                   }
                 ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "digest"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
+                  }
+                ]
               }
             ]
           },
@@ -740,10 +758,6 @@ data:
               {
                 "displayName": "Critical",
                 "desc": true
-              },
-              {
-                "displayName": "High",
-                "desc": true
               }
             ]
           },
@@ -754,7 +768,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -766,7 +780,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
               "refId": "B",
               "instant": true,
               "range": false,
@@ -778,7 +792,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
               "refId": "C",
               "instant": true,
               "range": false,
@@ -790,7 +804,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (namespace, image, image_digest) (label_join(label_join(trivy_image_vulnerabilities{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Unknown\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
               "refId": "D",
               "instant": true,
               "range": false,
@@ -812,17 +826,19 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "Value #A": 2,
-                  "Value #B": 3,
-                  "Value #C": 4,
-                  "Value #D": 5
+                  "image_digest": 2,
+                  "Value #A": 3,
+                  "Value #B": 4,
+                  "Value #C": 5,
+                  "Value #D": 6
                 },
                 "renameByName": {
                   "Value #A": "Critical",
                   "Value #B": "High",
                   "Value #C": "Medium",
                   "Value #D": "Unknown",
-                  "image": "イメージ"
+                  "image": "イメージ",
+                  "image_digest": "digest"
                 }
               }
             }
@@ -847,7 +863,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "脆弱性 ID × パッケージ × インストール済みバージョンごとに、影響を受けるイメージの数 (重複排除済み)。同じイメージを使うワークロードや完了 Job がいくつあっても 1 と数えるので、「どのパッケージを上げると何イメージ分が片付くか」の目安になる。「除外するパッケージ」変数で Go 標準ライブラリ・golang.org/x を外せる (Go バイナリを含むイメージが多く、同じ stdlib の CVE が数十イメージに出るため)。重大度 Unknown は MEDIUM 以上でベンダー評価が無いもの。脆弱性 ID のリンクで NVD / OSV を開く。",
+          "description": "脆弱性 ID × パッケージごとに 1 行で、影響を受けるイメージ (digest 単位) の数を出す。同じイメージを使うワークロードや完了 Job がいくつあっても 1 と数えるので、「どのパッケージを上げると何イメージ分が片付くか」の目安になる。重大度はベースイメージのディストリビューションごとにベンダー評価が違うことがあるので、影響イメージの中で最も高いものを出す。インストール済み・修正版のバージョンはイメージごとに違うので表には出さない (NVD / OSV のリンク先か、ワークロード別の表のイメージで確認する)。「除外するパッケージ」変数で Go 標準ライブラリ・golang.org/x を外せる (Go バイナリを含むイメージが多く、同じ stdlib の CVE が数十イメージに出るため)。「重大度」変数で絞り込める。重大度 Unknown は MEDIUM 以上でベンダー評価が無いもの。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -922,19 +938,23 @@ data:
                       {
                         "type": "value",
                         "options": {
-                          "Critical": {
+                          "4": {
+                            "text": "Critical",
                             "color": "red",
                             "index": 0
                           },
-                          "High": {
+                          "3": {
+                            "text": "High",
                             "color": "orange",
                             "index": 1
                           },
-                          "Medium": {
+                          "2": {
+                            "text": "Medium",
                             "color": "yellow",
                             "index": 2
                           },
-                          "Unknown": {
+                          "1": {
+                            "text": "Unknown",
                             "color": "blue",
                             "index": 3
                           }
@@ -990,10 +1010,6 @@ data:
             "showHeader": true,
             "sortBy": [
               {
-                "displayName": "重大度",
-                "desc": false
-              },
-              {
                 "displayName": "影響イメージ数",
                 "desc": true
               }
@@ -1006,8 +1022,20 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (vuln_id, severity, resource, installed_version, fixed_version, vuln_title) (max by (vuln_id, severity, resource, installed_version, fixed_version, vuln_title, image_registry, image_repository, image_tag) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\"}))",
+              "expr": "count by (vuln_id, resource, vuln_title) (count by (vuln_id, resource, vuln_title, image_registry, image_repository, image_tag, image_digest) (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\"}))",
               "refId": "A",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "max by (vuln_id, resource, vuln_title) ((trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Critical\"} * 0 + 4) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"High\"} * 0 + 3) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Medium\"} * 0 + 2) or (trivy_vulnerability_id{job=\"trivy-operator\", namespace=~\"$namespace\", resource!~\"$exclude_pkg\", severity=~\"$severity\", severity=\"Unknown\"} * 0 + 1))",
+              "refId": "B",
               "instant": true,
               "range": false,
               "format": "table"
@@ -1016,6 +1044,10 @@ data:
           "title": "CVE 別の影響イメージ数",
           "transformations": [
             {
+              "id": "merge",
+              "options": {}
+            },
+            {
               "id": "organize",
               "options": {
                 "excludeByName": {
@@ -1023,21 +1055,17 @@ data:
                 },
                 "indexByName": {
                   "vuln_id": 0,
-                  "severity": 1,
+                  "Value #B": 1,
                   "resource": 2,
-                  "installed_version": 3,
-                  "fixed_version": 4,
-                  "Value": 5,
-                  "vuln_title": 6
+                  "Value #A": 3,
+                  "vuln_title": 4
                 },
                 "renameByName": {
                   "vuln_id": "脆弱性 ID",
-                  "severity": "重大度",
+                  "Value #B": "重大度",
                   "resource": "パッケージ",
-                  "installed_version": "インストール済み",
-                  "fixed_version": "修正版",
                   "vuln_title": "概要",
-                  "Value": "影響イメージ数"
+                  "Value #A": "影響イメージ数"
                 }
               }
             }
@@ -1248,10 +1276,6 @@ data:
               {
                 "displayName": "Critical",
                 "desc": true
-              },
-              {
-                "displayName": "High",
-                "desc": true
               }
             ]
           },
@@ -1361,7 +1385,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "サポート終了したベース OS ごとのイメージ数 (重複排除済み)。trivy_image_info (operator.metricsImageInfo) から集計し、既存のレポートに OS 情報が入っているので、Operator がこの設定で再起動した後に値が入る。",
+          "description": "サポート終了したベース OS ごとのイメージ数 (digest 単位で重複排除)。trivy_image_info から集計する。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1414,7 +1438,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (image_os_family, image_os_name) (count by (image_os_family, image_os_name, image_registry, image_repository, image_tag) (trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}))",
+              "expr": "count by (image_os_family, image_os_name) (count by (image_os_family, image_os_name, image_registry, image_repository, image_tag, image_digest) (trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1430,7 +1454,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの一覧。OS パッケージの修正が出ないため、CVE を個別に追うよりベースイメージ (FROM) の更新を優先する。namespace ごとに 1 行。既存のレポートに OS 情報が入っているので、Operator が operator.metricsImageInfo の設定で再起動した後に値が入る。",
+          "description": "ベース OS がサポート終了 (EOSL) になっているイメージの一覧。OS パッケージの修正が出ないため、CVE を個別に追うよりベースイメージ (FROM) の更新を優先する。namespace × イメージ (digest 単位) ごとに 1 行。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1489,7 +1513,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, image_os_family, image_os_name) (label_join(label_join(trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
+              "expr": "max by (namespace, image, image_digest, image_os_family, image_os_name) (label_join(label_join(trivy_image_info{job=\"trivy-operator\", namespace=~\"$namespace\", image_os_eosl=\"true\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\"))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -1508,11 +1532,13 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "image_os_family": 2,
-                  "image_os_name": 3
+                  "image_digest": 2,
+                  "image_os_family": 3,
+                  "image_os_name": 4
                 },
                 "renameByName": {
                   "image": "イメージ",
+                  "image_digest": "digest",
                   "image_os_family": "OS",
                   "image_os_name": "OS バージョン"
                 }
@@ -1879,7 +1905,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(max by (image_registry, image_repository, image_tag) (trivy_image_exposedsecrets{job=\"trivy-operator\"}))",
+              "expr": "sum(max by (image_registry, image_repository, image_tag, image_digest, severity) (trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\"}))",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2047,7 +2073,7 @@ data:
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "ConfigAuditReport の失敗件数をリソースごとに出したもの。High 以上が多いリソースからsecurityContext などを見直す。",
+          "description": "ConfigAuditReport の失敗件数をリソースごとに出したもの (失敗が 1 件以上のリソースだけ)。High 以上が多いリソースから securityContext などを見直す。",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2197,10 +2223,6 @@ data:
             "showHeader": true,
             "sortBy": [
               {
-                "displayName": "Critical",
-                "desc": true
-              },
-              {
                 "displayName": "High",
                 "desc": true
               }
@@ -2213,7 +2235,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"})",
+              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Critical\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=~\"Critical|High|Medium\"}) > 0)",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2225,7 +2247,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"})",
+              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"High\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=~\"Critical|High|Medium\"}) > 0)",
               "refId": "B",
               "instant": true,
               "range": false,
@@ -2237,7 +2259,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"})",
+              "expr": "max by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=\"Medium\"}) and on (namespace, resource_kind, resource_name) (sum by (namespace, resource_kind, resource_name) (trivy_resource_configaudits{job=\"trivy-operator\", namespace=~\"$namespace\", severity=~\"Critical|High|Medium\"}) > 0)",
               "refId": "C",
               "instant": true,
               "range": false,
@@ -2437,7 +2459,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "max by (namespace, image, severity) (label_join(label_join(trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\")) > 0",
+              "expr": "max by (namespace, image, image_digest, severity) (label_join(label_join(trivy_image_exposedsecrets{job=\"trivy-operator\", namespace=~\"$namespace\"}, \"image\", \"/\", \"image_registry\", \"image_repository\"), \"image\", \":\", \"image\", \"image_tag\")) > 0",
               "refId": "A",
               "instant": true,
               "range": false,
@@ -2455,11 +2477,13 @@ data:
                 "indexByName": {
                   "namespace": 0,
                   "image": 1,
-                  "severity": 2,
-                  "Value": 3
+                  "image_digest": 2,
+                  "severity": 3,
+                  "Value": 4
                 },
                 "renameByName": {
                   "image": "イメージ",
+                  "image_digest": "digest",
                   "severity": "重大度",
                   "Value": "件数"
                 }
@@ -2713,7 +2737,7 @@ data:
               "text": "Go 標準ライブラリ・golang.org/x を除外",
               "value": "stdlib|golang.org/x/.*"
             },
-            "description": "CVE 別の表とユニーク CVE 数から除外するパッケージ。",
+            "description": "概要の CVE 数・重大度別の検出数と CVE 別の表から除外するパッケージ。",
             "hide": 0,
             "includeAll": false,
             "label": "除外するパッケージ",
@@ -2732,6 +2756,54 @@ data:
               }
             ],
             "query": "全部表示 : __none__, Go 標準ライブラリ・golang.org/x を除外 : stdlib|golang.org/x/.*",
+            "skipUrlSync": false,
+            "type": "custom"
+          },
+          {
+            "allValue": ".*",
+            "current": {
+              "selected": true,
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "description": "CVE 別の表だけに効く重大度の絞り込み。",
+            "hide": 0,
+            "includeAll": true,
+            "label": "重大度",
+            "multi": true,
+            "name": "severity",
+            "options": [
+              {
+                "selected": true,
+                "text": "All",
+                "value": "$__all"
+              },
+              {
+                "selected": false,
+                "text": "Critical",
+                "value": "Critical"
+              },
+              {
+                "selected": false,
+                "text": "High",
+                "value": "High"
+              },
+              {
+                "selected": false,
+                "text": "Medium",
+                "value": "Medium"
+              },
+              {
+                "selected": false,
+                "text": "Unknown",
+                "value": "Unknown"
+              }
+            ],
+            "query": "Critical, High, Medium, Unknown",
             "skipUrlSync": false,
             "type": "custom"
           }
