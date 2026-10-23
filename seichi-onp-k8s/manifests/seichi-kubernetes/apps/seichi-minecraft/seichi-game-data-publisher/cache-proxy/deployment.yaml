@@ -61,7 +61,7 @@ spec:
                 - SETUID
                 - SETGID
 
-          image: nginx:1.31.7
+          image: nginx:1.31.8
           name: seichi-game-data-publisher-cache-proxy
           ports:
             - containerPort: 80
