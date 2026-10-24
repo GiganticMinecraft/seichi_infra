@@ -1,0 +1,242 @@
+# ノードの host network namespace で動く Kubernetes のシステムコンポーネント
+# (kube-apiserver / etcd の static pod、kubelet、containerd) のトレースを受ける
+# ノードローカルの OTLP receiver。
+# k8s-monitoring の alloy-receiver は Pod ネットワーク上の 1 replica Deployment で、
+# host 側からは Service 名で引けないため、各ノードの 127.0.0.1:4317 (gRPC) /
+# 127.0.0.1:4318 (HTTP) で受けて Tempo へ中継する DaemonSet を別に置く。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alloy-host-receiver
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: cluster-wide-apps
+  source:
+    chart: alloy
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 1.14.3
+    helm:
+      values: |
+        controller:
+          type: daemonset
+          # 送信元が host netns にいるので、受け口も host netns の loopback に置く
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+          # kube-apiserver / etcd が動く control-plane ノードにも置く
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+          # priorityClassName は付けない。トレースは欠けても困らないので、
+          # 埋まったノードでゲームサーバー等を preempt してまで載せる必要は無い
+          # readinessProbe を外しているので Pod は起動直後に Ready になる。
+          # 設定ミスで起動直後に落ちる版が全ノードへ一気に広がらないよう、
+          # Ready が 30 秒続くまで次のノードへ進ませない
+          minReadySeconds: 30
+          volumes:
+            extra:
+              # readOnlyRootFilesystem のため storage.path (/tmp/alloy) を emptyDir にする
+              - name: tmp
+                emptyDir: {}
+
+        alloy:
+          # hostNetwork なので 0.0.0.0 で listen するとノードの LAN 側に UI と
+          # /metrics が露出する。loopback に限定する (Prometheus からの scrape は
+          # できなくなるが、今は受けたトレースを中継するだけなので許容する)
+          listenAddr: 127.0.0.1
+          # chart の readinessProbe は Pod IP (= ノード IP) に向くため、loopback
+          # だけで listen すると Ready にならない。chart 側の port 宣言と
+          # readinessProbe を外し、代わりに host: 127.0.0.1 の livenessProbe を置く。
+          # (hostNetwork の Pod では containerPort がそのまま hostPort として
+          # 扱われるので、loopback 専用のポートを宣言しない意味もある)
+          enableHttpServerPort: false
+          livenessProbe:
+            httpGet:
+              host: 127.0.0.1
+              path: /-/ready
+              port: 12345
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 5
+          enableReporting: false
+          mounts:
+            extra:
+              - name: tmp
+                mountPath: /tmp
+          # イメージの既定ユーザーは root なので、イメージ内に用意されている
+          # alloy ユーザー (uid/gid 473) を明示する。hostNetwork でも 1024 以上の
+          # ポートしか使わないので capability は要らない
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 473
+            runAsGroup: 473
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          configMap:
+            content: |
+              // 送信元は hostNetwork の static pod (kube-apiserver / etcd) と host process
+              // (kubelet / containerd)。これらは Pod ネットワークの DNS (Service 名) を
+              // 引けず、OTLP 送信に TLS も設定しにくいため、各ノードの loopback で受けて
+              // Tempo へ中継する。ノード外からは届かないよう 127.0.0.1 にだけ bind する。
+              otelcol.receiver.otlp "host" {
+                grpc {
+                  endpoint = "127.0.0.1:4317"
+                }
+
+                http {
+                  endpoint = "127.0.0.1:4318"
+                }
+
+                output {
+                  traces = [otelcol.processor.memory_limiter.default.input]
+                }
+              }
+
+              // Tempo が止まっている間に exporter のキューが膨らんで OOMKill されないよう、
+              // コンテナの memory limit (256Mi) より手前で受け付けを止める
+              otelcol.processor.memory_limiter "default" {
+                check_interval = "1s"
+                limit          = "200MiB"
+
+                output {
+                  traces = [otelcol.processor.transform.node.input]
+                }
+              }
+
+              // 送信元が自分で付けていない場合だけ k8s.node.name / k8s.cluster.name を補う
+              // (where で未設定のときに限るので、送信元の値は上書きしない)。
+              // K8S_NODE_NAME は chart が spec.nodeName から入れる。k8s.cluster.name は
+              // アプリのトレース (k8s-monitoring の alloy-receiver 経由) と揃える。
+              otelcol.processor.transform "node" {
+                error_mode = "ignore"
+
+                trace_statements {
+                  context    = "resource"
+                  statements = [
+                    string.format(`set(attributes["k8s.node.name"], "%s") where attributes["k8s.node.name"] == nil`, sys.env("K8S_NODE_NAME")),
+                    `set(attributes["k8s.cluster.name"], "seichi-cloud") where attributes["k8s.cluster.name"] == nil`,
+                  ]
+                }
+
+                output {
+                  traces = [otelcol.processor.filter.health.input]
+                }
+              }
+
+              // kube-apiserver はヘルスチェック (/healthz, /livez, /readyz とそのサブパス) にも
+              // span を作り、kubelet の probe や LB のチェックで数秒おきに届く。調査の役に
+              // 立たない割に量が多いので Tempo に送る前に捨てる。
+              // リソース以外へのリクエストの span 名は HTTP メソッド ("GET") だけなので、
+              // パスは apiserver が付ける http.target (クエリ込み) と otelhttp の url.path で見る。
+              otelcol.processor.filter "health" {
+                error_mode = "ignore"
+
+                traces {
+                  span = [
+                    `IsMatch(attributes["http.target"], "^/(healthz|livez|readyz)")`,
+                    `IsMatch(attributes["url.path"], "^/(healthz|livez|readyz)")`,
+                  ]
+                }
+
+                output {
+                  traces = [otelcol.processor.filter.exec_probe.input]
+                }
+              }
+
+              // kubelet の probe worker は Pod を作った syncPod の context をそのまま引き継ぐ
+              // (context.WithoutCancel で cancel だけ外し、trace の span は残る) ので、
+              // exec probe の ExecSync と containerd 側の exec 処理の span が、サンプリングされた
+              // syncPod の trace に Pod が消えるまで数秒おきに足され続ける。1 trace が際限なく
+              // 大きくなり、Tempo が TRACE_TOO_LARGE で受け取りを拒むので、exec probe 由来の
+              // span と containerd の task API の内部呼び出し (Exec/Start/State/Wait) を捨てる。
+              // Task/Start は exec のプロセス起動でも 1 回ずつ出るので残せない。
+              // コンテナ起動の流れは CRI の span (RunPodSandbox/CreateContainer/StartContainer)
+              // で追える。
+              otelcol.processor.filter "exec_probe" {
+                error_mode = "ignore"
+
+                traces {
+                  span = [
+                    `IsMatch(name, "^(runtime\\.v1\\.RuntimeService/ExecSync|client\\.task\\.Exec|containerd\\.task\\.v3\\.Task/(Exec|Start|State|Wait)|process\\.(Start|Wait))$")`,
+                  ]
+                }
+
+                output {
+                  traces = [otelcol.processor.batch.default.input]
+                }
+              }
+
+              // send_batch_max_size は send_batch_size 以上でないと起動時の評価で失敗する。
+              // 0 (上限なし) にすると 1 回の送信が Tempo の gRPC 受信上限 (16MiB) を超えうるので、
+              // send_batch_size と同じ値で上限を掛ける
+              otelcol.processor.batch "default" {
+                timeout             = "2s"
+                send_batch_size     = 8192
+                send_batch_max_size = 8192
+
+                output {
+                  traces = [otelcol.exporter.otlp.tempo.input]
+                }
+              }
+
+              // hostNetwork の Pod は dnsPolicy: ClusterFirstWithHostNet でクラスタ DNS を
+              // 引けるが、search path に頼らないよう FQDN で書く。
+              otelcol.exporter.otlp "tempo" {
+                client {
+                  endpoint = "tempo.monitoring.svc.cluster.local:4317"
+
+                  tls {
+                    insecure = true
+                  }
+                }
+
+                // 既定 (1000 バッチ) のままだと Tempo の停止中にメモリを使い切るので小さくする
+                sending_queue {
+                  queue_size = 50
+                }
+              }
+
+        # config-reloader (prometheus-config-reloader) は既定で :8080 に metrics を
+        # listen し、hostNetwork だとノードの 8080 を全インターフェースで掴んでしまう。
+        # 設定変更は Pod の checksum/config annotation でローリング再起動されるので不要
+        configReloader:
+          enabled: false
+
+        # hostNetwork + loopback で受けるので Service / ServiceMonitor は作らない
+        service:
+          enabled: false
+        serviceMonitor:
+          enabled: false
+
+        # この設定は Kubernetes API を使わないので RBAC も SA トークンも要らない
+        rbac:
+          create: false
+        serviceAccount:
+          create: true
+          automountServiceAccountToken: false
+
+        # chart 既定で PodLogs CRD を入れるが、k8s-monitoring 側で管理しているので触らない
+        crds:
+          create: false
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
