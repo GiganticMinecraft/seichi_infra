@@ -32,9 +32,12 @@ spec:
             - key: node-role.kubernetes.io/control-plane
               operator: Exists
               effect: NoSchedule
-          # ノード上のシステムコンポーネントの受け口なので、ノードが逼迫しても
-          # 追い出されにくくする
-          priorityClassName: system-node-critical
+          # priorityClassName は付けない。トレースは欠けても困らないので、
+          # 埋まったノードでゲームサーバー等を preempt してまで載せる必要は無い
+          # readinessProbe を外しているので Pod は起動直後に Ready になる。
+          # 設定ミスで起動直後に落ちる版が全ノードへ一気に広がらないよう、
+          # Ready が 30 秒続くまで次のノードへ進ませない
+          minReadySeconds: 30
           volumes:
             extra:
               # readOnlyRootFilesystem のため storage.path (/tmp/alloy) を emptyDir にする
@@ -101,6 +104,17 @@ spec:
                 }
 
                 output {
+                  traces = [otelcol.processor.memory_limiter.default.input]
+                }
+              }
+
+              // Tempo が止まっている間に exporter のキューが膨らんで OOMKill されないよう、
+              // コンテナの memory limit (256Mi) より手前で受け付けを止める
+              otelcol.processor.memory_limiter "default" {
+                check_interval = "1s"
+                limit          = "200MiB"
+
+                output {
                   traces = [otelcol.processor.transform.node.input]
                 }
               }
@@ -128,12 +142,15 @@ spec:
               // kube-apiserver はヘルスチェック (/healthz, /livez, /readyz とそのサブパス) にも
               // span を作り、kubelet の probe や LB のチェックで数秒おきに届く。調査の役に
               // 立たない割に量が多いので Tempo に送る前に捨てる。
+              // リソース以外へのリクエストの span 名は HTTP メソッド ("GET") だけなので、
+              // パスは apiserver が付ける http.target (クエリ込み) と otelhttp の url.path で見る。
               otelcol.processor.filter "health" {
                 error_mode = "ignore"
 
                 traces {
                   span = [
-                    `IsMatch(name, "^(GET|HEAD) /(healthz|livez|readyz)")`,
+                    `IsMatch(attributes["http.target"], "^/(healthz|livez|readyz)")`,
+                    `IsMatch(attributes["url.path"], "^/(healthz|livez|readyz)")`,
                   ]
                 }
 
@@ -142,12 +159,13 @@ spec:
                 }
               }
 
-              // k8s-monitoring の alloy-receiver と同じ値。send_batch_max_size の既定値は
-              // send_batch_size より小さく、8192 だけ指定すると起動時の評価で失敗する
+              // send_batch_max_size は send_batch_size 以上でないと起動時の評価で失敗する。
+              // 0 (上限なし) にすると 1 回の送信が Tempo の gRPC 受信上限 (16MiB) を超えうるので、
+              // send_batch_size と同じ値で上限を掛ける
               otelcol.processor.batch "default" {
                 timeout             = "2s"
                 send_batch_size     = 8192
-                send_batch_max_size = 0
+                send_batch_max_size = 8192
 
                 output {
                   traces = [otelcol.exporter.otlp.tempo.input]
@@ -163,6 +181,11 @@ spec:
                   tls {
                     insecure = true
                   }
+                }
+
+                // 既定 (1000 バッチ) のままだと Tempo の停止中にメモリを使い切るので小さくする
+                sending_queue {
+                  queue_size = 50
                 }
               }
 
