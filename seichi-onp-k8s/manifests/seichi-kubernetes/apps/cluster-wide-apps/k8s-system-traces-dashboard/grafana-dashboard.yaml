@@ -1034,7 +1034,7 @@ data:
           "id": 20,
           "type": "timeseries",
           "title": "API リクエストの p95 (span 名別、上位 10)",
-          "description": "kube-apiserver の server span。span 名は `GET /api/v1/namespaces/{:namespace}/pods/{:name}` のようにパスの可変部分を置き換えた形。watch は list と同じ span 名で接続中ずっと続くので除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)`",
+          "description": "kube-apiserver の server span。span 名は `GET /api/v1/namespaces/{:namespace}/pods/{:name}` のようにパスの可変部分を置き換えた形で、resource 以外のリクエストはメソッド名だけ (`GET`) になる。watch は list と同じ span 名で接続中ずっと続くので除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1090,8 +1090,8 @@ data:
         {
           "id": 21,
           "type": "timeseries",
-          "title": "etcd の p95 (メソッド別)",
-          "description": "etcd の server span (etcdserverpb.KV/Range など)。ストリームの間ずっと続く Watch / LeaseKeepAlive は除く。\n\nTraceQL: `{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)`",
+          "title": "API ハンドラの p95 (verb 別)",
+          "description": "server span の下のハンドラ span (Get / List / Delete など、verb 属性付き)。認証・認可・APF の待ちを含まない、ハンドラ自体の所要時間。WATCH は除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && span.verb != nil && span.verb != \"WATCH\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (span.verb)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1110,7 +1110,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
+              "query": "{ resource.service.name = \"apiserver\" && span.verb != nil && span.verb != \"WATCH\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (span.verb)",
               "metricsQueryType": "range",
               "limit": 20,
               "tableType": "traces"
@@ -1146,9 +1146,9 @@ data:
         },
         {
           "id": 22,
-          "type": "table",
-          "title": "1 秒以上かかった API リクエスト",
-          "description": "watch は除く。audit-id で監査ログと突き合わせられる。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")`",
+          "type": "timeseries",
+          "title": "etcd 呼び出しの p95 (apiserver 側、メソッド別)",
+          "description": "kube-apiserver の etcd client span (etcdserverpb.KV/Range など)。ネットワークを含めて apiserver が etcd を待った時間。ストリームの間ずっと続く Watch / LeaseKeepAlive は除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1167,26 +1167,45 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")",
+              "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
+              "metricsQueryType": "range",
               "limit": 20,
-              "spss": 3,
               "tableType": "traces"
             }
           ],
           "fieldConfig": {
-            "defaults": {},
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 1,
+                "fillOpacity": 10,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
             "overrides": []
           },
           "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "calcs": [
+                "mean",
+                "max"
+              ]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
           }
         },
         {
           "id": 23,
           "type": "table",
-          "title": "5xx を返した API リクエスト",
-          "description": "TraceQL: `{ resource.service.name = \"apiserver\" && (span.http.response.status_code >= 500 || span.http.status_code >= 500) && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")`",
+          "title": "50ms 以上かかったストレージ処理",
+          "description": "kube-apiserver のストレージ層 (Get etcd3 / GuaranteedUpdate etcd3 など)。key は etcd のキー。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && name =~ \".* etcd3\" && duration > 50ms && resource.k8s.node.name =~ \"$node\" } | select(span.key, span.\"audit-id\")`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1205,7 +1224,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && (span.http.response.status_code >= 500 || span.http.status_code >= 500) && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")",
+              "query": "{ resource.service.name = \"apiserver\" && name =~ \".* etcd3\" && duration > 50ms && resource.k8s.node.name =~ \"$node\" } | select(span.key, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1223,8 +1242,8 @@ data:
         {
           "id": 24,
           "type": "table",
-          "title": "admission webhook の呼び出し",
-          "description": "kube-apiserver から mutating / validating webhook への呼び出し。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.webhook, span.operation, span.resource)`",
+          "title": "1 秒以上かかった API リクエスト",
+          "description": "watch は除く。audit-id で監査ログと突き合わせられる。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1243,7 +1262,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.webhook, span.operation, span.resource)",
+              "query": "{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1261,8 +1280,8 @@ data:
         {
           "id": 25,
           "type": "table",
-          "title": "100ms 以上かかった etcd 処理",
-          "description": "Watch / LeaseKeepAlive のストリームは除く。\n\nTraceQL: `{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" }`",
+          "title": "5xx を返した API リクエスト",
+          "description": "TraceQL: `{ resource.service.name = \"apiserver\" && kind = server && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1281,7 +1300,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" }",
+              "query": "{ resource.service.name = \"apiserver\" && kind = server && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1299,15 +1318,15 @@ data:
         {
           "id": 26,
           "type": "table",
-          "title": "etcd 待ちが 100ms を超えた API リクエスト",
-          "description": "子孫の etcd span (Watch / LeaseKeepAlive を除く) が 100ms 以上かかった kube-apiserver の server span。\n\nTraceQL: `{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.\"audit-id\")`",
+          "title": "admission webhook の呼び出し",
+          "description": "kube-apiserver から mutating / validating webhook への呼び出し。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.configuration, span.webhook, span.operation, span.resource)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
           },
           "gridPos": {
             "h": 8,
-            "w": 24,
+            "w": 12,
             "x": 0,
             "y": 90
           },
@@ -1319,7 +1338,83 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.\"audit-id\")",
+              "query": "{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.configuration, span.webhook, span.operation, span.resource)",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          }
+        },
+        {
+          "id": 27,
+          "type": "table",
+          "title": "100ms 以上かかった etcd 呼び出し (apiserver 側)",
+          "description": "Watch / LeaseKeepAlive のストリームは除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" } | select(span.rpc.response.status_code)`",
+          "datasource": {
+            "type": "tempo",
+            "uid": "${tempo}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 90
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" } | select(span.rpc.response.status_code)",
+              "limit": 20,
+              "spss": 3,
+              "tableType": "traces"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm"
+          }
+        },
+        {
+          "id": 28,
+          "type": "table",
+          "title": "etcd 待ちが 100ms を超えた API リクエスト",
+          "description": "子孫の etcd 呼び出し (Watch / LeaseKeepAlive を除く) が 100ms 以上かかった kube-apiserver の server span。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.user_agent.original, span.\"audit-id\")`",
+          "datasource": {
+            "type": "tempo",
+            "uid": "${tempo}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 98
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "refId": "A",
+              "queryType": "traceql",
+              "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.user_agent.original, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
