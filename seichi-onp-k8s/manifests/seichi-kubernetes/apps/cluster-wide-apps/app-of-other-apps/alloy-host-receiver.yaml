@@ -164,15 +164,16 @@ spec:
               // exec probe の ExecSync と containerd 側の exec 処理の span が、サンプリングされた
               // syncPod の trace に Pod が消えるまで数秒おきに足され続ける。1 trace が際限なく
               // 大きくなり、Tempo が TRACE_TOO_LARGE で受け取りを拒むので、exec probe 由来の
-              // span と containerd の task API のポーリング (State/Wait) を捨てる。
-              // コンテナ起動の流れ (RunPodSandbox/CreateContainer/StartContainer や
-              // containerd.task.v3.Task/Start) は残す。
+              // span と containerd の task API の内部呼び出し (Exec/Start/State/Wait) を捨てる。
+              // Task/Start は exec のプロセス起動でも 1 回ずつ出るので残せない。
+              // コンテナ起動の流れは CRI の span (RunPodSandbox/CreateContainer/StartContainer)
+              // で追える。
               otelcol.processor.filter "exec_probe" {
                 error_mode = "ignore"
 
                 traces {
                   span = [
-                    `IsMatch(name, "^(runtime\\.v1\\.RuntimeService/ExecSync|client\\.task\\.Exec|containerd\\.task\\.v3\\.Task/(Exec|State|Wait)|process\\.(Start|Wait))$")`,
+                    `IsMatch(name, "^(runtime\\.v1\\.RuntimeService/ExecSync|client\\.task\\.Exec|containerd\\.task\\.v3\\.Task/(Exec|Start|State|Wait)|process\\.(Start|Wait))$")`,
                   ]
                 }
 
