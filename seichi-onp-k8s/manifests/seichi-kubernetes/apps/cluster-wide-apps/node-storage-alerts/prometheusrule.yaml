@@ -1,0 +1,39 @@
+# ノードのストレージ I/O 異常を既存の Alertmanager -> Discord 経路へ通知する。
+#
+# 2026-10-24 の障害では、Synology (seichi-cloud) の iSCSI ボリュームで I/O エラーと
+# BTRFS の Transaction aborted が多発し、mariadb / loki / pyroscope のボリュームが
+# read-only になったが、原因側のアラートは 1 つも鳴らなかった。
+# - node-exporter は /var/lib/kubelet/.+ を除外しているので、CSI ボリュームの
+#   read-only 化は node_filesystem_readonly に出てこない
+# - node-problem-detector は IOError / TaskHung を数えていたが、problem_counter に
+#   対するアラートが無かった
+#
+# カーネルログのパターン別の検知は Loki 側 (loki-alert-rules/node-storage.yaml) にある。
+# ただし Loki 自体も Synology 上にあり、今回の障害では WAL が read-only になって
+# ログを取り込めなかった。こちらは Prometheus だけで完結する保険として置く。
+#
+# kured の alertFilterRegexp には登録しない。ストレージ異常の最中にノードを
+# 再起動すると、ボリュームの付け外しで被害が広がるため、鳴っている間は再起動を止める。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-storage-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: node-storage-alerts
+      rules:
+        - alert: NodeStorageIOErrors
+          # 実測: 2026-10-17〜10-24 の 7 日間で IOError / TaskHung が増えたのは
+          # 10-24 05:00〜08:00 JST の障害中だけ (wk-2 IOError 20 件、wk-1/2/3 TaskHung 計 18 件)。
+          # 平常時は 0 なので 1 件でも鳴らす。
+          expr: sum by (node, reason) (increase(problem_counter{reason=~"IOError|TaskHung"}[10m])) > 0
+          for: 1m
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "{{ $labels.node }} でストレージの {{ $labels.reason }} が発生しています"
+            description: "node-problem-detector が {{ $labels.node }} で {{ $labels.reason }} を検知しました。ノードで journalctl -k を確認し、iSCSI の切断 (detected conn error) や BTRFS の Transaction aborted が出ていないか、Synology (seichi-cloud) の負荷が上がっていないかを確認してください。鳴っている間は kured の再起動が止まります。"

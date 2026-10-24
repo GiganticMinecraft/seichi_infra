@@ -1,0 +1,44 @@
+# ノード保守 (kured の drain + 再起動) を妨げる設定を通知する。
+#
+# 2026-10-24 に argocd-server の PDB が maxUnavailable: 0 (退避を一切許可しない) で、
+# argocd-server が載った wk-2 の drain が 4 回連続でタイムアウトした。drain が失敗する
+# たびに他の Pod は退避済みで、iSCSI ボリュームの付け外しが繰り返されて障害につながった。
+# この設定は 2022 年から入っていたが、argocd-server が wk ノードに載るまで表に出なかった。
+#
+# 既存の KubePdbNotEnoughHealthyPods は「Pod が不健全で budget を満たせない」ときにしか
+# 鳴らない。こちらは「Pod は全部健全なのに 1 台も退避できない」= 設定のせいで drain が
+# 必ず失敗する状態を捉える。
+#
+# kured の alertFilterRegexp に登録している。drain のループ自体は
+# KuredDrainFailed (loki-alert-rules/kured.yaml) で止まるので、これで全ノードの
+# 保守を止める必要はない。
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-maintenance-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: node-maintenance-alerts
+      rules:
+        - alert: KubePdbBlocksAllEvictions
+          # 実測: 2026-10-17〜10-24 の 7 日間でこの条件を満たした時間は
+          # argocd-server 164.5 時間 (常時)、pyroscope 2.3 時間、kyverno 3 種と
+          # seichi-game-data-server は各 0.2〜0.3 時間 (ローリング更新中の一時的なもの)。
+          # 6 時間続いたものだけを設定の問題とみなす。
+          # expected_pods > 0 で、Pod が 0 台の PDB (pyroscope の停止中など) を除く。
+          expr: |
+            kube_poddisruptionbudget_status_pod_disruptions_allowed == 0
+            and on (namespace, poddisruptionbudget)
+              kube_poddisruptionbudget_status_current_healthy >= kube_poddisruptionbudget_status_desired_healthy
+            and on (namespace, poddisruptionbudget)
+              kube_poddisruptionbudget_status_expected_pods > 0
+          for: 6h
+          labels:
+            severity: warning
+            notify: discord
+          annotations:
+            summary: "PDB {{ $labels.namespace }}/{{ $labels.poddisruptionbudget }} が退避を一切許可していません"
+            description: "Pod は全部健全なのに disruptionsAllowed が 6 時間以上 0 です。この Pod が載ったノードは kured の drain が必ず失敗します。maxUnavailable: 0 や、replicas と同じ値の minAvailable になっていないか確認し、replicas 2 以上なら maxUnavailable: 1 + unhealthyPodEvictionPolicy: AlwaysAllow にしてください。"

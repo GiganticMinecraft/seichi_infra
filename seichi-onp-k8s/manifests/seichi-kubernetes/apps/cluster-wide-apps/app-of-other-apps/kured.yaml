@@ -57,7 +57,18 @@ spec:
           # 止める理由は無く、mirror.gcr.io の障害などで長時間 firing しうるので除外する。
           # NodeTextFileCollectorScrapeError: textfile collector を使っているのは trivy-node-scanner だけで、
           # ディレクトリ作成前などの一時的なエラーで全ノードの保守を止めないよう除外する
-          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled|ConifersMigrationJobFailed|ArgoCDAppDegraded|ArgoCDAppSyncFailed|ArgoCDAppOutOfSyncTooLong|McserverOldGenHighAfterCollection|McserverFullGcStorm|McserverMemoryNearLimit|Trivy[A-Za-z]+|NodeTextFileCollectorScrapeError)$"
+          # SeichiPortalDebeziumDisconnected: アプリケーションアラート (seichi-portal-alerts)。
+          # 他のアプリアラートと同じく、ノード保守を止めても直らないので除外する
+          # KubePdbBlocksAllEvictions: 退避を一切許可しない PDB (node-maintenance-alerts)。
+          # その Pod が載ったノードの drain は失敗するが、ループは KuredDrainFailed で止まるので、
+          # 全ノードの保守まで止める必要はない
+          # NodeBtrfsChecksumErrors: すでに壊れているデータを読むたびに鳴るもので、再起動を
+          # 止めても直らないので除外する
+          # 逆に KuredDrainFailed / NodeStorageIOErrors / NodeBlockDeviceIOErrors /
+          # NodeIscsiConnErrors は除外しない。drain の失敗が 10 分おきに繰り返されたり、
+          # ストレージ異常の最中にボリュームの付け外しが起きたりするのを止めるため
+          # (2026-10-24 の障害は、この 2 つが重なって起きた)
+          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|SeichiPortalDebeziumDisconnected|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled|ConifersMigrationJobFailed|ArgoCDAppDegraded|ArgoCDAppSyncFailed|ArgoCDAppOutOfSyncTooLong|McserverOldGenHighAfterCollection|McserverFullGcStorm|McserverMemoryNearLimit|Trivy[A-Za-z]+|NodeTextFileCollectorScrapeError|KubePdbBlocksAllEvictions|NodeBtrfsChecksumErrors)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、
