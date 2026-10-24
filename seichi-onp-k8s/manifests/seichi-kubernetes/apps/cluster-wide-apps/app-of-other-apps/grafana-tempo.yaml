@@ -49,16 +49,26 @@ spec:
                     # これが混ざると p95 がヒストグラムの最大バケット (16.384s) に張り付くので、
                     # 生成時に除く。条件はダッシュボードの TraceQL パネルと同じ。
                     # exclude は 1 つでも当たれば除外、1 つの exclude の中の attributes は AND。
-                    # regex は部分一致 (Go の MatchString) なので完全一致させたいものは ^...$ で囲む。
+                    # regex は部分一致 (Go の MatchString) なので、TraceQL (完全一致) にある前後の .* は付けず、
+                    # 完全一致させたいものは ^...$ で囲む。
                     filter_policies: &apiserver-long-running-filter
-                      # watch (?watch=true, /watch/)・ログの follow・exec / attach / port-forward / proxy
+                      # watch (?watch=true, /watch/)・ログの follow・exec / attach / port-forward / proxy。
+                      # apiserver の otelhttp が旧 semconv の http.target を出している前提で、
+                      # url.path / url.query に移ったらこの条件は当たらなくなる。
                       - exclude:
                           match_type: regex
                           attributes:
                             - key: resource.service.name
                               value: ^apiserver$
                             - key: span.http.target
-                              value: .*([?&](watch|follow)=(1|t|T|true|True|TRUE)|/watch/|/(exec|attach|portforward|proxy)([/?]|$)).*
+                              value: ([?&](watch|follow)=(1|t|T|true|True|TRUE)|/watch/|/(exec|attach|portforward|proxy)([/?]|$))
+                      # client-go を使う他のコンポーネント (workflows-controller など) の informer の watch。
+                      # 新 semconv の client span は url.full に URL 全体が入る。
+                      - exclude:
+                          match_type: regex
+                          attributes:
+                            - key: span.url.full
+                              value: ([?&]watch=(1|t|T|true|True|TRUE)|/watch/)
                       # server span の下にあるフィルタ層の span。どれも後段の処理全体を包むので
                       # 所要時間は server span とほぼ同じで、watch でも同じ長さになる。
                       # 属性が無く watch かどうか見分けられないため、名前でまとめて除く
