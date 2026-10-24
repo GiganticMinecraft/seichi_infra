@@ -1,0 +1,24 @@
+# alloy-host-receiver (hostNetwork の DaemonSet) から Tempo への OTLP gRPC (4317/TCP) の
+# ingress 許可。hostNetwork の Pod は Cilium の endpoint を持たないので fromEndpoints の
+# ラベルでは選べず、通信元は entity で見る (同じノードの Tempo へは host、
+# 別ノードからは remote-node として届く)。
+# policyAuditMode が有効な間はこのポリシーが無くてもドロップされないが、
+# enforce に切り替える前に揃えておく必要がある。
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow--from-host-receiver--to-tempo
+  namespace: monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: tempo
+      app.kubernetes.io/instance: tempo
+  ingress:
+    - fromEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP

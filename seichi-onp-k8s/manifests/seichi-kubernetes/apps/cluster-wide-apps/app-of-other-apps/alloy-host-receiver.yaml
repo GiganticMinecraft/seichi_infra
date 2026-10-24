@@ -1,0 +1,196 @@
+# ノードの host network namespace で動く Kubernetes のシステムコンポーネント
+# (kube-apiserver / etcd の static pod、kubelet、containerd) のトレースを受ける
+# ノードローカルの OTLP receiver。
+# k8s-monitoring の alloy-receiver は Pod ネットワーク上の 1 replica Deployment で、
+# host 側からは Service 名で引けないため、各ノードの 127.0.0.1:4317 (gRPC) /
+# 127.0.0.1:4318 (HTTP) で受けて Tempo へ中継する DaemonSet を別に置く。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alloy-host-receiver
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io # cascade deletion on this App deletion
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: cluster-wide-apps
+  source:
+    chart: alloy
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 1.14.3
+    helm:
+      values: |
+        controller:
+          type: daemonset
+          # 送信元が host netns にいるので、受け口も host netns の loopback に置く
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+          # kube-apiserver / etcd が動く control-plane ノードにも置く
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+          # ノード上のシステムコンポーネントの受け口なので、ノードが逼迫しても
+          # 追い出されにくくする
+          priorityClassName: system-node-critical
+          volumes:
+            extra:
+              # readOnlyRootFilesystem のため storage.path (/tmp/alloy) を emptyDir にする
+              - name: tmp
+                emptyDir: {}
+
+        alloy:
+          # hostNetwork なので 0.0.0.0 で listen するとノードの LAN 側に UI と
+          # /metrics が露出する。loopback に限定する (Prometheus からの scrape は
+          # できなくなるが、今は受けたトレースを中継するだけなので許容する)
+          listenAddr: 127.0.0.1
+          # chart の readinessProbe は Pod IP (= ノード IP) に向くため、loopback
+          # だけで listen すると Ready にならない。chart 側の port 宣言と
+          # readinessProbe を外し、代わりに host: 127.0.0.1 の livenessProbe を置く。
+          # (hostNetwork の Pod では containerPort がそのまま hostPort として
+          # 扱われるので、loopback 専用のポートを宣言しない意味もある)
+          enableHttpServerPort: false
+          livenessProbe:
+            httpGet:
+              host: 127.0.0.1
+              path: /-/ready
+              port: 12345
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 5
+          enableReporting: false
+          mounts:
+            extra:
+              - name: tmp
+                mountPath: /tmp
+          # イメージの既定ユーザーは root なので、イメージ内に用意されている
+          # alloy ユーザー (uid/gid 473) を明示する。hostNetwork でも 1024 以上の
+          # ポートしか使わないので capability は要らない
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 473
+            runAsGroup: 473
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          configMap:
+            content: |
+              // 送信元は hostNetwork の static pod (kube-apiserver / etcd) と host process
+              // (kubelet / containerd)。これらは Pod ネットワークの DNS (Service 名) を
+              // 引けず、OTLP 送信に TLS も設定しにくいため、各ノードの loopback で受けて
+              // Tempo へ中継する。ノード外からは届かないよう 127.0.0.1 にだけ bind する。
+              otelcol.receiver.otlp "host" {
+                grpc {
+                  endpoint = "127.0.0.1:4317"
+                }
+
+                http {
+                  endpoint = "127.0.0.1:4318"
+                }
+
+                output {
+                  traces = [otelcol.processor.transform.node.input]
+                }
+              }
+
+              // 送信元が自分で付けていない場合だけ k8s.node.name / k8s.cluster.name を補う
+              // (where で未設定のときに限るので、送信元の値は上書きしない)。
+              // K8S_NODE_NAME は chart が spec.nodeName から入れる。k8s.cluster.name は
+              // アプリのトレース (k8s-monitoring の alloy-receiver 経由) と揃える。
+              otelcol.processor.transform "node" {
+                error_mode = "ignore"
+
+                trace_statements {
+                  context    = "resource"
+                  statements = [
+                    string.format(`set(attributes["k8s.node.name"], "%s") where attributes["k8s.node.name"] == nil`, sys.env("K8S_NODE_NAME")),
+                    `set(attributes["k8s.cluster.name"], "seichi-cloud") where attributes["k8s.cluster.name"] == nil`,
+                  ]
+                }
+
+                output {
+                  traces = [otelcol.processor.filter.health.input]
+                }
+              }
+
+              // kube-apiserver はヘルスチェック (/healthz, /livez, /readyz とそのサブパス) にも
+              // span を作り、kubelet の probe や LB のチェックで数秒おきに届く。調査の役に
+              // 立たない割に量が多いので Tempo に送る前に捨てる。
+              otelcol.processor.filter "health" {
+                error_mode = "ignore"
+
+                traces {
+                  span = [
+                    `IsMatch(name, "^(GET|HEAD) /(healthz|livez|readyz)")`,
+                  ]
+                }
+
+                output {
+                  traces = [otelcol.processor.batch.default.input]
+                }
+              }
+
+              // k8s-monitoring の alloy-receiver と同じ値。send_batch_max_size の既定値は
+              // send_batch_size より小さく、8192 だけ指定すると起動時の評価で失敗する
+              otelcol.processor.batch "default" {
+                timeout             = "2s"
+                send_batch_size     = 8192
+                send_batch_max_size = 0
+
+                output {
+                  traces = [otelcol.exporter.otlp.tempo.input]
+                }
+              }
+
+              // hostNetwork の Pod は dnsPolicy: ClusterFirstWithHostNet でクラスタ DNS を
+              // 引けるが、search path に頼らないよう FQDN で書く。
+              otelcol.exporter.otlp "tempo" {
+                client {
+                  endpoint = "tempo.monitoring.svc.cluster.local:4317"
+
+                  tls {
+                    insecure = true
+                  }
+                }
+              }
+
+        # config-reloader (prometheus-config-reloader) は既定で :8080 に metrics を
+        # listen し、hostNetwork だとノードの 8080 を全インターフェースで掴んでしまう。
+        # 設定変更は Pod の checksum/config annotation でローリング再起動されるので不要
+        configReloader:
+          enabled: false
+
+        # hostNetwork + loopback で受けるので Service / ServiceMonitor は作らない
+        service:
+          enabled: false
+        serviceMonitor:
+          enabled: false
+
+        # この設定は Kubernetes API を使わないので RBAC も SA トークンも要らない
+        rbac:
+          create: false
+        serviceAccount:
+          create: true
+          automountServiceAccountToken: false
+
+        # chart 既定で PodLogs CRD を入れるが、k8s-monitoring 側で管理しているので触らない
+        crds:
+          create: false
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
