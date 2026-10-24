@@ -155,6 +155,28 @@ spec:
                 }
 
                 output {
+                  traces = [otelcol.processor.filter.exec_probe.input]
+                }
+              }
+
+              // kubelet の probe worker は Pod を作った syncPod の context をそのまま引き継ぐ
+              // (context.WithoutCancel で cancel だけ外し、trace の span は残る) ので、
+              // exec probe の ExecSync と containerd 側の exec 処理の span が、サンプリングされた
+              // syncPod の trace に Pod が消えるまで数秒おきに足され続ける。1 trace が際限なく
+              // 大きくなり、Tempo が TRACE_TOO_LARGE で受け取りを拒むので、exec probe 由来の
+              // span と containerd の task API のポーリング (State/Wait) を捨てる。
+              // コンテナ起動の流れ (RunPodSandbox/CreateContainer/StartContainer や
+              // containerd.task.v3.Task/Start) は残す。
+              otelcol.processor.filter "exec_probe" {
+                error_mode = "ignore"
+
+                traces {
+                  span = [
+                    `IsMatch(name, "^(runtime\\.v1\\.RuntimeService/ExecSync|client\\.task\\.Exec|containerd\\.task\\.v3\\.Task/(Exec|State|Wait)|process\\.(Start|Wait))$")`,
+                  ]
+                }
+
+                output {
                   traces = [otelcol.processor.batch.default.input]
                 }
               }
