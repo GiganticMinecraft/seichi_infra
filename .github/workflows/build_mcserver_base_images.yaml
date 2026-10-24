@@ -21,15 +21,27 @@ jobs:
     strategy:
       matrix:
         include:
-          # mcserver_base_image_tag / mcserver_base_image_digest:
-          #   itzg/minecraft-server のタグと digest 値。（digest 値は、linux/amd64 の Manifest Digest を記載する。Index Digest ではない）
+          # mcserver_base_image_repo / mcserver_base_image_tag / mcserver_base_image_digest:
+          #   基底にする itzg/minecraft-server 系イメージの repo・タグ・digest 値。
+          #   digest 値は、itzg/minecraft-server の行は linux/amd64 の Manifest Digest (Index Digest ではない)、
+          #     ghcr.io/giganticminecraft/itzg-minecraft-server の行は cosign が署名した Index Digest を記載する
+          #     (renovate は記載されている digest の種類に合わせて更新する)。
+          #   java17 は上流の java17 タグが Ubuntu 20.04 (focal) + 古い JDK のままなので、
+          #     build_itzg_images.yaml が Ubuntu 26.04 ベースで再ビルドした
+          #     ghcr.io/giganticminecraft/itzg-minecraft-server を使う (上流同様 JRE ベース。
+          #     java_version_component_in_tag の -jdk は従来からのタグ名で、利用側の FROM と
+          #     renovate の追従を壊さないため据え置き)。
+          #     この行の digest は build_itzg_images.yaml が main で publish → renovate の
+          #     「itzg/minecraft-server images」PR → この workflow の再ビルド → 「seichi_minecraft_server images」PR
+          #     の順でしか進まないので、上流の変更が本番に届くまで数ホップかかる。
           #   これらの値は renovate によって更新したいため、
-          #     mcserver_base_image_tag / mcserver_base_image_digest そのものをリネームする必要があれば、
-          #     renovate.json も見直すこと。
-          #   また、 renovate に認識させるため、 [mcserver_base_image_tag, mcserver_base_image_digest] の順で
+          #     フィールドをリネームする必要があれば renovate.json5 も見直すこと。
+          #   また、 renovate に認識させるため、
+          #     [mcserver_base_image_repo, mcserver_base_image_tag, mcserver_base_image_digest] の順で
           #     フィールドを記述すること。
           #   itzg/minecraft-server には 2025.3.0-java21 のように日付を含むタグを持つイメージがあるが、
           #     これらのイメージを使用すると、renovate が更新を検知できないため使用しないこと。
+          #     itzg-minecraft-server も同様に java17-2026.10.0 ではなく java17 の方を使うこと。
           # java_version_component_in_tag:
           #   mcserver_base_image_tag に含まれる Java バージョンを含む文字列。
           #   当ワークフローが生成する整地鯖の基底イメージは、タグとして
@@ -37,13 +49,16 @@ jobs:
           #   renovate に各サーバーのイメージ更新 PR を出してもらえるように、
           #     各サーバーの基底イメージ指定は
           #     java_version_component_in_tag + digest pinning で行うこととしている。
-          - mcserver_base_image_tag: java8-jdk
+          - mcserver_base_image_repo: itzg/minecraft-server
+            mcserver_base_image_tag: java8-jdk
             mcserver_base_image_digest: "sha256:9d08892a088f02a2805626bab801b365f3d0dfed91dc3b419d835892625c4da5"
             java_version_component_in_tag: java8-jdk
-          - mcserver_base_image_tag: java17
-            mcserver_base_image_digest: "sha256:91bdad255ec58010164cee6bc790d1c8f1852971ed553dc2190ede54f31539d9"
+          - mcserver_base_image_repo: ghcr.io/giganticminecraft/itzg-minecraft-server
+            mcserver_base_image_tag: java17
+            mcserver_base_image_digest: "sha256:0d1c6ecf613602b57dd74eeaa9f7913135437322bb49d43a7dce496216a2f134"
             java_version_component_in_tag: java17-jdk
-          - mcserver_base_image_tag: java21-jdk
+          - mcserver_base_image_repo: itzg/minecraft-server
+            mcserver_base_image_tag: java21-jdk
             mcserver_base_image_digest: "sha256:8d61b543a0b485ed7ad004694cfda89c331c1b57fd2034c94deeb526c85167c8"
             java_version_component_in_tag: java21-jdk
 
@@ -92,7 +107,7 @@ jobs:
           # すべてのビルドステージのすべてのレイヤーをキャッシュして欲しいのでmode=max
           cache-to: type=gha,mode=max
           build-args: |
-            MCSERVER_BASE_IMAGE=itzg/minecraft-server:${{ matrix.mcserver_base_image_tag }}@${{ matrix.mcserver_base_image_digest }}
+            MCSERVER_BASE_IMAGE=${{ matrix.mcserver_base_image_repo }}:${{ matrix.mcserver_base_image_tag }}@${{ matrix.mcserver_base_image_digest }}
 
       - name: Sign container image with Cosign
         if: github.ref == 'refs/heads/main'
