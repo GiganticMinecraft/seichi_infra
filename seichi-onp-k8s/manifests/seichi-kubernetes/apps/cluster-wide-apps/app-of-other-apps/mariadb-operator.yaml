@@ -8,7 +8,7 @@ spec:
   source:
     chart: mariadb-operator-crds
     repoURL: ghcr.io/mariadb-operator/charts
-    targetRevision: 26.10.1
+    targetRevision: 26.10.2
     helm:
       releaseName: mariadb-operator-crds
   destination:
@@ -32,7 +32,7 @@ spec:
   source:
     chart: mariadb-operator
     repoURL: ghcr.io/mariadb-operator/charts
-    targetRevision: 26.10.1
+    targetRevision: 26.10.2
     helm:
       releaseName: mariadb-operator
       values: |
