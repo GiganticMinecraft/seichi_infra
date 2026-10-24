@@ -305,7 +305,7 @@ span が出てこない場合は、ノード上の受信側の Alloy を確認�
 
 ```bash
 # 受信側は monitoring namespace の DaemonSet alloy-host-receiver (Argo CD Application: alloy-host-receiver)
-kubectl -n monitoring get pods -l app.kubernetes.io/name=alloy-host-receiver -o wide --field-selector spec.nodeName=<node>
+kubectl -n monitoring get pods -l app.kubernetes.io/instance=alloy-host-receiver -o wide --field-selector spec.nodeName=<node>
 kubectl -n monitoring logs ds/alloy-host-receiver --since=10m | grep -iE 'error|refused|otlp'
 ```
 
