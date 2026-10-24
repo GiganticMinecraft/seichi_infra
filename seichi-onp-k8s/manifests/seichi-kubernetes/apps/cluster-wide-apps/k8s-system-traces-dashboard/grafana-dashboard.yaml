@@ -1240,6 +1240,158 @@ data:
             },
             {
               "id": 24,
+              "type": "timeseries",
+              "title": "etcd server の p95 (メソッド別、etcd 側)",
+              "description": "etcd 自身の server span。上の apiserver 側の値との差がネットワークやリトライの分。ストリームの間ずっと続く Watch / LeaseKeepAlive は除く。",
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 0,
+                "y": 82
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "id": 25,
+              "type": "timeseries",
+              "title": "etcd server の p95 (メンバー別)",
+              "description": "etcd メンバー (control plane ノード) ごとの server span の p95。1 台だけ遅いメンバーを見つける用。",
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 8,
+                "y": 82
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "id": 26,
+              "type": "table",
+              "title": "100ms 以上かかった etcd server span",
+              "description": "Watch / LeaseKeepAlive のストリームは除く。トレースを開くと呼び出し元の API リクエストまで辿れる。",
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 16,
+                "y": 82
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, name)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
+            {
+              "id": 27,
               "type": "table",
               "title": "1 秒以上かかった API リクエスト",
               "description": "watch・ログの follow・exec / attach / port-forward / proxy は除く。audit-id で監査ログと突き合わせられる。",
@@ -1251,7 +1403,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 0,
-                "y": 82
+                "y": 90
               },
               "targets": [
                 {
@@ -1277,7 +1429,7 @@ data:
               }
             },
             {
-              "id": 25,
+              "id": 28,
               "type": "table",
               "title": "5xx を返した API リクエスト",
               "description": "",
@@ -1289,7 +1441,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 12,
-                "y": 82
+                "y": 90
               },
               "targets": [
                 {
@@ -1315,7 +1467,7 @@ data:
               }
             },
             {
-              "id": 26,
+              "id": 29,
               "type": "table",
               "title": "admission webhook の呼び出し",
               "description": "kube-apiserver から mutating / validating webhook への呼び出し。",
@@ -1327,7 +1479,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 0,
-                "y": 90
+                "y": 98
               },
               "targets": [
                 {
@@ -1353,7 +1505,7 @@ data:
               }
             },
             {
-              "id": 27,
+              "id": 30,
               "type": "table",
               "title": "100ms 以上かかった etcd 呼び出し (apiserver 側)",
               "description": "Watch / LeaseKeepAlive のストリームは除く。",
@@ -1365,7 +1517,7 @@ data:
                 "h": 8,
                 "w": 12,
                 "x": 12,
-                "y": 90
+                "y": 98
               },
               "targets": [
                 {
@@ -1391,7 +1543,7 @@ data:
               }
             },
             {
-              "id": 28,
+              "id": 31,
               "type": "table",
               "title": "etcd 待ちが 100ms を超えた API リクエスト",
               "description": "子孫の etcd 呼び出し (Watch / LeaseKeepAlive を除く) が 100ms 以上かかった kube-apiserver の server span。",
@@ -1403,7 +1555,7 @@ data:
                 "h": 8,
                 "w": 24,
                 "x": 0,
-                "y": 98
+                "y": 106
               },
               "targets": [
                 {
