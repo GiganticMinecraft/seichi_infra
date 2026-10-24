@@ -428,8 +428,11 @@ skipPhases:
 ---
 # 稼働中のクラスタは kubeadm.k8s.io/v1beta4 / v1.37 系で、kube-system/kubeadm-config が正
 # (監査ログの設定などはここに無く、このファイルは追従していない)。v1beta3 の extraArgs はマップで書く。
-# トレース設定は docs/runbooks/k8s-system-component-tracing.md と
-# seichi-onp-k8s/cluster-boot-up/tracing/ を参照。
+# kube-apiserver / etcd のトレース設定は v1.34 以降が前提なので、v1.32.1 のここではコメントにしてある
+# (apiserver.config.k8s.io/v1 の TracingConfiguration は 1.34 から。kubeadm v1.32 の etcd 3.5 には
+# --enable-distributed-tracing が無く --experimental-* だけで、その --experimental-* は 3.7 で削除済み)。
+# kubernetesVersion を上げるときにコメントを外す。
+# refs: docs/runbooks/k8s-system-component-tracing.md, seichi-onp-k8s/cluster-boot-up/tracing/
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 networking:
@@ -439,23 +442,24 @@ etcd:
     local:
         extraArgs:
             listen-metrics-urls: http://0.0.0.0:2381
-            # apiserver でサンプリングされたリクエストの span だけを記録する (0 = ParentBased(NeverSample))
-            enable-distributed-tracing: "true"
-            distributed-tracing-address: 127.0.0.1:4317
-            distributed-tracing-sampling-rate: "0"
+            # (v1.34 以降) apiserver でサンプリングされたリクエストの span だけを記録する (0 = ParentBased(NeverSample))
+            # enable-distributed-tracing: "true"
+            # distributed-tracing-address: 127.0.0.1:4317
+            # distributed-tracing-sampling-rate: "0"
 kubernetesVersion: "v1.32.1"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
     certSANs:
         - k8s-api.onp-k8s.admin.local-tunnels.seichi.click
-    extraArgs:
-        tracing-config-file: /etc/kubernetes/tracing/apiserver-tracing.yaml
-    extraVolumes:
-        - name: tracing-config
-          hostPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
-          mountPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
-          readOnly: true
-          pathType: File
+    # (v1.34 以降) /etc/kubernetes/tracing/apiserver-tracing.yaml は上で配置済み
+    # extraArgs:
+    #     tracing-config-file: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    # extraVolumes:
+    #     - name: tracing-config
+    #       hostPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    #       mountPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    #       readOnly: true
+    #       pathType: File
 controllerManager:
     extraArgs:
         bind-address: "0.0.0.0"
