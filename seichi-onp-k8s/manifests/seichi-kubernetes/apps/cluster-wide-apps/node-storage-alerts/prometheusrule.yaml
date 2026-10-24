@@ -12,7 +12,7 @@
 # ただし Loki 自体も Synology 上にあり、今回の障害では WAL が read-only になって
 # ログを取り込めなかった。こちらは Prometheus だけで完結する保険として置く。
 #
-# kured の alertFilterRegexp には登録しない。ストレージ異常の最中にノードを
+# kured の alertFilterRegexp (許可リスト) に登録している。ストレージ異常の最中にノードを
 # 再起動すると、ボリュームの付け外しで被害が広がるため、鳴っている間は再起動を止める。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule

@@ -21,6 +21,15 @@ spec:
             kubeProxy: false
             alertmanager: true
             windows: false
+          # etcdDatabaseHighFragmentationRatio: 上流 (etcd mixin) の条件は「実使用 100MiB 超かつ
+          # ファイルの 50% 未満」で、2GiB quota に対して敏感すぎると上流でも指摘されたまま変わっていない
+          # (kube-prometheus#2470, etcd discussion#18620)。本クラスタは実使用 ~130MiB に対して
+          # ファイルが定常的に 2 倍強 (compaction 後の空きページを bbolt が再利用する平衡点) で、
+          # 2026-10-23 の defrag 後も 24 時間で元の大きさに戻った。defrag は実行中そのメンバーの
+          # 読み書きを止めるので繰り返す価値が無く、容量リスクは etcdDatabaseQuotaLowSpace (critical)
+          # が別に見ているため、このルールは無効化する
+          disabled:
+            etcdDatabaseHighFragmentationRatio: true
         prometheus-windows-exporter:
           prometheus:
             monitor:

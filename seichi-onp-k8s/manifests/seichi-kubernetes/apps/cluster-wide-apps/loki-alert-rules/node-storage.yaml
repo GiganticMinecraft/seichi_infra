@@ -9,10 +9,10 @@
 # (10-24 07:06 以降の分は欠けている)。Prometheus だけで完結する保険として
 # node-storage-alerts の NodeStorageIOErrors も置いている。
 #
-# NodeBlockDeviceIOErrors / NodeIscsiConnErrors は kured の alertFilterRegexp に登録しない。
-# ストレージ異常の最中にノードを再起動すると被害が広がるため、鳴っている間は再起動を止める。
-# NodeBtrfsChecksumErrors は登録する (すでに壊れているデータを読むたびに鳴るもので、
-# 再起動を止めても直らないため)。
+# Loki ruler のアラートは Alertmanager に直接送られ、kured が見る Prometheus の ALERTS 系列には
+# 現れない。そのため、ここのアラートでは kured の再起動を止められない (通知専用)。
+# ストレージ異常の最中に再起動を止める役は、Prometheus 側の NodeStorageIOErrors
+# (node-storage-alerts、kured の許可リストに登録済み) が担う。
 apiVersion: v1
 kind: ConfigMap
 metadata:
