@@ -26,49 +26,55 @@ spec:
           drainTimeout: 10m
           period: 10m
           annotateNodes: true
-          # 重要なアラートが firing している間は再起動を保留する。
-          # 常時 firing しがちな警告(TargetDown 等)は除外しないと永久にブロックされるため列挙している
+          # 特定のアラートが firing している間だけ再起動を保留する (許可リスト方式)。
+          #
+          # 導入時は「除外リストに無いアラートはすべてブロック」だったが、warning 級のアラートが
+          # 100 本以上あるこのクラスタでは常に何かが firing しており、2026-08-26〜10-23 の約 2 か月間
+          # kured は 1 台も drain できなかった (etcdDatabaseHighFragmentationRatio, KubeVersionMismatch,
+          # GarageBlockResyncErrors, ThanosObjectStorageOperationFailures, KubeContainerWaiting 等が
+          # 入れ替わりで 05:00-07:00 の窓を潰し続けた)。除外リストは 3 か月で 12 回追記しても
+          # 追いつかなかったため、alertFilterMatchOnly で意味を反転し、「今もう 1 台落とすと障害が
+          # 重なる」状態を表すアラートだけを列挙してブロック理由にする。これらは前のノードが復帰すれば
+          # 自然に消えるので、「前の 1 台が完全に戻るまで次を待つ」という本来の目的だけが残る。
+          #
+          # kured が見るのは Prometheus の ALERTS 系列だけなので、ここに書けるのは PrometheusRule 由来の
+          # アラートに限る。Loki ruler のアラート (loki-alert-rules/*: KuredDrainFailed,
+          # NodeBlockDeviceIOErrors, NodeIscsiConnErrors, NodeBtrfsChecksumErrors) は Alertmanager に
+          # 直接送られ Prometheus には現れないため、列挙しても何も起きない。
+          #
+          # 列挙しているもの:
+          # - ノード / control plane の死活: KubeNodeNotReady, KubeNodeUnreachable,
+          #   KubeNodeReadinessFlapping, KubeletDown, KubeAPIDown, KubeControllerManagerDown,
+          #   KubeSchedulerDown
+          # - etcd の quorum: etcdInsufficientMembers, etcdMembersDown, etcdNoLeader
+          # - ストレージの冗長性: GarageStorageNodeDisconnected (RF=2 なので 2 台目は落とせない)
+          # - ストレージ異常の最中にボリュームの付け外しをしない: NodeStorageIOErrors
+          #   (node-storage-alerts。node-problem-detector の IOError / TaskHung)
+          # - ノード 1 台分の余裕が無い: KubeCPUOvercommit, KubeMemoryOvercommit (requests の合計が
+          #   ノード 1 台を失った後の allocatable を超えている状態。drain した Pod の退避先が無く
+          #   Pending のまま残る。直近 36 日で firing 実績は無いので、普段は何も止めない)
+          # - 退避を一切許可しない PDB がある間は drain が失敗を繰り返すので止める:
+          #   KubePdbBlocksAllEvictions (node-maintenance-alerts。2026-10-24 の障害は、
+          #   argocd-server の PDB による drain 失敗の繰り返しとストレージ異常が重なって起きた)。
+          #   for: 6h なので窓の直前に入った PDB は拾えず、drain 失敗そのものを Prometheus 側で
+          #   検知する手段は未整備 (KuredDrainFailed は Loki ruler のため kured から見えない)
+          #
+          # 列挙していないもの (= 再起動を止めない) の代表例と理由:
+          # - アプリケーションアラート (SeichiPortal*, Gachadata*, Conifers*, Mcserver*, ArgoCDApp*):
+          #   drain で Pod が作り直されても根本原因は解消しないアプリ固有の問題
+          # - 状態や容量の警告 (KubeStatefulSetReplicasMismatch, KubeletTooManyPods, Trivy*,
+          #   KubeContainerWaiting 等): 再起動を保留しても直らない。KubeletTooManyPods は過密ノードの
+          #   drain だけが解消手段で、ブロックするとデッドロックになる (2026-07-19 の実績)
+          # - drain 自身が誘発する一時的なアラート (ThanosSidecarUploadStale, GarageS3SlowWrites,
+          #   ThanosObjectStorageOperationFailures 等): 1 台再起動するごとに次の周期を潰し、
+          #   1 窓で 2 台しか進まなくなる (2026-10-24 の窓の実績)
+          #
+          # 新しいアラートを足すときの基準は「他のノードを今すぐ再起動すると被害が広がるか」。
+          # 「通知したい」だけのアラートはここに入れない (通知は Alertmanager の仕事)。
           prometheusUrl: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
           alertFiringOnly: true
-          # KubeStatefulSetReplicasMismatch: pyroscope や debug 環境の redis が常時 firing しがちで、
-          # 2026-07-15/16 の窓で全ノードの再起動を 2 日間ブロックした実績があるため、
-          # 同クラスの KubeDeploymentReplicasMismatch / KubePodNotReady と同様に除外する
-          # KubeletTooManyPods (severity: info): kured が 1 台ずつ drain するたびに退避先の
-          # ノードへ Pod が集中し、その偏りを解消できる唯一の手段 (= 過密ノードの drain) を
-          # このアラート自身がブロックするデッドロックになるため除外する (2026-07-19 の窓で
-          # wk-1 が 107/110 Pod になり全ノードの再起動が止まった実績)。Pod 数だけの偏りは
-          # CPU/メモリ requests が高い本クラスタでは descheduler の LowNodeUtilization でも
-          # 解消できない (全リソースが閾値未満のノードが存在しないため移動先候補が出ない)
-          # ThanosSidecarUploadStale: 実態は sidecar 再起動でメトリクスが 0 リセットされることによる
-          # 偽発火で、drain が prometheus Pod を動かすたびに窓の最中に firing する (2026-07-20 の窓で
-          # wk-2 の再起動を 3 周期 (約 40 分) ブロックした実績)。アラート式側に > 0 ガードを入れて
-          # 根治したが、本物の停滞時も再起動の保留ではアップロードは復旧しないため除外は維持する
-          # SeichiPortalHighErrorRate / SeichiPortalBackendCrashLoop /
-          # GachadataServerCrashLoop / ConifersIngestorJobFailed / ArgoCDApp*:
-          # アプリケーションアラート (#5611, #5618, Sentry 撤去後の通知カバレッジ)。
-          # drain による Pod 再作成で症状が一旦消えることはあっても根本原因は解消しない
-          # アプリ固有の問題のため、ノード保守をブロックさせない
-          # Mcserver*: mcserver JVM の GC 予兆アラート (mcserver-jvm-alerts)。
-          # drain による Pod 再作成で heap は一旦初期化されるが根本原因は解消しない
-          # アプリ固有アラートであり、賑わい時間帯に warning が長時間 firing し続けて
-          # クラスタ全体のノード保守を止めうるため除外する
-          # Trivy*: Trivy Operator / ノードスキャン / KBOM スキャンの基盤故障アラート (trivy-operator-alerts,
-          # trivy-node-scanner-alerts)。スキャンが止まっていてもノードの再起動 (むしろ脆弱性の解消手段) を
-          # 止める理由は無く、mirror.gcr.io の障害などで長時間 firing しうるので除外する。
-          # NodeTextFileCollectorScrapeError: textfile collector を使っているのは trivy-node-scanner だけで、
-          # ディレクトリ作成前などの一時的なエラーで全ノードの保守を止めないよう除外する
-          # SeichiPortalDebeziumDisconnected: アプリケーションアラート (seichi-portal-alerts)。
-          # 他のアプリアラートと同じく、ノード保守を止めても直らないので除外する
-          # KubePdbBlocksAllEvictions: 退避を一切許可しない PDB (node-maintenance-alerts)。
-          # その Pod が載ったノードの drain は失敗するが、ループは KuredDrainFailed で止まるので、
-          # 全ノードの保守まで止める必要はない
-          # NodeBtrfsChecksumErrors: すでに壊れているデータを読むたびに鳴るもので、再起動を
-          # 止めても直らないので除外する
-          # 逆に KuredDrainFailed / NodeStorageIOErrors / NodeBlockDeviceIOErrors /
-          # NodeIscsiConnErrors は除外しない。drain の失敗が 10 分おきに繰り返されたり、
-          # ストレージ異常の最中にボリュームの付け外しが起きたりするのを止めるため
-          # (2026-10-24 の障害は、この 2 つが重なって起きた)
-          alertFilterRegexp: "^(Watchdog|InfoInhibitor|TargetDown|KubeJobFailed|CPUThrottlingHigh|PrometheusNotConnectedToAlertmanagers|KubePodCrashLooping|KubePodNotReady|KubeDeploymentReplicasMismatch|KubeStatefulSetReplicasMismatch|KubeletTooManyPods|ThanosSidecarUploadStale|SeichiPortalHighErrorRate|SeichiPortalBackendCrashLoop|SeichiPortalDebeziumDisconnected|GachadataServerCrashLoop|ConifersIngestorJobFailed|ConifersIngestorStalled|ConifersMigrationJobFailed|ArgoCDAppDegraded|ArgoCDAppSyncFailed|ArgoCDAppOutOfSyncTooLong|McserverOldGenHighAfterCollection|McserverFullGcStorm|McserverMemoryNearLimit|Trivy[A-Za-z]+|NodeTextFileCollectorScrapeError|KubePdbBlocksAllEvictions|NodeBtrfsChecksumErrors)$"
+          alertFilterMatchOnly: true
+          alertFilterRegexp: "^(KubeNodeNotReady|KubeNodeUnreachable|KubeNodeReadinessFlapping|KubeletDown|KubeAPIDown|KubeControllerManagerDown|KubeSchedulerDown|etcdInsufficientMembers|etcdMembersDown|etcdNoLeader|GarageStorageNodeDisconnected|NodeStorageIOErrors|KubeCPUOvercommit|KubeMemoryOvercommit|KubePdbBlocksAllEvictions)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、

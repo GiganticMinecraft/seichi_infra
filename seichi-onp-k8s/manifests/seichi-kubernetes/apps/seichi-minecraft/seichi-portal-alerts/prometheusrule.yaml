@@ -1,8 +1,8 @@
 # seichi-portal のアプリケーションアラート (#5611, #5618)。
 # kube-prometheus-stack の ruleSelector (release: prometheus) が namespace 横断で
 # PrometheusRule を発見する (seichi-portal-valkey チャートの prometheusRule と同じ仕組み)。
-# ここのアラート名は kured の alertFilterRegexp にも登録している (アプリのエラーで
-# ノード再起動を止めないため)。アラート名を変えたら kured 側も更新すること。
+# kured の alertFilterRegexp は許可リスト (再起動を止めるアラートだけを列挙) なので、
+# アプリのエラーでノード再起動を止めないよう、ここのアラート名は登録しない。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:

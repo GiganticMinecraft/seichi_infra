@@ -2,7 +2,8 @@
 # Sentry SDK 撤去 (seichi-timed-stats-conifers#196) 後の通知カバレッジ確保
 # (Codex レビュー指摘: 汎用の KubeJobFailed は notify=discord の opt-in
 # リストに含まれておらず、人的通知が消えていた)。
-# 各アラート名は kured の alertFilterRegexp にも登録している。
+# kured の alertFilterRegexp は許可リスト (再起動を止めるアラートだけを列挙) なので、
+# アプリのエラーでノード再起動を止めないよう、ここのアラート名は登録しない。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:

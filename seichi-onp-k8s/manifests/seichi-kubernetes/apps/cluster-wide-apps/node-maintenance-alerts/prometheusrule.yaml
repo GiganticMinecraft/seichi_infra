@@ -9,9 +9,11 @@
 # 鳴らない。こちらは「Pod は全部健全なのに 1 台も退避できない」= 設定のせいで drain が
 # 必ず失敗する状態を捉える。
 #
-# kured の alertFilterRegexp に登録している。drain のループ自体は
-# KuredDrainFailed (loki-alert-rules/kured.yaml) で止まるので、これで全ノードの
-# 保守を止める必要はない。
+# kured の alertFilterRegexp (許可リスト) に登録している。この PDB の Pod が載ったノードは
+# drain が必ず失敗し、kured は 10 分おきに cordon -> 退避 -> タイムアウト -> uncordon を
+# 繰り返して他の Pod を揺らし続けるので、鳴っている間は全ノードの再起動を止める。
+# KuredDrainFailed (loki-alert-rules/kured.yaml) は Loki ruler のアラートで Prometheus の
+# ALERTS 系列に現れないため、kured のループを止める役にはならない (通知専用)。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -41,4 +43,4 @@ spec:
             notify: discord
           annotations:
             summary: "PDB {{ $labels.namespace }}/{{ $labels.poddisruptionbudget }} が退避を一切許可していません"
-            description: "Pod は全部健全なのに disruptionsAllowed が 6 時間以上 0 です。この Pod が載ったノードは kured の drain が必ず失敗します。maxUnavailable: 0 や、replicas と同じ値の minAvailable になっていないか確認し、replicas 2 以上なら maxUnavailable: 1 + unhealthyPodEvictionPolicy: AlwaysAllow にしてください。"
+            description: "Pod は全部健全なのに disruptionsAllowed が 6 時間以上 0 です。この Pod が載ったノードは kured の drain が必ず失敗します。maxUnavailable: 0 や、replicas と同じ値の minAvailable になっていないか確認し、replicas 2 以上なら maxUnavailable: 1 + unhealthyPodEvictionPolicy: AlwaysAllow にしてください。鳴っている間は kured が全ノードの再起動を見送ります。"

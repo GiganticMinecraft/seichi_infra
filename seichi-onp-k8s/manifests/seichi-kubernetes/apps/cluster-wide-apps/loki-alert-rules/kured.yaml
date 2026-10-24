@@ -6,8 +6,10 @@
 # 次の周期 (--period=10m) でやり直すので、そのたびに他の Pod が退避され、iSCSI
 # ボリュームの付け外しが繰り返されて障害につながった。
 #
-# kured の alertFilterRegexp には登録しない。このアラートが鳴っている間 (最後の失敗から
-# 1 時間) は全ノードの再起動が止まるので、drain の失敗が 10 分おきに繰り返されることはない。
+# Loki ruler のアラートは Alertmanager に直接送られ、kured が見る Prometheus の ALERTS 系列には
+# 現れないので、このアラートで kured の再起動を止めることはできない (通知専用)。
+# drain の失敗が 10 分おきに繰り返されるのを止める役は、Prometheus 側の
+# KubePdbBlocksAllEvictions (node-maintenance-alerts、kured の許可リストに登録済み) が担う。
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -33,4 +35,4 @@ data:
               notify: discord
             annotations:
               summary: kured が {{ $labels.node }} の drain に失敗しました
-              description: Loki で {job="kube-system/kured"} |= "Error draining" を実行し、退避できなかった Pod を確認してください。PDB が原因なら kubectl get pdb -A で disruptionsAllowed が 0 のものを探してください。このアラートが鳴っている間 (最後の失敗から 1 時間) は kured が全ノードの再起動を見送ります。
+              description: Loki で {job="kube-system/kured"} |= "Error draining" を実行し、退避できなかった Pod を確認してください。PDB が原因なら kubectl get pdb -A で disruptionsAllowed が 0 のものを探してください。
