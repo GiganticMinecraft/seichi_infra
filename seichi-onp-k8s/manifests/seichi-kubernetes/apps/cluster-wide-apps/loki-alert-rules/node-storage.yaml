@@ -1,0 +1,76 @@
+# ノードのカーネルログからストレージ (iSCSI / BTRFS) の異常を通知する。
+#
+# 2026-10-24 の障害では、Synology (seichi-cloud) の iSCSI ボリュームで切断と I/O エラーが
+# 多発し、BTRFS が Transaction aborted で read-only になったが、カーネルログにしか
+# 出ないため誰も気付けなかった。カーネルログは journal 経由で
+# {job="integrations/kubernetes/journal"} に入っていて、instance ラベルがノード名になる。
+#
+# Loki 自体も Synology 上にあり、ストレージ障害の最中はログを取り込めないことがある
+# (10-24 07:06 以降の分は欠けている)。Prometheus だけで完結する保険として
+# node-storage-alerts の NodeStorageIOErrors も置いている。
+#
+# NodeBlockDeviceIOErrors / NodeIscsiConnErrors は kured の alertFilterRegexp に登録しない。
+# ストレージ異常の最中にノードを再起動すると被害が広がるため、鳴っている間は再起動を止める。
+# NodeBtrfsChecksumErrors は登録する (すでに壊れているデータを読むたびに鳴るもので、
+# 再起動を止めても直らないため)。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-alert-rules-node-storage
+  namespace: monitoring
+  labels:
+    loki_rule: "1"
+data:
+  node-storage.yaml: |
+    groups:
+      - name: node-storage-logs
+        interval: 1m
+        rules:
+          # ブロックデバイスへの書き込み失敗と、それによるファイルシステムの停止。
+          # 実測: 2026-10-17〜10-24 でこれらが出たのは、10-18〜19 (ノード再起動の前後) と
+          # 10-22 03:44 (Synology の I/O 停止) と 10-24 の障害時だけ。平常時は 0 なので
+          # 1 件でも鳴らす。
+          - alert: NodeBlockDeviceIOErrors
+            expr: |
+              sum by (instance) (
+                count_over_time({job="integrations/kubernetes/journal"} |~ "Transaction aborted|device offline error|I/O error, dev sd|Aborting journal|EXT4-fs error" [15m])
+              ) > 0
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: "{{ $labels.instance }} でブロックデバイスの I/O エラーが出ています"
+              description: '{{ $labels.instance }} のカーネルログに I/O エラーまたはファイルシステムの停止 (BTRFS の Transaction aborted / ext4 の journal abort) が出ています。read-only になったボリュームがないか、ノードで grep -E "^/dev/sd" /proc/mounts | grep " ro," を確認してください。iSCSI なら iscsiadm -m session -P3 で対象の PVC を特定し、Synology (seichi-cloud) の負荷も確認してください。read-only になったボリュームは、Synology が落ち着いてから Pod を作り直すと再マウントで戻ります。鳴っている間は kured の再起動が止まります。'
+
+          # iSCSI セッションの切断。
+          # 実測: 2026-10-17〜10-24 で、30 分に 2 件までの散発は wk-2 で何度もあった
+          # (すでに削除された PV の iSCSI セッションが残ってログインを試し続けていたもの)。
+          # 3 件以上になったのは 10-22 03:45 (Synology の I/O 停止、wk-1/wk-2 で 3〜5 件) と、
+          # 上記の残ったセッションが 10-24 12:23〜12:29 に 3 件出たときだけ。
+          - alert: NodeIscsiConnErrors
+            expr: |
+              sum by (instance) (
+                count_over_time({job="integrations/kubernetes/journal"} |= "detected conn error" [30m])
+              ) >= 3
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: "{{ $labels.instance }} で iSCSI の切断が続いています"
+              description: '{{ $labels.instance }} で直近 30 分に {{ $value }} 回 iSCSI の切断が検知されました。ノードで iscsiadm -m session -P3 を実行し、状態が FREE のセッションや、切断が続いているターゲットを確認してください。対応する PV が存在しなければ残ったセッションなので iscsiadm で logout してください。PV が存在するなら Synology (seichi-cloud) の負荷やネットワークを確認してください。鳴っている間は kured の再起動が止まります。'
+
+          # BTRFS がデータのチェックサム不一致 (破損) を検出したもの。Synology の LUN は
+          # 単一デバイスなので BTRFS 側では修復できない。
+          # 実測: 2026-10-22〜10-24 に毎日出ていた (mariadb の binlog、mcserver--s5 の dynmap タイルなど)。
+          # 壊れたファイルを読むたびに出るので、件数ではなく 1 件でも鳴らして場所を特定する。
+          - alert: NodeBtrfsChecksumErrors
+            expr: |
+              sum by (instance) (
+                count_over_time({job="integrations/kubernetes/journal"} |= "csum failed" [1h])
+              ) > 0
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: "{{ $labels.instance }} の BTRFS でデータ破損が検出されました"
+              description: '{{ $labels.instance }} のカーネルログに "csum failed root N ino M" が出ています。デバイス名と ino から、ノードで sudo btrfs inspect-internal inode-resolve <ino> <マウント先> を実行して壊れたファイルを特定し、iscsiadm -m session -P3 で PVC を特定してください。BTRFS 側では修復できないので、ファイルをバックアップから戻すか、作り直せるものなら削除してください。'

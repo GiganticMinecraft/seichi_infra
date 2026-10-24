@@ -1,0 +1,36 @@
+# kured の drain 失敗をログから通知する。
+#
+# kured が出すメトリクスは kured_reboot_required だけで、drain の失敗はログにしか出ない。
+# 2026-10-24 05:42〜07:02 JST に、argocd-server の PDB (maxUnavailable: 0) のせいで
+# wk-2 の drain が 10 分おきに 4 回タイムアウトした。kured は失敗すると uncordon して
+# 次の周期 (--period=10m) でやり直すので、そのたびに他の Pod が退避され、iSCSI
+# ボリュームの付け外しが繰り返されて障害につながった。
+#
+# kured の alertFilterRegexp には登録しない。このアラートが鳴っている間 (最後の失敗から
+# 1 時間) は全ノードの再起動が止まるので、drain の失敗が 10 分おきに繰り返されることはない。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-alert-rules-kured
+  namespace: monitoring
+  labels:
+    loki_rule: "1"
+data:
+  kured.yaml: |
+    groups:
+      - name: kured-logs
+        interval: 1m
+        rules:
+          # 実測: 2026-10-01〜10-24 で "Error draining" が出たのは 10-24 の 4 件だけ。
+          # 平常時は 0 なので 1 件でも鳴らす。
+          - alert: KuredDrainFailed
+            expr: |
+              sum by (node) (
+                count_over_time({job="kube-system/kured"} |= "Error draining" | regexp `Error draining (?P<node>[^:]+):` [1h])
+              ) > 0
+            labels:
+              severity: warning
+              notify: discord
+            annotations:
+              summary: kured が {{ $labels.node }} の drain に失敗しました
+              description: Loki で {job="kube-system/kured"} |= "Error draining" を実行し、退避できなかった Pod を確認してください。PDB が原因なら kubectl get pdb -A で disruptionsAllowed が 0 のものを探してください。このアラートが鳴っている間 (最後の失敗から 1 時間) は kured が全ノードの再起動を見送ります。

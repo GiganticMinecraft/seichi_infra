@@ -63,3 +63,26 @@ spec:
           annotations:
             summary: "seichi-portal-backend が CrashLoopBackOff です"
             description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしており、Service seichi-portal-backend に ready endpoint がありません。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
+
+        # Debezium が MariaDB の binlog を読めていない状態。止まっている間は検索インデックスに
+        # 変更が反映されない。2026-10-24 は破損した binlog (mariadb-bin.000405) を読もうとして
+        # 再起動とリトライを数時間繰り返していたが、KubePodCrashLooping に埋もれて気付けなかった。
+        # リトライの合間に一瞬 connected になるので、30 分の平均で見る。Pod ごとに instance
+        # ラベルが変わるため sum してから平均する。Pod が無いときは vector(0) で 0 扱いにする。
+        # 実測: 2026-10-21〜10-24 の平常時は常に 1、障害中は 0〜0.5。
+        - alert: SeichiPortalDebeziumDisconnected
+          expr: |
+            avg_over_time(
+              (
+                sum(debezium_connection_status{debezium_logical_name="seichi_portal", debezium_context="streaming", debezium_connection_state="connected"})
+                or vector(0)
+              )[30m:1m]
+            ) < 0.8
+          for: 15m
+          labels:
+            severity: warning
+            notify: discord
+            team: portal
+          annotations:
+            summary: "seichi-portal の Debezium が MariaDB の binlog に接続できていません"
+            description: "直近 30 分の大半で Debezium の binlog 接続が切れています。kubectl -n seichi-minecraft logs deploy/seichi-portal-debezium で Caused by を確認してください。binlog の読み取りエラー (Error reading file) が続く場合は、PVC 内の offsets.dat / dbhistory.dat を退避して Pod を作り直すと、全件スナップショットしてから現在の位置で再開します。"
