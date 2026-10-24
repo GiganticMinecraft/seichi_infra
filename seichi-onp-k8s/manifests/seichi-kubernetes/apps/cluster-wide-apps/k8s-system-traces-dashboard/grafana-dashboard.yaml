@@ -135,7 +135,7 @@ data:
           "id": 3,
           "type": "timeseries",
           "title": "呼び出しレート (サービス別)",
-          "description": "Tempo metrics-generator の span-metrics。全 span kind の合計で、kubelet の CRI client span と containerd の CRI server span は同じ呼び出しを両側で数える。1% サンプリング後の値。",
+          "description": "Tempo metrics-generator の span-metrics。全 span kind の合計で、kubelet の CRI client span と containerd の CRI server span は同じ呼び出しを両側で数える。1% サンプリング後の値。kube-apiserver の watch・ログの follow・exec / attach / port-forward / proxy の長時間接続、それを包むフィルタ層の span (authentication / authorization / audit / priorityandfairness / constrainedimpersonation)、etcd の Watch / LeaseKeepAlive は span-metrics の生成時に除いている。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -248,7 +248,7 @@ data:
           "id": 5,
           "type": "timeseries",
           "title": "レイテンシ p50 / p95 / p99 (サービス別)",
-          "description": "span-metrics のヒストグラムから計算した span の所要時間。",
+          "description": "span-metrics のヒストグラムから計算した span の所要時間。kube-apiserver の watch・ログの follow・exec / attach / port-forward / proxy の長時間接続、それを包むフィルタ層の span (authentication / authorization / audit / priorityandfairness / constrainedimpersonation)、etcd の Watch / LeaseKeepAlive は span-metrics の生成時に除いている。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -326,7 +326,7 @@ data:
           "id": 6,
           "type": "table",
           "title": "p95 が遅い span 上位 10 (表示期間全体)",
-          "description": "service と span_name ごとの p95 / p99 と呼び出しレート。表示期間全体で集計し、p95 の降順に 10 件。",
+          "description": "service と span_name ごとの p95 / p99 と呼び出しレート。表示期間全体で集計し、p95 の降順に 10 件。kube-apiserver の watch・ログの follow・exec / attach / port-forward / proxy の長時間接続、それを包むフィルタ層の span (authentication / authorization / audit / priorityandfairness / constrainedimpersonation)、etcd の Watch / LeaseKeepAlive は span-metrics の生成時に除いている。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -570,7 +570,7 @@ data:
           "id": 10,
           "type": "table",
           "title": "呼び出し経路ごとのレート・失敗率・p95 (表示期間全体)",
-          "description": "traces_service_graph_request_* から client → server の組ごとに集計。変数 service が client か server のどちらかに入る経路を出す。失敗率は失敗が 1 件も無い経路では 0。",
+          "description": "traces_service_graph_request_* から client → server の組ごとに集計。変数 service が client か server のどちらかに入る経路を出す。失敗率は失敗が 1 件も無い経路では 0。kube-apiserver の watch・ログの follow・exec / attach / port-forward / proxy の長時間接続と etcd の Watch / LeaseKeepAlive は service graph の生成時に除いていて、apiserver → apiserver は apiserver 自身 (loopback クライアント) からの呼び出し。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"

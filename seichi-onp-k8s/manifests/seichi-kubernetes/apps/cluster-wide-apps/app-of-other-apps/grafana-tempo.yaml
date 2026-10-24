@@ -44,12 +44,43 @@ spec:
                   - span-metrics
                 processor:
                   span_metrics:
+                    # kube-apiserver の watch / exec などの長時間接続は、普通の GET / LIST と
+                    # 同じ span 名 (GET /api/v1/namespaces/{:namespace}/pods など) で接続中ずっと続く。
+                    # これが混ざると p95 がヒストグラムの最大バケット (16.384s) に張り付くので、
+                    # 生成時に除く。条件はダッシュボードの TraceQL パネルと同じ。
+                    # exclude は 1 つでも当たれば除外、1 つの exclude の中の attributes は AND。
+                    # regex は部分一致 (Go の MatchString) なので完全一致させたいものは ^...$ で囲む。
+                    filter_policies: &apiserver-long-running-filter
+                      # watch (?watch=true, /watch/)・ログの follow・exec / attach / port-forward / proxy
+                      - exclude:
+                          match_type: regex
+                          attributes:
+                            - key: resource.service.name
+                              value: ^apiserver$
+                            - key: span.http.target
+                              value: .*([?&](watch|follow)=(1|t|T|true|True|TRUE)|/watch/|/(exec|attach|portforward|proxy)([/?]|$)).*
+                      # server span の下にあるフィルタ層の span。どれも後段の処理全体を包むので
+                      # 所要時間は server span とほぼ同じで、watch でも同じ長さになる。
+                      # 属性が無く watch かどうか見分けられないため、名前でまとめて除く
+                      # (同じ値は server span のメトリクスで見られる)。
+                      # etcd の Watch / LeaseKeepAlive はストリームが続く間ずっと開いている。
+                      - exclude:
+                          match_type: regex
+                          attributes:
+                            - key: resource.service.name
+                              value: ^apiserver$
+                            - key: name
+                              value: ^(audit|authentication|authorization|constrainedimpersonation|priorityandfairness|etcdserverpb\.Watch/Watch|etcdserverpb\.Lease/LeaseKeepAlive)$
                     # seichi-portal の入口 span (HTTP リクエスト / CDC / 通知 / 定期実行) に付く
                     # 処理の起点。値は user / cdc / notification / scheduled の 4 つだけで、
                     # 属性がない span ではラベルが付かないため系列はほとんど増えない。
                     # Prometheus では seichi_portal_flow ラベルになる。
                     dimensions:
                       - seichi_portal.flow
+                  service_graphs:
+                    # span_metrics と同じ条件。watch / exec の server span を落とすと、
+                    # 対になる client span (apiserver 自身の loopback など) の辺も一緒に捨てられる。
+                    filter_policies: *apiserver-long-running-filter
           server:
             grpc_server_max_recv_msg_size: 16777216
             grpc_server_max_send_msg_size: 16777216
