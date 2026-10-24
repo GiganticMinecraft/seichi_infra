@@ -91,7 +91,6 @@ data:
             "description": "span-metrics のパネルだけに効く",
             "query": "apiserver,etcd,kubelet,containerd",
             "includeAll": true,
-            "allValue": "apiserver|etcd|kubelet|containerd",
             "multi": true,
             "current": {
               "selected": true,
@@ -345,7 +344,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "A",
-              "expr": "histogram_quantile(0.95, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\", span_name!=\"\"}[$__range])))",
+              "expr": "histogram_quantile(0.95, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\", span_name!=\"\"}[$__range]))) >= 0",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -357,7 +356,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "B",
-              "expr": "histogram_quantile(0.99, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\", span_name!=\"\"}[$__range])))",
+              "expr": "histogram_quantile(0.99, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\", span_name!=\"\"}[$__range]))) >= 0",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -613,7 +612,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "C",
-              "expr": "histogram_quantile(0.95, sum by (le, client, server) (rate(traces_service_graph_request_server_seconds_bucket{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_server_seconds_bucket{server=~\"$service\"}[$__range])))",
+              "expr": "histogram_quantile(0.95, sum by (le, client, server) (rate(traces_service_graph_request_server_seconds_bucket{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_server_seconds_bucket{server=~\"$service\"}[$__range]))) >= 0",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -704,730 +703,732 @@ data:
           "id": 11,
           "type": "row",
           "title": "kubelet → containerd",
-          "collapsed": false,
+          "collapsed": true,
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
             "y": 33
           },
-          "panels": []
-        },
-        {
-          "id": 12,
-          "type": "timeseries",
-          "title": "CRI 呼び出しの p95 (ノード別)",
-          "description": "kubelet 側の CRI client span から TraceQL metrics で計算。所要時間がイメージサイズで決まる PullImage は除く。ExecSync (exec probe) と ListContainerStats は中身の処理時間を含むため他より長い。\n\nTraceQL: `{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 34
-          },
-          "targets": [
+          "panels": [
             {
+              "id": 12,
+              "type": "timeseries",
+              "title": "CRI 呼び出しの p95 (ノード別)",
+              "description": "kubelet 側の CRI client span から TraceQL metrics で計算。所要時間がイメージサイズで決まる PullImage は除く。ExecSync (exec probe) と ListContainerStats は中身の処理時間を含むため他より長い。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)",
-              "metricsQueryType": "range",
-              "limit": 20,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "drawStyle": "line",
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": false
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 34
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "calcs": [
-                "mean",
-                "max"
-              ]
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "id": 13,
-          "type": "timeseries",
-          "title": "kubelet のエラー (span 名別)",
-          "description": "kubelet の span のうち status = error のもの。syncPod のエラーは Pod の同期失敗 (イメージ取得やボリュームの待ちなど)、runtime.v1.* は CRI 呼び出しの失敗。\n\nTraceQL: `{ resource.service.name = \"kubelet\" && status = error && resource.k8s.node.name =~ \"$node\" } | rate() by (name)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 34
-          },
-          "targets": [
             {
+              "id": 13,
+              "type": "timeseries",
+              "title": "kubelet のエラー (span 名別)",
+              "description": "kubelet の span のうち status = error のもの。syncPod のエラーは Pod の同期失敗 (イメージ取得やボリュームの待ちなど)、runtime.v1.* は CRI 呼び出しの失敗。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"kubelet\" && status = error && resource.k8s.node.name =~ \"$node\" } | rate() by (name)",
-              "metricsQueryType": "range",
-              "limit": 20,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "reqps",
-              "custom": {
-                "drawStyle": "line",
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": false
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 34
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"kubelet\" && status = error && resource.k8s.node.name =~ \"$node\" } | rate() by (name)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "reqps",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "calcs": [
-                "mean",
-                "max"
-              ]
+            {
+              "id": 14,
+              "type": "table",
+              "title": "Pod の起動 (syncPod create)",
+              "description": "kubelet が新しい Pod を同期したトレース。開くと CRI 呼び出しから containerd 内部の処理まで追える。",
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 42
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"kubelet\" && name = \"syncPod\" && span.k8s.pod.update_type = \"create\" && resource.k8s.node.name =~ \"$node\" } | select(span.k8s.pod, resource.k8s.node.name)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
             },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "id": 14,
-          "type": "table",
-          "title": "Pod の起動 (syncPod create)",
-          "description": "kubelet が新しい Pod を同期したトレース。開くと CRI 呼び出しから containerd 内部の処理まで追える。\n\nTraceQL: `{ resource.service.name = \"kubelet\" && name = \"syncPod\" && span.k8s.pod.update_type = \"create\" && resource.k8s.node.name =~ \"$node\" } | select(span.k8s.pod, resource.k8s.node.name)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 42
-          },
-          "targets": [
             {
+              "id": 15,
+              "type": "table",
+              "title": "コンテナ・サンドボックスのライフサイクル",
+              "description": "containerd が受けた RunPodSandbox / CreateContainer / StartContainer / Stop* / Remove* の呼び出し。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"kubelet\" && name = \"syncPod\" && span.k8s.pod.update_type = \"create\" && resource.k8s.node.name =~ \"$node\" } | select(span.k8s.pod, resource.k8s.node.name)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 15,
-          "type": "table",
-          "title": "コンテナ・サンドボックスのライフサイクル",
-          "description": "containerd が受けた RunPodSandbox / CreateContainer / StartContainer / Stop* / Remove* の呼び出し。\n\nTraceQL: `{ resource.service.name = \"containerd\" && name =~ \"runtime.v1.RuntimeService/(RunPodSandbox|CreateContainer|StartContainer|StopContainer|StopPodSandbox|RemoveContainer|RemovePodSandbox)\" && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.sandbox.name, span.container.name, span.container.image.ref)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 42
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 42
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"containerd\" && name =~ \"runtime.v1.RuntimeService/(RunPodSandbox|CreateContainer|StartContainer|StopContainer|StopPodSandbox|RemoveContainer|RemovePodSandbox)\" && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.sandbox.name, span.container.name, span.container.image.ref)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 16,
+              "type": "table",
+              "title": "イメージの pull",
+              "description": "containerd の PullImage。image.size.bytes は pull したイメージのサイズ。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"containerd\" && name =~ \"runtime.v1.RuntimeService/(RunPodSandbox|CreateContainer|StartContainer|StopContainer|StopPodSandbox|RemoveContainer|RemovePodSandbox)\" && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.sandbox.name, span.container.name, span.container.image.ref)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 16,
-          "type": "table",
-          "title": "イメージの pull",
-          "description": "containerd の PullImage。image.size.bytes は pull したイメージのサイズ。\n\nTraceQL: `{ resource.service.name = \"containerd\" && name = \"runtime.v1.ImageService/PullImage\" && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.image.ref, span.image.size.bytes)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 50
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 50
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"containerd\" && name = \"runtime.v1.ImageService/PullImage\" && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.image.ref, span.image.size.bytes)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 17,
+              "type": "table",
+              "title": "500ms 以上かかった CRI 呼び出し",
+              "description": "PullImage は除く。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"containerd\" && name = \"runtime.v1.ImageService/PullImage\" && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.image.ref, span.image.size.bytes)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 17,
-          "type": "table",
-          "title": "500ms 以上かかった CRI 呼び出し",
-          "description": "PullImage は除く。\n\nTraceQL: `{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" && duration > 500ms } | select(resource.k8s.node.name, span.rpc.response.status_code)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 50
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 50
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" && duration > 500ms } | select(resource.k8s.node.name, span.rpc.response.status_code)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 18,
+              "type": "table",
+              "title": "エラーになった kubelet / containerd の span",
+              "description": "syncPod の失敗と、kubelet (client) / containerd (server) 両側の CRI 呼び出しの失敗。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" && duration > 500ms } | select(resource.k8s.node.name, span.rpc.response.status_code)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 18,
-          "type": "table",
-          "title": "エラーになった kubelet / containerd の span",
-          "description": "syncPod の失敗と、kubelet (client) / containerd (server) 両側の CRI 呼び出しの失敗。\n\nTraceQL: `{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, statusMessage, span.rpc.response.status_code)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 24,
-            "x": 0,
-            "y": 58
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "tempo",
-                "uid": "${tempo}"
+              "gridPos": {
+                "h": 7,
+                "w": 24,
+                "x": 0,
+                "y": 58
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, statusMessage, span.rpc.response.status_code)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, statusMessage, span.rpc.response.status_code)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
             }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
+          ]
         },
         {
           "id": 19,
           "type": "row",
           "title": "kube-apiserver → etcd / webhook",
-          "collapsed": false,
+          "collapsed": true,
           "gridPos": {
             "h": 1,
             "w": 24,
             "x": 0,
             "y": 65
           },
-          "panels": []
-        },
-        {
-          "id": 20,
-          "type": "timeseries",
-          "title": "API リクエストの p95 (span 名別、上位 10)",
-          "description": "kube-apiserver の server span。span 名は `GET /api/v1/namespaces/{:namespace}/pods/{:name}` のようにパスの可変部分を置き換えた形で、resource 以外のリクエストはメソッド名だけ (`GET`) になる。watch は list と同じ span 名で接続中ずっと続くので除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 66
-          },
-          "targets": [
+          "panels": [
             {
+              "id": 20,
+              "type": "timeseries",
+              "title": "API リクエストの p95 (span 名別、上位 10)",
+              "description": "kube-apiserver の server span。span 名は `GET /api/v1/namespaces/{:namespace}/pods/{:name}` のようにパスの可変部分を置き換えた形で、resource 以外のリクエストはメソッド名だけ (`GET`) になる。watch・ログの follow・exec / attach / port-forward / proxy は接続中ずっと続くので除く。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)",
-              "metricsQueryType": "range",
-              "limit": 20,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "drawStyle": "line",
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": false
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 66
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*([?&](watch|follow)=(1|t|T|true|True|TRUE)|/watch/|/(exec|attach|portforward|proxy)([/?]|$)).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "calcs": [
-                "mean",
-                "max"
-              ]
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "id": 21,
-          "type": "timeseries",
-          "title": "API ハンドラの p95 (verb 別)",
-          "description": "server span の下のハンドラ span (Get / List / Delete など、verb 属性付き)。認証・認可・APF の待ちを含まない、ハンドラ自体の所要時間。WATCH は除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && span.verb != nil && span.verb != \"WATCH\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (span.verb)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 66
-          },
-          "targets": [
             {
+              "id": 21,
+              "type": "timeseries",
+              "title": "API ハンドラの p95 (verb 別)",
+              "description": "server span の下のハンドラ span (Get / List / Delete など、verb 属性付き)。認証・認可・APF の待ちを含まない、ハンドラ自体の所要時間。接続中ずっと続く WATCH / CONNECT (exec・ログなど) は除く。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && span.verb != nil && span.verb != \"WATCH\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (span.verb)",
-              "metricsQueryType": "range",
-              "limit": 20,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "drawStyle": "line",
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": false
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 66
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && span.verb != nil && span.verb != \"WATCH\" && span.verb != \"CONNECT\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (span.verb)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "calcs": [
-                "mean",
-                "max"
-              ]
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "id": 22,
-          "type": "timeseries",
-          "title": "etcd 呼び出しの p95 (apiserver 側、メソッド別)",
-          "description": "kube-apiserver の etcd client span (etcdserverpb.KV/Range など)。ネットワークを含めて apiserver が etcd を待った時間。ストリームの間ずっと続く Watch / LeaseKeepAlive は除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 74
-          },
-          "targets": [
             {
+              "id": 22,
+              "type": "timeseries",
+              "title": "etcd 呼び出しの p95 (apiserver 側、メソッド別)",
+              "description": "kube-apiserver の etcd client span (etcdserverpb.KV/Range など)。ネットワークを含めて apiserver が etcd を待った時間。ストリームの間ずっと続く Watch / LeaseKeepAlive は除く。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
-              "metricsQueryType": "range",
-              "limit": 20,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "custom": {
-                "drawStyle": "line",
-                "lineWidth": 1,
-                "fillOpacity": 10,
-                "showPoints": "never",
-                "spanNulls": false
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 74
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
+                  "metricsQueryType": "range",
+                  "limit": 20,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
               }
             },
-            "overrides": []
-          },
-          "options": {
-            "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "calcs": [
-                "mean",
-                "max"
-              ]
+            {
+              "id": 23,
+              "type": "table",
+              "title": "50ms 以上かかったストレージ処理",
+              "description": "kube-apiserver のストレージ層 (Get etcd3 / GuaranteedUpdate etcd3 など)。key は etcd のキー。",
+              "datasource": {
+                "type": "tempo",
+                "uid": "${tempo}"
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 74
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && name =~ \".* etcd3\" && duration > 50ms && resource.k8s.node.name =~ \"$node\" } | select(span.key, span.\"audit-id\")",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
             },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          }
-        },
-        {
-          "id": 23,
-          "type": "table",
-          "title": "50ms 以上かかったストレージ処理",
-          "description": "kube-apiserver のストレージ層 (Get etcd3 / GuaranteedUpdate etcd3 など)。key は etcd のキー。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && name =~ \".* etcd3\" && duration > 50ms && resource.k8s.node.name =~ \"$node\" } | select(span.key, span.\"audit-id\")`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 74
-          },
-          "targets": [
             {
+              "id": 24,
+              "type": "table",
+              "title": "1 秒以上かかった API リクエスト",
+              "description": "watch・ログの follow・exec / attach / port-forward / proxy は除く。audit-id で監査ログと突き合わせられる。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && name =~ \".* etcd3\" && duration > 50ms && resource.k8s.node.name =~ \"$node\" } | select(span.key, span.\"audit-id\")",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 24,
-          "type": "table",
-          "title": "1 秒以上かかった API リクエスト",
-          "description": "watch は除く。audit-id で監査ログと突き合わせられる。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 82
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 82
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*([?&](watch|follow)=(1|t|T|true|True|TRUE)|/watch/|/(exec|attach|portforward|proxy)([/?]|$)).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 25,
+              "type": "table",
+              "title": "5xx を返した API リクエスト",
+              "description": "",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 25,
-          "type": "table",
-          "title": "5xx を返した API リクエスト",
-          "description": "TraceQL: `{ resource.service.name = \"apiserver\" && kind = server && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 82
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 82
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && kind = server && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 26,
+              "type": "table",
+              "title": "admission webhook の呼び出し",
+              "description": "kube-apiserver から mutating / validating webhook への呼び出し。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = server && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.user_agent.original, span.\"audit-id\")",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 26,
-          "type": "table",
-          "title": "admission webhook の呼び出し",
-          "description": "kube-apiserver から mutating / validating webhook への呼び出し。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.configuration, span.webhook, span.operation, span.resource)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 90
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 90
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.configuration, span.webhook, span.operation, span.resource)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 27,
+              "type": "table",
+              "title": "100ms 以上かかった etcd 呼び出し (apiserver 側)",
+              "description": "Watch / LeaseKeepAlive のストリームは除く。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && name =~ \"Call (mutating|validating) webhook\" && resource.k8s.node.name =~ \"$node\" } | select(span.configuration, span.webhook, span.operation, span.resource)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 27,
-          "type": "table",
-          "title": "100ms 以上かかった etcd 呼び出し (apiserver 側)",
-          "description": "Watch / LeaseKeepAlive のストリームは除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" } | select(span.rpc.response.status_code)`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 90
-          },
-          "targets": [
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 90
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" } | select(span.rpc.response.status_code)",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
             {
+              "id": 28,
+              "type": "table",
+              "title": "etcd 待ちが 100ms を超えた API リクエスト",
+              "description": "子孫の etcd 呼び出し (Watch / LeaseKeepAlive を除く) が 100ms 以上かかった kube-apiserver の server span。",
               "datasource": {
                 "type": "tempo",
                 "uid": "${tempo}"
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" } | select(span.rpc.response.status_code)",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
-        },
-        {
-          "id": 28,
-          "type": "table",
-          "title": "etcd 待ちが 100ms を超えた API リクエスト",
-          "description": "子孫の etcd 呼び出し (Watch / LeaseKeepAlive を除く) が 100ms 以上かかった kube-apiserver の server span。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.user_agent.original, span.\"audit-id\")`",
-          "datasource": {
-            "type": "tempo",
-            "uid": "${tempo}"
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 24,
-            "x": 0,
-            "y": 98
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "tempo",
-                "uid": "${tempo}"
+              "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 98
               },
-              "refId": "A",
-              "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.user_agent.original, span.\"audit-id\")",
-              "limit": 20,
-              "spss": 3,
-              "tableType": "traces"
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "${tempo}"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "query": "{ resource.service.name = \"apiserver\" && kind = client && name =~ \"etcdserverpb.*\" && name !~ \".*/(Watch|LeaseKeepAlive)\" && duration > 100ms } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.user_agent.original, span.\"audit-id\")",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "traces"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
             }
-          ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "options": {
-            "showHeader": true,
-            "cellHeight": "sm"
-          }
+          ]
         }
       ]
     }
