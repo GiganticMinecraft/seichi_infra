@@ -61,7 +61,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "seichi-portal の処理は起点ごとに 4 種類の流れに分かれ、backend の入口 span に `seichi_portal.flow` 属性が付く。 **user**: 利用者の操作 (ブラウザ → frontend → backend) / **cdc**: MariaDB の変更を検索に反映 (Debezium → RabbitMQ → backend → Meilisearch) / **notification**: 操作を受けた Discord 通知 / **scheduled**: 検索インデックスの定期チェック。 各流れのトレースは下の行から Tempo で開け、ログ行の trace ID からも同じトレースに飛べる。"
+            "content": "`seichi_portal.flow`: **user** ブラウザ → frontend → backend / **cdc** MariaDB → Debezium → RabbitMQ → backend → Meilisearch / **notification** Discord 通知 / **scheduled** 検索インデックスの整合チェック"
           },
           "transparent": true
         },
@@ -1029,7 +1029,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "利用者の操作に対応するリクエスト。backend の HTTP サーバー span (= flow user) をルート別に見る。 レイテンシのグラフ上の点 (exemplar) をクリックすると、その時刻の実際のトレースを開ける。"
+            "content": "flow=user の backend HTTP span をルート別に。レイテンシの点 (exemplar) からトレースを開ける"
           },
           "transparent": true
         },
@@ -2073,7 +2073,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "データが流れる順に左から並べている。どの区間で遅れているかは「遅延」パネルを左から見る。 トレースは Debezium の publish から backend の cdc.process → search_engine.sync までつながる。"
+            "content": "左から流れる順。Debezium publish → cdc.process → search_engine.sync"
           },
           "transparent": true
         },
@@ -2868,7 +2868,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "フォームの回答やメッセージなどの操作を受けて、バックグラウンドで Discord に通知する。 通知のトレースは起点になったリクエストのトレースの子としてつながる。"
+            "content": "Discord 通知。起点になったリクエストのトレースの子"
           },
           "transparent": true
         },
@@ -3051,7 +3051,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "DB と Meilisearch の件数を定期的に突き合わせ、食い違っていれば再同期する。1 回のチェックが 1 つの独立したトレースになる。"
+            "content": "DB と Meilisearch の件数を定期照合して再同期。1 チェック = 1 トレース"
           },
           "transparent": true
         },
@@ -3243,7 +3243,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "ログ行の trace ID (backend は openTelemetry.traceId、ブラウザは traceID) からそのトレースを開ける。"
+            "content": "ログの trace ID (backend: openTelemetry.traceId、ブラウザ: traceID) からトレースを開ける"
           },
           "transparent": true
         },
