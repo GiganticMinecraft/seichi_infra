@@ -75,7 +75,7 @@ spec:
               default: ""
       script:
         # AWS CLI と bash が入っている既存のバックアップ用イメージを使う
-        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:c0ef6f65ef407533b1f8adea2c5467b77d3d4608b8f8007062e8eaccbcfeaf7b
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:b805f60d80c6b587e8d60d41134c6f3895a998a9ff6524c1fea293f12b1f82ec
         command: ["/bin/bash"]
         source: |
           set -uo pipefail
