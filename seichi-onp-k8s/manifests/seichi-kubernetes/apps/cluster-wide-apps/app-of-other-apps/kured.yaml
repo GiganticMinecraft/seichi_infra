@@ -50,9 +50,14 @@ spec:
           # - ストレージの冗長性: GarageStorageNodeDisconnected (RF=2 なので 2 台目は落とせない)
           # - ストレージ異常の最中にボリュームの付け外しをしない: NodeStorageIOErrors
           #   (node-storage-alerts。node-problem-detector の IOError / TaskHung)
+          # - ノード 1 台分の余裕が無い: KubeCPUOvercommit, KubeMemoryOvercommit (requests の合計が
+          #   ノード 1 台を失った後の allocatable を超えている状態。drain した Pod の退避先が無く
+          #   Pending のまま残る。直近 36 日で firing 実績は無いので、普段は何も止めない)
           # - 退避を一切許可しない PDB がある間は drain が失敗を繰り返すので止める:
           #   KubePdbBlocksAllEvictions (node-maintenance-alerts。2026-10-24 の障害は、
-          #   argocd-server の PDB による drain 失敗の繰り返しとストレージ異常が重なって起きた)
+          #   argocd-server の PDB による drain 失敗の繰り返しとストレージ異常が重なって起きた)。
+          #   for: 6h なので窓の直前に入った PDB は拾えず、drain 失敗そのものを Prometheus 側で
+          #   検知する手段は未整備 (KuredDrainFailed は Loki ruler のため kured から見えない)
           #
           # 列挙していないもの (= 再起動を止めない) の代表例と理由:
           # - アプリケーションアラート (SeichiPortal*, Gachadata*, Conifers*, Mcserver*, ArgoCDApp*):
@@ -69,7 +74,7 @@ spec:
           prometheusUrl: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
           alertFiringOnly: true
           alertFilterMatchOnly: true
-          alertFilterRegexp: "^(KubeNodeNotReady|KubeNodeUnreachable|KubeNodeReadinessFlapping|KubeletDown|KubeAPIDown|KubeControllerManagerDown|KubeSchedulerDown|etcdInsufficientMembers|etcdMembersDown|etcdNoLeader|GarageStorageNodeDisconnected|NodeStorageIOErrors|KubePdbBlocksAllEvictions)$"
+          alertFilterRegexp: "^(KubeNodeNotReady|KubeNodeUnreachable|KubeNodeReadinessFlapping|KubeletDown|KubeAPIDown|KubeControllerManagerDown|KubeSchedulerDown|etcdInsufficientMembers|etcdMembersDown|etcdNoLeader|GarageStorageNodeDisconnected|NodeStorageIOErrors|KubeCPUOvercommit|KubeMemoryOvercommit|KubePdbBlocksAllEvictions)$"
           # kubelet のパッチ更新も kured の drain + 再起動に相乗りさせる。
           # pkgs.k8s.io はマイナーごとの repo (core:/stable:/v1.3x) なので、apt で入るのは
           # 同一マイナー内のパッチのみ。マイナーアップグレードは従来どおり kubeadm で手動実施し、

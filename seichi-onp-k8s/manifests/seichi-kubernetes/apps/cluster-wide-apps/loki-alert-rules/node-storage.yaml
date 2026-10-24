@@ -40,7 +40,7 @@ data:
               notify: discord
             annotations:
               summary: "{{ $labels.instance }} でブロックデバイスの I/O エラーが出ています"
-              description: '{{ $labels.instance }} のカーネルログに I/O エラーまたはファイルシステムの停止 (BTRFS の Transaction aborted / ext4 の journal abort) が出ています。read-only になったボリュームがないか、ノードで grep -E "^/dev/sd" /proc/mounts | grep " ro," を確認してください。iSCSI なら iscsiadm -m session -P3 で対象の PVC を特定し、Synology (seichi-cloud) の負荷も確認してください。read-only になったボリュームは、Synology が落ち着いてから Pod を作り直すと再マウントで戻ります。鳴っている間は kured の再起動が止まります。'
+              description: '{{ $labels.instance }} のカーネルログに I/O エラーまたはファイルシステムの停止 (BTRFS の Transaction aborted / ext4 の journal abort) が出ています。read-only になったボリュームがないか、ノードで grep -E "^/dev/sd" /proc/mounts | grep " ro," を確認してください。iSCSI なら iscsiadm -m session -P3 で対象の PVC を特定し、Synology (seichi-cloud) の負荷も確認してください。read-only になったボリュームは、Synology が落ち着いてから Pod を作り直すと再マウントで戻ります。'
 
           # iSCSI セッションの切断。
           # 実測: 2026-10-17〜10-24 で、30 分に 2 件までの散発は wk-2 で何度もあった
@@ -57,7 +57,7 @@ data:
               notify: discord
             annotations:
               summary: "{{ $labels.instance }} で iSCSI の切断が続いています"
-              description: '{{ $labels.instance }} で直近 30 分に {{ $value }} 回 iSCSI の切断が検知されました。ノードで iscsiadm -m session -P3 を実行し、状態が FREE のセッションや、切断が続いているターゲットを確認してください。対応する PV が存在しなければ残ったセッションなので iscsiadm で logout してください。PV が存在するなら Synology (seichi-cloud) の負荷やネットワークを確認してください。鳴っている間は kured の再起動が止まります。'
+              description: '{{ $labels.instance }} で直近 30 分に {{ $value }} 回 iSCSI の切断が検知されました。ノードで iscsiadm -m session -P3 を実行し、状態が FREE のセッションや、切断が続いているターゲットを確認してください。対応する PV が存在しなければ残ったセッションなので iscsiadm で logout してください。PV が存在するなら Synology (seichi-cloud) の負荷やネットワークを確認してください。'
 
           # BTRFS がデータのチェックサム不一致 (破損) を検出したもの。Synology の LUN は
           # 単一デバイスなので BTRFS 側では修復できない。

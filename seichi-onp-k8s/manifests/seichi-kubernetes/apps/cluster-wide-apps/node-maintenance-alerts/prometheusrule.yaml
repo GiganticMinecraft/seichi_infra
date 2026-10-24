@@ -43,4 +43,4 @@ spec:
             notify: discord
           annotations:
             summary: "PDB {{ $labels.namespace }}/{{ $labels.poddisruptionbudget }} が退避を一切許可していません"
-            description: "Pod は全部健全なのに disruptionsAllowed が 6 時間以上 0 です。この Pod が載ったノードは kured の drain が必ず失敗します。maxUnavailable: 0 や、replicas と同じ値の minAvailable になっていないか確認し、replicas 2 以上なら maxUnavailable: 1 + unhealthyPodEvictionPolicy: AlwaysAllow にしてください。"
+            description: "Pod は全部健全なのに disruptionsAllowed が 6 時間以上 0 です。この Pod が載ったノードは kured の drain が必ず失敗します。maxUnavailable: 0 や、replicas と同じ値の minAvailable になっていないか確認し、replicas 2 以上なら maxUnavailable: 1 + unhealthyPodEvictionPolicy: AlwaysAllow にしてください。鳴っている間は kured が全ノードの再起動を見送ります。"

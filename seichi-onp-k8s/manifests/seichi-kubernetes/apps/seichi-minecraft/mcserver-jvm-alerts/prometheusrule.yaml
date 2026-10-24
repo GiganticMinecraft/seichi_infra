@@ -6,7 +6,8 @@
 # 同様の Full GC 多発が観測されている (このときは自然回復)。
 # 瞬間の heap used はノコギリ波の頂点で常に高く誤検知するため、
 # 「collection 後」の使用量 (jvm_memory_pool_collection_used_bytes) を使う。
-# アラート名は kured の alertFilterRegexp にも登録している。変えたら kured 側も更新すること。
+# kured の alertFilterRegexp は許可リスト (再起動を止めるアラートだけを列挙) なので、
+# アプリのエラーでノード再起動を止めないよう、ここのアラート名は登録しない。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:

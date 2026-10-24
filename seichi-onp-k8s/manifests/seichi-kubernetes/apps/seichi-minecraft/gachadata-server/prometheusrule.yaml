@@ -3,7 +3,8 @@
 # 起動時 panic のログは file tailer が拾う前にコンテナが死んで Loki に
 # 届かないため、CrashLoop は PrometheusRule 側で通知する
 # (seichi-portal-alerts の SeichiPortalBackendCrashLoop と同じ理由)。
-# アラート名は kured の alertFilterRegexp にも登録している。
+# kured の alertFilterRegexp は許可リスト (再起動を止めるアラートだけを列挙) なので、
+# アプリのエラーでノード再起動を止めないよう、ここのアラート名は登録しない。
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
