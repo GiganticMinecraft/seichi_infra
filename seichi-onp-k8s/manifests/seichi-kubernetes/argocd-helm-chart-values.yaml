@@ -20,10 +20,17 @@ server:
     requests:
       cpu: 50m
       memory: 384Mi
+  # minReplicas 2 と組み合わせ、drain (kured のノード再起動など) で同時に 2 台とも
+  # 退避されないようにする。
+  # - chart は maxUnavailable が設定されているとそちらを優先する。以前の
+  #   maxUnavailable: 0 では退避が一切許可されず、argocd-server が載ったノードの
+  #   kured drain が毎回タイムアウトしていた
+  # - unhealthyPodEvictionPolicy: AlwaysAllow で、CrashLoop や NotReady の Pod は
+  #   budget に関係なく退避させる
   pdb:
     enabled: true
-    minAvailable: 1
-    maxUnavailable: 0
+    maxUnavailable: 1
+    unhealthyPodEvictionPolicy: AlwaysAllow
   metrics:
     enabled: true
     serviceMonitor:
