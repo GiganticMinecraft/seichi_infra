@@ -11,6 +11,7 @@ https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 - [Proxmoxバージョンアップ](./runbooks/proxmox-upgrade.md)
 - [Kubernetesクラスターバージョンアップ](./runbooks/k8s-cluster-upgrade.md)
 - [Kubernetes証明書更新](./runbooks/k8s-cert-renewal.md)
+- [Kubernetesシステムコンポーネントのトレース](./runbooks/k8s-system-component-tracing.md)
 - [Cloudflare証明書更新](./runbooks/cloudflare-cert-renewal.md)
 - [Minecraftメンテナンスモード](./runbooks/maintenance-mode.md)
 - [Minecraftワールド・MariaDBロールバック](./runbooks/rollback-mcserver-and-mariadb.md)

@@ -171,8 +171,26 @@ sudo containerd config dump 2>/dev/null \
     | grep -qE "^\s*config_path = ['\"]/etc/containerd/certs\.d(:[^'\"]*)?['\"]$" \
     || { echo "containerd の registry config_path が /etc/containerd/certs.d になっていません (docker.io ミラーが無効)" >&2; exit 1; }
 
+# containerd のトレース (OTEL_* 環境変数) を systemd drop-in で渡す。
+# 送信先は各ノードの hostNetwork の Alloy (127.0.0.1:4318)。containerd 2.x のトレースは
+# config.toml ではなく環境変数だけで設定する。
+# refs: docs/runbooks/k8s-system-component-tracing.md
+TRACING_RAW_BASE_URL="https://raw.githubusercontent.com/GiganticMinecraft/seichi_infra/${TARGET_BRANCH}/seichi-onp-k8s/cluster-boot-up/tracing"
+CONTAINERD_OTEL_CONF=$(mktemp)
+curl -fsSL "${TRACING_RAW_BASE_URL}/containerd-otel.conf" -o "${CONTAINERD_OTEL_CONF}"
+sudo mkdir -p /etc/systemd/system/containerd.service.d
+sudo install -m 0644 "${CONTAINERD_OTEL_CONF}" /etc/systemd/system/containerd.service.d/10-otel.conf
+rm -f "${CONTAINERD_OTEL_CONF}"
+sudo systemctl daemon-reload
+
 # Restart containerd to apply changes
 sudo systemctl restart containerd
+
+# OTEL_* 環境変数でトレースが有効になるのは containerd 2.x から (1.x は config.toml の設定が必要)。
+# トレースが無くてもノードは動くので、構築は止めずに警告だけ出す。
+if ! sudo ctr plugins ls | grep -qE '^io\.containerd\.tracing\.processor\.v1\s+otlp\s+.*\sok\s*$'; then
+    echo "WARNING: containerd の otlp トレースプラグインが有効になっていません (containerd 2.x 以降か確認する)" >&2
+fi
 
 # Modify kernel parameters for Kubernetes
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
@@ -217,6 +235,16 @@ case $1 in
         exit 1
         ;;
 esac
+
+# kube-apiserver のトレース設定。ClusterConfiguration の apiServer.extraVolumes で
+# pathType: File としてマウントするため、kubeadm init / join より前に置いておく
+# (無いと kube-apiserver が起動しない)。
+# refs: docs/runbooks/k8s-system-component-tracing.md
+APISERVER_TRACING_CONF=$(mktemp)
+curl -fsSL "${TRACING_RAW_BASE_URL}/apiserver-tracing.yaml" -o "${APISERVER_TRACING_CONF}"
+sudo install -d -m 0755 /etc/kubernetes/tracing
+sudo install -m 0600 -o root -g root "${APISERVER_TRACING_CONF}" /etc/kubernetes/tracing/apiserver-tracing.yaml
+rm -f "${APISERVER_TRACING_CONF}"
 
 # Install HAProxy
 apt-get install -y --no-install-recommends software-properties-common
@@ -404,6 +432,13 @@ localAPIEndpoint:
 skipPhases:
     - addon/kube-proxy
 ---
+# 稼働中のクラスタは kubeadm.k8s.io/v1beta4 / v1.37 系で、kube-system/kubeadm-config が正
+# (監査ログの設定などはここに無く、このファイルは追従していない)。v1beta3 の extraArgs はマップで書く。
+# kube-apiserver / etcd のトレース設定は v1.34 以降が前提なので、v1.32.1 のここではコメントにしてある
+# (apiserver.config.k8s.io/v1 の TracingConfiguration は 1.34 から。kubeadm v1.32 の etcd 3.5 には
+# --enable-distributed-tracing が無く --experimental-* だけで、その --experimental-* は 3.7 で削除済み)。
+# kubernetesVersion を上げるときにコメントを外す。
+# refs: docs/runbooks/k8s-system-component-tracing.md, seichi-onp-k8s/cluster-boot-up/tracing/
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 networking:
@@ -411,13 +446,26 @@ networking:
     podSubnet: "10.96.128.0/18"
 etcd:
     local:
-    extraArgs:
-        listen-metrics-urls: http://0.0.0.0:2381
+        extraArgs:
+            listen-metrics-urls: http://0.0.0.0:2381
+            # (v1.34 以降) apiserver でサンプリングされたリクエストの span だけを記録する (0 = ParentBased(NeverSample))
+            # enable-distributed-tracing: "true"
+            # distributed-tracing-address: 127.0.0.1:4317
+            # distributed-tracing-sampling-rate: "0"
 kubernetesVersion: "v1.32.1"
 controlPlaneEndpoint: "${KUBE_API_SERVER_VIP}:8443"
 apiServer:
     certSANs:
         - k8s-api.onp-k8s.admin.local-tunnels.seichi.click
+    # (v1.34 以降) /etc/kubernetes/tracing/apiserver-tracing.yaml は上で配置済み
+    # extraArgs:
+    #     tracing-config-file: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    # extraVolumes:
+    #     - name: tracing-config
+    #       hostPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    #       mountPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    #       readOnly: true
+    #       pathType: File
 controllerManager:
     extraArgs:
         bind-address: "0.0.0.0"
@@ -430,6 +478,10 @@ apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 cgroupDriver: "systemd"
 protectKernelDefaults: true
+# kubelet と、kubelet から traceparent を受け取る containerd の span を各ノードの Alloy に送る
+tracing:
+    endpoint: 127.0.0.1:4317
+    samplingRatePerMillion: 10000
 EOF
 
 # Install Kubernetes without kube-proxy

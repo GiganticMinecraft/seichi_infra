@@ -16,6 +16,15 @@ kubeadmを使用したKubernetesクラスターのバージョンアップ手順
 - 3 Worker nodes (wk-1, wk-2, wk-3)
 - CNI: Cilium
 
+## kubeadm-config に入っている設定
+
+`kubeadm upgrade apply` / `kubeadm upgrade node` は静的 Pod のマニフェストを `kube-system/kubeadm-config` から、kubelet の設定を `kube-system/kubelet-config` から作り直す。ノード上のファイルだけを直した設定はアップグレードで消える。
+
+- 監査ログ (`apiServer.extraArgs` の `audit-*` と `extraVolumes`)
+- システムコンポーネントのトレース (kube-apiserver の `tracing-config-file`、etcd の `*-distributed-tracing*`、kubelet の `tracing`)。詳細は [Kubernetesシステムコンポーネントのトレース](./k8s-system-component-tracing.md)
+
+kube-apiserver はトレース設定ファイル `/etc/kubernetes/tracing/apiserver-tracing.yaml` を `pathType: File` でマウントするので、ファイルが無いノードでは起動しない。コントロールプレーンを作り直す・追加するときは、`kubeadm join --control-plane` の前にこのファイルを置く。
+
 ## 手順
 
 ### 1. 事前確認

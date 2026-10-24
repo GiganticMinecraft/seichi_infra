@@ -1,0 +1,18 @@
+# kube-apiserver のトレース設定 (--tracing-config-file で読ませる)。
+# コントロールプレーンノードの /etc/kubernetes/tracing/apiserver-tracing.yaml に置き、
+# kubeadm-config の apiServer.extraArgs / extraVolumes から参照する。
+# 手順: docs/runbooks/k8s-system-component-tracing.md
+#
+# - endpoint: 各ノードの hostNetwork の Alloy (OTLP gRPC, 127.0.0.1:4317) に送る。
+#   kube-apiserver は OTLP gRPC の平文接続しか持たないため、ループバックで受ける。
+# - samplingRatePerMillion: 親を持たないリクエストの 1% (10000 / 1,000,000) を記録する。
+#   apiserver は kubelet / コントローラ / Argo CD などから常時数百 req/s を受けており、
+#   全件は Tempo (単一バイナリ、ローカル 100Gi PVC、保持 720h) に収まらない。1% でも
+#   webhook や etcd の遅延の傾向は追える。readyz / livez などのヘルスチェックは
+#   1 秒間隔で来るため、受信側の Alloy で捨てている (ここでは除外できない)。
+# - 外部から付いてきた traceparent は system:masters / system:monitoring のユーザーの
+#   リクエストでしか引き継がれない。それ以外は apiserver 自身がここの比率で判定する。
+apiVersion: apiserver.config.k8s.io/v1
+kind: TracingConfiguration
+endpoint: 127.0.0.1:4317
+samplingRatePerMillion: 10000

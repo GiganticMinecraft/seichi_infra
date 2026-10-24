@@ -1,0 +1,47 @@
+# 稼働中クラスタの kube-system ConfigMap に追記する差分 (このファイル自体は apply しない)。
+# 既存のキーは残したまま、リストの末尾に足す。手順: docs/runbooks/k8s-system-component-tracing.md
+#
+# 1 つ目: ConfigMap kubeadm-config の data.ClusterConfiguration (kubeadm.k8s.io/v1beta4)
+#   kubectl -n kube-system edit cm kubeadm-config
+#   kubeadm upgrade はここから静的 Pod のマニフェストを作り直すので、ノード上の
+#   マニフェストだけを直すと次のアップグレードで消える。
+# 2 つ目: ConfigMap kubelet-config の data.kubelet (kubelet.config.k8s.io/v1beta1)
+#   kubectl -n kube-system edit cm kubelet-config
+#   各ノードで kubeadm upgrade node phase kubelet-config を実行すると
+#   /var/lib/kubelet/config.yaml がこの内容で上書きされる。
+---
+# ClusterConfiguration (v1beta4。extraArgs は name / value のリスト)
+apiServer:
+  extraArgs:
+  # (既存の authorization-mode / audit-* の後ろに追加)
+  - name: tracing-config-file
+    value: /etc/kubernetes/tracing/apiserver-tracing.yaml
+  extraVolumes:
+  # (既存の audit-policy / audit-log の後ろに追加)
+  # pathType: File なので、ファイルが無いノードでは kube-apiserver が起動しない。
+  # 先に各コントロールプレーンへ apiserver-tracing.yaml を置いてから反映する。
+  - name: tracing-config
+    hostPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    mountPath: /etc/kubernetes/tracing/apiserver-tracing.yaml
+    readOnly: true
+    pathType: File
+etcd:
+  local:
+    extraArgs:
+    # (既存の listen-metrics-urls の後ろに追加)
+    - name: enable-distributed-tracing
+      value: "true"
+    - name: distributed-tracing-address
+      value: 127.0.0.1:4317
+    # 0 は親のない span を記録しない (ParentBased(NeverSample))。apiserver で
+    # サンプリングされたリクエストの etcd 側の span だけが残る。
+    - name: distributed-tracing-sampling-rate
+      value: "0"
+    # service.name は既定で "etcd"。distributed-tracing-instance-id は共有の ConfigMap では
+    # ノードごとに変えられないので指定しない (指定しなければ service.instance.id は付かない)。
+    # どのメンバーかは受信側の Alloy が付ける k8s.node.name で見分ける。
+---
+# KubeletConfiguration (ConfigMap kubelet-config の data.kubelet のトップレベルに追加)
+tracing:
+  endpoint: 127.0.0.1:4317
+  samplingRatePerMillion: 10000
