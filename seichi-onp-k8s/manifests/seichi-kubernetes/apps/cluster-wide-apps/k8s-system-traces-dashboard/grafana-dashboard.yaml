@@ -26,7 +26,7 @@ data:
       "schemaVersion": 39,
       "version": 1,
       "editable": true,
-      "refresh": "1m",
+      "refresh": "",
       "time": {
         "from": "now-1h",
         "to": "now"
@@ -345,7 +345,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "A",
-              "expr": "histogram_quantile(0.95, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\"}[$__range])))",
+              "expr": "histogram_quantile(0.95, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\", span_name!=\"\"}[$__range])))",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -357,7 +357,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "B",
-              "expr": "histogram_quantile(0.99, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\"}[$__range])))",
+              "expr": "histogram_quantile(0.99, sum by (le, service, span_name) (rate(traces_spanmetrics_latency_bucket{service=~\"$service\", span_name!=\"\"}[$__range])))",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -369,7 +369,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "C",
-              "expr": "sum by (service, span_name) (rate(traces_spanmetrics_calls_total{service=~\"$service\"}[$__range]))",
+              "expr": "sum by (service, span_name) (rate(traces_spanmetrics_calls_total{service=~\"$service\", span_name!=\"\"}[$__range]))",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -489,7 +489,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "A",
-              "expr": "topk(10, sum by (service, span_name) (rate(traces_spanmetrics_calls_total{service=~\"$service\"}[$__rate_interval])))",
+              "expr": "topk(10, sum by (service, span_name) (rate(traces_spanmetrics_calls_total{service=~\"$service\", span_name!=\"\"}[$__rate_interval])))",
               "legendFormat": "{{service}} {{span_name}}",
               "instant": false,
               "range": true
@@ -560,8 +560,8 @@ data:
               "refId": "A",
               "queryType": "serviceMap",
               "serviceMapQuery": [
-                "{client=~\"apiserver|etcd|kubelet|containerd\"}",
-                "{server=~\"apiserver|etcd|kubelet|containerd\"}"
+                "{client=~\"${service:regex}\"}",
+                "{server=~\"${service:regex}\"}"
               ]
             }
           ],
@@ -571,7 +571,7 @@ data:
           "id": 10,
           "type": "table",
           "title": "呼び出し経路ごとのレート・失敗率・p95 (表示期間全体)",
-          "description": "traces_service_graph_request_* から client → server の組ごとに集計。失敗率は失敗が 1 件も無い経路では 0。",
+          "description": "traces_service_graph_request_* から client → server の組ごとに集計。変数 service が client か server のどちらかに入る経路を出す。失敗率は失敗が 1 件も無い経路では 0。",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -589,7 +589,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "A",
-              "expr": "sum by (client, server) (rate(traces_service_graph_request_total{client=~\"kubelet|apiserver\"}[$__range]))",
+              "expr": "sum by (client, server) (rate(traces_service_graph_request_total{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_total{server=~\"$service\"}[$__range]))",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -601,7 +601,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "B",
-              "expr": "(sum by (client, server) (rate(traces_service_graph_request_failed_total{client=~\"kubelet|apiserver\"}[$__range])) or 0 * sum by (client, server) (rate(traces_service_graph_request_total{client=~\"kubelet|apiserver\"}[$__range]))) / (sum by (client, server) (rate(traces_service_graph_request_total{client=~\"kubelet|apiserver\"}[$__range])) > 0)",
+              "expr": "(sum by (client, server) (rate(traces_service_graph_request_failed_total{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_failed_total{server=~\"$service\"}[$__range])) or 0 * sum by (client, server) (rate(traces_service_graph_request_total{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_total{server=~\"$service\"}[$__range]))) / (sum by (client, server) (rate(traces_service_graph_request_total{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_total{server=~\"$service\"}[$__range])) > 0)",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -613,7 +613,7 @@ data:
                 "uid": "${datasource}"
               },
               "refId": "C",
-              "expr": "histogram_quantile(0.95, sum by (le, client, server) (rate(traces_service_graph_request_server_seconds_bucket{client=~\"kubelet|apiserver\"}[$__range])))",
+              "expr": "histogram_quantile(0.95, sum by (le, client, server) (rate(traces_service_graph_request_server_seconds_bucket{client=~\"$service\"}[$__range]) or rate(traces_service_graph_request_server_seconds_bucket{server=~\"$service\"}[$__range])))",
               "legendFormat": "",
               "instant": true,
               "range": false,
@@ -717,7 +717,7 @@ data:
           "id": 12,
           "type": "timeseries",
           "title": "CRI 呼び出しの p95 (ノード別)",
-          "description": "kubelet 側の CRI client span から TraceQL metrics で計算。ExecSync (exec probe) と ListContainerStats は中身の処理時間を含むため他より長い。\n\nTraceQL: `{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)`",
+          "description": "kubelet 側の CRI client span から TraceQL metrics で計算。所要時間がイメージサイズで決まる PullImage は除く。ExecSync (exec probe) と ListContainerStats は中身の処理時間を含むため他より長い。\n\nTraceQL: `{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -736,7 +736,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)",
+              "query": "{ resource.service.name = \"kubelet\" && name =~ \"runtime.v1.*\" && resource.k8s.node.name =~ \"$node\" && name != \"runtime.v1.ImageService/PullImage\" } | quantile_over_time(duration, .95) by (resource.k8s.node.name)",
               "metricsQueryType": "range",
               "limit": 20,
               "tableType": "traces"
@@ -983,7 +983,7 @@ data:
           "id": 18,
           "type": "table",
           "title": "エラーになった kubelet / containerd の span",
-          "description": "syncPod の失敗と、kubelet (client) / containerd (server) 両側の CRI 呼び出しの失敗。\n\nTraceQL: `{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, span.rpc.response.status_code, span.rpc.grpc.status_code)`",
+          "description": "syncPod の失敗と、kubelet (client) / containerd (server) 両側の CRI 呼び出しの失敗。\n\nTraceQL: `{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, statusMessage, span.rpc.response.status_code)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1002,7 +1002,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, span.rpc.response.status_code, span.rpc.grpc.status_code)",
+              "query": "{ resource.service.name =~ \"kubelet|containerd\" && status = error && resource.k8s.node.name =~ \"$node\" } | select(resource.k8s.node.name, span.k8s.pod, statusMessage, span.rpc.response.status_code)",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1034,7 +1034,7 @@ data:
           "id": 20,
           "type": "timeseries",
           "title": "API リクエストの p95 (span 名別、上位 10)",
-          "description": "kube-apiserver の server span。span 名は `GET /api/v1/namespaces/{:namespace}/pods/{:name}` のようにパスの可変部分を置き換えた形。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)`",
+          "description": "kube-apiserver の server span。span 名は `GET /api/v1/namespaces/{:namespace}/pods/{:name}` のようにパスの可変部分を置き換えた形。watch は list と同じ span 名で接続中ずっと続くので除く。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1053,7 +1053,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)",
+              "query": "{ resource.service.name = \"apiserver\" && kind = server && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name) | topk(10)",
               "metricsQueryType": "range",
               "limit": 20,
               "tableType": "traces"
@@ -1091,7 +1091,7 @@ data:
           "id": 21,
           "type": "timeseries",
           "title": "etcd の p95 (メソッド別)",
-          "description": "etcd の server span (etcdserverpb.KV/Range など)。\n\nTraceQL: `{ resource.service.name = \"etcd\" && kind = server && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)`",
+          "description": "etcd の server span (etcdserverpb.KV/Range など)。ストリームの間ずっと続く Watch / LeaseKeepAlive は除く。\n\nTraceQL: `{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1110,7 +1110,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"etcd\" && kind = server && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
+              "query": "{ resource.service.name = \"etcd\" && kind = server && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" } | quantile_over_time(duration, .95) by (name)",
               "metricsQueryType": "range",
               "limit": 20,
               "tableType": "traces"
@@ -1148,7 +1148,7 @@ data:
           "id": 22,
           "type": "table",
           "title": "1 秒以上かかった API リクエスト",
-          "description": "watch のような長時間接続も含む。audit-id で監査ログと突き合わせられる。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && resource.k8s.node.name =~ \"$node\" } | select(span.http.request.method, span.url.path, span.http.response.status_code, span.\"audit-id\")`",
+          "description": "watch は除く。audit-id で監査ログと突き合わせられる。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1167,7 +1167,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && resource.k8s.node.name =~ \"$node\" } | select(span.http.request.method, span.url.path, span.http.response.status_code, span.\"audit-id\")",
+              "query": "{ resource.service.name = \"apiserver\" && kind = server && duration > 1s && span.http.target !~ \".*[?&]watch=(1|true).*\" && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1186,7 +1186,7 @@ data:
           "id": 23,
           "type": "table",
           "title": "5xx を返した API リクエスト",
-          "description": "TraceQL: `{ resource.service.name = \"apiserver\" && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.request.method, span.url.path, span.\"audit-id\")`",
+          "description": "TraceQL: `{ resource.service.name = \"apiserver\" && (span.http.response.status_code >= 500 || span.http.status_code >= 500) && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1205,7 +1205,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && span.http.response.status_code >= 500 && resource.k8s.node.name =~ \"$node\" } | select(span.http.request.method, span.url.path, span.\"audit-id\")",
+              "query": "{ resource.service.name = \"apiserver\" && (span.http.response.status_code >= 500 || span.http.status_code >= 500) && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.http.response.status_code, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1262,7 +1262,7 @@ data:
           "id": 25,
           "type": "table",
           "title": "100ms 以上かかった etcd 処理",
-          "description": "TraceQL: `{ resource.service.name = \"etcd\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" }`",
+          "description": "Watch / LeaseKeepAlive のストリームは除く。\n\nTraceQL: `{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" }`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1281,7 +1281,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"etcd\" && duration > 100ms && resource.k8s.node.name =~ \"$node\" }",
+              "query": "{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" && resource.k8s.node.name =~ \"$node\" }",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
@@ -1300,7 +1300,7 @@ data:
           "id": 26,
           "type": "table",
           "title": "etcd 待ちが 100ms を超えた API リクエスト",
-          "description": "kube-apiserver のトレースの中で、子孫の etcd span が 100ms 以上かかったもの。\n\nTraceQL: `{ resource.service.name = \"apiserver\" && resource.k8s.node.name =~ \"$node\" } >> { resource.service.name = \"etcd\" && duration > 100ms }`",
+          "description": "子孫の etcd span (Watch / LeaseKeepAlive を除く) が 100ms 以上かかった kube-apiserver の server span。\n\nTraceQL: `{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.\"audit-id\")`",
           "datasource": {
             "type": "tempo",
             "uid": "${tempo}"
@@ -1319,7 +1319,7 @@ data:
               },
               "refId": "A",
               "queryType": "traceql",
-              "query": "{ resource.service.name = \"apiserver\" && resource.k8s.node.name =~ \"$node\" } >> { resource.service.name = \"etcd\" && duration > 100ms }",
+              "query": "{ resource.service.name = \"etcd\" && duration > 100ms && name !~ \".*/(Watch|LeaseKeepAlive)\" } << { resource.service.name = \"apiserver\" && kind = server && resource.k8s.node.name =~ \"$node\" } | select(span.http.target, span.\"audit-id\")",
               "limit": 20,
               "spss": 3,
               "tableType": "traces"
