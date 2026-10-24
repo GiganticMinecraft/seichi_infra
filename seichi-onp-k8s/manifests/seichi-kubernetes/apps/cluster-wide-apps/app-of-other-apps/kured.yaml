@@ -26,6 +26,15 @@ spec:
           drainTimeout: 10m
           period: 10m
           annotateNodes: true
+          # 暫定: bungeecord (seichi-gateway / seichi-debug-gateway) の Pod が載ったノードは再起動しない。
+          # itzg/mc-proxy 内の mc-image-helper 1.73.1 が、github.com の 302 応答に付くようになった
+          # 約 9KB の Content-Security-Policy ヘッダを netty の上限 (8192 / 10240 byte) 超えで
+          # 読めず (itzg/mc-image-helper#913)、PLUGINS の取得に失敗して起動できない。2026-10-25 時点で
+          # 本番 seichi-gateway は 10/18 起動の Pod 1 本だけで動いており、そのノードを drain すると
+          # 代わりの Pod が上がらず入口が全断する。プラグイン取得を initContainer に移す修正が
+          # 入って Pod が正常に起動するようになったら外す。
+          blockingPodSelector:
+            - app=bungeecord
           # 特定のアラートが firing している間だけ再起動を保留する (許可リスト方式)。
           #
           # 導入時は「除外リストに無いアラートはすべてブロック」だったが、warning 級のアラートが
