@@ -149,6 +149,39 @@
       ],
     },
     {
+      // build_itzg_images.yaml が再ビルドする上流 (itzg) の Dockerfile のタグ。
+      // マージしてもイメージが ghcr に積まれるだけで、本番への反映は下流の digest 更新 PR
+      // (seichi_minecraft_server images) で別途行うので automerge する
+      matchManagers: [
+        'custom.regex',
+      ],
+      matchPackageNames: [
+        'itzg/docker-minecraft-server',
+      ],
+      groupName: 'itzg upstream image sources',
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+    },
+    {
+      // 同じく build_itzg_images.yaml の base image。Java 17 系のタグに固定し、
+      // Ubuntu / JDK 側の更新は digest で追従する
+      matchManagers: [
+        'custom.regex',
+      ],
+      matchPackageNames: [
+        'eclipse-temurin',
+      ],
+      allowedVersions: '/^17(-jre)?$/',
+      pinDigests: true,
+      groupName: 'itzg upstream image sources',
+      schedule: [
+        'at any time',
+      ],
+      automerge: true,
+    },
+    {
       matchPackageNames: [
         'ghcr.io/mariadb-operator/charts/mariadb-operator',
         'ghcr.io/mariadb-operator/charts/mariadb-operator-crds',
@@ -279,6 +312,20 @@
       depNameTemplate: 'itzg/minecraft-server',
       extractVersionTemplate: '^(?<version>\\d+\\.\\d+\\.\\d+)-.*',
       datasourceTemplate: 'docker',
+    },
+    {
+      // build_itzg_images.yaml の matrix に付けた `# renovate:` コメント直後の行の値
+      // (上流タグ、base image の image:tag@digest) を追従する。
+      // docker の行は `eclipse-temurin:17-jre@sha256:...` のように image 名が前置されるので、
+      // `@` の手前の最後の `:` までを読み飛ばして tag 部分だけを currentValue にする
+      // (registry:port/ や mirror の path が付いても tag だけが残る)
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.github/workflows/build_itzg_images.yaml$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n\\s+[A-Za-z_]+: "?(?:[^@"\\s]*:)?(?<currentValue>[^:@"\\s/]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"?',
+      ],
     },
     {
       customType: 'regex',
