@@ -1,7 +1,15 @@
+# kubeadm join は JoinConfiguration 以外の文書を読まずに警告を出して捨て、kubelet の設定は
+# kube-system/kubelet-config ConfigMap から取得する (正はそちら)。ここは init 時の
+# KubeletConfiguration (scripts/nodes/k8s-node-setup.sh) と揃えておくための写し。
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 cgroupDriver: "systemd"
 protectKernelDefaults: true
+# kubelet と、kubelet から traceparent を受け取る containerd の span を各ノードの Alloy に送る
+# refs: docs/runbooks/k8s-system-component-tracing.md
+tracing:
+  endpoint: 127.0.0.1:4317
+  samplingRatePerMillion: 10000
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: JoinConfiguration
