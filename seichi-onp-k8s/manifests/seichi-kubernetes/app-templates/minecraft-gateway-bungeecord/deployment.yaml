@@ -82,7 +82,7 @@ spec:
               value: >-
                 -javaagent:/jmx-exporter/jmx-exporter-javaagent.jar=18321:/jmx-exporter/jmx-exporter-config.yaml
 
-          image: itzg/mc-proxy:java21
+          image: itzg/mc-proxy:java21@sha256:e0324b0363308ac2c3a9ee975e7c4820dc225676ec75576fc6bdef21a18c138a
           name: bungeecord
           ports:
             - containerPort: 25577

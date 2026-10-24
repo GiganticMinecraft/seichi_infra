@@ -132,6 +132,23 @@
       automerge: true,
     },
     {
+      // itzg/mc-proxy (bungeecord) は tag だけだとノードのキャッシュ次第で古い
+      // mc-image-helper が使われ続けるため digest で固定し、再ビルドのたびに
+      // 1 本の PR で追従する。seichi-gateway には sync window が無く、マージ即
+      // ローリング再起動でプレイヤーが切断されるので automerge はしない
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'itzg/mc-proxy',
+      ],
+      groupName: 'itzg/mc-proxy image',
+      pinDigests: true,
+      schedule: [
+        'at any time',
+      ],
+    },
+    {
       matchPackageNames: [
         'ghcr.io/mariadb-operator/charts/mariadb-operator',
         'ghcr.io/mariadb-operator/charts/mariadb-operator-crds',
