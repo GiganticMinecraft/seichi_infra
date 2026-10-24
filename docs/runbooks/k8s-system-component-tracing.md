@@ -159,6 +159,7 @@ kubelet の再起動では稼働中の Pod は再起動しない。
 # ノード上で
 # 現在のマニフェストと kubeadm-config から作るマニフェストの差分を見る (何も変えない)
 # --tracing-config-file と volumeMounts / volumes の tracing-config だけが出ること
+# (upgrade diff が比べるのは kube-apiserver / kube-controller-manager / kube-scheduler だけで、etcd は対象外)
 sudo kubeadm upgrade diff
 
 # kube-apiserver / kube-controller-manager / kube-scheduler のマニフェストを作り直す。
@@ -225,12 +226,15 @@ etcd のマニフェストは手で直す。
 sudo cp /etc/kubernetes/manifests/etcd.yaml /etc/kubernetes/tmp/etcd.yaml.bak-$(date +%Y%m%d%H%M%S)
 sudo cp /etc/kubernetes/manifests/etcd.yaml /root/etcd.yaml.new
 sudo sed -i 's#^    - --listen-metrics-urls=http://0.0.0.0:2381$#&\n    - --enable-distributed-tracing=true\n    - --distributed-tracing-address=127.0.0.1:4317\n    - --distributed-tracing-sampling-rate=0#' /root/etcd.yaml.new
-# 3 行が増えただけであること
+# 3 行が増えただけであること (3 でなければ sed が当たっていないので止める)
 sudo diff /etc/kubernetes/manifests/etcd.yaml /root/etcd.yaml.new
-sudo cp /root/etcd.yaml.new /etc/kubernetes/manifests/etcd.yaml
+[ "$(sudo grep -cE -- '--(enable-distributed-tracing|distributed-tracing-address|distributed-tracing-sampling-rate)=' /root/etcd.yaml.new)" = 3 ] \
+  && sudo cp /root/etcd.yaml.new /etc/kubernetes/manifests/etcd.yaml \
+  || echo 'etcd.yaml.new にトレースの引数が 3 つ入っていない。マニフェストは変更していない' >&2
 sudo rm /root/etcd.yaml.new
 ```
 
+sed は `    - --listen-metrics-urls=http://0.0.0.0:2381` の行 (インデント 4) の直後に足す。このノードのマニフェストで形が違う場合は `sudoedit` で同じ 3 行を足す。
 引数の並びは kubeadm が kubeadm-config から作るもの (既定の引数のあとに `extraArgs` を記載順に並べる) と揃えてある。
 
 確認:
@@ -342,7 +346,10 @@ kubeadm-config から `tracing-config-file` と `tracing-config` ボリューム
 sudo kubeadm upgrade diff
 sudo kubeadm upgrade node phase control-plane --etcd-upgrade=false --certificate-renewal=false
 
-# または退避したマニフェストを戻す (方法 A なら /etc/kubernetes/tmp/kubeadm-backed-up-manifests-*/kube-apiserver.yaml)
+# または退避したマニフェストを戻す
+# 方法 A で反映した場合 (kubeadm が退避したもの)
+sudo cp /etc/kubernetes/tmp/kubeadm-backed-up-manifests-<日時>/kube-apiserver.yaml /etc/kubernetes/manifests/kube-apiserver.yaml
+# 方法 B で反映した場合 (手で退避したもの)
 sudo cp /etc/kubernetes/tmp/kube-apiserver.yaml.bak-<日時> /etc/kubernetes/manifests/kube-apiserver.yaml
 ```
 
@@ -365,6 +372,7 @@ sudo cp /etc/kubernetes/tmp/etcd.yaml.bak-<日時> /etc/kubernetes/manifests/etc
 - **サンプリングのコスト**: Tempo は単一バイナリで、ローカルの 100Gi PVC に 720h 保持している。apiserver は常時数百 req/s を受けるため、比率を上げるとすぐにディスクが足りなくなる。上げるときは流入量 (`tempo_distributor_bytes_received_total` など) を見てから。readyz / livez などのヘルスチェックは受信側の Alloy で捨てている。
 - **etcd のサンプリング率 0**: etcd 3.7 は `ParentBased(NeverSample)` になり、親が sampled の span (apiserver でサンプリングされたリクエスト) だけを記録する。0 より大きくすると apiserver を経由しない etcd 呼び出し (etcdctl やメンバー間の処理) の分も増える。
 - **etcd のフラグ名**: etcd 3.7 では `--experimental-enable-distributed-tracing` などの `--experimental-*` 形式は削除されている。`--enable-distributed-tracing` などを使う。
+- **containerd 1.x**: OTEL_* 環境変数でトレースが有効になるのは containerd 2.x から。1.7 以前は `config.toml` の `plugins."io.containerd.tracing.processor.v1.otlp"` などに書く必要があり、この drop-in だけでは span が出ない (`ctr plugins ls` で otlp が ok にならない)。
 - **containerd の設定**: containerd 2.x のトレースは環境変数 (`OTEL_*`) だけで設定する。`config.toml` には書かない。`OTEL_EXPORTER_OTLP_ENDPOINT` には SDK が `/v1/traces` を付け足す。`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` に切り替える場合は `http://127.0.0.1:4318/v1/traces` とパスまで書く。
 - **node-runtime-updater**: containerd のバイナリを差し替える DaemonSet (`cluster-wide-apps/node-runtime-updater`) は systemd の drop-in を触らないので、更新後も `10-otel.conf` は残る。
 - **トレースが出ないコンポーネント**:

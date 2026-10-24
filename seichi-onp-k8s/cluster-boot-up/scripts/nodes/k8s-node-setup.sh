@@ -186,6 +186,12 @@ sudo systemctl daemon-reload
 # Restart containerd to apply changes
 sudo systemctl restart containerd
 
+# OTEL_* 環境変数でトレースが有効になるのは containerd 2.x から (1.x は config.toml の設定が必要)。
+# トレースが無くてもノードは動くので、構築は止めずに警告だけ出す。
+if ! sudo ctr plugins ls | grep -qE '^io\.containerd\.tracing\.processor\.v1\s+otlp\s+.*\sok\s*$'; then
+    echo "WARNING: containerd の otlp トレースプラグインが有効になっていません (containerd 2.x 以降か確認する)" >&2
+fi
+
 # Modify kernel parameters for Kubernetes
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
