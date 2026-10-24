@@ -115,7 +115,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "kube-apiserver / etcd / kubelet / containerd が OTLP で送るトレースを Tempo で見るダッシュボード。**サンプリング**: 親を持たないルート span の 1% だけを残し、子 span は親の判定に従う。そのため span-metrics の件数・レートは実際の呼び出し数のおよそ 1/100 で、割合とレイテンシ分布を見る用途向け。/healthz・/livez・/readyz のヘルスチェックは Tempo に入る前に捨てている。**対象外**: kube-scheduler・kube-controller-manager・CoreDNS は OTLP トレースを出さないので、スケジューリングやコントローラの処理はここには現れない。**外部からの trace の引き継ぎ**: kube-apiserver はリクエストの traceparent を system:masters / system:monitoring グループからの呼び出しに限って採用し、それ以外は apiserver を起点に新しいトレースを始める。変数 node は TraceQL のパネルだけに効く (span-metrics にはノードのラベルが無い)。"
+            "content": "- サンプリング: root span の 1% (子は親に従う)。span-metrics の件数は実数の約 1/100\n- /healthz /livez /readyz は受信側 Alloy で破棄\n- scheduler / controller-manager / CoreDNS は OTLP 非対応のため対象外\n- 変数 node は TraceQL パネルにのみ効く"
           }
         },
         {
