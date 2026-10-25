@@ -7,6 +7,7 @@
 #   - meta ボリューム残量 (LMDB は再同期中に 3 倍以上に膨れる)
 #   - ブロック削除数 / ブロック参照カウンタ数 (2026-10-19 に repair block-refs で block_ref が
 #     誤って消され、ブロックが GC された事故はこの 2 つにしか現れなかった)
+#   - トレース (Tempo): バケット別のレイテンシ / リクエスト数、遅い S3 API の一覧、受信側 RPC の p99
 # JSON は scratchpad の build_dash.py 相当のスクリプトで生成したもの。手で触る場合は
 # Grafana UI で編集 → JSON model をここに貼り戻す。
 apiVersion: v1
@@ -57,7 +58,46 @@ data:
               "text": "All",
               "value": "$__all"
             },
-            "refresh": 2
+            "refresh": 2,
+            "allValue": ".*"
+          },
+          {
+            "name": "bucket",
+            "label": "Bucket",
+            "type": "query",
+            "description": "トレースのパネルだけに効く。bucket 属性の無い span (認証やパース前に失敗した要求) は含まない",
+            "datasource": {
+              "type": "tempo",
+              "uid": "P214B5B846CF3925F"
+            },
+            "definition": "bucket",
+            "query": {
+              "type": 1,
+              "label": "bucket",
+              "refId": "TempoDatasourceVariableQueryEditor-VariableQuery"
+            },
+            "includeAll": true,
+            "allValue": ".*",
+            "multi": true,
+            "refresh": 1,
+            "sort": 1,
+            "current": {
+              "selected": true,
+              "text": "All",
+              "value": "$__all"
+            }
+          },
+          {
+            "name": "slow",
+            "label": "遅い閾値",
+            "type": "custom",
+            "description": "遅い S3 API の一覧に効く",
+            "query": "100ms,500ms,1s,5s",
+            "current": {
+              "selected": true,
+              "text": "500ms",
+              "value": "500ms"
+            }
           }
         ]
       },
@@ -1619,6 +1659,239 @@ data:
               "sort": "desc"
             }
           }
+        },
+        {
+          "id": 32,
+          "type": "row",
+          "title": "トレース (Tempo)",
+          "collapsed": true,
+          "gridPos": {
+            "x": 0,
+            "y": 65,
+            "w": 24,
+            "h": 1
+          },
+          "panels": [
+            {
+              "id": 37,
+              "type": "text",
+              "title": "",
+              "transparent": true,
+              "gridPos": {
+                "x": 0,
+                "y": 66,
+                "w": 24,
+                "h": 3
+              },
+              "options": {
+                "mode": "markdown",
+                "content": "- TraceQL は選択範囲内の Garage の全 span (無サンプリング) を毎回走査する。長いレンジは Tempo に重く、上限は 7 日\n- 変数 pod はこの行の全パネル、bucket は S3 API の 3 パネルに効く"
+              }
+            },
+            {
+              "id": 33,
+              "type": "timeseries",
+              "title": "S3 API p99 (バケット別)",
+              "description": "Prometheus のレイテンシはエンドポイント別までなので、バケット別はトレースから出す (TraceQL の quantile は 2 の冪のバケットによる推定で、Prometheus の p99 と厳密には一致しない)",
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "gridPos": {
+                "x": 0,
+                "y": 69,
+                "w": 12,
+                "h": 8
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "P214B5B846CF3925F"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "metricsQueryType": "range",
+                  "query": "{ resource.service.name = \"garage\" && name =~ \"S3 API .*\" && span.bucket =~ \"${bucket:regex}\" && resource.k8s.pod.name =~ \"${pod:regex}\" } | quantile_over_time(duration, .99) by (span.bucket)"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "id": 34,
+              "type": "timeseries",
+              "title": "S3 API リクエスト数 (バケット別)",
+              "description": "Garage はサンプリングしないので実数に近いが、bucket 属性の無い span (ListBuckets、認証やパース前に失敗した要求) は含まない",
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "gridPos": {
+                "x": 12,
+                "y": 69,
+                "w": 12,
+                "h": 8
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "P214B5B846CF3925F"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "metricsQueryType": "range",
+                  "query": "{ resource.service.name = \"garage\" && name =~ \"S3 API .*\" && span.bucket =~ \"${bucket:regex}\" && resource.k8s.pod.name =~ \"${pod:regex}\" } | rate() by (span.bucket)"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "reqps",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "calcs": [
+                    "mean",
+                    "max"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            {
+              "id": 35,
+              "type": "table",
+              "title": "$slow 以上かかった S3 API",
+              "description": "一致した span のうち 20 件で順序は不定。bucket 属性の無い要求 (認証失敗など) も出る。行から Tempo のウォーターフォールを開ける。他ノード宛の処理は RPC >> の下に入り、自ノード分と rpc_helper 配下は親なしで見える (内部 RPC の span を落としているため)",
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "gridPos": {
+                "x": 0,
+                "y": 77,
+                "w": 24,
+                "h": 9
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "P214B5B846CF3925F"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "limit": 20,
+                  "spss": 3,
+                  "tableType": "spans",
+                  "query": "{ resource.service.name = \"garage\" && name =~ \"S3 API .*\" && (span.bucket =~ \"${bucket:regex}\" || span.bucket = nil) && resource.k8s.pod.name =~ \"${pod:regex}\" && duration >= $slow } | select(span.bucket, span.endpoint, span.uri, resource.k8s.pod.name)"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "showHeader": true,
+                "cellHeight": "sm"
+              }
+            },
+            {
+              "id": 36,
+              "type": "timeseries",
+              "title": "受信側 RPC p99 (path 別)",
+              "description": "受信ノードでの処理時間。ノード間 RPC の行の rpc_duration は送信側の往復なので、差分がネットワークと待ち時間",
+              "datasource": {
+                "type": "tempo",
+                "uid": "P214B5B846CF3925F"
+              },
+              "gridPos": {
+                "x": 0,
+                "y": 86,
+                "w": 24,
+                "h": 8
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "tempo",
+                    "uid": "P214B5B846CF3925F"
+                  },
+                  "refId": "A",
+                  "queryType": "traceql",
+                  "metricsQueryType": "range",
+                  "query": "{ resource.service.name = \"garage\" && name =~ \">> RPC .*\" && resource.k8s.pod.name =~ \"${pod:regex}\" } | quantile_over_time(duration, .99) by (name)"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "s",
+                  "custom": {
+                    "drawStyle": "line",
+                    "lineWidth": 1,
+                    "fillOpacity": 10,
+                    "showPoints": "never",
+                    "spanNulls": false
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "calcs": [
+                    "mean",
+                    "last"
+                  ]
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            }
+          ]
         }
       ]
     }

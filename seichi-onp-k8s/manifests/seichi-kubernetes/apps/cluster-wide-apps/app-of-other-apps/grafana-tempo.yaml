@@ -26,6 +26,12 @@ spec:
           backendWorker:
             compaction:
               block_retention: 720h
+          # TraceQL metrics (quantile_over_time / rate) の範囲上限。既定は 24h で、Garage
+          # オーバービューのトレース行を 2 日以上のレンジで開くとパネルがエラーになるので、
+          # search の上限 (既定 168h) に揃える。範囲内の span を全部走査するので長いレンジは重い。
+          queryFrontend:
+            metrics:
+              max_duration: 168h
           metricsGenerator:
             enabled: true
             storage:
