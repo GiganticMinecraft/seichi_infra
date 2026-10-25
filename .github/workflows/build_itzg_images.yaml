@@ -43,7 +43,7 @@ jobs:
             variant: java17
             upstream_repo: itzg/docker-minecraft-server
             # renovate: datasource=github-releases depName=itzg/docker-minecraft-server
-            upstream_ref: 2026.10.0
+            upstream_ref: 2026.10.1
             # renovate: datasource=docker depName=eclipse-temurin
             base_image: eclipse-temurin:17-jre@sha256:e04fa72be13b257a59fdec6dc14af78c8f80f035d3c1ed4e03e45552a231d4c8
 
