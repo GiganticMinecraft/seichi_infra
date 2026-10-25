@@ -116,13 +116,14 @@ spec:
                 - 'resource.attributes["service.name"] == "seichi-portal-debezium" and attributes["original_span_name"] == "Channel.waitForConfirmsOrDie"'
                 # Garage は Sampler::AlwaysOn 固定でサンプリング設定が無く (src/garage/tracing_setup.rs)、
                 # 2026-10-19 実測で約 200 span/s を送っていた。その半分以上が内部 RPC
-                # ("RPC [garage_table/...] to <node id>" など) とパーティションごとのロック取得
+                # ("RPC [garage_table/...] to <node id>" など。v2.5.0 からは ">> RPC garage_table/..."
+                # と先頭に ">> " が付く) とパーティションごとのロック取得
                 # ("Acquire mutation_lock #0〜#255") で、span 名のカーディナリティも高い。
                 # S3 API のルート span と、そのレイテンシ内訳になる BlockManager / テーブル操作の
                 # 子 span は残し、それ以外の内部処理と admin API (metrics scrape 含む) を落とす。
                 # (正規表現にバックスラッシュを入れると YAML → Helm → Alloy → OTTL の各段で
                 #  エスケープ解釈が変わるので、"RPC [" ではなく "RPC " で前方一致させる)
-                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^RPC ")'
+                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^(>> )?RPC ")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Acquire mutation_lock #.*")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Admin API .*")'
                 - 'resource.attributes["service.name"] == "garage" and name == "admin/gather_metrics"'
