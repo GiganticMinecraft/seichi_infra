@@ -123,11 +123,20 @@ spec:
                 # (正規表現にバックスラッシュを入れると YAML → Helm → Alloy → OTTL の各段で
                 #  エスケープ解釈が変わるので、"RPC [" ではなく "RPC " で前方一致させる)
                 # v2.5.0 で garage_net の telemetry feature が有効になり (src/garage/Cargo.toml の
-                # telemetry-otlp)、ノード間通信の span が増えた。クライアント側 "RPC >> <path>" は
-                # 上の前方一致でそのまま落ちる。サーバ側 ">> RPC <path>" (SpanKind::Server、約 20 種、
-                # 約 22 span/s) は S3 のルート span から受信ノードの write_block / read_block に
-                # つながる唯一の親なので残す。落とすと受信側の span が親なしになる。
-                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^RPC ")'
+                # telemetry-otlp)、ノード間通信の span も出るようになった。PutObject の親子関係は
+                #   S3 API PutObject → RPC [path] try_write_many_sets (quorum ..) → RPC [path] to <node>
+                #   → RPC >> <path> (netapp クライアント側) → >> RPC <path> (netapp サーバ側、受信ノード)
+                #   → BlockManagerLocked::write_block
+                # で、rpc_helper と netapp の span は全部落とし、受信ノード側の write_block / read_block /
+                # テーブル操作だけ残す。">> RPC" を残しても親の netapp クライアント側が落ちているので
+                # つながらず、resync / GC / table sync / counter 伝搬由来の分はルート無しの trace を作るだけ。
+                # 残した受信側の span は、S3 由来なら S3 のルートと同じ trace に親なしで残り、
+                # バックグラウンド由来なら (ルートの "Resync block" も下で落とすので) ルート無しの trace に
+                # なる。v2.4.1 までは netapp が context を伝搬せず、受信側の span は毎回独立したルートだった。
+                # ルート無しの trace を無くすには、名前ではなく tail_sampling でルートの有無を見る必要がある (未対応)。
+                # Client / Server の対を両方落とすので、service graph の garage → garage の辺と
+                # Server kind の span metrics は出ない。
+                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^(>> )?RPC ")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Acquire mutation_lock #.*")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Admin API .*")'
                 - 'resource.attributes["service.name"] == "garage" and name == "admin/gather_metrics"'
