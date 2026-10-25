@@ -124,6 +124,8 @@
       ],
       matchPackageNames: [
         'itzg/minecraft-server*',
+        // build_itzg_images.yaml が Ubuntu 26.04 で再ビルドした上流イメージ (build_mcserver_base_images.yaml から参照)
+        'ghcr.io/giganticminecraft/itzg-*',
       ],
       groupName: 'itzg/minecraft-server images',
       schedule: [
@@ -307,9 +309,8 @@
         '/^.github/workflows/build_mcserver_base_images.yaml$/',
       ],
       matchStrings: [
-        '- mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\"(?<currentDigest>sha256:[a-f0-9]+)\\"',
+        '- mcserver_base_image_repo: (?<depName>[^\\s]+)\\n\\s+mcserver_base_image_tag: (?<currentValue>.*)\\n\\s+mcserver_base_image_digest: \\"(?<currentDigest>sha256:[a-f0-9]+)\\"',
       ],
-      depNameTemplate: 'itzg/minecraft-server',
       extractVersionTemplate: '^(?<version>\\d+\\.\\d+\\.\\d+)-.*',
       datasourceTemplate: 'docker',
     },
