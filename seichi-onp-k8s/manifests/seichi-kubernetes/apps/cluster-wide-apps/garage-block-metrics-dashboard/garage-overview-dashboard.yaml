@@ -1673,22 +1673,6 @@ data:
           },
           "panels": [
             {
-              "id": 37,
-              "type": "text",
-              "title": "",
-              "transparent": true,
-              "gridPos": {
-                "x": 0,
-                "y": 66,
-                "w": 24,
-                "h": 3
-              },
-              "options": {
-                "mode": "markdown",
-                "content": "- TraceQL は選択範囲内の Garage の全 span (無サンプリング) を毎回走査する。長いレンジは Tempo に重く、上限は 7 日\n- 変数 pod はこの行の全パネル、bucket は S3 API の 3 パネルに効く"
-              }
-            },
-            {
               "id": 33,
               "type": "timeseries",
               "title": "S3 API p99 (バケット別)",
@@ -1699,7 +1683,7 @@ data:
               },
               "gridPos": {
                 "x": 0,
-                "y": 69,
+                "y": 66,
                 "w": 12,
                 "h": 8
               },
@@ -1754,7 +1738,7 @@ data:
               },
               "gridPos": {
                 "x": 12,
-                "y": 69,
+                "y": 66,
                 "w": 12,
                 "h": 8
               },
@@ -1809,7 +1793,7 @@ data:
               },
               "gridPos": {
                 "x": 0,
-                "y": 77,
+                "y": 74,
                 "w": 24,
                 "h": 9
               },
@@ -1847,7 +1831,7 @@ data:
               },
               "gridPos": {
                 "x": 0,
-                "y": 86,
+                "y": 83,
                 "w": 24,
                 "h": 8
               },
