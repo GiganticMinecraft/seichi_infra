@@ -120,23 +120,29 @@ spec:
                 # ("Acquire mutation_lock #0〜#255") で、span 名のカーディナリティも高い。
                 # S3 API のルート span と、そのレイテンシ内訳になる BlockManager / テーブル操作の
                 # 子 span は残し、それ以外の内部処理と admin API (metrics scrape 含む) を落とす。
-                # (正規表現にバックスラッシュを入れると YAML → Helm → Alloy → OTTL の各段で
-                #  エスケープ解釈が変わるので、"RPC [" ではなく "RPC " で前方一致させる)
                 # v2.5.0 で garage_net の telemetry feature が有効になり (src/garage/Cargo.toml の
                 # telemetry-otlp)、ノード間通信の span も出るようになった。PutObject の親子関係は
                 #   S3 API PutObject → RPC [path] try_write_many_sets (quorum ..) → RPC [path] to <node>
                 #   → RPC >> <path> (netapp クライアント側) → >> RPC <path> (netapp サーバ側、受信ノード)
                 #   → BlockManagerLocked::write_block
-                # で、rpc_helper と netapp の span は全部落とし、受信ノード側の write_block / read_block /
-                # テーブル操作だけ残す。">> RPC" を残しても親の netapp クライアント側が落ちているので
-                # つながらず、resync / GC / table sync / counter 伝搬由来の分はルート無しの trace を作るだけ。
-                # 残した受信側の span は、S3 由来なら S3 のルートと同じ trace に親なしで残り、
-                # バックグラウンド由来なら (ルートの "Resync block" も下で落とすので) ルート無しの trace に
-                # なる。v2.4.1 までは netapp が context を伝搬せず、受信側の span は毎回独立したルートだった。
-                # ルート無しの trace を無くすには、名前ではなく tail_sampling でルートの有無を見る必要がある (未対応)。
-                # Client / Server の対を両方落とすので、service graph の garage → garage の辺と
-                # Server kind の span metrics は出ない。
-                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^(>> )?RPC ")'
+                # 落とすのは rpc_helper の "RPC [path] ..." (名前にノード ID や quorum が入る、2 段) だけにし、
+                # netapp の対 "RPC >> <path>" / ">> RPC <path>" (名前は path だけ、30 種前後) は残す。これで
+                # 他ノードに送った分の write_block / read_block / テーブル操作は ">> RPC" → "RPC >>" まで
+                # つながり、S3 のルートとの間の gap は rpc_helper の 2 段になる。自ノード宛の RPC は netapp を
+                # 通らず handler を直接呼ぶ (src/net/endpoint.rs) ので、自ノード分の span は親なしのまま残る。
+                # netapp の対は 1 RPC あたり 2 span で、2026-10-25 時点で約 50 span/s。Client / Server の対が
+                # 揃うので、service graph に garage → garage の辺が出て、span metrics に Client / Server kind
+                # の "RPC >> ..." / ">> RPC ..." の系列が増える。
+                # resync / GC / table sync 由来の RPC は、ルートの "Resync block" を下で落とすか元から span が
+                # 無いので、"RPC >>" を頂点にしたルート無しの trace として残る。
+                # netapp 自身の peering Ping (garage_net/) は rpc_helper を通らず、残すと 2 span だけの trace を
+                # 毎回作るので落とす。
+                # ルート無しや親なしの span を名前で選り分けるのは限界があり、無くすには tail_sampling で
+                # ルートの有無を見る必要がある (未対応)。
+                # (正規表現にバックスラッシュを入れると YAML → Helm → Alloy → OTTL の各段でエスケープ解釈が
+                #  変わるので、"[" は文字クラス "[[]" で書く)
+                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^RPC [[]")'
+                - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^(>> )?RPC (>> )?garage_net/")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Acquire mutation_lock #.*")'
                 - 'resource.attributes["service.name"] == "garage" and IsMatch(name, "^Admin API .*")'
                 - 'resource.attributes["service.name"] == "garage" and name == "admin/gather_metrics"'
