@@ -1,4 +1,4 @@
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:1.0.0@sha256:06df072574de09fa797f7c0886263d6aeaca6a22cb339590f0b7d1843701b599
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_debug_base_1_18_2:1.0.0@sha256:1b017603fce6658eec73f8d2081a6f70991f8afab1aac8ba505593423bc649e3
 
 # このイメージは sha-<git short SHA> タグに加えて、再 push される安定タグ 1.0.0 でも公開される。
 # マニフェスト側は 1.0.0@sha256:... で参照し、digest の更新は Renovate が追従する。
