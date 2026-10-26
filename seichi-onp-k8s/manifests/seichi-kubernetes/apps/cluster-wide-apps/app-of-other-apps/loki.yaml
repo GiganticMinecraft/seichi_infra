@@ -111,9 +111,6 @@ spec:
                 kvstore:
                   store: memberlist
 
-        minio:
-          enabled: false
-
         # rules sidecar (chart デフォルトで singleBinary Pod に同居) の配置先を
         # 単一テナント "fake" のディレクトリへ向ける
         sidecar:
@@ -181,31 +178,17 @@ spec:
           replicas: 0
         indexGateway:
           replicas: 0
-        bloomCompactor:
-          replicas: 0
         bloomGateway:
           replicas: 0
 
-        # -- DEPRECATED Monitoring section determines which monitoring features to enable, this section is being replaced
-        # by https://github.com/grafana/meta-monitoring-chart
         monitoring:
-          # -- DEPRECATED Recording rules for monitoring Loki, required for some dashboards
+          # loki-mixin の recording rule (cluster_job:* など)
           rules:
             enabled: true
             labels:
               release: prometheus
             additionalRuleLabels:
               release: prometheus
-            additionalGroups:
-            - name: additional-loki-rules
-              rules:
-                - record: job:loki_request_duration_seconds_bucket:sum_rate
-                  expr: sum(rate(loki_request_duration_seconds_bucket[1m])) by (le, job)
-                - record: job_route:loki_request_duration_seconds_bucket:sum_rate
-                  expr: sum(rate(loki_request_duration_seconds_bucket[1m])) by (le, job, route)
-                - record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate
-                  expr: sum(rate(container_cpu_usage_seconds_total[1m])) by (node, namespace, pod, container)
-          #  -- DEPRECATED ServiceMonitor configuration
           serviceMonitor:
             enabled: true
             labels:
