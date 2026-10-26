@@ -111,9 +111,6 @@ spec:
                 kvstore:
                   store: memberlist
 
-        minio:
-          enabled: false
-
         # rules sidecar (chart デフォルトで singleBinary Pod に同居) の配置先を
         # 単一テナント "fake" のディレクトリへ向ける
         sidecar:
@@ -180,8 +177,6 @@ spec:
         compactor:
           replicas: 0
         indexGateway:
-          replicas: 0
-        bloomCompactor:
           replicas: 0
         bloomGateway:
           replicas: 0
