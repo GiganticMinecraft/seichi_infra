@@ -191,12 +191,17 @@
       groupName: 'mariadb-operator',
     },
     {
-      // chart の appVersion と image を同じ PR で上げる
+      // chart の appVersion がそのまま Meilisearch エンジンのバージョンになり、
+      // MEILI_UPGRADE_DB で起動時に DB を in-place 移行する (ダウングレード不可)
+      matchDatasources: [
+        'helm',
+      ],
       matchPackageNames: [
         'meilisearch',
-        'getmeili/meilisearch',
       ],
-      groupName: 'meilisearch',
+      prBodyNotes: [
+        ':warning: Chart.yaml の appVersion が変わる場合は Meilisearch エンジンの更新です。release notes の breaking changes を確認し、merge 前に `POST /snapshots` でスナップショットを取ってください。',
+      ],
     },
     {
       // debianは日付付きタグ（例: trixie-20260406）を無視し、バージョン番号（例: 13, 13.4, 13-slim）・コードネーム（例: trixie, trixie-slim, trixie-backports）・エイリアス（例: stable, latest）のみ許可する
@@ -298,18 +303,6 @@
         '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)[\\s\\S]*?tag: "(?<currentValue>[^"]+)"',
       ],
       versioningTemplate: 'semver-coerced',
-    },
-    {
-      // Meilisearch は chart の appVersion と独立に image.tag を values で固定しているため、
-      // Application の values (YAML block scalar 内) のタグを追従する。
-      customType: 'regex',
-      managerFilePatterns: [
-        '/^seichi-onp-k8s/manifests/seichi-kubernetes/apps/seichi-minecraft/meilisearch/meilisearch[.]yaml$/',
-      ],
-      matchStrings: [
-        '# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s+tag: "(?<currentValue>v[\\d.]+)"',
-      ],
-      versioningTemplate: 'semver',
     },
     {
       // hubble-observer は Cilium Agent のイメージ同梱の hubble を使うので、
