@@ -12,7 +12,8 @@ spec:
     helm:
       releaseName: seichi-portal-meilisearch
       values: |
-        # image は chart の既定値 (appVersion) に従わせる。chart の更新 PR がそのままエンジンの更新になる。
+        # image は chart の既定値 (values.yaml の image.tag、appVersion と同じ版) に従わせる。
+        # chart の更新 PR がそのままエンジンの更新になる。
         auth:
           existingMasterKeySecret: seichi-portal-meilisearch-master-key
         environment:
@@ -24,7 +25,8 @@ spec:
         persistence:
           enabled: true
           size: 10Gi
-        # 起動時の DB 移行は tasks DB (1GiB 超) の走査を含み、chart 既定の 60 秒では足りなくなり得る。
+        # 起動時の移行のうち task queue の移行 (tasks DB 1GiB 超の走査) は HTTP を開く前に走るので、
+        # chart 既定の 60 秒を超えても CrashLoop にしない。index の移行は起動後に upgradeDatabase task として走る。
         startupProbe:
           failureThreshold: 300
         resources:

@@ -191,7 +191,7 @@
       groupName: 'mariadb-operator',
     },
     {
-      // chart の appVersion がそのまま Meilisearch エンジンのバージョンになり、
+      // chart の既定 image.tag (appVersion と同じ版) がそのまま Meilisearch エンジンのバージョンになり、
       // MEILI_UPGRADE_DB で起動時に DB を in-place 移行する (ダウングレード不可)
       matchDatasources: [
         'helm',
@@ -200,7 +200,8 @@
         'meilisearch',
       ],
       prBodyNotes: [
-        ':warning: Chart.yaml の appVersion が変わる場合は Meilisearch エンジンの更新です。release notes の breaking changes を確認し、merge 前に `POST /snapshots` でスナップショットを取ってください。',
+        ':warning: chart の values.yaml の image.tag (appVersion) が変わる場合は Meilisearch エンジンの更新で、反映時に DB を in-place 移行します (ダウングレード不可)。release notes の breaking changes を確認してください。',
+        ':warning: 反映 (sync) の直前に `POST /snapshots` でスナップショットを取り、upgradeDatabase task の成功を確認したら `/meili_data/snapshots/` から削除してください (データ PVC と同じ 10Gi に書かれます)。',
       ],
     },
     {
