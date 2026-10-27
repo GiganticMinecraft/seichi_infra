@@ -191,6 +191,20 @@
       groupName: 'mariadb-operator',
     },
     {
+      // chart の既定 image.tag (appVersion と同じ版) がそのまま Meilisearch エンジンのバージョンになり、
+      // MEILI_UPGRADE_DB で起動時に DB を in-place 移行する (ダウングレード不可)
+      matchDatasources: [
+        'helm',
+      ],
+      matchPackageNames: [
+        'meilisearch',
+      ],
+      prBodyNotes: [
+        ':warning: chart の values.yaml の image.tag (appVersion) が変わる場合は Meilisearch エンジンの更新で、反映時に DB を in-place 移行します (ダウングレード不可)。release notes の breaking changes を確認してください。',
+        ':warning: 反映 (sync) の直前に `POST /snapshots` でスナップショットを取り、upgradeDatabase task の成功を確認したら `/meili_data/snapshots/` から削除してください (データ PVC と同じ 10Gi に書かれます)。',
+      ],
+    },
+    {
       // debianは日付付きタグ（例: trixie-20260406）を無視し、バージョン番号（例: 13, 13.4, 13-slim）・コードネーム（例: trixie, trixie-slim, trixie-backports）・エイリアス（例: stable, latest）のみ許可する
       matchPackageNames: [
         'debian', 'mirror.gcr.io/debian'

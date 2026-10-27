@@ -12,17 +12,23 @@ spec:
     helm:
       releaseName: seichi-portal-meilisearch
       values: |
-        image:
-          repository: getmeili/meilisearch
-          tag: "v1.36.0"
+        # image は chart の既定値 (values.yaml の image.tag、appVersion と同じ版) に従わせる。
+        # chart の更新 PR がそのままエンジンの更新になる。
         auth:
           existingMasterKeySecret: seichi-portal-meilisearch-master-key
         environment:
           MEILI_ENV: production
           MEILI_NO_ANALYTICS: "true"
+          # Meilisearch の DB はバージョン固定で、image を上げただけだと起動時に VersionMismatch で落ちる。
+          # DB とバイナリのバージョンが違うときだけ起動時に in-place で移行し、一致していれば何もしないので常設する。
+          MEILI_UPGRADE_DB: "true"
         persistence:
           enabled: true
           size: 10Gi
+        # 起動時の移行のうち task queue の移行 (tasks DB 1GiB 超の走査) は HTTP を開く前に走るので、
+        # chart 既定の 60 秒を超えても CrashLoop にしない。index の移行は起動後に upgradeDatabase task として走る。
+        startupProbe:
+          failureThreshold: 300
         resources:
           # Redmine 移行後の大量同期を処理できるよう、一時的に余裕を持たせる。
           requests:
