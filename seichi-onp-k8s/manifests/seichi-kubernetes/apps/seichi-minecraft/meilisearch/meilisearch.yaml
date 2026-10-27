@@ -14,12 +14,18 @@ spec:
       values: |
         image:
           repository: getmeili/meilisearch
-          tag: "v1.36.0"
+          # chart の appVersion とは独立に image を固定しているので、Renovate にここを追従させる。
+          # chart は tag を app.kubernetes.io/version ラベルにも使うため digest は付けない。
+          # renovate: datasource=docker depName=getmeili/meilisearch
+          tag: "v1.56.0"
         auth:
           existingMasterKeySecret: seichi-portal-meilisearch-master-key
         environment:
           MEILI_ENV: production
           MEILI_NO_ANALYTICS: "true"
+          # Meilisearch の DB はバージョン固定で、image を上げただけだと起動時に VersionMismatch で落ちる。
+          # DB とバイナリのバージョンが違うときだけ起動時に in-place で移行し、一致していれば何もしないので常設する。
+          MEILI_UPGRADE_DB: "true"
         persistence:
           enabled: true
           size: 10Gi
