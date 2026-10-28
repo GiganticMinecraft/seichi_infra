@@ -45,7 +45,7 @@ jobs:
             # renovate: datasource=github-releases depName=itzg/docker-minecraft-server
             upstream_ref: 2026.10.1
             # renovate: datasource=docker depName=eclipse-temurin
-            base_image: eclipse-temurin:17-jre@sha256:6958ae44998e44f6046bb66c8c2f28e0dc600c0433d7cafee793c9130c44d56d
+            base_image: eclipse-temurin:17-jre@sha256:4faa9eaf440514dd4f7ef71fecb92526e13679aea039bed5d2fc98e885c60dee
 
     steps:
       # 上流のタグは動かせるので、ビルド時点の commit に解決してから context に渡し、
