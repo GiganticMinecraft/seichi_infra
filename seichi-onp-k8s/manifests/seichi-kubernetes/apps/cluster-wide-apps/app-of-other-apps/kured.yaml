@@ -16,8 +16,9 @@ spec:
           timeZone: "Asia/Tokyo"
           # 04:00 からの Minecraft バックアップ(kubectl patch による replicas 操作)と
           # 07:00-08:00 の ArgoCD selfHeal ウィンドウを避けた時間帯のみ再起動を許可する。
-          # Alertmanager の time_interval "kured-reboot-window" (prometheus-operator.yaml) が
-          # 同じ時間帯の Discord 通知を抑止しているので、変更時は両方を更新すること。
+          # この時間帯に連動している設定: Alertmanager の time_interval "kured-reboot-window"
+          # (prometheus-operator.yaml、窓内の副作用アラートを mute) と descheduler の
+          # 07:30 JST スケジュール (descheduler.yaml、窓のクローズ後に実行)。変更時は 3 か所を更新すること。
           startTime: "05:00"
           endTime: "07:00"
           # ロックにより同時に再起動するノードは 1 台のみ

@@ -405,7 +405,6 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
-                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-portal-noncritical"
                   matchers:
@@ -416,8 +415,13 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
-                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
+                  routes:
+                    - matchers:
+                        - alertname =~ "SeichiPortalDebeziumDisconnected"
+                      mute_time_intervals:
+                        - "kured-reboot-window"
+                        - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-infra-critical"
                   matchers:
                     - notify = "discord"
@@ -427,8 +431,13 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
-                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
+                  routes:
+                    - matchers:
+                        - alertname =~ "GarageS3ServerErrors"
+                      mute_time_intervals:
+                        - "kured-reboot-window"
+                        - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-infra-noncritical"
                   matchers:
                     - notify = "discord"
@@ -437,15 +446,29 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
-                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
+                  routes:
+                    - matchers:
+                        - alertname =~ "GarageS3SlowWrites"
+                      mute_time_intervals:
+                        - "kured-reboot-window"
+                        - "argocd-seichi-minecraft-sync-window"
             time_intervals:
-              # kured の再起動窓 (kured.yaml の startTime/endTime) と同じ時間帯は Discord 通知を
-              # 抑止する。ノードを 1 台ずつ再起動するだけで GarageS3ServerErrors (RF=2 で write
-              # quorum が崩れる)、SeichiPortalDebeziumDisconnected (mariadb-0 の退避先が無く数分停止)、
-              # TargetDown などが毎回 firing するため。評価・状態記録は継続し、窓の終了時点で
-              # まだ firing なら通知する。kured 自身は Prometheus の ALERTS を直接見るので、
-              # ここで mute しても alertFilterRegexp による再起動の保留には影響しない。
+              # kured の再起動窓 (kured.yaml の startTime/endTime) の間だけ、ノード 1 台の再起動で
+              # 毎回 firing する副作用アラートの通知を抑止する。対象は各 route の子 route で
+              # alertname を列挙したものに限る (全 route を mute すると 2026-10-24 のような本物の
+              # 障害も 08:00 まで届かなくなるため)。
+              # - GarageS3ServerErrors / GarageS3SlowWrites: RF=2 で write quorum も 2 のため、
+              #   1 台停止中は全 PUT が 503 になりクライアントのリトライで遅延も伸びる
+              # - SeichiPortalDebeziumDisconnected: mariadb-0 は drain 後に他ノードへ載らず
+              #   元ノード復帰まで数分停止し、Debezium が crash loop する
+              # 子 route は親の receiver を継承するので、対象アラートの severity を変えた場合は
+              # 子 route も対応する親へ移すこと。
+              # 評価・状態記録は継続し、窓の終了時点でまだ firing なら通知する (直後に
+              # argocd-seichi-minecraft-sync-window が続くため、実際に届くのは 08:00 以降)。
+              # 窓の中で resolved になった通知は窓明けにも送られない (sync window と同じ挙動)。
+              # kured 自身は Prometheus の ALERTS を直接見るので、ここで mute しても
+              # alertFilterRegexp による再起動の保留には影響しない。
               # kured の startTime/endTime を変更した場合はこの interval も同時に更新すること。
               - name: "kured-reboot-window"
                 time_intervals:
