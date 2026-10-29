@@ -408,7 +408,7 @@ spec:
                     - "argocd-seichi-minecraft-sync-window"
                   routes:
                     - matchers:
-                        - alertname =~ "SeichiPortalBackendPanic"
+                        - alertname =~ "SeichiPortalBackendCrashLoop"
                       mute_time_intervals:
                         - "kured-reboot-window"
                         - "argocd-seichi-minecraft-sync-window"
@@ -468,9 +468,10 @@ spec:
               #   1 台停止中は全 PUT が 503 になりクライアントのリトライで遅延も伸びる
               # - SeichiPortalDebeziumDisconnected: mariadb-0 は drain 後に他ノードへ載らず
               #   元ノード復帰まで数分停止し、Debezium が crash loop する
-              # - SeichiPortalBackendPanic: portal 一式が同じノードから退避されると backend が
+              # - SeichiPortalBackendCrashLoop: portal 一式が同じノードから退避されると backend が
               #   valkey / mariadb より先に起動し、接続拒否で起動時 panic → CrashLoopBackOff になる
-              #   (2026-10-24 / 10-28 / 10-29 の再起動で毎回発生)
+              #   (2026-10-24 / 10-28 / 10-29 の再起動で毎回発生)。この起動時 panic は
+              #   SeichiPortalBackendPanic (Loki ruler) 側で除外しているので、そちらは mute しない
               # 子 route は親の receiver を継承するので、対象アラートの severity を変えた場合は
               # 子 route も対応する親へ移すこと。
               # 評価・状態記録は継続し、窓の終了時点でまだ firing なら通知する (直後に

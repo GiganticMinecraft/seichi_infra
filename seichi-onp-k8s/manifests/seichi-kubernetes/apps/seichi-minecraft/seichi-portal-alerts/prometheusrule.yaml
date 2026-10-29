@@ -36,12 +36,14 @@ spec:
           annotations:
             summary: "{{ $labels.service }} のエラーレートが 5% を超えています"
             description: "{{ $labels.service }} のサーバーサイドスパンのエラーレートが 10 分間 5% を超えています (現在値: {{ $value | humanizePercentage }})。"
-        # 起動直後に即死する panic (CrashLoopBackOff) は stdout が alloy-logs の
-        # file tailer に拾われる前に書き終わるため、Loki ruler の panic ルール (#5618)
-        # では検知できない (2026-08-01 実測: 0.2.0 の起動時 panic ログは Loki に
-        # 1 行も届いていない)。Sentry が担っていた「起動不能の即時通知」は
-        # この CrashLoop アラートで代替する。rollout 中に旧 Pod がサービスを継続
-        # できている場合は通知せず、Service の ready endpoint が 0 の場合だけ通知する
+        # 起動不能 (CrashLoopBackOff) の通知。Loki ruler の panic ルール (#5618) は
+        # 起動時の依存先接続拒否 (valkey / mariadb) を除外しているので、その経路は
+        # このアラートだけが拾う (2026-10-21 までは起動直後の panic ログ自体が Loki に
+        # 届いておらず、当初からこのアラートが「起動不能の即時通知」を担っている)。
+        # rollout 中に旧 Pod がサービスを継続できている場合は通知せず、Service の
+        # ready endpoint が 0 の場合だけ通知する。kured の再起動窓 (05:00-07:00 JST) では
+        # 退避直後の依存先待ちで毎回 CrashLoopBackOff になるため Alertmanager 側で mute
+        # (prometheus-operator.yaml の kured-reboot-window)
         - alert: SeichiPortalBackendCrashLoop
           expr: |
             (
@@ -62,7 +64,7 @@ spec:
             team: portal
           annotations:
             summary: "seichi-portal-backend が CrashLoopBackOff です"
-            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしており、Service seichi-portal-backend に ready endpoint がありません。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
+            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしており、Service seichi-portal-backend に ready endpoint がありません。原因は Loki で {job=\"seichi-minecraft/seichi-portal-backend\"} | json | panic=\"true\" か kubectl logs --previous で確認する。"
 
         # Debezium が MariaDB の binlog を読めていない状態。止まっている間は検索インデックスに
         # 変更が反映されない。2026-10-24 は破損した binlog (mariadb-bin.000405) を読もうとして
