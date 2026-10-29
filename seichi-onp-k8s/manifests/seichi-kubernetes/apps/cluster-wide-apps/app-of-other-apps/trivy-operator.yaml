@@ -31,7 +31,7 @@ spec:
     chart: trivy-operator
     # ghcr の OCI ミラーは 0.32.1 で更新が止まっているため HTTPS リポジトリを使う
     repoURL: https://aquasecurity.github.io/helm-charts/
-    targetRevision: 0.37.0
+    targetRevision: 0.38.1
     helm:
       releaseName: trivy-operator
       values: |
