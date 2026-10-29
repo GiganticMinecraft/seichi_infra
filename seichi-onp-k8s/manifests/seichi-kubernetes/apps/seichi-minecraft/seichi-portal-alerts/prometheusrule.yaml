@@ -36,14 +36,12 @@ spec:
           annotations:
             summary: "{{ $labels.service }} のエラーレートが 5% を超えています"
             description: "{{ $labels.service }} のサーバーサイドスパンのエラーレートが 10 分間 5% を超えています (現在値: {{ $value | humanizePercentage }})。"
-        # 起動不能 (CrashLoopBackOff) の通知。Loki ruler の panic ルール (#5618) は
-        # 起動時の依存先接続拒否 (valkey / mariadb) を除外しているので、その経路は
-        # このアラートだけが拾う (2026-10-21 までは起動直後の panic ログ自体が Loki に
-        # 届いておらず、当初からこのアラートが「起動不能の即時通知」を担っている)。
+        # 起動不能 (CrashLoopBackOff) の通知。2026-10-21 (#6468/#6472) までは起動直後の
+        # panic ログが Loki に届かず Loki ruler の panic ルール (#5618) で検知できなかった
+        # ため、Sentry が担っていた「起動不能の即時通知」をこのアラートで代替している。
+        # 今は panic ログも Loki に届くが、panic 以外の起動失敗も拾えるので残す。
         # rollout 中に旧 Pod がサービスを継続できている場合は通知せず、Service の
-        # ready endpoint が 0 の場合だけ通知する。kured の再起動窓 (05:00-07:00 JST) では
-        # 退避直後の依存先待ちで毎回 CrashLoopBackOff になるため Alertmanager 側で mute
-        # (prometheus-operator.yaml の kured-reboot-window)
+        # ready endpoint が 0 の場合だけ通知する。
         - alert: SeichiPortalBackendCrashLoop
           expr: |
             (

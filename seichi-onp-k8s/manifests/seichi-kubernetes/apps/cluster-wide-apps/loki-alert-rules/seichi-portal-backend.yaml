@@ -18,27 +18,22 @@ data:
     #     {pod=~"..."} ではなく {job="<namespace>/<container>"} で選択する
     #   - 起動直後に即死する panic も Loki に届く (2026-10-21 の #6468/#6472 で
     #     alloy-logs が新規ファイルを先頭から読むようになった。それ以前は file tailer
-    #     が拾えず届いていなかった)。ただし依存先 (valkey / mariadb) への接続拒否で
-    #     起動時に panic する経路は下記ルールで除外し、PrometheusRule の
-    #     SeichiPortalBackendCrashLoop 側に任せる
+    #     が拾えず届いていなかった)。起動不能が続く場合は PrometheusRule の
+    #     SeichiPortalBackendCrashLoop も鳴る
     groups:
       - name: seichi-portal-backend-logs
         interval: 1m
         rules:
           # 単発 panic から通知する (Sentry の panic 通知の代替)。
           # 5 分窓のため、firing 後 5 分間新規 panic がなければ自動で resolved になる
-          #
-          # 除外: 起動時の依存先接続拒否 (message = "panicked: Cannot establish Valkey
-          #   connection: Connection refused" / "panicked: Cannot establish portal database
-          #   connection.")。kured の再起動で portal 一式が同じノードから退避されると backend が
-          #   valkey / mariadb より先に起動して毎回これで CrashLoopBackOff になる
-          #   (2026-10-24 / 10-28 / 10-29、直近 8 日の panic 15 件はすべてこれ)。
-          #   起動できない状態が続く場合は SeichiPortalBackendCrashLoop が通知するので、
-          #   このルールはアプリ本体の panic だけを対象にする
+          # 起動時の依存先 (valkey / mariadb) 接続拒否による panic は、Deployment の
+          # initContainer (wait-for-dependencies) で依存先の TCP が開くまで待つことで
+          # 発生自体を防いでいる。それでもこの message で鳴ったら initContainer の
+          # 待ち先と env の接続先がずれていないか確認する
           - alert: SeichiPortalBackendPanic
             expr: |
               sum by (service_name) (
-                count_over_time({job="seichi-minecraft/seichi-portal-backend"} | json | panic="true" | message !~ "panicked: Cannot establish .*connection.*" [5m])
+                count_over_time({job="seichi-minecraft/seichi-portal-backend"} | json | panic="true" [5m])
               ) > 0
             labels:
               severity: critical
@@ -47,7 +42,7 @@ data:
               service: seichi-portal-backend
             annotations:
               summary: seichi-portal-backend で panic が発生しました
-              description: 直近 5 分間に panic ログが記録されました (起動時の依存先接続拒否は除外済み)。trace_id 付きの詳細は Loki で {job="seichi-minecraft/seichi-portal-backend"} | json | panic="true" を実行して確認する。
+              description: 直近 5 分間に panic ログが記録されました。trace_id 付きの詳細は Loki で {job="seichi-minecraft/seichi-portal-backend"} | json | panic="true" を実行して確認する。
           # level=ERROR の頻発を通知する (panic とは別ルールに分ける)。
           # 閾値 10 件/10 分は暫定値。backend 0.2.1 デプロイ後の実データで見直し、
           # ノイズになる既知エラーが出たら行フィルタや json フィールド条件で除外を積む
