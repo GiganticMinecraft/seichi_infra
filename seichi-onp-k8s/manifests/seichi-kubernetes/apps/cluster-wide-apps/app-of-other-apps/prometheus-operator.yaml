@@ -405,6 +405,7 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
+                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-portal-noncritical"
                   matchers:
@@ -415,6 +416,7 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
+                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-infra-critical"
                   matchers:
@@ -425,6 +427,7 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
+                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
                 - receiver: "discord-infra-noncritical"
                   matchers:
@@ -434,8 +437,22 @@ spec:
                   group_interval: 5m
                   repeat_interval: 4h
                   mute_time_intervals:
+                    - "kured-reboot-window"
                     - "argocd-seichi-minecraft-sync-window"
             time_intervals:
+              # kured の再起動窓 (kured.yaml の startTime/endTime) と同じ時間帯は Discord 通知を
+              # 抑止する。ノードを 1 台ずつ再起動するだけで GarageS3ServerErrors (RF=2 で write
+              # quorum が崩れる)、SeichiPortalDebeziumDisconnected (mariadb-0 の退避先が無く数分停止)、
+              # TargetDown などが毎回 firing するため。評価・状態記録は継続し、窓の終了時点で
+              # まだ firing なら通知する。kured 自身は Prometheus の ALERTS を直接見るので、
+              # ここで mute しても alertFilterRegexp による再起動の保留には影響しない。
+              # kured の startTime/endTime を変更した場合はこの interval も同時に更新すること。
+              - name: "kured-reboot-window"
+                time_intervals:
+                  - times:
+                      - start_time: "05:00"
+                        end_time: "07:00"
+                    location: "Asia/Tokyo"
               # seichi-minecraft AppProject の allow Sync Window と同じ時間帯は、
               # Prometheus / Loki から Alertmanager を経由する全 Discord 通知を抑止する。
               # アラートの評価・状態記録は継続し、window 終了後も firing なら通知する。
