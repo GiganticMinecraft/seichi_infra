@@ -86,7 +86,7 @@ spec:
           # CI が default branch への merge ごとに :master を上書き push する。
           # Renovate (pinDigests) が :master の digest の変化を検知して更新 PR を出す。
           # 特定コミットに固定してロールバックしたいときは sha-<commit> タグの digest を指定する
-          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:master@sha256:e49516d4e9db44615e39b7f251386c30737cca918a20fc167a6eadca6a093455
+          image: ghcr.io/giganticminecraft/seichi-game-data-publisher:master@sha256:35c8f271060a414b2742676513c6d75469f963d051b2ff3d5140bd9374675a19
           imagePullPolicy: Always
           name: seichi-game-data-publisher-server
           ports:
