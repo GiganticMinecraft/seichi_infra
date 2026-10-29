@@ -24,7 +24,7 @@ spec:
           # main への push ごとに :latest を上書き push する。Renovate (pinDigests) が
           # :latest の digest の変化を検知して更新 PR を出す。特定コミットに固定して
           # ロールバックしたいときは sha-<commit> タグの digest を指定する
-          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:latest@sha256:fcc775fa79b65d48d9b499f795ee3f4ba1b1e813fbfb7c49d39fd02a7842290d
+          image: ghcr.io/giganticminecraft/garage-admin-console-frontend:latest@sha256:787a289721e2964540c2489d9e6b927790e9098aac521a457d0aeb96ad077bd9
           ports:
             - containerPort: 80
           resources:
