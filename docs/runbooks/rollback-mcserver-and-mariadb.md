@@ -50,9 +50,9 @@ MariaDB の業務 database（flyway, seichi-timed-stats-conifers, seichiassist�
 - バックアップ先: Garage S3 バケット `mariadb-backups`、prefix は `database--{Database CR名}`
 - ワークフロー: `backup--mariadb-all-databases`（CronWorkflow）
 - スケジュール: 毎日 **04:00 JST**
-- 保持期間: S3 オブジェクトは **DB（prefix）ごとに最新 3 件**、Backup CR は 3 日で自動削除
+- 保持期間: S3 オブジェクトは **DB（prefix）ごとに最新 14 件**、Backup CR は 3 日で自動削除
   （`backup--mariadb-all-databases` の `KEEP` / `RETENTION_DAYS`）
-  - つまり通常経路で戻せるのは直近 3 日分程度。ロールバック先のダンプが自動削除される前に作業できない場合は、
+  - つまり通常経路で戻せるのは直近 2 週間程度。ロールバック先のダンプが自動削除される前に作業できない場合は、
     手順 0 のとおり別 prefix へ退避しておく
 - リストアは MariaDB Operator の `Restore` CRD によるポイントインタイムリカバリ
 
@@ -383,11 +383,11 @@ StatefulSet を `replicas=0` → ボリュームの切り離し（`kubectl get v
 
 - **メンテナンスモード ON 中は毎日 04:00 JST の MariaDB バックアップ Cron がスキップされる。**
   ロールバックが長時間にわたって 04:00 JST を跨ぐ場合、その日のバックアップは作成されない。なお、現在の実装ではワークフローがエラー（Failed）として終了するため、Discord 等に失敗通知が飛ぶ点に留意すること。
-- MariaDB バックアップ本体（Garage S3 上の `database--{name}` prefix）は DB ごとに最新 3 件だけ残る。
+- MariaDB バックアップ本体（Garage S3 上の `database--{name}` prefix）は DB ごとに最新 14 件だけ残る。
   `targetRecoveryTime` は秒単位の point-in-time recovery ではなく、指定時刻以前で最新の
   フルバックアップを採用する仕組み（MariaDB CR で binlog を有効化していないため）なので、
   **実質「日次精度」のロールバック**となる。
-- 通常経路では直近 3 件より前の状態には戻せない（必要なら手順 0a で事前に退避する）。なお Garage S3 自体は毎日 10:00 JST に
+- 通常経路では直近 14 件より前の状態には戻せない（必要なら手順 0a で事前に退避する）。なお Garage S3 自体は毎日 10:00 JST に
   Proxmox Backup Server へ二次バックアップされており（`backup--garage-to-pbs`、ID `garage`）、
   原理的には PBS 保持期間内の任意日時へ巻き戻せる。ただし既存の `restore--garage-from-pbs`
   ワークフローは Garage 全バケットを sync で上書きするため、特定 prefix だけを復元する
