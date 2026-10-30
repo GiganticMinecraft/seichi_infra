@@ -8,6 +8,14 @@ data:
   # 管理プラグイン経由 (-rabbitmq_management load_definitions) は boot step の依存関係が
   # 宣言されておらず、Erlang 28 以降 (RabbitMQ 4.4 のイメージ) で実行順が変わって
   # boot が永久に止まる (rabbitmq/rabbitmq-server#17914、修正は 4.4.1 / 4.3.8 予定)
+  # RabbitMQ はコンテナの memory limit ではなくノード全体のメモリ (90GiB) を基準に
+  # vm_memory_high_watermark (既定 0.6) を計算するため、limit に達する前に publisher を
+  # 止める flow control が一度も効かず、cgroup の OOMKill で落ちていた (2026-10-30、
+  # ログ: "Memory high watermark set to 54300 MiB of 90500 MiB total")。
+  # 利用可能メモリを limit (2Gi) に合わせて上書きし、約 1.2GiB で publisher
+  # (Debezium) をブロックさせる。stateful-set.yaml の limits.memory と同じ値にすること
+  10-memory.conf: |
+    total_memory_available_override_value = 2147483648
   20-definitions.conf: |
     definitions.import_backend = local_filesystem
     definitions.local.path = /etc/rabbitmq/definitions.json

@@ -118,6 +118,9 @@ spec:
             - name: definitions
               mountPath: /etc/rabbitmq/conf.d/20-definitions.conf
               subPath: 20-definitions.conf
+            - name: definitions
+              mountPath: /etc/rabbitmq/conf.d/10-memory.conf
+              subPath: 10-memory.conf
             - name: data
               mountPath: /var/lib/rabbitmq
           resources:
@@ -125,10 +128,16 @@ spec:
               # 以前の 500m は probe の rabbitmq-diagnostics が食っていた分(約 0.3 core)を
               # 実測として取り込んだ値。probe を TCP に替えた後の broker 本体は数十 m で済む
               cpu: 100m
-              memory: 512Mi
+              memory: 1Gi
+            # Debezium の全件スナップショットは 1〜2 分で 11 万件以上 (約 400MiB) を
+            # 流し込み、backend の消費 (数件〜十数件/秒) では追いつかない。1Gi では
+            # 2026-10-30 に 2 回 OOMKilled になり、broker 再起動で backend の consumer が
+            # 消えて (再接続しても basic_consume をやり直さない) スナップショットも失敗 →
+            # やり直しで重複が積み上がる → 再 OOM のループになった。スナップショット
+            # 1 回分が丸ごと載る量にする。10-memory.conf の watermark と連動させること
             limits:
               cpu: 1
-              memory: 1Gi
+              memory: 2Gi
           # 旧 probe の rabbitmq-diagnostics ping は実行ごとに Erlang VM を起動して
           # distribution に join するため 1 回あたり約 1 CPU 秒かかり、5 秒 + 10 秒間隔の
           # 実行だけで常時 0.3 core を消費して CFS throttling が 50% に達していた。

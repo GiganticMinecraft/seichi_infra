@@ -9,7 +9,11 @@ data:
     debezium.sink.rabbitmq.connection.host=seichi-portal-rabbitmq
     debezium.sink.rabbitmq.connection.port=5672
     debezium.sink.rabbitmq.connection.username=seichi-portal
-    debezium.sink.rabbitmq.ackTimeout=3000
+    # publisher confirm の待ち時間。RabbitMQ が memory watermark で publisher を
+    # ブロックしている間 (backend の消費待ち) に 3 秒で諦めるとスナップショット全体が
+    # 失敗してやり直しになる (2026-10-30 "Error while executing batch: TimeoutException")。
+    # ブロックは消費が進めば解けるので、失敗ではなく待つ側に寄せる
+    debezium.sink.rabbitmq.ackTimeout=120000
     debezium.sink.rabbitmq.exchange=seichi_portal
     debezium.sink.rabbitmq.routingKey=seichi_portal
 
