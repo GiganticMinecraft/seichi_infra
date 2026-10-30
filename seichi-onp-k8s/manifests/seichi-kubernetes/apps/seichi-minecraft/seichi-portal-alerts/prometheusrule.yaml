@@ -36,12 +36,15 @@ spec:
           annotations:
             summary: "{{ $labels.service }} のエラーレートが 5% を超えています"
             description: "{{ $labels.service }} のサーバーサイドスパンのエラーレートが 10 分間 5% を超えています (現在値: {{ $value | humanizePercentage }})。"
-        # 起動直後に即死する panic (CrashLoopBackOff) は stdout が alloy-logs の
-        # file tailer に拾われる前に書き終わるため、Loki ruler の panic ルール (#5618)
-        # では検知できない (2026-08-01 実測: 0.2.0 の起動時 panic ログは Loki に
-        # 1 行も届いていない)。Sentry が担っていた「起動不能の即時通知」は
-        # この CrashLoop アラートで代替する。rollout 中に旧 Pod がサービスを継続
-        # できている場合は通知せず、Service の ready endpoint が 0 の場合だけ通知する
+        # 起動不能 (CrashLoopBackOff) の通知。2026-10-21 (#6468/#6472) までは起動直後の
+        # panic ログが Loki に届かず Loki ruler の panic ルール (#5618) で検知できなかった
+        # ため、Sentry が担っていた「起動不能の即時通知」をこのアラートで代替している。
+        # 今は panic ログも Loki に届くが、panic 以外の起動失敗も拾えるので残す。
+        # rollout 中に旧 Pod がサービスを継続できている場合は通知せず、Service の
+        # ready endpoint が 0 の場合だけ通知する。
+        # Deployment の initContainer (wait-for-dependencies) で依存先待ちをしているため、
+        # 依存先が落ちている間は CrashLoopBackOff にならず Init で止まる。その状態は
+        # 下の SeichiPortalBackendUnavailable が拾う。
         - alert: SeichiPortalBackendCrashLoop
           expr: |
             (
@@ -62,7 +65,28 @@ spec:
             team: portal
           annotations:
             summary: "seichi-portal-backend が CrashLoopBackOff です"
-            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしており、Service seichi-portal-backend に ready endpoint がありません。起動時 panic のログは Loki に届かないため、原因は kubectl logs --previous で確認する。"
+            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} が繰り返しクラッシュしており、Service seichi-portal-backend に ready endpoint がありません。原因は Loki で {job=\"seichi-minecraft/seichi-portal-backend\"} | json | panic=\"true\" か kubectl logs --previous で確認する。"
+
+        # 理由を問わず Service に ready endpoint が無い状態の通知。initContainer で依存先を
+        # 待っている (Init:0/1)、イメージが pull できない、Pending のまま載らない、など
+        # CrashLoopBackOff にならない起動不能をすべて拾う。kured 窓の依存先復帰では
+        # backend の ready endpoint が 6 分無かった (2026-10-28、mariadb-0 の停止 5 分半 +
+        # 起動) ので、窓の副作用で鳴らないよう for は 15m にする。
+        # rollout は maxUnavailable: 0 なので旧 Pod が ready のままで鳴らない。
+        # crash loop が続く本物の障害では CrashLoop (5m) とこれ (15m) が両方鳴る。
+        - alert: SeichiPortalBackendUnavailable
+          expr: |
+            kube_service_info{namespace="seichi-minecraft", service="seichi-portal-backend", job="kube-state-metrics"}
+            unless on (namespace)
+            kube_endpointslice_endpoints{namespace="seichi-minecraft", endpointslice=~"seichi-portal-backend-.*", ready="true", job="kube-state-metrics"}
+          for: 15m
+          labels:
+            severity: critical
+            notify: discord
+            team: portal
+          annotations:
+            summary: "seichi-portal-backend に ready endpoint がありません"
+            description: "Service seichi-portal-backend に 15 分間 ready endpoint がありません。kubectl get pods -n seichi-minecraft -l app=seichi-portal-backend で Init (依存先待ち) / ImagePullBackOff / Pending のどれかを確認する。Init のままなら mariadb と seichi-portal-valkey の状態を見る。"
 
         # Debezium が MariaDB の binlog を読めていない状態。止まっている間は検索インデックスに
         # 変更が反映されない。2026-10-24 は破損した binlog (mariadb-bin.000405) を読もうとして

@@ -462,6 +462,9 @@ spec:
               #   1 台停止中は全 PUT が 503 になりクライアントのリトライで遅延も伸びる
               # - SeichiPortalDebeziumDisconnected: mariadb-0 は drain 後に他ノードへ載らず
               #   元ノード復帰まで数分停止し、Debezium が crash loop する
+              # seichi-portal-backend が退避直後に valkey / mariadb より先に起動して panic する
+              # 副作用 (SeichiPortalBackendPanic / CrashLoop) は、critical を毎日 3 時間落とさない
+              # ために mute ではなく Deployment の initContainer で発生自体を防いでいる。
               # 子 route は親の receiver を継承するので、対象アラートの severity を変えた場合は
               # 子 route も対応する親へ移すこと。
               # 評価・状態記録は継続し、窓の終了時点でまだ firing なら通知する (直後に
