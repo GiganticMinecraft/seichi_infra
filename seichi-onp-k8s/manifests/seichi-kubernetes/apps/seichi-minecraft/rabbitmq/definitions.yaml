@@ -4,6 +4,15 @@ metadata:
   name: seichi-portal-rabbitmq-definitions
   namespace: seichi-minecraft
 data:
+  # RabbitMQ はコンテナの memory limit ではなくノード全体のメモリ (90GiB) を基準に
+  # vm_memory_high_watermark (既定 0.6) を計算するため、limit に達する前に publisher を
+  # 止める flow control が一度も効かず、cgroup の OOMKill で落ちていた (2026-10-30、
+  # ログ: "Memory high watermark set to 54300 MiB of 90500 MiB total")。
+  # コンテナでは絶対値で指定する (公式の推奨)。limit (4Gi) より十分低くして、超えても
+  # OOMKill ではなく publisher (Debezium) のブロックで止まるようにする。
+  # stateful-set.yaml の limits.memory を変えるときはここも合わせて変えること
+  10-memory.conf: |
+    vm_memory_high_watermark.absolute = 2560MiB
   # 定義ファイルの取り込みは core の definitions.* 設定で行う。以前使っていた
   # 管理プラグイン経由 (-rabbitmq_management load_definitions) は boot step の依存関係が
   # 宣言されておらず、Erlang 28 以降 (RabbitMQ 4.4 のイメージ) で実行順が変わって

@@ -88,6 +88,39 @@ spec:
             summary: "seichi-portal-backend に ready endpoint がありません"
             description: "Service seichi-portal-backend に 15 分間 ready endpoint がありません。kubectl get pods -n seichi-minecraft -l app=seichi-portal-backend で Init (依存先待ち) / ImagePullBackOff / Pending のどれかを確認する。Init のままなら mariadb と seichi-portal-valkey の状態を見る。"
 
+        # CDC キューを誰も消費していない状態。backend は broker が再起動すると接続は
+        # 張り直すが consumer (basic_consume) を再登録しないため、RabbitMQ の OOMKilled や
+        # 更新のたびに黙って消費が止まる (2026-10-30)。検索インデックスへの反映が止まり、
+        # Debezium のスナップショットが来るとキューが溜まる一方になる。
+        # 復旧は backend の rollout restart。
+        - alert: SeichiPortalCdcQueueNoConsumer
+          expr: |
+            rabbitmq_detailed_queue_consumers{namespace="seichi-minecraft", queue="seichi_portal"} == 0
+          for: 5m
+          labels:
+            severity: warning
+            notify: discord
+            team: portal
+          annotations:
+            summary: "seichi_portal キューに consumer がいません"
+            description: "RabbitMQ の seichi_portal キューを 5 分間誰も消費していません。backend が broker 再起動後に consumer を再登録できていない可能性が高い。kubectl -n seichi-minecraft rollout restart deploy/seichi-portal-backend で復旧する。"
+
+        # RabbitMQ が memory watermark に達して publisher をブロックしている状態。
+        # Debezium のスナップショットが消費を大きく上回ると起きる。ブロックが続くと
+        # Debezium 側が confirm 待ちで失敗してスナップショットをやり直すので、
+        # consumer が生きているか (上のアラート) とキューの減り方を確認する。
+        - alert: SeichiPortalRabbitMqMemoryAlarm
+          expr: |
+            rabbitmq_alarms_memory_used_watermark{namespace="seichi-minecraft"} == 1
+          for: 2m
+          labels:
+            severity: warning
+            notify: discord
+            team: portal
+          annotations:
+            summary: "seichi-portal の RabbitMQ がメモリ上限で publisher をブロックしています"
+            description: "RabbitMQ の memory alarm が 2 分間続いています。seichi_portal キューの滞留と consumer の有無を確認する。"
+
         # Debezium が MariaDB の binlog を読めていない状態。止まっている間は検索インデックスに
         # 変更が反映されない。2026-10-24 は破損した binlog (mariadb-bin.000405) を読もうとして
         # 再起動とリトライを数時間繰り返していたが、KubePodCrashLooping に埋もれて気付けなかった。
