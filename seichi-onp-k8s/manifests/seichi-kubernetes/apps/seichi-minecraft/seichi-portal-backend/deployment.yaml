@@ -46,7 +46,8 @@ spec:
       # - Valkey は RDB ロード中も TCP は開いていて -LOADING を返すため、PING に +PONG が
       #   返るまで待つ (認証無し。valkey コンテナには readinessProbe が無く、Service の
       #   endpoint は LOADING 中も ready)。応答が無い相手で待ち続けないよう timeout で切る
-      # 接続先は本体と同じ env (MYSQL_HOST / REDIS_HOST ...) を参照し、二重管理を避ける。
+      # 接続先は本体の env (MYSQL_HOST / MYSQL_PORT / REDIS_HOST / REDIS_PORT) と同じ値を
+      # initContainer 側にも書いている。本体の接続先を変えるときは両方を直す。
       # Meilisearch / RabbitMQ は起動時に無くても degraded で動くので待たない。
       # 依存先が長時間落ちていると Pod は Init のまま止まり CrashLoopBackOff にならないため、
       # その状態は SeichiPortalBackendUnavailable (seichi-portal-alerts) が通知する。
