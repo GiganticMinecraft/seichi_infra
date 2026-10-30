@@ -19,17 +19,18 @@ data:
     #   - 起動直後に即死する panic も Loki に届く (2026-10-21 の #6468/#6472 で
     #     alloy-logs が新規ファイルを先頭から読むようになった。それ以前は file tailer
     #     が拾えず届いていなかった)。起動不能が続く場合は PrometheusRule の
-    #     SeichiPortalBackendCrashLoop も鳴る
+    #     SeichiPortalBackendCrashLoop / SeichiPortalBackendUnavailable も鳴る
     groups:
       - name: seichi-portal-backend-logs
         interval: 1m
         rules:
           # 単発 panic から通知する (Sentry の panic 通知の代替)。
           # 5 分窓のため、firing 後 5 分間新規 panic がなければ自動で resolved になる
-          # 起動時の依存先 (valkey / mariadb) 接続拒否による panic は、Deployment の
-          # initContainer (wait-for-dependencies) で依存先の TCP が開くまで待つことで
-          # 発生自体を防いでいる。それでもこの message で鳴ったら initContainer の
-          # 待ち先と env の接続先がずれていないか確認する
+          # 起動時の依存先 (valkey / mariadb) 接続失敗による panic は、Deployment の
+          # initContainer (wait-for-dependencies) で依存先が応答するまで待つことで防いでいる
+          # (暫定。本来は backend 側で起動時接続をリトライすべき)。それでも
+          # "Cannot establish ... connection" で鳴ったら、initContainer が見ていない経路
+          # (MINECRAFT_BANS_DATABASE_URL の別ホスト化、認証やユーザ権限の不備など) を疑う
           - alert: SeichiPortalBackendPanic
             expr: |
               sum by (service_name) (

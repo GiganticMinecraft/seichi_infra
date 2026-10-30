@@ -38,25 +38,45 @@ spec:
       # sidecar の image pull で 1 分半) や mariadb (他ノードにメモリ不足で載らず元ノード
       # 復帰まで数分) より先に起動して CrashLoopBackOff になり、依存先が復帰した後も
       # backoff の分だけ余計に止まる (2026-10-24 / 10-28 / 10-29、毎回 restart 6 回)。
-      # 必須依存 (/health が必須としている 2 つ) の TCP が開くまで Init で待つことで、
+      # 必須依存 (/health が必須としている 2 つ) が応答するまで Init で待つことで、
       # panic も CrashLoopBackOff も起こさず、依存先復帰の数秒後に起動する。
-      # 待ち先は env の MYSQL_HOST:MYSQL_PORT / REDIS_HOST:REDIS_PORT と同じ値。
+      # - MariaDB は listen 開始が InnoDB リカバリ後なので TCP が開けば接続できる。
+      #   MINECRAFT_BANS_DATABASE_URL (Terraform 管理の Secret) も同じ mariadb:3306 を
+      #   指しており、接続できないと同様に panic する。別ホストに変える場合はここにも足す
+      # - Valkey は RDB ロード中も TCP は開いていて -LOADING を返すため、PING に +PONG が
+      #   返るまで待つ (認証無し。valkey コンテナには readinessProbe が無く、Service の
+      #   endpoint は LOADING 中も ready)。応答が無い相手で待ち続けないよう timeout で切る
+      # 接続先は本体と同じ env (MYSQL_HOST / REDIS_HOST ...) を参照し、二重管理を避ける。
       # Meilisearch / RabbitMQ は起動時に無くても degraded で動くので待たない。
+      # 依存先が長時間落ちていると Pod は Init のまま止まり CrashLoopBackOff にならないため、
+      # その状態は SeichiPortalBackendUnavailable (seichi-portal-alerts) が通知する。
+      # 本来は backend 側で起動時接続をリトライすべきで、これはそれまでの暫定措置。
       initContainers:
         - name: wait-for-dependencies
-          image: busybox:1.38.0
+          image: mirror.gcr.io/library/busybox:1.38.0
           command:
             - sh
             - -c
             - |
-              for target in mariadb:3306 seichi-portal-valkey:6379; do
-                host=${target%:*}; port=${target#*:}
-                until nc -z -w 2 "$host" "$port"; do
-                  echo "waiting for $target"
-                  sleep 2
-                done
-                echo "$target is reachable"
+              until nc -z -w 2 "$MYSQL_HOST" "$MYSQL_PORT"; do
+                echo "waiting for mariadb $MYSQL_HOST:$MYSQL_PORT"
+                sleep 2
               done
+              echo "mariadb is reachable"
+              until printf 'PING\r\n' | timeout 5 nc "$REDIS_HOST" "$REDIS_PORT" | grep -qF '+PONG'; do
+                echo "waiting for valkey $REDIS_HOST:$REDIS_PORT"
+                sleep 2
+              done
+              echo "valkey is ready"
+          env:
+            - name: MYSQL_HOST
+              value: mariadb
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: REDIS_HOST
+              value: seichi-portal-valkey
+            - name: REDIS_PORT
+              value: "6379"
           resources:
             requests:
               cpu: 10m
