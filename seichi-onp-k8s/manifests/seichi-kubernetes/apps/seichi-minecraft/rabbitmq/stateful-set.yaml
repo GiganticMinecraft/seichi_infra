@@ -128,16 +128,20 @@ spec:
               # 以前の 500m は probe の rabbitmq-diagnostics が食っていた分(約 0.3 core)を
               # 実測として取り込んだ値。probe を TCP に替えた後の broker 本体は数十 m で済む
               cpu: 100m
-              memory: 1Gi
-            # Debezium の全件スナップショットは 1〜2 分で 11 万件以上 (約 400MiB) を
-            # 流し込み、backend の消費 (数件〜十数件/秒) では追いつかない。1Gi では
-            # 2026-10-30 に 2 回 OOMKilled になり、broker 再起動で backend の consumer が
-            # 消えて (再接続しても basic_consume をやり直さない) スナップショットも失敗 →
-            # やり直しで重複が積み上がる → 再 OOM のループになった。スナップショット
-            # 1 回分が丸ごと載る量にする。10-memory.conf の watermark と連動させること
+              memory: 512Mi
+            # 平常時の RSS は約 100MiB だが、Debezium の全件スナップショットは 1〜2 分で
+            # 11 万件以上 (約 400MiB) を流し込み、backend の消費 (数件〜十数件/秒) では
+            # 追いつかずキューに溜まる。1Gi では 2026-10-30 に 2 回 OOMKilled になり、
+            # broker 再起動で backend の consumer が消えて (再接続しても basic_consume を
+            # やり直さない) スナップショットも失敗 → やり直しで重複が積み上がる → 再 OOM
+            # のループになった。publisher をブロックして待たせる方式は、ブロックが消費速度
+            # 次第で数十分続き、Debezium の confirm 待ちや MariaDB の net_write_timeout (60s)
+            # でスナップショットごと失敗するため採らない。スナップショット 1 回分が
+            # 10-memory.conf の watermark (2560MiB) に届かずに載る余裕として 4Gi にする。
+            # limit を変えるときは watermark も合わせて変えること
             limits:
               cpu: 1
-              memory: 2Gi
+              memory: 4Gi
           # 旧 probe の rabbitmq-diagnostics ping は実行ごとに Erlang VM を起動して
           # distribution に join するため 1 回あたり約 1 CPU 秒かかり、5 秒 + 10 秒間隔の
           # 実行だけで常時 0.3 core を消費して CFS throttling が 50% に達していた。
