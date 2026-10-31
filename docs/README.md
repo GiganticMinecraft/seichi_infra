@@ -16,6 +16,7 @@ https://giganticminecraft.github.io/seichi_infra/ で閲覧可能。
 - [Minecraftメンテナンスモード](./runbooks/maintenance-mode.md)
 - [Minecraftワールド・MariaDBロールバック](./runbooks/rollback-mcserver-and-mariadb.md)
 - [Garage meta ボリュームの storageClass 切り替え](./runbooks/garage-meta-volume-migration.md)
+- [Synology（seichi-cloud）の不良ディスクの交換](./runbooks/synology-disk-replacement.md)
 
 ## Guides（ガイド）
 
