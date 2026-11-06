@@ -271,6 +271,22 @@ resource "kubernetes_secret_v1" "garage_backup_s3_credentials" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret_v1" "garage_restore_s3_credentials" {
+  depends_on = [kubernetes_namespace_v1.garage]
+
+  metadata {
+    name      = "garage-restore-s3-credentials"
+    namespace = "garage"
+  }
+
+  data = {
+    "AWS_ACCESS_KEY_ID"     = var.garage_restore_access_key_id
+    "AWS_SECRET_ACCESS_KEY" = var.garage_restore_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret_v1" "garage_backup_failure_notify_webhook" {
   depends_on = [kubernetes_namespace_v1.garage]
 

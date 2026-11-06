@@ -336,6 +336,18 @@ variable "garage_backup_secret_access_key" {
   sensitive   = true
 }
 
+variable "garage_restore_access_key_id" {
+  description = "Garage access key ID for restoring from PBS (requires write access to the backed up buckets)"
+  type        = string
+  sensitive   = true
+}
+
+variable "garage_restore_secret_access_key" {
+  description = "Garage secret access key for restoring from PBS"
+  type        = string
+  sensitive   = true
+}
+
 #endregion
 
 #region Garage Admin Console secrets
