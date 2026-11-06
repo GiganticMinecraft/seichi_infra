@@ -113,7 +113,7 @@ spec:
         storageClassName: topolvm-provisioner
         resources:
           requests:
-            storage: 400Gi
+            storage: 500Gi
   volumes:
     - name: pbs-tmpfs
       emptyDir: {}
