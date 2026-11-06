@@ -70,7 +70,7 @@ RAID から切り離されない SSD を DSM の「ドライブの交換」で�
 
 - PBS: 直近の mcserver / garage / VM のバックアップのうち、**不良の兆候が出る前の世代**を protected にする
   （`proxmox-backup-debug api set /admin/datastore/<ds>/protected --backup-type <host|vm> --backup-id <id> --backup-time <epoch> --protected true`）
-- mariadb のダンプ: Garage の `database--{name}/` は DB ごとに最新 14 件しか残らない。同じく兆候の前の世代を別 prefix に退避する
+- mariadb のダンプ: Garage の `database--{name}/` は DB ごとに最新 3 件しか残らない。同じく兆候の前の世代を別 prefix に退避する
   （[ロールバックの Runbook](./rollback-mcserver-and-mariadb.md) の手順 0a）
 
 ## 2-A. 不良ディスクを無効化してリビルドする（ほかのディスクが健全な場合。こちらを優先）

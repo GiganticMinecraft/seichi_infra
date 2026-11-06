@@ -54,6 +54,9 @@ MariaDB の業務 database（flyway, seichi-timed-stats-conifers, seichiassist�
   （`backup--mariadb-all-databases` の `KEEP` / `RETENTION_DAYS`）
   - つまり通常経路で戻せるのは直近 3 日分程度。ロールバック先のダンプが自動削除される前に作業できない場合は、
     手順 0 のとおり別 prefix へ退避しておく
+  - S3 に目的の世代が残っていない場合は、PBS の Garage バックアップ（`host/garage` の `data.pxar`）内の
+    `mariadb-backups/database--{name}/` から該当ダンプを取り出して使う。各スナップショットには
+    その時点の最新 3 件が入っている。`restore--garage-from-pbs` は全バケットを書き戻すので、この用途には使わない
 - リストアは MariaDB Operator の `Restore` CRD によるポイントインタイムリカバリ
 
 ## 手順
