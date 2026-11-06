@@ -64,12 +64,12 @@ spec:
           - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: garage-backup-s3-credentials
+                name: garage-restore-s3-credentials
                 key: AWS_ACCESS_KEY_ID
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: garage-backup-s3-credentials
+                name: garage-restore-s3-credentials
                 key: AWS_SECRET_ACCESS_KEY
           - name: RESTORE_ARCHIVE_NAME
             value: "data.pxar"

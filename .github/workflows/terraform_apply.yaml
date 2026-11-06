@@ -53,6 +53,8 @@ jobs:
           TF_VAR_garage_admin_session_secret: ${{ secrets.TF_VAR_GARAGE_ADMIN_SESSION_SECRET }}
           TF_VAR_garage_backup_access_key_id: ${{ secrets.TF_VAR_GARAGE_BACKUP_ACCESS_KEY_ID }}
           TF_VAR_garage_backup_secret_access_key: ${{ secrets.TF_VAR_GARAGE_BACKUP_SECRET_ACCESS_KEY }}
+          TF_VAR_garage_restore_access_key_id: ${{ secrets.TF_VAR_GARAGE_RESTORE_ACCESS_KEY_ID }}
+          TF_VAR_garage_restore_secret_access_key: ${{ secrets.TF_VAR_GARAGE_RESTORE_SECRET_ACCESS_KEY }}
           TF_VAR_garage_loki_access_key_id: ${{ secrets.TF_VAR_GARAGE_LOKI_ACCESS_KEY_ID }}
           TF_VAR_garage_loki_secret_access_key: ${{ secrets.TF_VAR_GARAGE_LOKI_SECRET_ACCESS_KEY }}
           TF_VAR_garage_pyroscope_access_key_id: ${{ secrets.TF_VAR_GARAGE_PYROSCOPE_ACCESS_KEY_ID }}
