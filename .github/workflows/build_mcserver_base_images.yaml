@@ -55,7 +55,7 @@ jobs:
             java_version_component_in_tag: java8-jdk
           - mcserver_base_image_repo: ghcr.io/giganticminecraft/itzg-minecraft-server
             mcserver_base_image_tag: java17
-            mcserver_base_image_digest: "sha256:dbab6f8a38880d07a123aecd8c39086195dea9831264ae01c044c94dc0a21f19"
+            mcserver_base_image_digest: "sha256:6a0e189b553e73e46b77b85a864cb523b839a9de015a723b4576d35f040d4faf"
             java_version_component_in_tag: java17-jdk
           - mcserver_base_image_repo: itzg/minecraft-server
             mcserver_base_image_tag: java21-jdk
