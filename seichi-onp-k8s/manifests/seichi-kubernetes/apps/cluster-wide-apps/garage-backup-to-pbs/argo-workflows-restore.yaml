@@ -29,7 +29,7 @@ spec:
         # proxmox-backup-client と AWS CLI は pbs-client イメージに焼き込まれている。
         # 実行時に Proxmox の CDN へ取りに行くと、疎通しない CDN ノードを掴んだときに
         # リストアごと落ちるため (詳細は docker-images/pbs-client/Dockerfile)。
-        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:754af8b8149f6276580a0568316b822593e8e42dd1b1527638a14ea3bf75db35
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:b70844b65592171a506c623ab585939495c6346929c31bda139e79720322cbad
         command: ["/bin/sh", "-c"]
         source: |
           set -e
