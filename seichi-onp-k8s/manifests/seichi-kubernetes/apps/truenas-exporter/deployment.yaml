@@ -22,7 +22,7 @@ spec:
           # CI (.github/workflows/truenas_exporter.yaml) が main への push ごとに :latest を
           # 上書き push する。Renovate (pinDigests) が :latest の digest の変化を検知して更新 PR を出す。
           # 特定コミットに固定してロールバックしたいときは sha-<commit> タグの digest を指定する
-          image: ghcr.io/giganticminecraft/truenas-exporter:latest@sha256:0b89a0a838d0d15ca5c58bc7e1943e36dc2989e985ff0d1032122477a2027828
+          image: ghcr.io/giganticminecraft/truenas-exporter:latest@sha256:184b591ea9dd2e0d6bc2b9a637be53b2368308bad797195df7604318bfacc716
           ports:
             - containerPort: 9814
               name: metrics
