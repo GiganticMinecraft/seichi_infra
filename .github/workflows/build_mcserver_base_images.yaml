@@ -51,7 +51,7 @@ jobs:
           #     java_version_component_in_tag + digest pinning で行うこととしている。
           - mcserver_base_image_repo: itzg/minecraft-server
             mcserver_base_image_tag: java8-jdk
-            mcserver_base_image_digest: "sha256:7ed5453100d7562799b9bd87b40f31094fe46f34c42a8eecbe668e95a6037478"
+            mcserver_base_image_digest: "sha256:88dabbde1c5b7c2d8ddfbc8b50f73688c3d7a7989c3273657b0f7bb187641e83"
             java_version_component_in_tag: java8-jdk
           - mcserver_base_image_repo: ghcr.io/giganticminecraft/itzg-minecraft-server
             mcserver_base_image_tag: java17
@@ -59,7 +59,7 @@ jobs:
             java_version_component_in_tag: java17-jdk
           - mcserver_base_image_repo: itzg/minecraft-server
             mcserver_base_image_tag: java21-jdk
-            mcserver_base_image_digest: "sha256:f4ac4b522e1f053ae1ceeafb2a05857db0e81e31633d9e2cb39e39391d4d75d4"
+            mcserver_base_image_digest: "sha256:df8e9f85cac44fb15f3f775c24b5ac0d1913c08bff29d2c143ad68c4ced1d2d6"
             java_version_component_in_tag: java21-jdk
 
     steps:
