@@ -4,7 +4,7 @@ resource "helm_release" "kubernetes_replicator" {
   chart      = "kubernetes-replicator"
   name       = "kubernetes-replicator"
   namespace  = "kube-system"
-  version    = "2.12.4"
+  version    = "2.12.6"
 
   reset_values    = true
   cleanup_on_fail = true
