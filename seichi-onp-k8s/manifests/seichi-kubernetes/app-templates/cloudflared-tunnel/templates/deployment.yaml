@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: cloudflared-tunnel-{{ .Values.installationName }}
-          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2026.10.7@sha256:6fa11893a31fc4c5562ac609c90670b7e4b240827cb714d11da2356300f64d5b"
+          image: "ghcr.io/giganticminecraft/cloudflared-with-auto-dns-route:2026.10.7@sha256:59648fac6a950157412c46efde8578f97604e7f43e398e0a07c34fcd9b86fdf7"
           env:
             - name: TUNNEL_NAME
               value: '{{ required "tunnelNamePrefix is required" .Values.tunnelNamePrefix }}-{{ .Values.installationName }}'
