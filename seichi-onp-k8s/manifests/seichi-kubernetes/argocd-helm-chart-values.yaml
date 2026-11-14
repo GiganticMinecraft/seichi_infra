@@ -63,6 +63,13 @@ configs:
           redirectURIs:
             - https://argo-workflows.onp-k8s.admin.seichi.click/oauth2/callback
           secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
+      # dex.replicas を 2 以上にするための共有ストレージ。既定の memory は Pod ごとに
+      # 状態を持つので、認可リクエストを受けた Pod と callback を受けた Pod が違うと失敗する。
+      # dex.coreos.com の CRD は Dex が起動時に自分で作る (RBAC は chart が描画する)。
+      storage:
+        type: kubernetes
+        config:
+          inCluster: true
     admin.enabled: false
     accounts.mcp-service: apiKey
     accounts.backup-workflow: apiKey
@@ -126,6 +133,12 @@ controller:
 
 dex:
   # イメージは chart の既定値に任せる (固定すると更新が止まり、ベース OS が EOL のまま残る)。
+  # ノード再起動で Dex が退避されている間も SSO ログインを止めない。
+  replicas: 2
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+    unhealthyPodEvictionPolicy: AlwaysAllow
   env:
     - name: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
       valueFrom:
