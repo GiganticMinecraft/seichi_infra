@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
 metadata:
   name: verify-ghcr-image-signatures
   annotations:
@@ -7,36 +7,41 @@ metadata:
     policies.kyverno.io/description: >-
       ghcr.io/giganticminecraft/* のコンテナイメージが
       GitHub Actions の Cosign keyless signing で署名されていることを検証する。
-      署名されていないイメージのデプロイをブロックする。
+      検証結果は Audit として記録し、デプロイはブロックしない。
 spec:
-  validationFailureAction: Audit
-  webhookTimeoutSeconds: 30
-  rules:
-    - name: verify-giganticminecraft-images
-      skipBackgroundRequests: true
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      verifyImages:
-        - mutateDigest: false
-          verifyDigest: true
-          required: true
-          useCache: true
-          # 署名はレガシー Cosign 形式 (sha256-<digest>.sig タグ) を前提とする。
-          # cosign v3 デフォルトの sigstore bundle 形式は、ghcr.io が OCI 1.1
-          # referrers API 非対応のため fallback タグに保存されるが、その index の
-          # descriptor に正しい artifactType が乗らず Kyverno が bundle を発見
-          # できない (type: SigstoreBundle でも検証不可)。このためビルド側は
-          # --new-bundle-format=false でレガシー形式に署名している
-          imageReferences:
-            - "ghcr.io/giganticminecraft/*"
-          attestors:
-            - entries:
-                - keyless:
-                    subjectRegExp: "https://github\\.com/GiganticMinecraft/.+"
-                    issuer: "https://token.actions.githubusercontent.com"
-                    rekor:
-                      url: https://rekor.sigstore.dev
-                  signatureAlgorithm: sha256
+  validationActions: [Audit]
+  webhookConfiguration:
+    timeoutSeconds: 30
+  evaluation:
+    admission:
+      enabled: true
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [pods]
+  matchImageReferences:
+    - glob: "ghcr.io/giganticminecraft/*"
+  validationConfigurations:
+    mutateDigest: false
+    verifyDigest: true
+    required: true
+  # ビルド側の --new-bundle-format=false に対応する Cosign 署名を検証する。
+  attestors:
+    - name: githubActions
+      cosign:
+        keyless:
+          identities:
+            - subjectRegExp: "https://github\\.com/GiganticMinecraft/.+"
+              issuer: "https://token.actions.githubusercontent.com"
+        ctlog:
+          url: https://rekor.sigstore.dev
+  validations:
+    # 通常コンテナだけでなく init / ephemeral コンテナも検証する。
+    - expression: >-
+        (images.containers + images.initContainers + images.ephemeralContainers)
+          .all(image, verifyImageSignatures(image, [attestors.githubActions]) > 0)
+      message: "Image must be signed by GiganticMinecraft GitHub Actions"
