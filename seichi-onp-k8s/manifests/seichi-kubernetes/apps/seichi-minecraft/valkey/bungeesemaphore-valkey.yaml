@@ -8,7 +8,7 @@ spec:
   source:
     chart: valkey
     repoURL: 'https://valkey-io.github.io/valkey-helm'
-    targetRevision: 0.12.1
+    targetRevision: 1.0.0
     helm:
       releaseName: seichi-bungeesemaphore-valkey
       values: |
@@ -17,16 +17,27 @@ spec:
           repository: valkey/valkey
           tag: "9.0.1"
         deploymentStrategy: Recreate
+        # 終了時の RDB 保存とストレージ I/O に猶予を持たせる。
+        terminationGracePeriodSeconds: 120
+        # データ読み込み中は接続を流さず、一時的な遅延で再起動しないようにする。
+        readinessProbe:
+          enabled: true
+          timeoutSeconds: 3
+        livenessProbe:
+          timeoutSeconds: 3
+        startupProbe:
+          timeoutSeconds: 3
+          failureThreshold: 12
         resources:
           requests:
             cpu: "20m"
             memory: "64Mi"
-        valkeyConfig: |
+        extraConfig: |
           notify-keyspace-events "Eg$x"
           maxmemory 2048mb
-        dataStorage:
+        persistence:
           enabled: true
-          requestedSize: 8Gi
+          size: 8Gi
         metrics:
           enabled: true
           exporter:
@@ -43,13 +54,12 @@ spec:
                 memory: "192Mi"
           serviceMonitor:
             enabled: true
-            # chart (valkey-io/valkey-helm) のキーは extraLabels。additionalLabels は無視され、
-            # release ラベルが付かず Prometheus の serviceMonitorSelector から漏れていた
-            extraLabels:
+            # Prometheus の serviceMonitorSelector に合わせる (chart 1.x は labels)
+            labels:
               release: prometheus
           prometheusRule:
             enabled: true
-            extraLabels:
+            labels:
               release: prometheus
             rules:
               - alert: ValkeyDown
