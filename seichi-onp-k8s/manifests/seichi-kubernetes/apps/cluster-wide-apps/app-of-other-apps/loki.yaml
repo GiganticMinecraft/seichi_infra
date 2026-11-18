@@ -117,6 +117,10 @@ spec:
           rules:
             folder: /rules/fake
 
+        gateway:
+          image:
+            tag: 1.31.9-alpine
+
         deploymentMode: SingleBinary
 
         singleBinary:
