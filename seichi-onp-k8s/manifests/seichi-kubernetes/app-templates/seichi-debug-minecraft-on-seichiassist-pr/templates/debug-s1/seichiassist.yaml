@@ -289,7 +289,7 @@ spec:
                 rg flag -w world_SW_the_end __global__ deny-spawn ENDER_DRAGON
                 mv reload
 
-          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:1.0.0@sha256:9dde3ba30e0daf7d9f4a2e8a2652bef9a9966bc98ab8457ed4c4c68bcb25a92d
+          image: ghcr.io/giganticminecraft/seichi_minecraft_server_debug_seichi_1:1.0.0@sha256:ba37e756a5764b2a9ce6e76e35145765010d7b44acaa4834403424401a201ba5
           name: minecraft
           ports:
             - containerPort: 25565
