@@ -110,6 +110,8 @@ runcmd:
   - su - cloudinit -c "curl -sS https://github.com/unchama.keys >> ~/.ssh/authorized_keys"
   - su - cloudinit -c "curl -sS https://github.com/inductor.keys >> ~/.ssh/authorized_keys"
   - su - cloudinit -c "curl -sS https://github.com/kory33.keys >> ~/.ssh/authorized_keys"
+  # agent-seichi: unchama が運用する常時稼働の Claude Code の作業用 VM。GitHub アカウントには登録しない鍵なので直接書く
+  - su - cloudinit -c "echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFTGjUIa3rSXeAJm9WbkdGNZtKAB0P5SHr5K104w+Frv agent-seichi' >> ~/.ssh/authorized_keys"
   - su - cloudinit -c "chmod 600 ~/.ssh/authorized_keys"
   # run install scripts
   - su - cloudinit -c "curl -s ${REPOSITORY_RAW_SOURCE_URL}/seichi-onp-k8s/cluster-boot-up/scripts/nodes/k8s-node-setup.sh > ~/k8s-node-setup.sh"
