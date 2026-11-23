@@ -1,5 +1,5 @@
 FROM ghcr.io/giganticminecraft/chunk-search-rs:sha-265ed4d@sha256:0f0ccab73966d2272bab9bbbc1f7c65245f6b6170db95f11aca20e2f22b740fe AS chunk-search-provider
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:38b1785401dbab5a761afaf01a53ff3b85621cac9f81a9dfd32a3f8975db2240
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:f7acddb08032891933a7d492b0e9f397569e87493b71c568541457ab34072724
 
 ENV VERSION="1.18.2"
 
