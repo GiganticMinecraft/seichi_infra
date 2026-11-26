@@ -53,7 +53,7 @@ spec:
         # proxmox-backup-client / AWS CLI / zstd / python3 は pbs-client イメージに
         # 焼き込まれている。実行時に Proxmox の CDN へ取りに行くと、疎通しない
         # CDN ノードを掴んだときに落ちるため (詳細は docker-images/pbs-client/Dockerfile)。
-        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:5317cb8dd1b71fca693da48d9f6591852d77b9f6edc69c249658d0114a4a7d9b
+        image: ghcr.io/giganticminecraft/pbs-client:1.0.0@sha256:73790750ae5754108ec8ab4bef3c4941f0c4d8a312fdd575ab1eb0259e7e0c84
         command: ["/bin/sh", "-c"]
         source: |
           set -e
