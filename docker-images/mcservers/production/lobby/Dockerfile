@@ -5,7 +5,7 @@ RUN wget \
   -O /root/SrvStopper.jar \
   https://github.com/giganticminecraft/SrvStopper/releases/download/v${SRV_STOPPER_VERSION}/SrvStopper-${SRV_STOPPER_VERSION}.jar
 
-FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:43b929a139b7427d8c77e0f6fa1842b8a29cffbdedca6d4adea284e240838124
+FROM ghcr.io/giganticminecraft/seichi_minecraft_server_base:1.0.0-java17-jdk@sha256:20648ab265991eaac388e97adc6880ad70e71e16406aa57f405d7179fdf7d361
 
 ENV VERSION="1.18.2"
 ENV DIFFICULTY="peaceful"
