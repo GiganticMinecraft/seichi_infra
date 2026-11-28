@@ -11,7 +11,7 @@ resources:
 images:
   - name: controller
     newName: ghcr.io/giganticminecraft/seichi-gateway-operator
-    newTag: latest@sha256:fded55556de4371fb309c35d7029f10c187e2fc6a3637d12cd46a970bcfd09a4
+    newTag: latest@sha256:5adcc46c290d66c4d208f7bc5737cb82838231b0656805529282ab4aa55e58d5
 
 patches:
   # 上流の ServiceMonitor を kube-prometheus-stack の Prometheus (serviceMonitorSelector: release=prometheus) に拾わせる。
