@@ -21,7 +21,7 @@ spec:
     spec:
       initContainers:
         - name: mod-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:65f144cef7d2c68aea868e042ae6346e5555eecd1acaeabebfe554dd7e7487ee
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:6173c3ee7a4d8217a2e529ef72d7c37a3279f3fdd7ecfa2de4d887f470251d61
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
@@ -45,7 +45,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
         - name: seichiassist-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:65f144cef7d2c68aea868e042ae6346e5555eecd1acaeabebfe554dd7e7487ee
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:6173c3ee7a4d8217a2e529ef72d7c37a3279f3fdd7ecfa2de4d887f470251d61
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
@@ -69,7 +69,7 @@ spec:
             - name: mod-downloader-volume
               mountPath: /downloaded-plugins
         - name: world-downloader
-          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:65f144cef7d2c68aea868e042ae6346e5555eecd1acaeabebfe554dd7e7487ee
+          image: ghcr.io/giganticminecraft/mod-downloader:1.0.0@sha256:6173c3ee7a4d8217a2e529ef72d7c37a3279f3fdd7ecfa2de4d887f470251d61
           env:
             - name: S3_ENDPOINT
               value: garage.garage.svc.cluster.local:3900
